@@ -1,0 +1,3292 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Book · Kutralam Ezhilagam</title>
+<link rel="preload" as="image" href="img/logo.webp">
+<link rel="preload" as="image" href="img/hero.webp">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://drive.google.com">
+<style>
+/* Hand-written, inlined on purpose. The Tailwind play CDN compiles in the
+   browser: it is explicitly not for production, it costs a round trip before
+   anything is styled, and if it fails to load — a flaky phone signal, an ISP
+   that blocks it — the guest gets an unstyled page at the moment they are
+   deciding whether to hand over money. A booking page should not have a
+   render-time dependency on somebody else's server. */
+:root{
+  --ink:#1c1917; --mute:#78716c; --line:#e7e5e4; --bg:#faf9f7; --card:#fff;
+  --brand:#047857; --brand-dk:#065f46; --gold:#b45309; --bad:#b91c1c;
+  --r:16px; color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:400 15px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+.wrap{max-width:460px;margin:0 auto;padding:20px 16px 120px}
+h1{margin:.1em 0 0;font-size:27px;font-weight:800;letter-spacing:-.02em}
+.eyebrow{margin:0;font-size:11px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--brand)}
+.sub{margin:.35em 0 0;font-size:12.5px;color:var(--mute)}
+header{margin-bottom:20px}
+
+.steps{display:flex;gap:6px;list-style:none;margin:0 0 18px;padding:0}
+.steps li{flex:1;border-radius:99px;padding:5px 4px;text-align:center;
+  font-size:10px;font-weight:800;background:#e7e5e4;color:var(--mute)}
+.steps li.on{background:var(--ink);color:#fff}
+.steps li.done{background:var(--brand);color:#fff}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:16px;margin-bottom:12px}
+.step{animation:rise .22s ease-out both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+label{display:block}
+.lbl{font-size:11px;font-weight:700;color:var(--mute)}
+input[type=date],input[type=text],input[type=tel],input[type=number],select{
+  width:100%;margin-top:5px;padding:11px 12px;border:1px solid #d6d3d1;
+  border-radius:12px;font-size:16px;font-weight:600;background:#fff;color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--brand);outline-offset:-1px;border-color:transparent}
+select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%2378716c' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.grid2>*{min-width:0}
+.row{display:flex;align-items:center;gap:10px;margin-top:14px}
+.row input[type=checkbox]{width:20px;height:20px;accent-color:var(--brand);margin:0}
+.row .hint{margin-left:auto;font-size:11px;color:var(--mute)}
+.stack>*+*{margin-top:12px}
+
+.opt{display:block;width:100%;text-align:left;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--r);padding:15px;
+  font:inherit;color:inherit;cursor:pointer;transition:.15s}
+.opt:active{transform:scale(.99)}
+.opt.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.opt .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.tag{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+.tag.gold{color:var(--gold)}
+.opt.on .tag{color:#6ee7b7}
+.opt h3{margin:2px 0 0;font-size:16px;font-weight:800}
+.opt p{margin:1px 0 0;font-size:11.5px;color:var(--mute)}
+.opt.on p{color:rgba(255,255,255,.72)}
+.price{font-size:17px;font-weight:800;white-space:nowrap}
+.price small{display:block;font-size:10px;font-weight:400;color:var(--mute)}
+.opt.on .price small{color:rgba(255,255,255,.6)}
+.roomrow{display:flex;align-items:center;gap:12px;padding:13px 15px}
+.roomrow.on{background:#ecfdf5;border-color:var(--brand);color:var(--ink)}
+/* .opt.on turns a package chip dark and paints its text white. A chosen room
+   row keeps a PALE green background, so those same white rules left the floor,
+   the head count and the "/night" suffix invisible on it — and now that chosen
+   rooms sit at the top of the list, those were the first lines a guest read.
+   Put the colour back for this case specifically. */
+.roomrow.on p{color:#3d6152}
+.roomrow.on .price small{color:#3d6152}
+.roomrow.on .more{color:var(--brand)}
+.roomrow.on .rec{background:#fff;color:var(--brand)}
+.roomrow .price{font-size:15px}
+.roomrow .price small{display:inline;font-size:10px}
+.sechead{margin:16px 0 8px;font-size:11px;font-weight:800;letter-spacing:.09em;
+  text-transform:uppercase;color:#a8a29e}
+
+dl{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line);font-size:13.5px}
+dl div{display:flex;justify-content:space-between;padding:3px 0}
+dt{color:var(--mute)} dd{margin:0;font-weight:700}
+dd.big{font-weight:800;color:var(--brand)}
+
+.pay{display:block;border-radius:var(--r);background:var(--brand);color:#fff;
+  padding:16px;text-align:center;font-size:15px;font-weight:800;text-decoration:none;
+  font-family:inherit;border:0;width:100%;cursor:pointer;margin-bottom:10px}
+.pay.off{background:#d6d3d1}
+.ref{width:100%;margin-top:10px;padding:13px;text-align:center;font-size:22px;
+  font-weight:800;letter-spacing:.4em;border:1px solid #d6d3d1;border-radius:12px}
+.note{font-size:12.5px;line-height:1.6;color:#57534e;margin:0}
+.fine{font-size:11px;line-height:1.5;color:#a8a29e;margin:8px 0 0}
+.warn{background:#fffbeb;color:#92400e;border-radius:12px;padding:11px 13px;
+  font-size:12px;font-weight:600;margin:0 0 12px}
+.err{background:#fef2f2;color:var(--bad);border-radius:12px;padding:11px 13px;
+  font-size:12.5px;font-weight:600;margin:0 0 12px}
+
+.pass{background:var(--brand);color:#fff;border-radius:var(--r);padding:20px;margin-bottom:12px}
+.pass .eyebrow{color:#a7f3d0}
+.pass h2{margin:4px 0 0;font-size:22px;font-weight:800;line-height:1.15}
+.pass .rooms{margin:2px 0 0;font-size:13px;color:#d1fae5}
+.passgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;
+  padding-top:13px;border-top:1px solid rgba(255,255,255,.25);font-size:13px}
+.passgrid span{display:block;font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;color:#a7f3d0}
+.passgrid b{font-size:14px;font-weight:800}
+.bookno{margin-top:14px;background:rgba(255,255,255,.15);border-radius:12px;padding:10px 13px}
+.bookno b{display:block;font-size:19px;font-weight:800;letter-spacing:.03em}
+.paid{margin:13px 0 0;font-size:12px;color:#d1fae5}
+.btn-dark{display:block;border-radius:var(--r);background:var(--ink);color:#fff;
+  padding:14px;text-align:center;font-size:14px;font-weight:800;text-decoration:none;margin-bottom:10px}
+.btn-plain{display:block;width:100%;border-radius:var(--r);background:#fff;
+  border:1px solid var(--line);padding:14px;font:inherit;font-size:14px;
+  font-weight:800;color:#44403c;cursor:pointer}
+.closing{margin:14px 4px 0;text-align:center;font-size:11.5px;line-height:1.6;color:var(--mute)}
+.empty{text-align:center;padding:22px 12px}
+.empty b{font-size:16px;font-weight:800}
+.loading{text-align:center;padding:26px;font-size:13px;color:var(--mute)}
+
+#bar{position:fixed;inset:auto 0 0 0;background:rgba(255,255,255,.96);
+  backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:11px 16px;
+  padding-bottom:calc(11px + env(safe-area-inset-bottom))}
+#bar .in{max-width:460px;margin:0 auto;display:flex;gap:8px;align-items:center}
+#back{background:none;border:0;font:inherit;font-size:13px;font-weight:700;
+  color:var(--mute);padding:14px 14px;cursor:pointer}
+#next{flex:1;border:0;border-radius:var(--r);padding:15px;font:inherit;
+  font-size:15px;font-weight:800;color:#fff;background:var(--brand);cursor:pointer}
+#next:disabled{background:#d6d3d1;cursor:default}
+#next:not(:disabled):active{transform:scale(.99)}
+
+#ez-thumb{width:56px;height:56px;border-radius:12px;object-fit:cover;background:#e7e5e4;flex:none}
+.roomrow .meta{min-width:0;flex:1}
+.more{display:block;margin-top:6px;font-size:11px;font-weight:800;color:var(--brand)}
+#sheet{position:fixed;inset:0;z-index:50;background:rgba(28,25,23,.45);
+   display:flex;align-items:flex-end;justify-content:center}
+#sheet .panel{width:100%;max-width:460px;max-height:92vh;overflow-y:auto;background:var(--bg);
+   border-radius:20px 20px 0 0;padding:0 16px 120px;animation:up .24s ease-out both}
+@keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.sheetbar{position:sticky;top:0;background:var(--bg);padding:14px 0 10px;display:flex;
+   align-items:center;gap:10px;z-index:2}
+.sheetbar h2{margin:0;font-size:20px;font-weight:800;flex:1}
+.x{border:0;background:#e7e5e4;color:#57534e;font:inherit;font-size:18px;font-weight:800;
+   width:34px;height:34px;border-radius:99px;cursor:pointer;line-height:1}
+.gal{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;
+   margin:0 -16px;padding:0 16px 4px}
+.gal img{width:84%;flex:none;scroll-snap-align:center;border-radius:14px;
+   aspect-ratio:4/3;object-fit:cover;background:#e7e5e4}
+.vid{position:relative;width:100%;padding-top:56.25%;margin-top:12px;
+   border-radius:14px;overflow:hidden;background:#1c1917}
+.vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.facts{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.facts span{background:#fff;border:1px solid var(--line);border-radius:99px;
+   padding:5px 11px;font-size:11.5px;font-weight:700;color:#57534e}
+.sheetfoot{position:fixed;inset:auto 0 0 0;background:rgba(255,255,255,.97);
+   border-top:1px solid var(--line);padding:11px 16px;
+   padding-bottom:calc(11px + env(safe-area-inset-bottom))}
+.sheetfoot .in{max-width:460px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.sheetfoot .tot{font-size:13px;font-weight:800;white-space:nowrap}
+.sheetfoot .tot small{display:block;font-size:10px;font-weight:400;color:var(--mute)}
+.sheetfoot button{flex:1;border:0;border-radius:var(--r);padding:14px;font:inherit;
+   font-size:14.5px;font-weight:800;color:#fff;background:var(--brand);cursor:pointer}
+#modal{position:fixed;inset:0;z-index:60;background:rgba(28,25,23,.55);
+  display:flex;align-items:center;justify-content:center;padding:18px}
+#modal .mpanel{width:100%;max-width:400px;background:var(--bg);border-radius:20px;
+  padding:22px 20px;animation:pop .2s ease-out both}
+@keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+.mtitle{margin:4px 0 0;font-size:21px;font-weight:800;letter-spacing:-.01em}
+.mgo{width:100%;margin-top:18px;border:0;border-radius:var(--r);background:var(--brand);
+  color:#fff;padding:15px;font:inherit;font-size:15px;font-weight:800;cursor:pointer}
+.mback{width:100%;margin-top:8px;border:0;background:none;color:var(--mute);
+  font:inherit;font-size:12.5px;font-weight:700;padding:8px;cursor:pointer}
+.cnt{display:flex;align-items:center;justify-content:space-between;
+  padding:13px 0;border-bottom:1px solid var(--line)}
+.pm{display:flex;align-items:center;gap:14px}
+.pm button{width:38px;height:38px;border-radius:99px;border:1px solid #d6d3d1;
+  background:#fff;font:inherit;font-size:20px;font-weight:700;color:var(--ink);cursor:pointer;line-height:1}
+.pm button:active{background:#e7e5e4}
+.pm b{min-width:22px;text-align:center;font-size:17px;font-weight:800}
+.rec{display:inline-block;margin-left:6px;background:#d1fae5;color:#065f46;
+  border-radius:99px;padding:2px 8px;font-size:9.5px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;vertical-align:2px}
+/* The logo, not a banner. It carries its own transparency, so it needs no
+   card, no corner radius and no background — it sits directly on whatever is
+   behind it. Sized by height rather than width, because height is what has to
+   agree with the text under it. */
+.mark{display:block;height:52px;width:auto;max-width:100%;margin:0 auto 8px}
+.markxs{display:block;height:26px;width:auto;flex:none;margin:0}
+.hero{display:block;width:100%;height:auto;border-radius:var(--r);
+  margin:0 0 14px;background:#e7e5e4}
+header{margin-bottom:10px;text-align:center}
+#modal .mark{height:50px;margin:2px auto 12px}
+#modal .eyebrow{text-align:center}
+#modal .mtitle{text-align:center}
+/* the count of steps sits directly under the logo, so the eye goes
+   logo -> where am I -> what is being asked */
+.stepof{text-align:center;margin:0 0 9px;color:var(--mute)}
+.award{margin:22px 0 0;padding:0}
+.award img{display:block;width:100%;height:auto;border-radius:var(--r);background:#e7e5e4}
+.award figcaption{margin-top:7px;text-align:center;font-size:11px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.waitcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:26px 20px;text-align:center;margin-bottom:12px}
+.waitcard h2{margin:14px 0 0;font-size:18px;font-weight:800}
+.waitcard .fine{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.spin{width:34px;height:34px;margin:0 auto;border-radius:99px;
+  border:3px solid #e7e5e4;border-top-color:var(--brand);animation:sp .9s linear infinite}
+.spin.off{border-top-color:#b45309;animation:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* The voucher. Yellowish brown, as asked — warm paper rather than the green
+   the rest of the flow uses, so the thing the guest keeps looks like a
+   document and not like another screen. */
+.voucher{background:linear-gradient(160deg,#8a5a1c 0%,#6f4715 55%,#5a390f 100%);
+  color:#fdf6e8;border-radius:var(--r);padding:20px;margin-bottom:12px;
+  box-shadow:0 8px 24px rgba(90,57,15,.22)}
+.vhead{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.vmark{width:150px;height:auto;border-radius:8px;display:block}
+.vstamp{flex:none;background:rgba(253,246,232,.16);border:1px solid rgba(253,246,232,.4);
+  color:#fdf6e8;border-radius:99px;padding:5px 11px;font-size:10px;font-weight:800;
+  letter-spacing:.07em;text-transform:uppercase}
+.vname{margin:16px 0 0;font-size:22px;font-weight:800;line-height:1.15}
+.vrooms{margin:2px 0 0;font-size:13.5px;color:#f0dcbb}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;
+  padding-top:14px;border-top:1px solid rgba(253,246,232,.28)}
+.vgrid span{display:block;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#e3c79a}
+.vgrid b{font-size:13.5px;font-weight:800}
+.vno{margin-top:14px;background:rgba(253,246,232,.14);border-radius:12px;padding:10px 13px}
+.vno span{display:block;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#e3c79a}
+.vno b{display:block;font-size:19px;font-weight:800;letter-spacing:.04em}
+.vpaid{margin:13px 0 0;font-size:12.5px;color:#f0dcbb}
+.vconf{margin:6px 0 0;font-size:11px;font-weight:700;color:#bff0cf}
+@media print{.voucher{box-shadow:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media print{#bar,.btn-dark,.btn-plain{display:none}}
+
+/* Hover preview, asked for on 1 Sep. Only where there is a real pointer:
+   a phone has nothing to hover with, so on a phone this costs nothing and
+   tapping "Photos & walkthrough" does the same job. */
+@media (hover:hover) and (pointer:fine){
+  .roomrow{position:relative}
+  .rpop{position:absolute;left:58px;bottom:calc(100% - 8px);z-index:40;width:236px;
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:6px;
+    box-shadow:0 14px 34px rgba(41,37,36,.24);pointer-events:none;
+    opacity:0;transform:translateY(6px);transition:opacity .16s ease,transform .16s ease}
+  .rpop.show{opacity:1;transform:translateY(0)}
+  .rpop img{width:100%;height:132px;object-fit:cover;border-radius:9px;display:block;background:#efe9e2}
+  .rpop b{display:block;font-size:11.5px;font-weight:700;padding:6px 4px 1px;color:#57534e}
+  .rpop i{display:block;font-style:normal;font-size:10.5px;padding:0 4px 4px;color:#8b8279}
+}
+@media (hover:none){.rpop{display:none}}
+
+/* The voucher as a picture. The card above it is the readable version; this
+   is the one that goes into the guest's gallery and into WhatsApp. Drawn at
+   1080x1920 so it stays sharp when it is forwarded and re-compressed. */
+#vcanvas{display:none}
+.vdl{display:block;width:100%;margin-top:8px}
+.amen{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.amen span{background:#f3f0ec;border:1px solid var(--line);border-radius:99px;
+  padding:5px 10px;font-size:11.5px;font-weight:600;color:#57534e}
+.bedline{margin:12px 0 0;font-size:12.5px;color:#57534e}
+.bedline b{font-weight:800}
+
+/* The voucher on screen is the canvas itself. */
+#voucher{border-radius:var(--r);overflow:hidden;margin-bottom:10px;
+  box-shadow:0 10px 28px rgba(90,57,15,.28);background:#140A02}
+#voucher canvas{display:block;width:100%;height:auto}
+.vref{margin:0 0 12px;font-size:12.5px;color:#78716c;text-align:center}
+.vref b{color:var(--ink);font-weight:800;letter-spacing:.03em}
+
+/* Paying: the button, the way out of the button, and the code. */
+.qrbox{background:#fff;border:1px solid var(--line);border-radius:var(--r);
+  padding:18px 16px;text-align:center;margin-bottom:12px}
+.qrhead{margin:0 0 12px;font-size:11px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--mute)}
+.qrbox canvas{display:block;width:100%;max-width:238px;height:auto;margin:0 auto;
+  image-rendering:pixelated;image-rendering:crisp-edges}
+.qramt{margin:14px 0 0;font-size:14px;font-weight:700}
+.qrvpa{margin:4px 0 12px;font-size:13.5px;font-weight:800;color:var(--brand);
+  word-break:break-all}
+.qrvpa span{display:block;font-size:11.5px;font-weight:600;color:var(--mute);
+  margin-top:2px}
+
+/* Where the money goes. Two small buttons rather than a dropdown: on a payment
+   screen the guest should be able to see both answers at once without opening
+   anything, and the one that is selected has to be readable at a glance. */
+/* A personal UPI handle shows the account holder's name, not the hotel's, and
+   the guest sees it at the exact moment they are deciding whether this is a
+   real hotel. Saying it first, on our own page, costs one line. Letting them
+   meet it cold on the payment screen costs the booking, and leaves nothing in
+   any log to say why. */
+.qrwho{margin:-6px 0 12px;font-size:12px;line-height:1.45;color:var(--mute)}
+.qrwho b{color:var(--ink);font-weight:700}
+
+.payee{display:flex;gap:8px;justify-content:center;margin:12px 0 0;flex-wrap:wrap}
+.payee-b{flex:1 1 auto;min-width:118px;min-height:38px;padding:8px 12px;
+  border:1px solid var(--line);border-radius:999px;background:#fff;
+  font:inherit;font-size:12px;font-weight:700;color:var(--mute);cursor:pointer}
+.payee-b.on{border-color:var(--brand);background:var(--brand);color:#fff}
+.payee-b:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+/* Two ways to pay, and they are not equivalent: UPI goes straight to the
+   hotel, a card goes through a gateway. The page says which is which rather
+   than presenting them as interchangeable. */
+.railhead{margin:0 0 7px;font-size:11px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--mute)}
+.railsplit{display:flex;align-items:center;gap:11px;margin:0 0 10px;color:var(--mute)}
+.railsplit:before,.railsplit:after{content:"";flex:1;height:1px;background:var(--line)}
+.railsplit span{font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+
+/* The card rail, in the logo's sky blue, so the two ways to pay are told
+   apart by colour as well as by wording — green is the hotel's own money in,
+   blue is the gateway. Same height and weight as the UPI button: one is not
+   being nudged over the other. */
+.paycard{display:block;width:100%;border:0;border-radius:var(--r);
+  background:linear-gradient(180deg,#0EA5E9,#0284C7);color:#fff;
+  padding:16px;text-align:center;font-size:15px;font-weight:800;
+  font-family:inherit;cursor:pointer;margin:0 0 14px;
+  box-shadow:0 2px 10px rgba(2,132,199,.28)}
+.paycard:active{background:#0369A1;box-shadow:none}
+.paycard:disabled{background:#bae6fd;color:#0c4a6e;box-shadow:none}
+.payrow dt{font-weight:800;color:var(--ink)}
+.payrow dd.big{font-size:20px}
+.sechead.picked{color:var(--brand)}
+
+/* ══ voucher card — every selector scoped to #vcard ══ */
+#vcard{
+  --vv-paper:#FDFBF7;
+  --vv-card:#FFFDF9;
+  --vv-ink:#1A1A1A;
+  --vv-ink-2:#5C5344;
+  --vv-ink-3:#6B6153;
+  --vv-gold:#C5A869;
+  --vv-gold-dk:#9A7F42;
+  --vv-line:#EDE6D8;
+
+  /* pulled from the logo */
+  --vv-cyan:#00A3E0;
+  --vv-green:#00A651;
+  --vv-red:#ED1C24;
+
+  --vv-paid:#0F7A3D;      /* darkened from the logo green: #00A651 on cream is
+                          2.4:1 and fails on a phone in daylight. The brand
+                          green stays for rules and dots, never for a value. */
+  --vv-r:16px;
+  --vv-serif:"Cormorant Garamond","Times New Roman",Georgia,serif;
+}
+
+
+/* Every element here that toggles sets its own display, which outranks the
+   user agent's [hidden] rule. Without !important the code and its fallback
+   are both on screen at once. */
+#vcard [hidden]{display:none !important}
+
+
+
+/* 9:16-ish column, centred on anything wider than a phone */
+
+
+/* ── The card ─────────────────────────────────────────────────────────── */
+#vcard .v-card{
+  position:relative;background:var(--vv-card);border-radius:var(--vv-r);
+  border:1px solid var(--vv-gold);
+  box-shadow:0 10px 30px rgba(60,45,20,.09), 0 2px 6px rgba(0,0,0,.04);
+  overflow:hidden;
+}
+/* the second line of the double frame, inset */
+#vcard .v-card::before{
+  content:"";position:absolute;inset:6px;border:1px solid rgba(197,168,105,.42);
+  border-radius:11px;pointer-events:none;z-index:2;
+}
+/* the watermark: the property, held at 6% behind everything */
+#vcard .v-card::after{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:var(--vv-wm) center / cover no-repeat;
+  opacity:.055;
+}
+#vcard .v-card > *{position:relative;z-index:1}
+
+/* delicate corner accents, drawn with borders so nothing depends on a font */
+#vcard .v-corner{position:absolute;width:26px;height:26px;z-index:3;pointer-events:none}
+#vcard .v-corner i{position:absolute;inset:0;border:0 solid var(--vv-gold);border-radius:3px}
+#vcard .v-corner.tl{top:12px;left:12px}      .v-corner.tl i{border-top-width:2px;border-left-width:2px}
+#vcard .v-corner.tr{top:12px;right:12px}     .v-corner.tr i{border-top-width:2px;border-right-width:2px}
+#vcard .v-corner.bl{bottom:12px;left:12px}   .v-corner.bl i{border-bottom-width:2px;border-left-width:2px}
+#vcard .v-corner.br{bottom:12px;right:12px}  .v-corner.br i{border-bottom-width:2px;border-right-width:2px}
+
+#vcard .v-pad{padding:26px 20px 22px}
+
+/* ── Header ───────────────────────────────────────────────────────────── */
+#vcard .v-hdr{text-align:center}
+#vcard .v-hdr h1{
+  margin:0;font-family:var(--vv-serif);font-weight:700;
+  font-size:clamp(26px,7.6vw,32px);line-height:1.1;
+  letter-spacing:.14em;color:var(--vv-gold-dk);
+}
+#vcard .v-hdr h2{
+  margin:8px 0 0;font-size:clamp(15px,4.2vw,17px);font-weight:800;
+  letter-spacing:.19em;color:var(--vv-ink);
+}
+#vcard .v-tick{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  margin-top:12px;padding:6px 14px;border-radius:99px;
+  background:rgba(15,122,61,.09);border:1px solid rgba(15,122,61,.28);
+  font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--vv-paid);
+}
+#vcard .v-tick svg{width:13px;height:13px}
+
+#vcard .v-rule{display:flex;align-items:center;gap:10px;margin:18px 0}
+#vcard .v-rule::before, #vcard .v-rule::after{
+  content:"";flex:1;height:1px;
+  background:linear-gradient(90deg,transparent,var(--vv-gold),transparent);
+}
+#vcard .v-rule i{width:5px;height:5px;transform:rotate(45deg);background:var(--vv-gold)}
+
+/* ── Brand ────────────────────────────────────────────────────────────── */
+#vcard .v-brand{text-align:center}
+#vcard .v-brand img{width:186px;max-width:62%;height:auto;display:block;margin:0 auto}
+#vcard .v-brand p{
+  margin:10px 0 0;font-size:10.5px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--vv-gold-dk);
+}
+
+/* ── Guest ────────────────────────────────────────────────────────────── */
+#vcard .v-guest{text-align:center;margin-top:18px}
+#vcard .v-guest .v-nm{
+  margin:0;font-family:var(--vv-serif);font-weight:700;
+  font-size:clamp(23px,6.4vw,26px);line-height:1.2;
+  /* a long Tamil name must wrap, not push the card sideways */
+  overflow-wrap:anywhere;
+}
+#vcard .v-guest .v-ph{
+  margin:4px 0 0;font-size:15px;color:var(--vv-ink-2);
+  font-variant-numeric:tabular-nums;
+}
+#vcard .v-guest .v-ph a{color:inherit;text-decoration:none}
+
+/* ── Stay block ───────────────────────────────────────────────────────── */
+#vcard .v-stay{
+  margin-top:18px;border:1px solid var(--vv-line);border-radius:14px;
+  background:rgba(255,255,255,.72);overflow:hidden;
+}
+/* The first cut put the booking id in a 96px column beside the stay, and on a
+   390 that broke "WSEP10061" across two lines and pushed "10:00 AM" onto its
+   own. Stacking the id above a two-column date pair gives every value the full
+   width of the card and removes the wrap entirely — the times are the thing a
+   guest checks twice, so they get the room. */
+#vcard .v-stay .v-idrow{padding:14px 15px 0}
+#vcard .v-stay .v-top{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:12px;padding:12px 15px 14px;
+}
+#vcard .v-stay .v-top > div{min-width:0}
+#vcard .v-tail{padding:0 15px 14px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px;flex-wrap:wrap}
+#vcard .v-lbl{
+  font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--vv-gold-dk);margin:0 0 5px;
+}
+#vcard .v-bid{
+  margin:0;font-size:clamp(20px,5.6vw,24px);font-weight:800;letter-spacing:.02em;
+  white-space:nowrap;
+}
+#vcard .v-divider{border-left:1px solid var(--vv-line);padding-left:12px}
+#vcard .v-big{margin:0;font-size:clamp(16px,4.4vw,18px);font-weight:800;line-height:1.3}
+#vcard .v-big span{display:block;font-size:.86em;font-weight:700;color:var(--vv-ink-2)}
+#vcard .v-sm{margin:3px 0 0;font-size:13.5px;color:var(--vv-ink-2)}
+#vcard .v-room{
+  display:inline-block;margin:0;padding:3px 10px;border-radius:99px;
+  background:rgba(0,163,224,.10);border:1px solid rgba(0,163,224,.30);
+  font-size:13.5px;font-weight:800;color:#04627F;
+}
+#vcard .v-addr{
+  margin:0;padding:12px 15px 14px;border-top:1px solid var(--vv-line);
+  text-align:center;font-size:12px;line-height:1.5;color:var(--vv-ink-2);
+}
+
+/* ── Money ────────────────────────────────────────────────────────────── */
+#vcard .v-pay{margin-top:16px;border:1px solid var(--vv-line);border-radius:14px;
+  background:rgba(255,255,255,.72);padding:14px 15px}
+#vcard .v-pay h3{margin:0 0 10px;text-align:center}
+#vcard .v-row{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:7px 0;border-bottom:1px dashed var(--vv-line);
+}
+#vcard .v-row:last-of-type{border-bottom:0}
+#vcard .v-row .v-k{font-size:14px;color:var(--vv-ink-2)}
+#vcard .v-row .v-v{font-size:17px;font-weight:800;text-align:right;
+  font-variant-numeric:tabular-nums}
+#vcard .v-v.v-ok{color:var(--vv-paid)}
+#vcard .v-v.v-due{color:#8A5A12}
+#vcard .v-badge{
+  display:inline-block;padding:4px 12px;border-radius:99px;font-size:13px;
+  font-weight:800;background:rgba(15,122,61,.10);color:var(--vv-paid);
+  border:1px solid rgba(15,122,61,.30);
+}
+#vcard .v-badge.v-part{background:rgba(138,90,18,.10);color:#8A5A12;
+  border-color:rgba(138,90,18,.32)}
+#vcard .v-stamp{margin:10px 0 0;text-align:center;font-size:11.5px;color:var(--vv-paid)}
+
+/* ── The QR, which owns the bottom of the screen ──────────────────────── */
+#vcard .v-scan{margin-top:18px;margin-left:-10px;margin-right:-10px}
+#vcard .v-scan .v-frame{
+  position:relative;border:2px solid var(--vv-gold);border-radius:14px;
+  background:#fff;padding:12px;
+}
+#vcard .v-scan canvas, #vcard .v-scan .v-ref{
+  display:block;width:100%;height:auto;
+  /* square, full width — the whole point is that a desk scanner reads it off
+     a dim screen at arm's length without anybody pinching to zoom */
+  aspect-ratio:1/1;
+  image-rendering:pixelated;      /* never blur the modules on scaling up */
+}
+#vcard .v-scan .v-ref{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;text-align:center;aspect-ratio:auto;padding:26px 14px;
+}
+#vcard .v-scan .v-ref b{font-size:clamp(30px,9vw,40px);letter-spacing:.02em;
+  overflow-wrap:anywhere}
+#vcard .v-scan .v-cap{margin:11px 10px 0;text-align:center;font-size:12.5px;color:var(--vv-ink-2)}
+#vcard .v-scan .v-tok{
+  margin:6px 10px 0;text-align:center;font-size:14px;font-weight:800;
+  letter-spacing:.08em;font-variant-numeric:tabular-nums;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────── */
+#vcard .v-foot{margin-top:18px;text-align:center}
+#vcard .v-foot .v-terms{margin:0;font-size:11.5px;line-height:1.6;color:var(--vv-ink-3)}
+#vcard .v-foot .v-terms b{color:#9A3412}
+#vcard .v-wa{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:14px;min-height:52px;padding:11px 18px;border-radius:13px;
+  background:#0F7A3D;color:#fff;text-decoration:none;
+  font-size:15px;font-weight:800;line-height:1.25;
+}
+#vcard .v-wa small{display:block;font-size:13px;font-weight:700;opacity:.9;
+  font-variant-numeric:tabular-nums}
+#vcard .v-wa svg{width:19px;height:19px;flex:0 0 auto}
+#vcard .v-tiny{margin:14px 0 0;font-size:10.5px;color:var(--vv-ink-3)}
+
+
+
+
+
+
+
+/* ── Print / save as PDF ──────────────────────────────────────────────── */
+
+</style>
+</head>
+<body>
+
+<!-- ────────────────────────────────────────────────────────────────────
+     CONFIG — the values that are Rakesh's, not mine.
+
+     UPI_VPA is a PAYEE address: it can only receive. It is not a credential
+     and it belongs in the page, which is why it is here in plain sight rather
+     than hidden somewhere clever. Given by Rakesh on 1 Sep 2026.
+
+     The one thing to know about it: the guest's UPI app does not show
+     UPI_NAME. It shows whatever name HDFC holds against that handle. If that
+     reads as a person rather than the hotel, some guests will stop at the
+     confirmation screen — which is a booking lost silently, with nothing in
+     any log to say why.
+     ──────────────────────────────────────────────────────────────────── -->
+<script>
+const CFG = {
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwUVyNn9AIKvCpF2SQRsTqyepZgqwhOIeWCJt25YT5wyC3pp0fWayuTSDTvlwmD24Ww/exec",
+  /* WHERE THE MONEY LANDS.
+     First in the list is the one the guest gets by default. Rakesh,
+     7 Sep 2026: "have both but prefer having HDFC since gpay does not
+     approve the earlier UPI transfer" — so HDFC leads and the Google Pay
+     Business handle stays as the second option rather than being deleted.
+
+     `name` is NOT what the guest sees. Their app shows whatever name the
+     bank holds against the handle, and for the HDFC one that is a person,
+     "V P RAKESH" — read off Rakesh's own QR, not guessed. It is written
+     here so the page can say the same thing the guest is about to see on
+     their payment screen. A page that promises "Kutralam Ezhilagam" and
+     then shows a personal name is how somebody stops at the last step.
+
+     `mcc` is a merchant category and only a business handle may carry one.
+     The HDFC handle's own QR says mc=0000 — a person-to-person address —
+     so it is left blank here, and upiUrl() then omits `mc` and `tr`
+     entirely rather than sending fields some apps reject on a P2P intent.
+
+     Whichever handle is used, the booking only reconciles when a credit
+     notification for THAT account reaches the watched phone and lands in
+     the Gpay tab. Adding a handle here does not add it to the macro. */
+  UPI: [
+    { vpa:"9840213184@hdfc",      name:"V P RAKESH",         mcc:"",     bank:"HDFC" },
+    { vpa:"9840213184@okbizaxis", name:"Kutralam Ezhilagam", mcc:"7011", bank:"Google Pay Business" }
+  ],
+  UPI_PHONE:  "+91 98402 13184",        /* shown beside the handle on the QR */
+  BRAND:      "Kutralam Ezhilagam",     /* the hotel's name, for the card gateway */
+  /* Cards and net banking go through Razorpay because there is no other way
+     to take them. UPI does NOT: it goes straight to the handle above, free
+     and instant, and Razorpay's checkout is told to refuse it. Razorpay's
+     platform fee is about 2% plus GST on every method including UPI, so
+     letting it take a UPI payment would be paying roughly 2.36% for something
+     that costs nothing two lines up. */
+  RZP_ENABLED: true,
+  RZP_JS:      "https://checkout.razorpay.com/v1/checkout.js",
+  DESK_WA:    "919962222415",           /* the number the guest is told to message */
+  ADVANCE_PC: 60,                       /* % taken when the guest chooses to pay part */
+  /* n8n. Leave blank and the page talks to Apps Script directly, exactly as
+     before — n8n is an addition, not a dependency. Fill it in and every
+     booking goes through the workflow instead, with the direct call kept as
+     the fallback if n8n is unreachable. A booking must never be lost
+     because an automation server was restarting. */
+  N8N_WEBHOOK: "",
+
+  /* Printed on the voucher under INCLUDED. Say only what every room really
+     has — this is the one line on the card a guest can hold you to at the
+     desk. Leave it blank and the row is not drawn at all. */
+  INCLUDED: "Wi-Fi · Family Friendly · 24/7 Power Backup · Hot Water"
+};
+
+/* The rate card. Public prices, so they belong in the page — but they are a
+   COPY of the sheet's, and a copy can drift. If a tariff changes, it changes
+   in two places. Worth an endpoint later; not worth blocking this on. */
+const ROOMS = [
+  { name:"Aambal", rate:1199, pax:2, type:"Studio", floor:"Ground", ac:false, beds:false,
+    video:"_oAx9wZhcNs", photos:["https://drive.google.com/thumbnail?id=1Q0XMZxhI0p9kvVHtaPquFPk4cdkuUdL6&sz=w800", "https://drive.google.com/thumbnail?id=1qmtx7iUM-g24D-8r7POF6ErVCZExLxFH&sz=w800"], thumbs:["https://drive.google.com/thumbnail?id=1Q0XMZxhI0p9kvVHtaPquFPk4cdkuUdL6&sz=w160", "https://drive.google.com/thumbnail?id=1qmtx7iUM-g24D-8r7POF6ErVCZExLxFH&sz=w160"],
+    amen:["Garden facing","Ground floor — no stairs"], bed:"One double bed",
+    desc:"Compact studio for one or two, opening on to the garden. No air conditioning." },
+  { name:"Thillai", rate:1899, pax:4, type:"Studio", floor:"Ground", ac:true, beds:true,
+    video:"JI6k7zTDtNI", photos:["https://drive.google.com/thumbnail?id=19sS4VUH5c9rmW_Q2x9QC8WkU5A8ADOhu&sz=w800"], thumbs:["https://drive.google.com/thumbnail?id=19sS4VUH5c9rmW_Q2x9QC8WkU5A8ADOhu&sz=w160"],
+    amen:["Ground floor — no stairs","Family sized"], bed:"Double cots · extra beds on request",
+    desc:"Ground-floor studio with room for a family of four." },
+  { name:"Marutham", rate:2099, pax:4, type:"Studio", floor:"Second", ac:true, beds:true,
+    video:"2zSyiaMIdO4", photos:["https://drive.google.com/thumbnail?id=1rVz-A0WTs4YtjLGUn8CYuHuAQ3pGKKlg&sz=w800", "https://drive.google.com/thumbnail?id=1xfArTBzFiroMyi3LMQOaPgewEEER0rZl&sz=w800", "https://drive.google.com/thumbnail?id=1sYXPV5p2RQjIVLQ1UXREpe35BITabfrp&sz=w800"], thumbs:["https://drive.google.com/thumbnail?id=1rVz-A0WTs4YtjLGUn8CYuHuAQ3pGKKlg&sz=w160", "https://drive.google.com/thumbnail?id=1xfArTBzFiroMyi3LMQOaPgewEEER0rZl&sz=w160", "https://drive.google.com/thumbnail?id=1sYXPV5p2RQjIVLQ1UXREpe35BITabfrp&sz=w160"],
+    amen:["Balcony over the grounds"], bed:"Double cots · extra beds on request",
+    desc:"Second-floor studio with a balcony over the grounds." },
+  { name:"Mullai", rate:2199, pax:4, type:"Studio", floor:"Second", ac:true, beds:true,
+    video:"LaAJmEnBzKU", photos:["https://drive.google.com/thumbnail?id=1BYNx533kDTUQ3hvmVKwZPdCAU4IuW8tA&sz=w800", "https://drive.google.com/thumbnail?id=162pwp5YpVnuljyziHDVNtyqsFFJR3z0h&sz=w800"], thumbs:["https://drive.google.com/thumbnail?id=1BYNx533kDTUQ3hvmVKwZPdCAU4IuW8tA&sz=w160", "https://drive.google.com/thumbnail?id=162pwp5YpVnuljyziHDVNtyqsFFJR3z0h&sz=w160"],
+    amen:["Quietest room · furthest from the road"], bed:"Double cots · extra beds on request",
+    desc:"Quiet second-floor studio, the furthest from the road." },
+  { name:"Paalai", rate:2699, pax:5, type:"Studio", floor:"First", ac:true, beds:true,
+    video:"koIl5BPC6YA", photos:["https://drive.google.com/thumbnail?id=1w0pfUMNecnKvaQSMN4pzXs66nrxZa_Vn&sz=w800", "https://drive.google.com/thumbnail?id=1PwgfKiT2R5ZxwYYjT179Kgoj-CvhUoDe&sz=w800"], thumbs:["https://drive.google.com/thumbnail?id=1w0pfUMNecnKvaQSMN4pzXs66nrxZa_Vn&sz=w160", "https://drive.google.com/thumbnail?id=1PwgfKiT2R5ZxwYYjT179Kgoj-CvhUoDe&sz=w160"],
+    amen:["First floor"], bed:"Double cots · extra beds on request",
+    desc:"First-floor studio with double cots \u2014 comfortable for five." },
+  { name:"Kurinji", rate:2899, pax:5, type:"Studio", floor:"Second", ac:true, beds:true,
+    video:"17MDHAKBoG4", photos:["https://drive.google.com/thumbnail?id=1BQUwK1qb5HTYFXqflPSXprEFF20MMNhV&sz=w800", "https://drive.google.com/thumbnail?id=1Q-tS9PQOKOsEp4D3wC1s_zl8Wb9WONIf&sz=w800", "https://drive.google.com/thumbnail?id=1RPxqylGCFSJea3Jg8lDG_Tukvf1SLltx&sz=w800", "https://drive.google.com/thumbnail?id=1uLCLAzMnzAykCofgVNcNip5CYemSEBHc&sz=w800"], thumbs:["https://drive.google.com/thumbnail?id=1BQUwK1qb5HTYFXqflPSXprEFF20MMNhV&sz=w160", "https://drive.google.com/thumbnail?id=1Q-tS9PQOKOsEp4D3wC1s_zl8Wb9WONIf&sz=w160", "https://drive.google.com/thumbnail?id=1RPxqylGCFSJea3Jg8lDG_Tukvf1SLltx&sz=w160", "https://drive.google.com/thumbnail?id=1uLCLAzMnzAykCofgVNcNip5CYemSEBHc&sz=w160"],
+    amen:["Mountain view"], bed:"Double cots · extra beds on request",
+    desc:"Second-floor double-cot room with the mountain view." },
+  { name:"Shenbagam", rate:4599, pax:10, type:"Suite", floor:"First", ac:false, beds:true,
+    video:"-13te1AytlM", photos:["https://drive.google.com/thumbnail?id=1D45yMWOpOViryCRSuiYRbIH9921v3Ek-&sz=w800", "https://drive.google.com/thumbnail?id=120Uz9w0P54s6ja-1aJ1WOWykgPZgVPIz&sz=w800", "https://drive.google.com/thumbnail?id=1axzG_LYz8uZT4VfUk-JTnSqsJshqFIHh&sz=w800", "https://drive.google.com/thumbnail?id=1J5PuzP3obYejKr-TG3YtLryPnYYN0l8m&sz=w800", "https://drive.google.com/thumbnail?id=15TMCieRDAyZat18RsWhEQrxiqXdDZkLl&sz=w800", "https://drive.google.com/thumbnail?id=1iJA-QMD8H4SghehuZzgeeoR19gg7N6aL&sz=w800"], thumbs:["https://drive.google.com/thumbnail?id=1D45yMWOpOViryCRSuiYRbIH9921v3Ek-&sz=w160", "https://drive.google.com/thumbnail?id=120Uz9w0P54s6ja-1aJ1WOWykgPZgVPIz&sz=w160", "https://drive.google.com/thumbnail?id=1axzG_LYz8uZT4VfUk-JTnSqsJshqFIHh&sz=w160", "https://drive.google.com/thumbnail?id=1J5PuzP3obYejKr-TG3YtLryPnYYN0l8m&sz=w160", "https://drive.google.com/thumbnail?id=15TMCieRDAyZat18RsWhEQrxiqXdDZkLl&sz=w160", "https://drive.google.com/thumbnail?id=1iJA-QMD8H4SghehuZzgeeoR19gg7N6aL&sz=w160"],
+    amen:["Own kitchen","Suite"], bed:"Double cots · extra beds on request",
+    desc:"Premium suite with its own kitchen. No air conditioning." },
+  { name:"Mavval", rate:4899, pax:10, type:"Suite", floor:"First", ac:true, beds:true,
+    video:"3e-ED3Gyz4c", photos:["https://drive.google.com/thumbnail?id=1BeUaSgD6X35Hs1MiGZLDhZL1wcKtVeBD&sz=w800", "https://drive.google.com/thumbnail?id=1JJOkMPlDh0qbPcGoD_2Jq2jnFO8vuQTp&sz=w800", "https://drive.google.com/thumbnail?id=1S5N6Q_Qt4YZNR6tnZ6zIw6UVsfccz76B&sz=w800", "https://drive.google.com/thumbnail?id=1HmqDf9bsgWhL4A70VsNBNXruNN0ERhPF&sz=w800"], thumbs:["https://drive.google.com/thumbnail?id=1BeUaSgD6X35Hs1MiGZLDhZL1wcKtVeBD&sz=w160", "https://drive.google.com/thumbnail?id=1JJOkMPlDh0qbPcGoD_2Jq2jnFO8vuQTp&sz=w160", "https://drive.google.com/thumbnail?id=1S5N6Q_Qt4YZNR6tnZ6zIw6UVsfccz76B&sz=w160", "https://drive.google.com/thumbnail?id=1HmqDf9bsgWhL4A70VsNBNXruNN0ERhPF&sz=w160"],
+    amen:["Suite","Family sized"], bed:"Double cots · extra beds on request",
+    desc:"Premium first-floor suite for a large family." },
+  { name:"Vaagai", rate:5499, pax:15, type:"Suite", floor:"Ground", ac:true, beds:true,
+    video:"YaJNIivvbhQ", photos:["https://drive.google.com/thumbnail?id=1nkvq8Ft_f-LtukBmDOTeSijV1Eq2XbEL&sz=w800", "https://drive.google.com/thumbnail?id=1elrqhi5avV7zGIAgfXTK4Y5sBPiu4FwK&sz=w800", "https://drive.google.com/thumbnail?id=1zF59wijXaM36atAmP28pdp6d2_6nr_s3&sz=w800", "https://drive.google.com/thumbnail?id=17fG-coc4cfDGs0syomz-LItA81vPBNVJ&sz=w800"], thumbs:["https://drive.google.com/thumbnail?id=1nkvq8Ft_f-LtukBmDOTeSijV1Eq2XbEL&sz=w160", "https://drive.google.com/thumbnail?id=1elrqhi5avV7zGIAgfXTK4Y5sBPiu4FwK&sz=w160", "https://drive.google.com/thumbnail?id=1zF59wijXaM36atAmP28pdp6d2_6nr_s3&sz=w160", "https://drive.google.com/thumbnail?id=17fG-coc4cfDGs0syomz-LItA81vPBNVJ&sz=w160"],
+    amen:["Largest room in the house","Ground floor — no stairs"], bed:"Double cots · extra beds on request",
+    desc:"The largest room in the house \u2014 ground-floor suite, sleeps up to fifteen." },
+];
+const AC_ADDON = { Studio: 500, Suite: 1000 };
+/* Same four the staff app offers, so the register reads identically whether
+   the booking came from the desk or from this page. */
+const ID_TYPES = ["Aadhaar", "Driving License", "Passport", "Voter ID"];
+</script>
+
+<script>
+/* ── A QR encoder, byte mode, error correction level M ────────────────────
+ *
+ * Inlined rather than fetched. This draws the code a guest scans to pay us;
+ * if it came from a CDN then the one moment it is needed — the UPI app
+ * failed to open — is exactly the moment a second network request is least
+ * likely to succeed. Versions 1 to 13 cover any UPI string this page builds.
+ *
+ * Verified against the reference implementation module-for-module; see
+ * qr/verify_qr.mjs. */
+const QR = (() => {
+  /* EC level M: [ec codewords per block, [ [blocks, data codewords], ... ] ] */
+  const EC_M = [
+    null,
+    [10, [[1, 16]]],            [16, [[1, 28]]],            [26, [[1, 44]]],
+    [18, [[2, 32]]],            [24, [[2, 43]]],            [16, [[4, 27]]],
+    [18, [[4, 31]]],            [22, [[2, 38], [2, 39]]],   [22, [[3, 36], [2, 37]]],
+    [26, [[4, 43], [1, 44]]],   [30, [[1, 50], [4, 51]]],   [22, [[6, 36], [2, 37]]],
+    [22, [[8, 37], [1, 38]]]
+  ];
+  const ALIGN = [
+    null, [], [6,18], [6,22], [6,26], [6,30], [6,34],
+    [6,22,38], [6,24,42], [6,26,46], [6,28,50], [6,30,54], [6,32,58], [6,34,62]
+  ];
+
+  /* GF(256), primitive polynomial 0x11D */
+  const EXP = new Uint8Array(512), LOG = new Uint8Array(256);
+  for (let i = 0, x = 1; i < 255; i++) {
+    EXP[i] = x; LOG[x] = i;
+    x <<= 1; if (x & 0x100) x ^= 0x11D;
+  }
+  for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+  const mul = (a, b) => (a === 0 || b === 0) ? 0 : EXP[LOG[a] + LOG[b]];
+
+  function generator(n) {
+    let g = [1];
+    for (let i = 0; i < n; i++) {
+      const next = new Array(g.length + 1).fill(0);
+      for (let j = 0; j < g.length; j++) {
+        next[j] ^= g[j];
+        next[j + 1] ^= mul(g[j], EXP[i]);
+      }
+      g = next;
+    }
+    return g;
+  }
+  function ecBytes(data, n) {
+    const g = generator(n), res = new Array(data.length + n).fill(0);
+    for (let i = 0; i < data.length; i++) res[i] = data[i];
+    for (let i = 0; i < data.length; i++) {
+      const c = res[i];
+      if (!c) continue;
+      for (let j = 0; j < g.length; j++) res[i + j] ^= mul(g[j], c);
+    }
+    return res.slice(data.length);
+  }
+
+  /* 15-bit format information, and 18-bit version information for v >= 7 */
+  function bch(v, poly, deg) {
+    let d = v << deg;
+    const bits = (n) => { let c = 0; while (n) { c++; n >>>= 1; } return c; };
+    while (bits(d) - 1 >= bits(poly) - 1 + deg - deg) {
+      if (bits(d) < bits(poly)) break;
+      d ^= poly << (bits(d) - bits(poly));
+    }
+    return d;
+  }
+  const formatBits = (mask) => {
+    const v = (0b00 << 3) | mask;                 /* 00 = level M */
+    return ((v << 10) | bch(v, 0x537, 10)) ^ 0x5412;
+  };
+  const versionBits = (ver) => (ver << 12) | bch(ver, 0x1F25, 12);
+
+  const utf8 = (s) => {
+    const out = [];
+    for (const b of new TextEncoder().encode(s)) out.push(b);
+    return out;
+  };
+
+  function encode(text) {
+    const bytes = utf8(text);
+    let ver = 0;
+    for (let v = 1; v <= 13; v++) {
+      const [ec, groups] = EC_M[v];
+      const cap = groups.reduce((a, [b, d]) => a + b * d, 0);
+      const lenBits = v <= 9 ? 8 : 16;
+      if (4 + lenBits + bytes.length * 8 <= cap * 8) { ver = v; break; }
+    }
+    if (!ver) throw new Error("too long for QR version 13");
+
+    const [ecLen, groups] = EC_M[ver];
+    const dataCw = groups.reduce((a, [b, d]) => a + b * d, 0);
+    const lenBits = ver <= 9 ? 8 : 16;
+
+    /* bit stream: mode 0100, length, payload, terminator, pad */
+    const bits = [];
+    const push = (val, n) => { for (let i = n - 1; i >= 0; i--) bits.push((val >> i) & 1); };
+    push(0b0100, 4);
+    push(bytes.length, lenBits);
+    bytes.forEach((b) => push(b, 8));
+    for (let i = 0; i < 4 && bits.length < dataCw * 8; i++) bits.push(0);
+    while (bits.length % 8) bits.push(0);
+    const cw = [];
+    for (let i = 0; i < bits.length; i += 8)
+      cw.push(bits.slice(i, i + 8).reduce((a, b) => (a << 1) | b, 0));
+    const PAD = [0xEC, 0x11];
+    for (let i = 0; cw.length < dataCw; i++) cw.push(PAD[i % 2]);
+
+    /* split into blocks, error-correct each, then interleave */
+    const dBlocks = [], eBlocks = [];
+    let at = 0;
+    groups.forEach(([count, len]) => {
+      for (let i = 0; i < count; i++) {
+        const b = cw.slice(at, at + len); at += len;
+        dBlocks.push(b); eBlocks.push(ecBytes(b, ecLen));
+      }
+    });
+    const out = [];
+    const maxD = Math.max(...dBlocks.map((b) => b.length));
+    for (let i = 0; i < maxD; i++)
+      dBlocks.forEach((b) => { if (i < b.length) out.push(b[i]); });
+    for (let i = 0; i < ecLen; i++) eBlocks.forEach((b) => out.push(b[i]));
+
+    return { ver, codewords: out };
+  }
+
+  function place(ver, codewords) {
+    const N = ver * 4 + 17;
+    const m = Array.from({ length: N }, () => new Int8Array(N).fill(-1));
+
+    const finder = (r, c) => {
+      for (let i = -1; i <= 7; i++) for (let j = -1; j <= 7; j++) {
+        const y = r + i, x = c + j;
+        if (y < 0 || y >= N || x < 0 || x >= N) continue;
+        const on = (i >= 0 && i <= 6 && (j === 0 || j === 6)) ||
+                   (j >= 0 && j <= 6 && (i === 0 || i === 6)) ||
+                   (i >= 2 && i <= 4 && j >= 2 && j <= 4);
+        m[y][x] = on ? 1 : 0;
+      }
+    };
+    finder(0, 0); finder(0, N - 7); finder(N - 7, 0);
+
+    for (let i = 8; i < N - 8; i++) {           /* timing */
+      m[6][i] = m[i][6] = (i % 2 === 0) ? 1 : 0;
+    }
+    ALIGN[ver].forEach((r) => ALIGN[ver].forEach((c) => {
+      if ((r === 6 && c === 6) || (r === 6 && c === N - 7) || (r === N - 7 && c === 6)) return;
+      for (let i = -2; i <= 2; i++) for (let j = -2; j <= 2; j++)
+        m[r + i][c + j] = (Math.abs(i) === 2 || Math.abs(j) === 2 || (i === 0 && j === 0)) ? 1 : 0;
+    }));
+    m[N - 8][8] = 1;                            /* the dark module */
+
+    /* reserve format and version areas so data skips them */
+    const reserve = () => {
+      for (let i = 0; i <= 8; i++) {
+        if (m[8][i] === -1) m[8][i] = 0;
+        if (m[i][8] === -1) m[i][8] = 0;
+      }
+      for (let i = 0; i < 8; i++) {
+        if (m[8][N - 1 - i] === -1) m[8][N - 1 - i] = 0;
+        if (m[N - 1 - i][8] === -1) m[N - 1 - i][8] = 0;
+      }
+      if (ver >= 7) for (let i = 0; i < 6; i++) for (let j = 0; j < 3; j++) {
+        m[N - 11 + j][i] = 0; m[i][N - 11 + j] = 0;
+      }
+    };
+    const before = m.map((r) => Int8Array.from(r));
+    reserve();
+    const reserved = m.map((r, y) => Int8Array.from(r, (v, x) => before[y][x] === -1 && v !== -1 ? 1 : 0));
+
+    /* data, two columns at a time, bottom-up then top-down */
+    const bits = [];
+    codewords.forEach((b) => { for (let i = 7; i >= 0; i--) bits.push((b >> i) & 1); });
+    let bi = 0, up = true;
+    for (let c = N - 1; c > 0; c -= 2) {
+      if (c === 6) c--;                          /* the timing column is skipped */
+      for (let k = 0; k < N; k++) {
+        const r = up ? N - 1 - k : k;
+        for (const cc of [c, c - 1]) {
+          if (before[r][cc] !== -1 || reserved[r][cc]) continue;
+          m[r][cc] = bi < bits.length ? bits[bi++] : 0;
+        }
+      }
+      up = !up;
+    }
+    return { m, N, fixed: before, reserved };
+  }
+
+  const MASKS = [
+    (r, c) => (r + c) % 2 === 0,
+    (r) => r % 2 === 0,
+    (r, c) => c % 3 === 0,
+    (r, c) => (r + c) % 3 === 0,
+    (r, c) => (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0,
+    (r, c) => ((r * c) % 2) + ((r * c) % 3) === 0,
+    (r, c) => ((((r * c) % 2) + ((r * c) % 3)) % 2) === 0,
+    (r, c) => ((((r + c) % 2) + ((r * c) % 3)) % 2) === 0
+  ];
+
+  function penalty(g, N) {
+    let p = 0;
+    /* runs of five or more */
+    for (let i = 0; i < N; i++) {
+      for (const row of [true, false]) {
+        let run = 1;
+        for (let j = 1; j < N; j++) {
+          const a = row ? g[i][j] : g[j][i], b = row ? g[i][j - 1] : g[j - 1][i];
+          if (a === b) { run++; } else { if (run >= 5) p += run - 2; run = 1; }
+        }
+        if (run >= 5) p += run - 2;
+      }
+    }
+    /* 2x2 blocks */
+    for (let r = 0; r < N - 1; r++) for (let c = 0; c < N - 1; c++)
+      if (g[r][c] === g[r][c+1] && g[r][c] === g[r+1][c] && g[r][c] === g[r+1][c+1]) p += 3;
+    /* finder-like patterns */
+    const PAT = [1,0,1,1,1,0,1];
+    const looks = (get) => {
+      let n = 0;
+      for (let i = 0; i + 11 <= N; i++) {
+        let ok1 = true, ok2 = true;
+        for (let k = 0; k < 7; k++) if (get(i + k) !== PAT[k]) { ok1 = false; break; }
+        if (ok1) { let z = true; for (let k = 7; k < 11; k++) if (get(i + k) !== 0) { z = false; break; } if (z) n++; }
+        for (let k = 0; k < 4; k++) if (get(i + k) !== 0) { ok2 = false; break; }
+        if (ok2) { let q = true; for (let k = 0; k < 7; k++) if (get(i + 4 + k) !== PAT[k]) { q = false; break; } if (q) n++; }
+      }
+      return n;
+    };
+    for (let i = 0; i < N; i++) { p += 40 * looks((j) => g[i][j]); p += 40 * looks((j) => g[j][i]); }
+    /* balance of dark and light */
+    let dark = 0;
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) dark += g[r][c];
+    p += Math.floor(Math.abs(dark * 100 / (N * N) - 50) / 5) * 10;
+    return p;
+  }
+
+  function putFormat(g, N, ver, mask) {
+    const f = formatBits(mask);
+    for (let i = 0; i < 15; i++) {
+      const bit = (f >> i) & 1;
+      if (i < 6) g[i][8] = bit;
+      else if (i < 8) g[i + 1][8] = bit;
+      else if (i === 8) g[8][7] = bit;
+      else g[8][14 - i] = bit;
+
+      if (i < 8) g[8][N - 1 - i] = bit;
+      else g[N - 15 + i][8] = bit;
+    }
+    if (ver >= 7) {
+      const v = versionBits(ver);
+      for (let i = 0; i < 18; i++) {
+        const bit = (v >> i) & 1;
+        g[Math.floor(i / 3)][N - 11 + (i % 3)] = bit;
+        g[N - 11 + (i % 3)][Math.floor(i / 3)] = bit;
+      }
+    }
+  }
+
+  /* Returns a square array of 0/1 — 1 is a dark module. */
+  function matrix(text) {
+    const { ver, codewords } = encode(text);
+    const { m, N, fixed, reserved } = place(ver, codewords);
+    let best = null;
+    for (let mask = 0; mask < 8; mask++) {
+      const g = m.map((r) => Int8Array.from(r));
+      for (let r = 0; r < N; r++) for (let c = 0; c < N; c++)
+        if (fixed[r][c] === -1 && !reserved[r][c] && MASKS[mask](r, c)) g[r][c] ^= 1;
+      putFormat(g, N, ver, mask);
+      const p = penalty(g, N);
+      if (!best || p < best.p) best = { p, g, mask };
+    }
+    return { modules: best.g, size: N, version: ver, mask: best.mask };
+  }
+
+  return { matrix };
+})();
+
+</script>
+
+<div id="app" class="wrap"></div>
+
+<script>
+/* ── plumbing ─────────────────────────────────────────────────────────── */
+const $ = (h) => { const d = document.createElement("div"); d.innerHTML = h.trim(); return d.firstElementChild; };
+const inr = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
+const iso = (d) => d.toISOString().slice(0, 10);
+const addDays = (s, n) => { const d = new Date(s + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return iso(d); };
+const nightsBetween = (a, b) => Math.max(0, Math.round((new Date(b) - new Date(a)) / 86400000));
+const fmt = (s) => new Date(s + "T12:00:00Z").toLocaleDateString("en-GB",
+  { day:"numeric", month:"short", timeZone:"UTC" });
+
+/* Apps Script sends no CORS headers, so anything that triggers a preflight
+   fails outright. text/plain is a "simple request" and goes straight through —
+   the staff app has posted this way since August. */
+async function post(payload) {
+  const r = await fetch(CFG.SCRIPT_URL, {
+    method: "POST", redirect: "follow",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  });
+  return r.json();
+}
+async function get(qs) {
+  const r = await fetch(CFG.SCRIPT_URL + "?" + qs, { redirect: "follow" });
+  return r.json();
+}
+
+/* Everything a guest typed goes through this before it reaches innerHTML.
+   The voucher interpolates their own name, and a name is data: "Aravind
+   <img src=x onerror=alert(1)>" is a self-inflicted wound rather than an
+   attack on anybody else, but it is still script running on a page that
+   holds a booking id and a payment reference. */
+function esc(v) {
+  return String(v == null ? "" : v)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+const S = {
+  step: 1, checkIn: iso(new Date()), checkOut: addDays(iso(new Date()), 1),
+  adults: 2, children: 0, busy: null, loading: false, pick: [], wantAc: false,
+  /* Which modal is on screen: 1 dates, 2 headcount, 0 none. The wizard opens
+     on 1 rather than on the room list, because a list of rooms before anyone
+     has said when or how many is a list of guesses. */
+  modal: 1,
+  /* Set the moment modal 1 is confirmed, so the availability request is in
+     flight while the guest is still tapping the guest counts. By the time
+     they press Find Available Rooms it has almost always landed. */
+  prefetch: null,
+  guest: { name:"", phone:"", address:"", city:"", pin:"", idType:"Aadhaar", idLast4:"" },
+  payRef: "", booking: null, error: "",
+  /* Rakesh, 1 Sep 2026: "should always ask for full payment or 60 percent as
+     advance if the select checkbox advance else it should always keep full
+     payment as priority". So full is the default and the part payment is a
+     deliberate opt-in, not a toggle sitting at 50/50. */
+  partPay: false,
+  /* 0 not started · "waiting" money not seen yet · "paid" the desk phone saw it */
+  settle: 0, settleTries: 0,
+  /* Whether the payment code is open. It lives here rather than in the DOM
+     because ticking the 60% advance re-renders the whole step: a panel that
+     only knows it is open by being on screen disappears the moment the
+     guest changes the amount, which is exactly when they are looking at it. */
+  qrOpen: false,
+  /* "upi" pays the hotel directly; "card" goes through Razorpay. The rail
+     decides how the payment is confirmed, so it has to be remembered. */
+  rail: "upi", rzp: null, paying: false,
+  /* Index into CFG.UPI. 0 is HDFC, which is the one Rakesh wants used. */
+  payee: 0
+};
+
+/* ── availability ─────────────────────────────────────────────────────── */
+function nightsOf() {
+  const out = [];
+  for (let d = S.checkIn; d < S.checkOut; d = addDays(d, 1)) out.push(d);
+  return out.length ? out : [S.checkIn];
+}
+function freeRooms() {
+  if (!S.busy) return [];
+  const nights = nightsOf();
+  return ROOMS.filter((r) => nights.every((n) => !(S.busy[n] || []).includes(r.name)));
+}
+function roomCost(r) { return r.rate + (S.wantAc && r.ac ? AC_ADDON[r.type] : 0); }
+
+/* Budget = the cheapest set that sleeps everyone.
+   Premium = the fewest rooms, suites preferred — a family would rather be in
+   one room than three, and will pay for it. */
+function packages() {
+  const free = freeRooms();
+  if (!free.length) return {};
+  const fits = (set) => set.reduce((a, r) => a + r.pax, 0) >= paxTotal();
+  const cost = (set) => set.reduce((a, r) => a + roomCost(r), 0);
+  const subsets = [];
+  for (let m = 1; m < (1 << free.length); m++) {
+    const set = free.filter((_, i) => m & (1 << i));
+    if (set.length > 4 || !fits(set)) continue;
+    /* minimal: dropping any room must break it */
+    if (set.some((_, i) => fits(set.filter((_, j) => j !== i)))) continue;
+    subsets.push(set);
+  }
+  if (!subsets.length) return {};
+  const budget = subsets.slice().sort((a, b) => cost(a) - cost(b))[0];
+  const premium = subsets.slice().sort((a, b) =>
+    a.length - b.length ||
+    (b.filter(r => r.type === "Suite").length - a.filter(r => r.type === "Suite").length) ||
+    cost(b) - cost(a))[0];
+  return { budget, premium };
+}
+const paxTotal = () => Math.max(1, (Number(S.adults) || 0) + (Number(S.children) || 0));
+const tariff = () => S.pick.reduce((a, n) => a + roomCost(ROOMS.find(r => r.name === n)), 0)
+                     * Math.max(1, nightsBetween(S.checkIn, S.checkOut));
+/* What is being collected right now. Full unless the guest ticked the box. */
+const payNow = () => S.partPay ? Math.round(tariff() * CFG.ADVANCE_PC / 100) : tariff();
+const dueLater = () => Math.max(0, tariff() - payNow());
+const paidInFull = () => dueLater() === 0;
+
+/* ── render ───────────────────────────────────────────────────────────── */
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  app.appendChild($(`
+    <header>
+      <img class="mark" src="img/logo.webp" alt="Kutralam Ezhilagam"
+        width="480" height="164" fetchpriority="high">
+      <p class="sub">Courtallam · nine rooms by the falls</p>
+    </header>`));
+
+  app.appendChild($(`<p class="eyebrow stepof">Step ${S.step} of 4</p>`));
+
+  app.appendChild($(`
+    <ol class="steps">
+      ${["Dates","Details","Pay","Done"].map((t, i) => `
+        <li class="${S.step > i + 1 ? "done" : S.step === i + 1 ? "on" : ""}">${t}</li>`).join("")}
+    </ol>`));
+
+  if (S.error) app.appendChild($(`
+    <p class="err">${S.error}</p>`));
+
+  ({ 1: stepDates, 2: stepGuest, 3: stepPay, 4: stepDone })[S.step](app);
+  openModal();
+}
+
+/* ── step 1 ───────────────────────────────────────────────────────────── */
+function stepDates(app) {
+  const card = $(`<section class="step"></section>`);
+  /* The building the guest will actually walk up to, which does more for a
+     booking than any stock photograph of a bed. It used to be the brick sign;
+     the sign said the name a second time, and the name is now the logo at the
+     top of every step. */
+  card.appendChild($(`<img class="hero" src="img/hero.webp"
+    alt="Kutralam Ezhilagam at dusk" width="900" height="600" loading="eager" fetchpriority="high">`));
+
+  /* The dates and headcount were asked for in the modals, so the list page
+     shows what was said rather than asking again — with one tap to go back
+     and change it. Repeating the same two questions under the answers is how
+     a wizard starts feeling like a form. */
+  const nights0 = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
+  card.appendChild($(`
+    <div class="card" style="display:flex;align-items:center;gap:12px">
+      <div style="min-width:0;flex:1">
+        <p class="lbl">Your stay</p>
+        <p style="margin:2px 0 0;font-size:14px;font-weight:800">${fmt(S.checkIn)} → ${fmt(S.checkOut)}</p>
+        <p style="margin:1px 0 0;font-size:11.5px;color:var(--mute)">${nights0} night${nights0>1?"s":""} ·
+          ${S.adults} adult${S.adults==1?"":"s"}${S.children ? " · " + S.children + " child" + (S.children==1?"":"ren") : ""}</p>
+      </div>
+      <button id="redo" class="x" style="width:auto;padding:0 14px;border-radius:12px;font-size:12px">Change</button>
+    </div>`));
+  card.querySelector("#redo").onclick = () => { S.modal = 1; render(); };
+
+  const acRow = $(`
+    <label class="row card" style="margin-bottom:12px">
+      <input id="ac" type="checkbox" ${S.wantAc ? "checked" : ""}>
+      <span style="font-size:13.5px;font-weight:600">Air conditioning</span>
+      <span class="hint">+${inr(500)}–${inr(1000)} a room</span>
+    </label>`);
+  acRow.querySelector("#ac").onchange = (e) => { S.wantAc = e.target.checked; render(); };
+  card.appendChild(acRow);
+
+  const list = $(`<div id="rooms" class="stack"></div>`);
+  card.appendChild(list);
+  app.appendChild(card);
+
+  drawRooms(list);
+  if (!S.busy && !S.modal) startPrefetch().then(render);
+}
+
+function drawRooms(list) {
+  if (S.loading) { list.appendChild($(`<p class="loading">Checking what is free…</p>`)); return; }
+  if (!S.busy) return;
+  const nights = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
+  const free = freeRooms();
+  if (!free.length) {
+    list.appendChild($(`<div class="card empty">
+      <b>Nothing free for those nights</b>
+      <p class="note" style="margin-top:6px">Try a different date, or message us — we sometimes have a room back.</p></div>`));
+    return;
+  }
+  const pk = packages();
+  const chip = (label, set, tone) => {
+    if (!set) return "";
+    const c = set.reduce((a, r) => a + roomCost(r), 0) * nights;
+    const on = S.pick.length === set.length && set.every(r => S.pick.includes(r.name));
+    return `<button data-pkg="${set.map(r=>r.name).join(",")}" class="opt ${on?"on":""}">
+      <div class="top">
+        <div><p class="tag ${tone}">${label}</p>
+          <h3>${set.map(r=>r.name).join(" + ")}</h3>
+          <p>sleeps ${set.reduce((a,r)=>a+r.pax,0)} · ${set.length} room${set.length>1?"s":""}</p></div>
+        <div class="price">${inr(c)}<small>${nights} night${nights>1?"s":""}</small></div>
+      </div></button>`;
+  };
+  list.appendChild($(`<div class="stack">
+    ${chip("Budget", pk.budget, "")}
+    ${pk.premium && pk.budget && pk.premium.map(r=>r.name).join() !== pk.budget.map(r=>r.name).join()
+      ? chip("Premium", pk.premium, "gold") : ""}
+  </div>`));
+
+  /* ── Budget and Premium, with what actually fits at the top ────────────
+   *
+   * Rakesh, 1 Sep 2026, gave the bands: 1–2 studio, 3–4 double cot, 5–8+
+   * suite. Written as a fit test rather than as three hard-coded room names,
+   * because the named rooms are often booked — Marutham is the busiest room
+   * in the house — and a recommendation engine that only knows three rooms
+   * says "nothing available" on exactly the nights the hotel is full.
+   *
+   * "Recommended" means: it sleeps the party, and it is the smallest thing
+   * that does. Offering Vaagai to a couple is not a recommendation, it is an
+   * upsell wearing one. */
+  const p = paxTotal();
+  const suits = (r) => r.pax >= p;
+  const tight = free.filter(suits).sort((a, b) => a.pax - b.pax)[0];
+
+  const band = (title, tone, rooms) => {
+    if (!rooms.length) return;
+    list.appendChild($(`<p class="sechead ${tone === "picked" ? "picked" : ""}">${title}</p>`));
+    rooms.forEach((r) => {
+      const on = S.pick.includes(r.name);
+      const rec = tight && r.name === tight.name;
+      list.appendChild($(`
+        <button data-room="${r.name}" class="opt roomrow ${on ? "on" : ""}">
+          ${r.thumbs && r.thumbs[0]
+            ? `<img class="rthumb" alt="" loading="lazy" src="${r.thumbs[0]}">` : ""}
+          <div class="meta">
+            <h3>${r.name}${rec ? ` <span class="rec">Best fit</span>` : ""}</h3>
+            <p>${r.type} · ${r.floor} Floor · sleeps ${r.pax}${!r.ac ? " · no AC" : ""}</p>
+            <span class="more" data-detail="${r.name}">Photos &amp; walkthrough →</span></div>
+          <div class="price">${inr(roomCost(r))}<small>/night</small></div>
+        </button>`));
+    });
+  };
+
+  /* Chosen rooms come to the top, in the order they were chosen, and leave the
+     band they came from rather than appearing twice. Rakesh, 2 Sep: a guest who
+     has picked two rooms should see those two first. Scrolling back down a list
+     of nine to check what you already chose is the kind of small friction that
+     loses a booking on a phone.
+
+     They are taken OUT of the bands below because a room listed in two places
+     is two things to tap and two states to keep in step — and the one that is
+     off screen is the one that goes stale. */
+  const chosen = S.pick
+    .map((n) => free.find((r) => r.name === n))
+    .filter(Boolean);
+  const rest = (type) => free.filter((r) => r.type === type && !S.pick.includes(r.name));
+
+  band(chosen.length > 1 ? "Your rooms · tap to remove" : "Your room · tap to remove",
+       "picked", chosen);
+  band("Budget · studio rooms", "", rest("Studio"));
+  band("Premium · suites", "gold", rest("Suite"));
+
+  list.appendChild($(`
+    <figure class="award">
+      <img src="img/jd-award.webp" alt="JustDial Users' Choice 2025 — Kutralam Ezhilagam"
+        width="760" height="428" loading="lazy" decoding="async">
+      <figcaption>JustDial Users&rsquo; Choice 2025</figcaption>
+    </figure>`));
+
+  const tooBig = !free.some(suits);
+  if (tooBig) list.appendChild($(`<p class="warn" style="margin-top:12px">
+    No single room sleeps ${p}. Pick two or more below — the total updates as you go,
+    or message us and we will arrange it.</p>`));
+
+  list.querySelectorAll("[data-pkg]").forEach((b) => b.onclick = () => {
+    S.pick = b.dataset.pkg.split(","); S.error = ""; render();
+  });
+  list.querySelectorAll("[data-room]").forEach((b) => b.onclick = (ev) => {
+    /* The room row does two jobs, so it has to be told which one was meant.
+       Tapping the words opens the pictures; tapping anywhere else picks the
+       room. Without this the gallery would be unreachable on a phone, where
+       there is no hover to reveal anything. */
+    if (ev.target && ev.target.dataset && ev.target.dataset.detail) {
+      ev.preventDefault(); ev.stopPropagation();
+      openRoom(ev.target.dataset.detail);
+      return;
+    }
+    const n = b.dataset.room;
+    S.pick = S.pick.includes(n) ? S.pick.filter(x => x !== n) : S.pick.concat(n);
+    S.error = ""; render();
+  });
+
+  /* Hover preview. Built only when the device actually has a pointer, so a
+     phone never downloads the larger image or carries the extra nodes. The
+     picture is fetched on first hover rather than with the list — nine of
+     them up front would be several megabytes nobody asked for. */
+  if (window.matchMedia && window.matchMedia("(hover:hover) and (pointer:fine)").matches) {
+    list.querySelectorAll("[data-room]").forEach((b) => {
+      const r = ROOMS.find((x) => x.name === b.dataset.room);
+      if (!r || !r.photos || !r.photos.length) return;
+      let pop = null, t = 0;
+      b.addEventListener("mouseenter", () => {
+        t = setTimeout(() => {
+          if (pop) { pop.classList.add("show"); return; }
+          pop = $(`<div class="rpop"><img alt="" src="${big(r.photos[0], 480)}">
+            <b>${r.name}</b><i>${r.floor} floor · sleeps ${r.pax} · ${r.ac ? "AC available" : "no AC"}</i></div>`);
+          b.appendChild(pop);
+          requestAnimationFrame(() => pop.classList.add("show"));
+        }, 120);
+      });
+      b.addEventListener("mouseleave", () => {
+        clearTimeout(t); if (pop) pop.classList.remove("show");
+      });
+    });
+  }
+}
+
+/* Drive serves whatever width is asked for. The list uses w160, the hover
+   preview w480 and the detail carousel w1200 — same file, three sizes, and
+   the phone on a hill road only ever fetches the small one. */
+function big(u, w) { return String(u || "").replace(/sz=w\d+/, "sz=w" + w); }
+
+/* ── The two questions, asked before anything is shown ───────────────────
+ *
+ * Rakesh, 1 Sep 2026: dates first, then headcount, and start fetching
+ * availability the moment the dates are confirmed so the room list appears
+ * without a spinner.
+ *
+ * WHY THE PREFETCH USES publicAvail RATHER THAN A DATED ENDPOINT. The brief
+ * asked for ?action=roomAvailability&checkIn=..&checkOut=.. . publicAvail
+ * already returns the whole 120-day busy calendar in one call, which is
+ * strictly better here: the guest who changes their mind about dates on the
+ * room list gets an instant answer instead of a second round trip, and there
+ * is no new endpoint to deploy. One request, cached for the session.
+ */
+function stepper(id, label, value, min, max) {
+  return `<div class="cnt">
+    <div><p style="margin:0;font-size:14px;font-weight:700">${label}</p></div>
+    <div class="pm">
+      <button data-step="${id}:-1" aria-label="one fewer ${label}">−</button>
+      <b id="n-${id}">${value}</b>
+      <button data-step="${id}:1" aria-label="one more ${label}">+</button>
+    </div>
+  </div>`;
+}
+
+function openModal() {
+  document.querySelectorAll("#modal").forEach((n) => n.remove());
+  if (!S.modal) { document.body.style.overflow = ""; return; }
+  const wrap = $(`<div id="modal"><div class="mpanel"></div></div>`);
+  const panel = wrap.querySelector(".mpanel");
+
+  panel.appendChild($(`<img class="mark" src="img/logo.webp"
+    alt="Kutralam Ezhilagam" width="480" height="164">`));
+
+  if (S.modal === 1) {
+    panel.appendChild($(`
+      <div>
+        <p class="eyebrow">Step 1 of 2</p>
+        <h2 class="mtitle">Select your stay dates</h2>
+        <div class="grid2" style="margin-top:16px">
+          <label><span class="lbl">Check in</span>
+            <input id="m-ci" type="date" value="${S.checkIn}" min="${iso(new Date())}"></label>
+          <label><span class="lbl">Check out</span>
+            <input id="m-co" type="date" value="${S.checkOut}" min="${addDays(S.checkIn,1)}"></label>
+        </div>
+        <p class="fine" id="m-nights"></p>
+      </div>`));
+
+    const nightsLine = () => {
+      const n = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
+      panel.querySelector("#m-nights").textContent =
+        `${fmt(S.checkIn)} → ${fmt(S.checkOut)} · ${n} night${n > 1 ? "s" : ""}`;
+    };
+    /* Picking a check-in sets check-out to the next day. Most stays here are
+       one night, and a guest who wants two changes one field instead of two —
+       but the field stays editable, so nothing is decided for them. */
+    panel.querySelector("#m-ci").onchange = (e) => {
+      S.checkIn = e.target.value;
+      S.checkOut = addDays(S.checkIn, 1);
+      const co = panel.querySelector("#m-co");
+      co.value = S.checkOut; co.min = addDays(S.checkIn, 1);
+      S.pick = []; nightsLine();
+    };
+    panel.querySelector("#m-co").onchange = (e) => {
+      S.checkOut = e.target.value <= S.checkIn ? addDays(S.checkIn, 1) : e.target.value;
+      e.target.value = S.checkOut; S.pick = []; nightsLine();
+    };
+    nightsLine();
+
+    panel.appendChild($(`<button class="mgo">Continue</button>`));
+    panel.querySelector(".mgo").onclick = () => {
+      startPrefetch();          /* in flight while they choose the guests */
+      S.modal = 2; render();
+    };
+  }
+
+  if (S.modal === 2) {
+    panel.appendChild($(`
+      <div>
+        <p class="eyebrow">Step 2 of 2</p>
+        <h2 class="mtitle">How many guests?</h2>
+        <div style="margin-top:14px">
+          ${stepper("adults", "Adults", S.adults, 1, 40)}
+          ${stepper("children", "Children", S.children, 0, 20)}
+        </div>
+        <p class="fine" id="m-cap"></p>
+      </div>`));
+
+    const capLine = () => {
+      const p = paxTotal();
+      panel.querySelector("#m-cap").textContent =
+        p > 59 ? "The whole house sleeps 59 — please call us for a larger party."
+               : `${p} guest${p > 1 ? "s" : ""} · we will show what fits`;
+    };
+    panel.querySelectorAll("[data-step]").forEach((b) => b.onclick = () => {
+      const [k, d] = b.dataset.step.split(":");
+      const lo = k === "adults" ? 1 : 0;
+      S[k] = Math.max(lo, Math.min(k === "adults" ? 40 : 20, Number(S[k]) + Number(d)));
+      panel.querySelector("#n-" + k).textContent = S[k];
+      S.pick = []; capLine();
+    });
+    capLine();
+
+    panel.appendChild($(`<button class="mgo">Find available rooms</button>`));
+    panel.querySelector(".mgo").onclick = async () => {
+      const btn = panel.querySelector(".mgo");
+      /* If the prefetch has already landed this resolves instantly and the
+         list is simply there. If the signal was slow we say so rather than
+         showing an empty page that looks like "nothing is free". */
+      if (!S.busy) { btn.textContent = "Checking availability…"; await startPrefetch(); }
+      S.modal = 0; render();
+    };
+    panel.appendChild($(`<button class="mback">Back to dates</button>`));
+    panel.querySelector(".mback").onclick = () => { S.modal = 1; render(); };
+  }
+
+  document.body.style.overflow = "hidden";
+  document.body.appendChild(wrap);
+}
+
+/* One request per session, shared by whoever asks first. */
+function startPrefetch() {
+  if (S.prefetch) return S.prefetch;
+  S.prefetch = get("action=publicAvail&days=120")
+    .then((d) => { S.busy = (d && d.busy) || {}; })
+    .catch(() => { S.error = "Could not reach the booking system. Please try again."; })
+    .finally(() => { S.prefetch = null; });
+  return S.prefetch;
+}
+
+/* ── The room, in pictures ───────────────────────────────────────────────
+ *
+ * Rakesh, 1 Sep 2026, asked for a gallery, a YouTube walkthrough and a hover
+ * preview. Hover is the one thing not built: this is opened on a phone, where
+ * there is no pointer to hover with, and a preview nobody can reach is worse
+ * than no preview. Tapping the words does the same job on both.
+ *
+ * The video is loaded only when the sheet opens. Nine iframes sitting on the
+ * list page would pull several megabytes of YouTube player before the guest
+ * has decided anything, on a phone signal at the falls. */
+function openRoom(name) {
+  const r = ROOMS.find((x) => x.name === name);
+  if (!r) return;
+  const nights = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
+  const wrap = $(`<div id="sheet"><div class="panel"></div></div>`);
+  const panel = wrap.querySelector(".panel");
+
+  panel.appendChild($(`
+    <div class="sheetbar">
+      <img class="markxs" src="img/logo.webp" alt="Kutralam Ezhilagam" width="480" height="164">
+      <h2>${r.name}</h2>
+      <button class="x" aria-label="Close">×</button>
+    </div>`));
+
+  if (r.photos && r.photos.length) {
+    panel.appendChild($(`<div class="gal">${
+      r.photos.map((u, i) => `<img loading="${i ? "lazy" : "eager"}" alt="${r.name}" src="${big(u, 1200)}">`).join("")
+    }</div>`));
+  }
+
+  if (r.video) {
+    panel.appendChild($(`<div class="vid"><iframe
+      src="https://www.youtube.com/embed/${r.video}?rel=0&playsinline=1"
+      title="${r.name} walkthrough" allowfullscreen
+      allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"></iframe></div>`));
+  }
+
+  panel.appendChild($(`<div class="facts">
+    <span>${r.type}</span><span>${r.floor} Floor</span><span>Sleeps ${r.pax}</span>
+    <span>${r.ac ? "AC available" : "No AC"}</span>
+    ${r.beds ? "<span>Extra beds</span>" : ""}
+  </div>`));
+
+  if (r.desc) panel.appendChild($(`<p class="note" style="margin-top:12px">${r.desc}</p>`));
+
+  /* Amenities are drawn from what the hotel already says about each room in
+     the sheet. Nothing here is invented — an amenity a guest reads on a
+     booking page is a promise, and a promise nobody at the desk knows about
+     is an argument at check-in. */
+  if (r.amen && r.amen.length) {
+    panel.appendChild($(`<div class="amen">${r.amen.map((a) => `<span>${a}</span>`).join("")}</div>`));
+  }
+  if (r.bed) panel.appendChild($(`<p class="bedline">Bedding · <b>${r.bed}</b></p>`));
+
+  const cost = roomCost(r) * nights;
+  panel.appendChild($(`<p class="fine">${inr(roomCost(r))} a night${
+    S.wantAc && r.ac ? " including AC" : ""} · ${nights} night${nights > 1 ? "s" : ""}</p>`));
+
+  wrap.appendChild($(`<div class="sheetfoot"><div class="in">
+    <div class="tot">${inr(cost)}<small>${nights} night${nights > 1 ? "s" : ""}</small></div>
+    <button id="take">${S.pick.includes(r.name) ? "Remove from stay" : "Choose " + r.name}</button>
+  </div></div>`));
+
+  const close = () => { wrap.remove(); document.body.style.overflow = ""; };
+  wrap.querySelector(".x").onclick = close;
+  wrap.onclick = (e) => { if (e.target === wrap) close(); };
+  wrap.querySelector("#take").onclick = () => {
+    S.pick = S.pick.includes(r.name) ? S.pick.filter((x) => x !== r.name) : S.pick.concat(r.name);
+    S.error = ""; close(); render();
+  };
+  document.body.style.overflow = "hidden";
+  document.body.appendChild(wrap);
+}
+
+async function loadAvail() {
+  S.loading = true; render();
+  try {
+    const d = await get("action=publicAvail&days=120");
+    S.busy = (d && d.busy) || {};
+  } catch (e) { S.error = "Could not reach the booking system. Please try again."; }
+  S.loading = false; render();
+}
+
+/* ── step 2 ───────────────────────────────────────────────────────────── */
+function stepGuest(app) {
+  const f = S.guest;
+  const box = $(`<section class="step">
+    <div class="card stack">
+      ${[["name","Full name","text","As on your ID"],
+         ["phone","WhatsApp number","tel","10 digits"],
+         ["address","Address","text","House / street"],
+         ["city","City","text","e.g. Chennai"],
+         ["pin","PIN code","tel","6 digits"]].map(([k,l,t,ph]) => `
+        <label><span class="lbl">${l}</span>
+          <input data-f="${k}" type="${t}" value="${f[k]}" placeholder="${ph}"></label>`).join("")}
+
+      <label><span class="lbl">ID you will bring</span>
+        <select data-f="idType">${ID_TYPES.map((x) =>
+          `<option${x === f.idType ? " selected" : ""}>${x}</option>`).join("")}</select></label>
+
+      <label><span class="lbl">Last 4 digits of that ID</span>
+        <input data-f="idLast4" type="tel" inputmode="numeric" maxlength="4"
+          value="${f.idLast4}" placeholder="4821"></label>
+      <p class="fine">Four digits only — enough for the desk to match you to your
+        booking. Your full ID is checked in person at check-in and is never typed
+        into this page.</p>
+    </div></section>`);
+  box.querySelectorAll("select[data-f]").forEach((i) => i.onchange = (e) => {
+    S.guest[e.target.dataset.f] = e.target.value;
+  });
+  box.querySelectorAll("input[data-f]").forEach((i) => i.oninput = (e) => {
+    if (e.target.dataset.f === "idLast4") {
+      S.guest.idLast4 = e.target.value.replace(/\D/g, "").slice(0, 4);
+      e.target.value = S.guest.idLast4; return;
+    }
+    const k = i.dataset.f; let v = e.target.value;
+    if (k === "phone") v = v.replace(/\D/g, "").slice(-10);
+    if (k === "pin") v = v.replace(/\D/g, "").slice(0, 6);
+    S.guest[k] = v;
+  });
+  app.appendChild(box);
+}
+
+
+/* ── Paying ───────────────────────────────────────────────────────────────
+ *
+ * One string, built once, used by the button and by the QR. Two of them that
+ * could disagree is how a guest ends up scanning for one amount and being
+ * charged another.
+ *
+ * pn is percent-encoded rather than plus-encoded. Both are legal; a few UPI
+ * apps print the payee name back to the guest verbatim, and "Kutralam+Ezhilagam"
+ * on the confirmation screen is the kind of thing that makes someone stop. */
+
+/* The handle the guest is paying right now. S.payee is an index into CFG.UPI,
+   and it is clamped rather than trusted: an out-of-range index would build a
+   upi:// string with `pa=undefined`, which scans perfectly and pays nobody. */
+function payee() {
+  const list = (CFG.UPI || []);
+  if (!list.length) return null;
+  const i = Math.min(Math.max(0, S.payee | 0), list.length - 1);
+  return list[i];
+}
+
+function upiUrl() {
+  const p = payee();
+  if (!p || !p.vpa) return "";
+  const amt = payNow().toFixed(2);
+  /* The booking reference travels in the note, so it lands in the narration
+     on the bank statement. That is the string Rakesh reads when he is
+     reconciling by eye, and it is the only part of this that survives into
+     an account he is looking at days later. */
+  const note = "Ezhilagam " + S.ref;
+  let u = "upi://pay"
+    + "?pa=" + encodeURIComponent(p.vpa)
+    + "&pn=" + encodeURIComponent(p.name || "Kutralam Ezhilagam")
+    + "&am=" + amt
+    + "&cu=INR"
+    + "&tn=" + encodeURIComponent(note);
+  /* mc and tr are merchant fields. On a business handle they are what let the
+     payment carry a category and an order number; on a personal handle some
+     apps reject the intent outright for carrying them, and the guest gets an
+     error instead of a payment screen. So they go on only when the handle
+     actually is a merchant one. */
+  if (p.mcc) u += "&mc=" + encodeURIComponent(p.mcc) + "&tr=" + encodeURIComponent(S.ref);
+  return u;
+}
+
+/* Android is handed straight to Google Pay, because that is the account the
+   money has to land in and the chooser is one more place to go wrong. If
+   Google Pay is not installed the intent quietly does nothing, so a timer
+   falls through to the ordinary upi:// chooser, and a second timer gives up
+   and shows the QR. There is no callback that says "an app opened" — the
+   page going hidden is the only signal there is, so that is what is used. */
+function startPay(btn) {
+  const url = upiUrl();
+  if (!url) return;
+  const android = /android/i.test(navigator.userAgent || "");
+  let left = false;
+  const gone = () => { left = true; };
+  window.addEventListener("blur", gone, { once: true });
+  window.addEventListener("pagehide", gone, { once: true });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) gone(); }, { once: true });
+  const stillHere = () => !left && !document.hidden;
+  /* The one seam in this file. window.location cannot be replaced, so without
+     it the chain below — Google Pay, then the chooser, then the QR — could not
+     be tested at all, and an untested fallback chain is how a guest ends up
+     stranded on a payment screen. Nothing in production sets __openUrl. */
+  const go = (u) => {
+    try { (window.__openUrl || ((x) => { window.location.href = x; }))(u); } catch (e) {}
+  };
+
+  /* Google Pay is only forced for the Google Pay Business handle, because that
+     is the account whose notification the watched phone actually hears. The
+     HDFC handle is an ordinary person-to-person address that every UPI app
+     pays equally well, and Rakesh moved to it because Google Pay would not
+     approve the other one — so sending a guest into Google Pay to pay it is
+     pointing them at the app that caused the problem. That one gets the plain
+     chooser and the guest picks PhonePe, Paytm, or their own bank app. */
+  const forceGpay = !!(payee() && payee().mcc);
+  if (android && forceGpay) {
+    go("intent://pay?" + url.split("?")[1] +
+       "#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end");
+    setTimeout(() => { if (stillHere()) go(url); }, 1300);
+  } else if (android) {
+    go(url);
+  } else {
+    /* iOS ignores upi:// unless an app has claimed it, and Google Pay's own
+       scheme is the one that works there. Desktop will do nothing at all,
+       which is exactly why the QR exists. */
+    go("gpay://upi/pay?" + url.split("?")[1]);
+    setTimeout(() => { if (stillHere()) go(url); }, 1100);
+  }
+  setTimeout(() => { if (stillHere()) showQr(); }, android ? 2900 : 2500);
+}
+
+function showQr() {
+  const box = document.getElementById("qrbox");
+  if (!box) return;
+  const wasShut = box.hidden;
+  S.qrOpen = true; box.hidden = false;
+  drawQr();
+  if (wasShut) box.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function drawQr() {
+  const cv = document.getElementById("qr");
+  if (!cv) return;
+  try {
+    const { modules, size } = QR.matrix(upiUrl());
+    const quiet = 4, px = 8, side = (size + quiet * 2) * px;
+    cv.width = side; cv.height = side;
+    const c = cv.getContext("2d");
+    c.fillStyle = "#fff"; c.fillRect(0, 0, side, side);
+    c.fillStyle = "#1c1917";
+    for (let r = 0; r < size; r++) for (let col = 0; col < size; col++)
+      if (modules[r][col]) c.fillRect((col + quiet) * px, (r + quiet) * px, px, px);
+  } catch (e) {
+    /* An unscannable code is worse than none: say so and leave the handle,
+       which the guest can still type into any UPI app. */
+    cv.replaceWith($(`<p class="warn" style="margin:0">Could not draw the code.
+      Please pay to <b>${(payee()||{}).vpa || ""}</b> and quote <b>${S.ref}</b>.</p>`));
+  }
+}
+
+async function copyVpa(btn) {
+  const was = btn.textContent;
+  const vpa = (payee() || {}).vpa || "";
+  try { await navigator.clipboard.writeText(vpa); }
+  catch (e) {
+    /* clipboard.writeText needs a secure context and permission; a hidden
+       textarea works where it does not. */
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = vpa; ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+      document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); ta.remove();
+    } catch (e2) { btn.textContent = "Press and hold to copy"; return; }
+  }
+  btn.textContent = "Copied";
+  setTimeout(() => { btn.textContent = was; }, 1800);
+}
+
+
+/* ── Cards and net banking, through Razorpay ──────────────────────────────
+ *
+ * Rakesh, 2 Sep 2026: only cards, credit cards and net banking go through
+ * Razorpay; UPI, GPay, Paytm and PhonePe keep paying the hotel's own handle.
+ *
+ * That instruction is enforced in the `method` block below. Razorpay's
+ * checkout offers UPI by default, and a guest who took it would cost about
+ * 2% plus GST for a payment that is free through the button above. Turning it
+ * off is the whole point of having two rails.
+ *
+ * The script is fetched only when a guest actually chooses a card, so anyone
+ * paying by UPI — which is most people — never downloads it. */
+function loadRzp() {
+  if (window.Razorpay) return Promise.resolve(true);
+  if (loadRzp._p) return loadRzp._p;
+  loadRzp._p = new Promise((res) => {
+    const t = setTimeout(() => res(false), 9000);
+    const el = document.createElement("script");
+    el.src = CFG.RZP_JS; el.async = true;
+    el.onload = () => { clearTimeout(t); res(!!window.Razorpay); };
+    el.onerror = () => { clearTimeout(t); res(false); };
+    document.head.appendChild(el);
+  });
+  return loadRzp._p;
+}
+
+async function payByCard(btn) {
+  if (S.paying) return;
+  S.paying = true;
+  const was = btn.textContent;
+  btn.disabled = true; btn.textContent = "Opening secure checkout…";
+  const done = (msg) => {
+    S.paying = false; btn.disabled = false; btn.textContent = was;
+    if (msg) fail(msg);
+  };
+
+  /* The amount is asked for, not sent. The sheet re-prices the stay from the
+     rooms and dates and creates the order for its own figure, so a browser
+     with the console open cannot buy a suite for a rupee. */
+  let d;
+  try {
+    d = await post({
+      action: "rzpOrder",
+      room: S.pick.join(","), checkIn: S.checkIn, checkOut: S.checkOut,
+      wantAc: S.wantAc, part: S.partPay,
+      name: S.guest.name.trim(), phone: S.guest.phone, ref: S.ref
+    });
+  } catch (e) { return done("Could not reach the booking system. Please try again."); }
+  if (!d || !d.ok) return done((d && d.message) || "Could not start the card payment.");
+
+  if (!(await loadRzp())) {
+    return done("The card checkout could not load. Please use the UPI button above, " +
+                "or message us and we will send a payment link.");
+  }
+
+  S.rzp = { orderId: d.orderId, amount: d.amount };
+  const rz = new window.Razorpay({
+    key: d.keyId,                     /* publishable; the secret never leaves the sheet */
+    order_id: d.orderId,
+    amount: d.amount, currency: d.currency || "INR",
+    name: CFG.BRAND,
+    description: S.pick.join(" + ") + " · " + fmt(S.checkIn) + " to " + fmt(S.checkOut),
+    prefill: { name: S.guest.name.trim(), contact: "91" + S.guest.phone },
+    notes: { ref: S.ref },
+    /* Cards and net banking only. See the note above — this is the line that
+       keeps UPI off the gateway. */
+    method: { card: true, netbanking: true, upi: false, wallet: false,
+              emi: false, paylater: false, cardless_emi: false },
+    theme: { color: "#0f766e" },
+    modal: { ondismiss: () => done("") },
+    handler: (r) => { finishCard(r, btn, was); }
+  });
+  try {
+    rz.on("payment.failed", (ev) => {
+      const m = (ev && ev.error && ev.error.description) || "The card was declined.";
+      done(m + " Nothing has been charged. You can try another card or pay by UPI.");
+    });
+  } catch (e) {}
+  rz.open();
+}
+
+/* Razorpay hands the browser three values. The browser is not trusted with
+   them: they go to the sheet, which checks the signature with the secret and
+   then re-reads the order from Razorpay's own API. A signature only proves a
+   payment was attempted; "paid" from the API is what proves the money is
+   captured. */
+async function finishCard(r, btn, was) {
+  btn.textContent = "Confirming your payment…";
+  let v;
+  try {
+    v = await post({
+      action: "rzpVerify",
+      razorpay_order_id: r.razorpay_order_id,
+      razorpay_payment_id: r.razorpay_payment_id,
+      razorpay_signature: r.razorpay_signature
+    });
+  } catch (e) { v = null; }
+  S.paying = false; btn.disabled = false; btn.textContent = was;
+
+  if (!v || !v.ok || !v.verified) {
+    return fail("We could not verify that payment. Please do not pay again — " +
+                "message us with your card reference and we will confirm it by hand.");
+  }
+  if (!v.paid) {
+    return fail("The payment has not completed yet. Give it a moment and try again, " +
+                "or pay by UPI instead.");
+  }
+  /* Paid and proved. Hold the room, then straight to the voucher — there is
+     nothing to wait for, because the gateway has already answered. */
+  S.payRef = String(r.razorpay_payment_id || "").slice(-4);
+  S.settleAmount = v.amount; S.settleAt = v.at;
+  await holdRoom({ payment: "Card / Net banking",
+                   paymentRef: r.razorpay_payment_id, rzpOrderId: r.razorpay_order_id },
+                 "paid");
+}
+
+/* ── step 3 ───────────────────────────────────────────────────────────── */
+function stepPay(app) {
+  const nights = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
+  const ref = "EZ" + Date.now().toString(36).toUpperCase().slice(-6);
+  S.ref = S.ref || ref;
+  const amt = payNow();
+  const upi = upiUrl();
+  const pay = payee() || { vpa:"", name:"", bank:"" };
+  /* The button names the app it is about to open, and only when it really is
+     about to open that one. On the HDFC handle it opens whatever the guest
+     has, so it says so instead of promising Google Pay. */
+  const payLabel = pay.mcc ? "Pay with GPay / UPI" : "Pay with any UPI app";
+
+  app.appendChild($(`<section class="step">
+    <div class="card">
+      <p class="sechead" style="margin-top:0">Your stay</p>
+      <h3 style="margin:2px 0 0;font-size:16px;font-weight:800">${S.pick.join(" + ")}</h3>
+      <p class="note" style="font-size:12.5px;color:#78716c">${fmt(S.checkIn)} → ${fmt(S.checkOut)} · ${nights} night${nights>1?"s":""} · ${paxTotal()} guest${paxTotal()>1?"s":""}</p>
+      <dl>
+        <div><dt>Tariff</dt><dd>${inr(tariff())}</dd></div>
+        <div class="payrow"><dt>${S.partPay ? "Paying now (" + CFG.ADVANCE_PC + "% advance)" : "Paying now — in full"}</dt>
+          <dd class="big">${inr(amt)}</dd></div>
+        ${S.partPay
+          ? `<div><dt>At check-in</dt><dd>${inr(dueLater())}</dd></div>`
+          : `<div><dt>At check-in</dt><dd style="color:var(--brand)">nothing</dd></div>`}
+      </dl>
+      <label class="row" style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px">
+        <input id="part" type="checkbox" ${S.partPay ? "checked" : ""}>
+        <span style="font-size:13px;font-weight:600">Pay ${CFG.ADVANCE_PC}% now, the rest at check-in</span>
+      </label>
+    </div>
+
+    ${!upi ? `<p class="warn">UPI address not set. Fill <code>CFG.UPI</code> before this page goes live — otherwise Pay does nothing.</p>` : ""}
+
+    <p class="railhead">Pay by UPI — straight to the hotel, no fee</p>
+    <button id="pay" class="pay ${upi ? "" : "off"}" ${upi ? "" : "disabled"}>${payLabel}</button>
+
+    <div id="qrbox" class="qrbox" ${S.qrOpen ? "" : "hidden"}>
+      <p class="qrhead">Scan with any UPI app</p>
+      <canvas id="qr" width="256" height="256" role="img"
+        aria-label="UPI payment code for ${inr(amt)}"></canvas>
+      <p class="qramt">${inr(amt)} to <b>${pay.name}</b></p>
+      <p class="qrvpa">${pay.vpa}<span>${CFG.UPI_PHONE}</span></p>
+      ${pay.mcc ? "" : `<p class="qrwho">Your UPI app will show
+        <b>${pay.name}</b> — that is ${CFG.BRAND}'s own account.</p>`}
+      <button id="copyvpa" class="btn-plain">Copy UPI ID</button>
+      ${CFG.UPI.length > 1 ? `
+      <div class="payee" role="group" aria-label="Choose where to pay">
+        ${CFG.UPI.map((h, i) => `<button type="button" class="payee-b${i === S.payee ? " on" : ""}"
+            data-payee="${i}" ${i === S.payee ? 'aria-pressed="true"' : 'aria-pressed="false"'}>${h.bank}</button>`).join("")}
+      </div>` : ""}
+      <p class="fine" style="margin-top:10px">Works with GPay, PhonePe, Paytm, BHIM
+        and any bank app. Quote <b>${S.ref}</b> if you are asked for a note.</p>
+    </div>
+
+    ${CFG.RZP_ENABLED ? `
+    <div class="railsplit"><span>or</span></div>
+    <button id="paycard" class="paycard">Pay by Card / Net Banking</button>
+` : ""}
+
+    <div class="card">
+      <p class="note">Paying by UPI? Your app will open. After paying, come back here and type the
+        <b>last 4 digits of the UPI reference</b> — that is what lets us find your payment
+        and hold the room.</p>
+      <input id="ref" class="ref" inputmode="numeric" maxlength="4" placeholder="4321" value="${S.payRef}">
+      <p class="fine">Reference <b>${S.ref}</b> — quote it if you message us.</p>
+    </div></section>`));
+
+  /* The footer button is drawn by foot(), not by this section, so changing
+     the reference has to tell it. Without this the guest types all four
+     digits and Continue stays grey — they have paid and the page will not
+     let them finish, which is the worst state this screen can be in. */
+  const payBtn = app.querySelector("#pay");
+  if (upi) payBtn.onclick = () => startPay(payBtn);
+  app.querySelector("#copyvpa").onclick = (e) => copyVpa(e.currentTarget);
+  /* Switching where the money goes rebuilds the code and the button. It does
+     NOT re-render the whole step: that would collapse the open QR panel the
+     guest is looking at, which is the one thing they must not lose hold of
+     mid-payment. */
+  app.querySelectorAll("[data-payee]").forEach((b) => {
+    b.onclick = () => {
+      const i = Number(b.dataset.payee) || 0;
+      if (i === S.payee) return;
+      S.payee = i;
+      render();
+      /* render() rebuilds the step from scratch, so re-open the panel the
+         guest already had open rather than making them find it again. */
+      if (S.qrOpen) showQr();
+    };
+  });
+  const card = app.querySelector("#paycard");
+  if (card) card.onclick = () => payByCard(card);
+  /* Re-drawn on every render while it is open. A code showing the previous
+     amount is the worst kind of wrong, because it scans. */
+  if (S.qrOpen) drawQr();
+
+  app.querySelector("#part").onchange = (e) => {
+    S.partPay = e.target.checked;
+    /* The amount changes, so the UPI link, the summary and the footer button
+       all have to be rebuilt — a stale upi:// href would send the guest to pay
+       the old figure, and they would have no way of knowing. */
+    render();
+  };
+
+  app.querySelector("#ref").oninput = (e) => {
+    S.payRef = e.target.value.replace(/\D/g, "").slice(0, 4);
+    e.target.value = S.payRef;
+    foot();
+  };
+}
+
+/* ── Waiting for the money to actually arrive ────────────────────────────
+ *
+ * Rakesh, 1 Sep 2026: the voucher goes out only once the Prime app has seen
+ * the payment. The desk phone's Google Pay notification is the only thing in
+ * the whole system that knows the money landed — the browser cannot know, and
+ * a upi:// intent never reports back.
+ *
+ * So this polls, gently and with an end: every 5 seconds for about 3 minutes.
+ * Not for ever, because a page that spins indefinitely teaches the guest that
+ * it is broken. When it gives up it says something true and useful rather
+ * than something reassuring. */
+async function watchPayment(id) {
+  if (!id || !scriptReachable()) return;
+  const MAX = 36;                       /* 36 x 5s = three minutes */
+  const tick = async () => {
+    if (S.settle === "paid" || S.step !== 4) return;
+    S.settleTries++;
+    try {
+      const d = await get("action=paymentStatus&bookingId=" + encodeURIComponent(id));
+      if (d && d.paid) {
+        S.settle = "paid"; S.settleAmount = d.amount; S.settleAt = d.at;
+        render();
+        n8nSend("paid", { paymentStatus: "Confirmed - Direct Web",
+                          confirmedAmount: d.amount, confirmedAt: d.at });
+        return;
+      }
+    } catch (e) { /* a dropped poll is not a failed payment; keep waiting */ }
+    if (S.settleTries >= MAX) { S.settle = "slow"; render(); return; }
+    setTimeout(tick, 5000);
+  };
+  setTimeout(tick, 2500);
+}
+function scriptReachable() { return !!CFG.SCRIPT_URL && CFG.SCRIPT_URL.startsWith("http"); }
+
+/* ── step 4 ───────────────────────────────────────────────────────────── */
+function stepDone(app) {
+  const b = S.booking || {};
+  const id = b.bookingId || S.ref;
+  const nights = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
+
+  /* ── Not yet confirmed ────────────────────────────────────────────────
+   * The room is held, the money has not been seen. Saying both plainly is
+   * the point: a guest who has paid should not be told "failed", and a guest
+   * who has not should not be handed a voucher. */
+  if (S.settle !== "paid") {
+    const slow = S.settle === "slow";
+    app.appendChild($(`<section class="step">
+      <div class="waitcard">
+        <div class="spin${slow ? " off" : ""}"></div>
+        <h2>${slow ? "Still waiting for your payment" : "Checking your payment…"}</h2>
+        <p class="note" style="margin-top:8px">${slow
+          ? `We have held <b>${S.pick.join(" + ")}</b> for you, but the payment has not reached
+             us yet. If your UPI app says it went through, send us the reference on WhatsApp
+             and we will confirm within minutes.`
+          : `Your booking reference is <b>${id}</b>. We are waiting for the payment to land in
+             the hotel account — this usually takes a few seconds. Please keep this page open.`}</p>
+        <p class="fine">Room held · ${fmt(S.checkIn)} → ${fmt(S.checkOut)} · ${inr(payNow())} ${
+          paidInFull() ? "in full" : "advance"}</p>
+      </div>
+      <a class="btn-dark" target="_blank" rel="noopener"
+        href="https://wa.me/${CFG.DESK_WA}?text=${encodeURIComponent(
+          "Booking " + id + " · " + S.guest.name + " · paid " + inr(payNow()) + ", ref " + S.payRef)}">
+        Message us about this booking</a>
+    </section>`));
+    return;
+  }
+
+  /* ── Confirmed. The voucher. ──────────────────────────────────────────
+   * Yellowish brown, as asked — and it is issued only here, on the far side
+   * of the desk phone actually seeing the money. */
+  const wa = `https://wa.me/${CFG.DESK_WA}?text=` + encodeURIComponent(
+    `Booking ${id} · ${S.guest.name} · ${S.pick.join(" + ")} · ` +
+    `${fmt(S.checkIn)} to ${fmt(S.checkOut)} · ${paxTotal()} guests · ${
+      paidInFull() ? `PAID IN FULL ${inr(tariff())}` : `advance ${inr(payNow())} paid, ${inr(dueLater())} at check-in`
+    }, ref ${S.payRef}`);
+
+  /* ── What the guest sees, and when ────────────────────────────────────
+   *
+   * This is HTML, not the canvas. The canvas card is still the file they
+   * download and the picture n8n forwards, but making them WAIT for it was
+   * costing 2.4 seconds of blank screen after the money landed — an Apps
+   * Script round trip, two image fetches and a six-megapixel paint, none of
+   * which the guest is interested in. Every value below is already in hand
+   * the moment payment confirms, so this paints on the same frame.
+   *
+   * The two renderings still say the same thing, which is the rule that
+   * matters; they are built from the same S. */
+  const paid  = paidInFull();
+  const digits = String(S.guest.phone || "").replace(/\D/g, "");
+  const phone = digits.length === 10
+    ? "+91 " + digits.slice(0, 5) + " " + digits.slice(5) : "";
+  const ciParts = (fmt(S.checkIn)  + " · 12:00 PM").split("·");
+  const coParts = (fmt(S.checkOut) + " · 10:00 AM").split("·");
+  const nightsN = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
+
+  app.appendChild($(`<section class="step">
+    <div id="vcard">
+      <div class="v-card">
+        <span class="v-corner tl"><i></i></span><span class="v-corner tr"><i></i></span>
+        <span class="v-corner bl"><i></i></span><span class="v-corner br"><i></i></span>
+        <div class="v-pad">
+
+          <header class="v-hdr">
+            <h1>PAYMENT SUCCESSFUL</h1>
+            <h2>BOOKING CONFIRMED</h2>
+            <p class="v-tick">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 12.5l5.5 5.5L20 7"/></svg>
+              <span>${paid ? "Paid in full" : "Advance received"}</span>
+            </p>
+          </header>
+
+          <div class="v-rule" aria-hidden="true"><i></i></div>
+
+          <div class="v-brand">
+            <img src="img/logo.webp" alt="Kutralam Ezhilagam" width="186" height="64">
+            <p>Premium Stay · Reservations &amp; Services</p>
+          </div>
+
+          <div class="v-guest">
+            <p class="v-nm">${esc(S.guest.name || "Your room")}</p>
+            ${phone ? `<p class="v-ph"><a href="tel:+91${digits}">${phone}</a></p>` : ""}
+          </div>
+
+          <section class="v-stay">
+            <div class="v-idrow">
+              <p class="v-lbl">Booking ID</p>
+              <p class="v-bid">${esc(id)}</p>
+            </div>
+            <div class="v-top">
+              <div>
+                <p class="v-lbl">Check-in</p>
+                <p class="v-big">${esc(ciParts[0].trim())}<span>${esc((ciParts[1]||"").trim())}</span></p>
+              </div>
+              <div class="v-divider">
+                <p class="v-lbl">Check-out</p>
+                <p class="v-big">${esc(coParts[0].trim())}<span>${esc((coParts[1]||"").trim())}</span></p>
+              </div>
+            </div>
+            <div class="v-tail">
+              <span class="v-room">Room: ${esc(S.pick.join(" + "))}</span>
+              <span class="v-sm" style="margin:0">${paxTotal()} guest${paxTotal()===1?"":"s"} · ${nightsN} Night${nightsN===1?"":"s"} Stay</span>
+            </div>
+            <p class="v-addr">
+              No 46, Vairams Nagar, Five Falls Road<br>
+              Courtallam, Tenkasi District, Tamil Nadu 627802
+            </p>
+          </section>
+
+          <section class="v-pay">
+            <h3 class="v-lbl" style="text-align:center;margin-bottom:10px">Payment Summary</h3>
+            <div class="v-row"><span class="v-k">${paid ? "Amount Paid" : "Advance Paid"}</span>
+              <span class="v-v v-ok">${inr(payNow())}</span></div>
+            <div class="v-row"><span class="v-k">Balance at Check-in</span>
+              <span class="v-v ${paid ? "v-ok" : "v-due"}">${paid ? "Nothing" : inr(dueLater())}</span></div>
+            <div class="v-row"><span class="v-k">Status</span>
+              <span><span class="v-badge${paid ? "" : " v-part"}">${paid ? "Fully Paid" : "Partial Advance"}</span></span></div>
+            ${S.settleAt ? `<p class="v-stamp">✓ Payment confirmed by the hotel · ${esc(prettyStamp(S.settleAt))}</p>` : ""}
+          </section>
+
+          <section class="v-scan">
+            <p class="v-lbl" style="text-align:center;margin-left:10px;margin-right:10px"
+               id="vScanLbl">Your booking reference</p>
+            <div class="v-frame">
+              <canvas id="vQr" hidden></canvas>
+              <div class="v-ref" id="vRef">
+                <span class="v-lbl" style="margin:0">Show this at the front desk</span>
+                <b>${esc(id)}</b>
+              </div>
+            </div>
+            <p class="v-cap" id="vScanCap">Show this at the front desk to check in</p>
+            <p class="v-tok" id="vTok" hidden></p>
+          </section>
+
+          <footer class="v-foot">
+            <p class="v-terms">
+              Government photo ID required at check-in for all adults.
+              <b>Wedding proof is mandatory for couples.</b>
+              Check-in from 12:00 PM · check-out strictly by 10:00 AM.
+            </p>
+            <a class="v-wa" href="${wa}" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2z"/>
+                <path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.6c.1-.2.2-.3.3-.5v-.5c-.1-.2-.7-1.6-.9-2.2-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.3z"/>
+              </svg>
+              <span>WhatsApp front desk<small>+91 99622 22415</small></span>
+            </a>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <button id="save" class="btn-plain vdl">Download voucher (JPEG)</button>
+  </section>`));
+
+  /* The code, when and if the token arrives. The card is already on screen;
+     this fills the frame in place and moves nothing else, so a guest reading
+     their booking reference does not have it jump under them. */
+  paintScanCode(id);
+
+  /* Hand the picture to the automation once, so the copy that reaches the
+     guest on WhatsApp is the same image they are looking at. Best effort and
+     deliberately silent: the confirmation text has already gone from n8n, and
+     a picture that fails to upload must not turn a confirmed booking into an
+     error message. */
+  if (!S.voucherSent) {
+    S.voucherSent = true;
+    /* Deferred to idle. Painting a six-megapixel canvas and encoding it to a
+       JPEG is hundreds of milliseconds of blocked main thread, and doing it
+       inline stole them from the frame that shows the guest their booking.
+       Nothing is waiting on this: the confirmation text has already gone. */
+    const later = () => voucherJpeg()
+      .then((url) => { if (url) n8nSend("voucher", { voucherJpeg: url }); })
+      .catch(() => {});
+    if (window.requestIdleCallback) requestIdleCallback(later, { timeout: 4000 });
+    else setTimeout(later, 1200);
+  }
+}
+
+
+
+/* ── n8n ──────────────────────────────────────────────────────────────────
+ *
+ * n8n does the announcing, not the reserving. The room is still held by the
+ * Apps Script call below, because that is the only thing that re-reads the
+ * sheet under a lock before it writes — routing the reservation through an
+ * automation server would put a second writer on the same rows and re-open
+ * the duplicate-booking bug that cost this system five rows sharing one id.
+ *
+ * So the order is: hold the room, then tell n8n. If n8n is unset, asleep or
+ * mid-restart the guest still has a room and the desk still hears about it
+ * from the script's own notice. Nothing here is allowed to throw. */
+function n8nPayload(extra) {
+  const b = S.booking || {};
+  return Object.assign({
+    bookingId: b.bookingId || S.ref,
+    ref: S.ref,
+    guest: S.guest.name.trim(),
+    phone: S.guest.phone,
+    waNumber: "91" + S.guest.phone,
+    address: [S.guest.address, S.guest.city].filter(Boolean).join(", "),
+    pin: S.guest.pin,
+    idType: S.guest.idType,
+    idLast4: S.guest.idLast4,
+    rooms: S.pick.join(", "),
+    checkIn: S.checkIn, checkOut: S.checkOut,
+    nights: Math.max(1, nightsBetween(S.checkIn, S.checkOut)),
+    adults: Number(S.adults) || 0, children: Number(S.children) || 0,
+    pax: paxTotal(),
+    tariff: tariff(), amountPaid: payNow(), balance: dueLater(),
+    paidInFull: paidInFull(),
+    upiRef: S.payRef, upiVpa: (payee() || {}).vpa || "",
+    acPreference: S.wantAc ? "AC" : "Non-AC",
+    source: "Direct Web", scriptUrl: CFG.SCRIPT_URL
+  }, extra || {});
+}
+async function n8nSend(event, extra) {
+  if (!CFG.N8N_WEBHOOK) return null;
+  try {
+    const r = await fetch(CFG.N8N_WEBHOOK, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(Object.assign({ event: event }, n8nPayload(extra)))
+    });
+    return r.ok ? await r.json().catch(() => ({ ok: true })) : null;
+  } catch (e) { return null; }
+}
+
+/* ── The voucher as a picture ─────────────────────────────────────────────
+ *
+ * The card on screen is the readable version. This is the one that ends up in
+ * the guest's photo gallery and gets forwarded on WhatsApp, so it is drawn at
+ * 1080x1920 — nine by sixteen, the same shape as the register card — and it
+ * survives being re-compressed by every app it passes through.
+ *
+ * It is drawn only after the desk phone has seen the money. A voucher is a
+ * receipt; drawing one earlier would make a picture of a payment that has not
+ * happened, and pictures travel further than pages do. */
+/* ══════════════════════════════════════════════════════════════════════════
+   A QR ENCODER, IN THE PAGE
+   ──────────────────────────────────────────────────────────────────────────
+   Byte mode, error correction M, versions 1 to 10. About two hundred lines,
+   which is more than a CDN import — and it is here rather than imported for
+   the same reason the page's CSS is inlined: this draws at the one moment the
+   guest has just parted with money, and a render-time dependency on somebody
+   else's server is a dependency that fails on the worst possible screen.
+
+   ECC level M is not the default choice by accident. The card is photographed
+   off a phone screen, forwarded through WhatsApp twice, and then held under a
+   desk lamp at an angle. L would fit a longer payload in a smaller grid and
+   fail exactly there.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Data capacity in bytes at level M, and the block structure to match.
+   [ dataBytes, eccPerBlock, [ [blocks, dataCwPerBlock], ... ] ] */
+const QR_M = {
+  1:  [14,  10, [[1, 16]]],
+  2:  [26,  16, [[1, 28]]],
+  3:  [42,  26, [[1, 44]]],
+  4:  [62,  18, [[2, 32]]],
+  5:  [84,  24, [[2, 43]]],
+  6:  [106, 16, [[4, 27]]],
+  7:  [122, 18, [[4, 31]]],
+  8:  [152, 22, [[2, 38], [2, 39]]],
+  9:  [180, 22, [[3, 36], [2, 37]]],
+  10: [213, 26, [[4, 43], [1, 44]]]
+};
+
+const QR_ALIGN = {
+  1: [], 2: [6, 18], 3: [6, 22], 4: [6, 26], 5: [6, 30], 6: [6, 34],
+  7: [6, 22, 38], 8: [6, 24, 42], 9: [6, 26, 46], 10: [6, 28, 50]
+};
+
+/* GF(256), primitive polynomial 0x11D. */
+const QR_EXP = new Uint8Array(512), QR_LOG = new Uint8Array(256);
+(function () {
+  let x = 1;
+  for (let i = 0; i < 255; i++) {
+    QR_EXP[i] = x; QR_LOG[x] = i;
+    x <<= 1; if (x & 0x100) x ^= 0x11D;
+  }
+  for (let i = 255; i < 512; i++) QR_EXP[i] = QR_EXP[i - 255];
+})();
+function qrMul(a, b) { return (a === 0 || b === 0) ? 0 : QR_EXP[QR_LOG[a] + QR_LOG[b]]; }
+
+/* Reed–Solomon remainder — the error-correction codewords for one block. */
+function qrEcc(data, n) {
+  let gen = [1];
+  for (let i = 0; i < n; i++) {
+    const next = new Array(gen.length + 1).fill(0);
+    for (let j = 0; j < gen.length; j++) {
+      next[j] ^= gen[j];
+      next[j + 1] ^= qrMul(gen[j], QR_EXP[i]);
+    }
+    gen = next;
+  }
+  const rem = new Array(n).fill(0);
+  for (const d of data) {
+    const factor = d ^ rem[0];
+    rem.shift(); rem.push(0);
+    if (factor !== 0) for (let j = 0; j < n; j++) rem[j] ^= qrMul(gen[j + 1], factor);
+  }
+  return rem;
+}
+
+/* BCH(15,5) for the format string, BCH(18,6) for the version string. */
+function qrBch(value, poly, bits) {
+  let v = value << (bits - 1);
+  const top = 1 << (bits + (poly.toString(2).length - bits) - 1);
+  let d = v;
+  const polyLen = poly.toString(2).length;
+  while (d.toString(2).length >= polyLen) d ^= poly << (d.toString(2).length - polyLen);
+  return v | d;
+}
+
+function qrEncode(text) {
+  const bytes = [];
+  for (const ch of unescape(encodeURIComponent(text))) bytes.push(ch.charCodeAt(0));
+
+  let version = 0;
+  for (let v = 1; v <= 10; v++) if (bytes.length <= QR_M[v][0]) { version = v; break; }
+  if (!version) throw new Error("QR payload too long: " + bytes.length + " bytes");
+
+  const [, eccPer, groups] = QR_M[version];
+  const size = version * 4 + 17;
+
+  /* ── bit stream ──────────────────────────────────────────────────────── */
+  const bits = [];
+  const push = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >> i) & 1); };
+  push(0b0100, 4);                                  /* byte mode            */
+  push(bytes.length, version < 10 ? 8 : 16);        /* character count      */
+  bytes.forEach(b => push(b, 8));
+
+  const totalData = groups.reduce((a, [n, cw]) => a + n * cw, 0);
+  const capacity = totalData * 8;
+  push(0, Math.min(4, capacity - bits.length));     /* terminator           */
+  while (bits.length % 8) bits.push(0);
+  const cws = [];
+  for (let i = 0; i < bits.length; i += 8)
+    cws.push(bits.slice(i, i + 8).reduce((a, b) => (a << 1) | b, 0));
+  /* The pad bytes alternate EC, 11, EC, 11 — starting from EC ALWAYS, not
+     from whichever the current length's parity happens to select. Keyed off
+     cws.length it is right only when the data happens to end on an even
+     codeword, which is why a 76 and an 86 byte payload passed and a 99 byte
+     one did not. */
+  const PAD = [0xEC, 0x11];
+  for (let i = 0; cws.length < totalData; i++) cws.push(PAD[i % 2]);
+
+  /* ── blocks, then interleave ─────────────────────────────────────────── */
+  const dataBlocks = [], eccBlocks = [];
+  let at = 0;
+  groups.forEach(([n, cw]) => {
+    for (let i = 0; i < n; i++) {
+      const blk = cws.slice(at, at + cw); at += cw;
+      dataBlocks.push(blk); eccBlocks.push(qrEcc(blk, eccPer));
+    }
+  });
+  const stream = [];
+  const maxData = Math.max(...dataBlocks.map(b => b.length));
+  for (let i = 0; i < maxData; i++)
+    dataBlocks.forEach(b => { if (i < b.length) stream.push(b[i]); });
+  for (let i = 0; i < eccPer; i++) eccBlocks.forEach(b => stream.push(b[i]));
+
+  /* ── the grid ────────────────────────────────────────────────────────── */
+  const m = Array.from({ length: size }, () => new Array(size).fill(null));
+  const fixed = Array.from({ length: size }, () => new Array(size).fill(false));
+  const set = (r, c, v) => { m[r][c] = v; fixed[r][c] = true; };
+
+  const finder = (r0, c0) => {
+    for (let r = -1; r <= 7; r++) for (let c = -1; c <= 7; c++) {
+      const r1 = r0 + r, c1 = c0 + c;
+      if (r1 < 0 || c1 < 0 || r1 >= size || c1 >= size) continue;
+      const on = (r >= 0 && r <= 6 && (c === 0 || c === 6)) ||
+                 (c >= 0 && c <= 6 && (r === 0 || r === 6)) ||
+                 (r >= 2 && r <= 4 && c >= 2 && c <= 4);
+      set(r1, c1, on ? 1 : 0);
+    }
+  };
+  finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+
+  for (let i = 8; i < size - 8; i++) {                    /* timing */
+    set(6, i, i % 2 ? 0 : 1); set(i, 6, i % 2 ? 0 : 1);
+  }
+
+  const ali = QR_ALIGN[version];
+  ali.forEach(r => ali.forEach(c => {
+    if ((r <= 7 && c <= 7) || (r <= 7 && c >= size - 8) || (r >= size - 8 && c <= 7)) return;
+    for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++)
+      set(r + dr, c + dc,
+          (Math.abs(dr) === 2 || Math.abs(dc) === 2 || (dr === 0 && dc === 0)) ? 1 : 0);
+  }));
+
+  set(size - 8, 8, 1);                                    /* dark module */
+
+  /* reserve the format areas so the data walk skips them */
+  for (let i = 0; i < 9; i++) { if (!fixed[8][i]) set(8, i, 0); if (!fixed[i][8]) set(i, 8, 0); }
+  for (let i = 0; i < 8; i++) {
+    if (!fixed[8][size - 1 - i]) set(8, size - 1 - i, 0);
+    if (!fixed[size - 1 - i][8]) set(size - 1 - i, 8, 0);
+  }
+  if (version >= 7) {
+    const vinfo = qrBch(version, 0x1F25, 13);
+    for (let i = 0; i < 18; i++) {
+      const bit = (vinfo >> i) & 1;
+      set(Math.floor(i / 3), size - 11 + (i % 3), bit);
+      set(size - 11 + (i % 3), Math.floor(i / 3), bit);
+    }
+  }
+
+  /* ── the zigzag ──────────────────────────────────────────────────────── */
+  let bi = 0, up = true;
+  const bitAt = i => (i >> 3) < stream.length ? (stream[i >> 3] >> (7 - (i & 7))) & 1 : 0;
+  for (let col = size - 1; col > 0; col -= 2) {
+    if (col === 6) col--;                                 /* the timing column */
+    for (let n = 0; n < size; n++) {
+      const row = up ? size - 1 - n : n;
+      for (const c of [col, col - 1]) {
+        if (fixed[row][c]) continue;
+        m[row][c] = bitAt(bi++);
+      }
+    }
+    up = !up;
+  }
+
+  /* ── mask, chosen by penalty rather than picked ──────────────────────── */
+  const MASKS = [
+    (r, c) => (r + c) % 2 === 0,
+    (r) => r % 2 === 0,
+    (r, c) => c % 3 === 0,
+    (r, c) => (r + c) % 3 === 0,
+    (r, c) => (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0,
+    (r, c) => ((r * c) % 2) + ((r * c) % 3) === 0,
+    (r, c) => (((r * c) % 2) + ((r * c) % 3)) % 2 === 0,
+    (r, c) => (((r + c) % 2) + ((r * c) % 3)) % 2 === 0
+  ];
+
+  let best = null, bestScore = Infinity;
+  for (let k = 0; k < 8; k++) {
+    const g = m.map(row => row.slice());
+    for (let r = 0; r < size; r++) for (let c = 0; c < size; c++)
+      if (!fixed[r][c] && MASKS[k](r, c)) g[r][c] ^= 1;
+
+    const fmt = qrBch((0b00 << 3) | k, 0x537, 11) ^ 0x5412;   /* M = 00 */
+    /* Two things here are easy to get backwards and both were, first time:
+       the strip runs MOST significant bit first, and copy 2 splits after bit
+       6, not bit 7. Verified by diffing the finished matrix against a known
+       encoder — the data area matched perfectly while nine modules in these
+       two strips did not, which is what pointed at the format rather than at
+       the Reed-Solomon. */
+    for (let i = 0; i < 15; i++) {
+      const bit = (fmt >> (14 - i)) & 1;
+      /* copy 1, wrapped round the top-left finder */
+      if (i < 6) g[8][i] = bit;
+      else if (i < 8) g[8][i + 1] = bit;
+      else if (i === 8) g[7][8] = bit;
+      else g[14 - i][8] = bit;
+      /* copy 2: bits 0-6 climb the bottom-left, 7-14 run along the top-right */
+      if (i < 7) g[size - 1 - i][8] = bit;
+      else g[8][size - 15 + i] = bit;
+    }
+    g[size - 8][8] = 1;                                       /* dark module */
+
+    const sc = qrPenalty(g, size);
+    if (sc < bestScore) { bestScore = sc; best = g; }
+  }
+  return best;
+}
+
+/* The four standard penalty rules. Without these the encoder still produces a
+   valid symbol, but a badly masked one can defeat a phone camera at an angle
+   under a desk lamp — which is precisely the reading condition this card
+   exists for. */
+function qrPenalty(g, size) {
+  let p = 0;
+  const run = line => {
+    let n = 1;
+    for (let i = 1; i < size; i++) {
+      if (line[i] === line[i - 1]) { n++; if (n === 5) p += 3; else if (n > 5) p++; }
+      else n = 1;
+    }
+  };
+  for (let r = 0; r < size; r++) run(g[r]);
+  for (let c = 0; c < size; c++) run(g.map(row => row[c]));
+
+  for (let r = 0; r < size - 1; r++) for (let c = 0; c < size - 1; c++)
+    if (g[r][c] === g[r][c + 1] && g[r][c] === g[r + 1][c] && g[r][c] === g[r + 1][c + 1]) p += 3;
+
+  const pat = [1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0];
+  const rpat = pat.slice().reverse();
+  const scan = line => {
+    for (let i = 0; i + 11 <= size; i++) {
+      const w = line.slice(i, i + 11);
+      if (w.every((v, j) => v === pat[j]) || w.every((v, j) => v === rpat[j])) p += 40;
+    }
+  };
+  for (let r = 0; r < size; r++) scan(g[r]);
+  for (let c = 0; c < size; c++) scan(g.map(row => row[c]));
+
+  let dark = 0;
+  for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) dark += g[r][c];
+  p += Math.floor(Math.abs((dark * 100) / (size * size) - 50) / 5) * 10;
+  return p;
+}
+
+/* Draw the grid. The quiet zone is four modules on every side and is not
+   optional — a QR pressed against a border is the classic "it scans on my
+   phone but not on theirs" bug. */
+function drawQrMatrix(ctx, text, x, y, size) {
+  const g = qrEncode(text);
+  const n = g.length, quiet = 4, span = n + quiet * 2;
+  const px = size / span;
+  ctx.save();
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(x, y, size, size);
+  ctx.fillStyle = "#1A1208";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (g[r][c])
+    /* +0.5 on the width closes the hairline seams that appear between modules
+       when px is fractional and the JPEG encoder then smears them. */
+    ctx.fillRect(x + (c + quiet) * px, y + (r + quiet) * px, px + 0.5, px + 0.5);
+  ctx.restore();
+  return n;
+}
+
+/* A missing or slow logo must not stop a paid guest getting their voucher,
+   so this never rejects — it resolves with null and the card falls back to
+   the lettering. */
+function vcImage(src) {
+  return new Promise((res) => {
+    const im = new Image();
+    im.onload = () => res(im);
+    im.onerror = () => res(null);
+    setTimeout(() => res(im.complete && im.naturalWidth ? im : null), 4000);
+    im.src = src;
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   THE VOUCHER, IVORY AND GOLD
+   ──────────────────────────────────────────────────────────────────────────
+   Drawn at 800 x 1350 design units and scaled x2, so the file that leaves the
+   phone is 1600 x 2700. That size is not vanity: the picture is forwarded
+   through WhatsApp, which re-compresses it at every hop, and at 800 wide the
+   reference goes soft after one.
+
+   The palette inverts the old bronze card. Ivory paper, gold rule, dark ink.
+   Two consequences worth stating, because they drove most of the decisions
+   below:
+
+   1. On a pale ground, gold is decoration and CANNOT carry information. Gold
+      on ivory is about 2.4:1 — fine for a rule or a label, illegible for a
+      name or an amount on a phone in daylight. So every value a guest or a
+      receptionist actually reads is near-black ink; gold is reserved for
+      borders, ornament and small-caps labels.
+   2. The property photograph goes UNDER the detail panel at low opacity and
+      the panel is drawn over it as near-opaque white. A photograph behind
+      text is how a pretty voucher becomes an unreadable one.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Two heights, not one. A QR big enough to scan needs about 240 units, and
+   the only way to fit one at the old height was to shrink it until it stopped
+   being scannable — which is not a compromise, it is a broken feature that
+   looks finished. The card is as tall as its contents require: 1450 without a
+   code (1600 x 3090 out), 1895 with one (1600 x 3790).
+
+   Both are taller than the first cut because the type was raised about a
+   third. A voucher is read on a phone at arm's length by somebody checking a
+   figure, and at 800 design units across, a 12-unit label renders around six
+   pixels on a 400px-wide screen. Growing the card is the cheap fix; setting
+   the type smaller to fit a number chosen earlier is not a fix at all. */
+const VC = { W: 800, H: 1545, H_QR: 1895, SCALE: 2 };
+
+const INK    = "#241C12";   /* everything that must be read            */
+const INK_2  = "#5A4A33";   /* secondary lines                          */
+const GOLD   = "#A6812E";   /* rules, labels, ornament                  */
+const GOLD_L = "#D9BC72";   /* highlight pass on the frame              */
+const PAPER  = "#FBF7EE";
+const PANEL  = "#FFFFFF";
+const GREEN  = "#1B6B3F";   /* paid                                     */
+const AMBER  = "#8A5A12";   /* balance outstanding                      */
+
+const SERIF = '"Times New Roman", Georgia, serif';
+const SANS  = 'Arial, Helvetica, sans-serif';
+
+/* roundRect landed in Chrome 99 and Safari 16.4. Plenty of the phones that
+   book a room in Courtallam are older, and an unpolyfilled call throws —
+   which would mean no voucher at all on exactly the handsets least likely to
+   try again. */
+if (typeof CanvasRenderingContext2D !== "undefined" &&
+    !CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+    const rad = Math.min(typeof r === "number" ? r : (r && r[0]) || 0, w / 2, h / 2);
+    this.beginPath();
+    this.moveTo(x + rad, y);
+    this.arcTo(x + w, y, x + w, y + h, rad);
+    this.arcTo(x + w, y + h, x, y + h, rad);
+    this.arcTo(x, y + h, x, y, rad);
+    this.arcTo(x, y, x + w, y, rad);
+    this.closePath();
+    return this;
+  };
+}
+
+/* Shrink a line until it fits the space it was given. Every collision on the
+   old card came from text drawn at a fixed size into a fixed box — a name is
+   data, and data does not agree to be short. */
+function vcFit(ctx, text, maxW, weight, size, family, min) {
+  let sz = size;
+  do { ctx.font = weight + " " + sz + "px " + family; sz -= 1; }
+  while (ctx.measureText(text).width > maxW && sz > (min || 11));
+  return sz + 1;
+}
+
+/* Wrap to a width, capped at a line count. Returns the lines. */
+function vcWrap(ctx, text, maxW, maxLines) {
+  const words = String(text).split(/\s+/);
+  const out = []; let line = "";
+  for (const w of words) {
+    const t = line ? line + " " + w : w;
+    if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; }
+    else line = t;
+    if (out.length === maxLines) break;
+  }
+  if (line && out.length < maxLines) out.push(line);
+  return out;
+}
+
+/* Text bent around a circle, the way the reference sets the house name.
+   Drawn character by character: canvas has no arc-text primitive, and the
+   alternative — a curved path with textPath — is SVG only. */
+function vcArc(ctx, text, cx, cy, radius, size, colour, spread) {
+  ctx.save();
+  ctx.font = "700 " + size + "px " + SERIF;
+  ctx.fillStyle = colour;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  const chars = [...text];
+  /* Space the characters by their real widths rather than dividing the arc
+     evenly. Even division makes an 'i' sit as far from its neighbour as a
+     'W', which reads as a typographic mistake even to people who cannot say
+     why. */
+  const widths = chars.map(ch => ctx.measureText(ch).width);
+  const total = widths.reduce((a, b) => a + b, 0) * (spread || 1);
+  let angle = -total / (2 * radius);
+  for (let i = 0; i < chars.length; i++) {
+    const step = (widths[i] * (spread || 1)) / radius;
+    angle += step / 2;
+    ctx.save();
+    ctx.translate(cx + Math.sin(angle) * radius, cy - Math.cos(angle) * radius);
+    ctx.rotate(angle);
+    ctx.fillText(chars[i], 0, 0);
+    ctx.restore();
+    angle += step / 2;
+  }
+  ctx.restore();
+}
+
+/* A small centred ornament — a rule, a diamond, a rule. Not a glyph: a
+   decorative character depends on a font being present and draws a tofu box
+   when it is not, which is the one failure a printed-looking document cannot
+   have. Strokes always draw. */
+function vcOrnament(ctx, cx, y, half) {
+  ctx.save();
+  ctx.strokeStyle = GOLD; ctx.fillStyle = GOLD; ctx.lineWidth = 1;
+  const gap = 16;
+  ctx.beginPath();
+  ctx.moveTo(cx - half, y); ctx.lineTo(cx - gap, y);
+  ctx.moveTo(cx + gap, y); ctx.lineTo(cx + half, y);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx, y - 5); ctx.lineTo(cx + 6, y); ctx.lineTo(cx, y + 5);
+  ctx.lineTo(cx - 6, y); ctx.closePath(); ctx.fill();
+  /* the two outer pips */
+  [[cx - half - 8, y], [cx + half + 8, y]].forEach(([px, py]) => {
+    ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI * 2); ctx.fill();
+  });
+  ctx.restore();
+}
+
+/* The art-deco corner. Two nested quarter-arcs with a short spur on each
+   axis — the shape the reference uses at all four corners, mirrored by
+   transform rather than written out four times. */
+function vcCorner(ctx, x, y, r, flipX, flipY) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+  ctx.strokeStyle = GOLD;
+  ctx.lineCap = "round";
+
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(r + 46, 0);
+  ctx.arcTo(0, 0, 0, r + 46, r);
+  ctx.lineTo(0, r + 46);
+  ctx.stroke();
+
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = GOLD_L;
+  ctx.beginPath();
+  ctx.moveTo(r + 30, 9);
+  ctx.arcTo(9, 9, 9, r + 30, r - 9);
+  ctx.lineTo(9, r + 30);
+  ctx.stroke();
+
+  /* the little inward spur that stops the arc looking like a plain radius */
+  ctx.strokeStyle = GOLD; ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.moveTo(r * 0.42, r * 0.42);
+  ctx.lineTo(r * 0.30, r * 0.30);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(r * 0.26, r * 0.26, 2.6, 0, Math.PI * 2);
+  ctx.fillStyle = GOLD; ctx.fill();
+  ctx.restore();
+}
+
+/* A small-caps gold label over a dark value. Used for every field in the
+   panel, so the panel reads as one system rather than a list of exceptions. */
+function vcField(ctx, x, y, w, label, value, opts) {
+  const o = opts || {};
+  ctx.save();
+  ctx.textAlign = o.align || "left";
+  const ax = o.align === "right" ? x + w : (o.align === "center" ? x + w / 2 : x);
+
+  ctx.fillStyle = GOLD;
+  ctx.font = "700 15px " + SANS;
+  ctx.fillText(vcSpaced(label), ax, y);
+
+  ctx.fillStyle = o.colour || INK;
+  const size = vcFit(ctx, value, w, o.weight || "700", o.size || 24, o.family || SANS, 14);
+  ctx.font = (o.weight || "700") + " " + size + "px " + (o.family || SANS);
+  ctx.fillText(value, ax, y + (o.gap || 32));
+  ctx.restore();
+  return y + (o.gap || 32);
+}
+
+/* Letter-spacing by hand. ctx.letterSpacing is Chrome-only and silently does
+   nothing everywhere else, which would leave the labels looking cramped on
+   exactly the phones we cannot test on. */
+function vcSpaced(s) { return [...String(s).toUpperCase()].join(" "); }
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+function drawPremiumVoucher(ctx, d) {
+  const W = VC.W, H = d.height || VC.H, CX = W / 2;
+
+  /* ── The page ──────────────────────────────────────────────────────── */
+  ctx.fillStyle = PAPER;
+  ctx.fillRect(0, 0, W, H);
+
+  /* A faint linen tooth, so a large flat cream area does not band when the
+     JPEG is compressed. Deterministic, not random: a voucher redrawn for the
+     same booking must be the same picture, or a guest who screenshots it
+     twice has two different documents. */
+  ctx.save();
+  ctx.globalAlpha = 0.04;
+  ctx.strokeStyle = "#8A7A5E"; ctx.lineWidth = 1;
+  for (let i = 0; i < H; i += 4) {
+    ctx.beginPath(); ctx.moveTo(0, i + (i % 8 ? 0 : 1)); ctx.lineTo(W, i); ctx.stroke();
+  }
+  ctx.restore();
+
+  /* ── The headline, outside the frame ───────────────────────────────── */
+  ctx.textAlign = "center";
+  ctx.fillStyle = GOLD;
+  ctx.font = "700 " + vcFit(ctx, vcSpaced("PAYMENT SUCCESSFUL"), W - 76, "700", 54, SERIF, 30) + "px " + SERIF;
+  ctx.fillText(vcSpaced("PAYMENT SUCCESSFUL"), CX, 80);
+
+  ctx.fillStyle = INK;
+  ctx.font = "700 35px " + SANS;
+  ctx.fillText(vcSpaced("Booking Confirmed"), CX, 130);
+
+  /* ── The card ──────────────────────────────────────────────────────── */
+  const CX0 = 34, CY0 = 160, CW = W - 68, CH = H - CY0 - 34;
+
+  ctx.save();
+  ctx.shadowColor = "rgba(60,45,20,.16)";
+  ctx.shadowBlur = 18; ctx.shadowOffsetY = 5;
+  ctx.fillStyle = "#FFFDF8";
+  ctx.roundRect(CX0, CY0, CW, CH, 26); ctx.fill();
+  ctx.restore();
+
+  /* double rule, then the four corners */
+  ctx.strokeStyle = GOLD; ctx.lineWidth = 2;
+  ctx.roundRect(CX0 + 9, CY0 + 9, CW - 18, CH - 18, 20); ctx.stroke();
+  ctx.strokeStyle = GOLD_L; ctx.lineWidth = 1;
+  ctx.roundRect(CX0 + 17, CY0 + 17, CW - 34, CH - 34, 15); ctx.stroke();
+
+  const cr = 54, m = 30;
+  vcCorner(ctx, CX0 + m,      CY0 + m,      cr, false, false);
+  vcCorner(ctx, CX0 + CW - m, CY0 + m,      cr, true,  false);
+  vcCorner(ctx, CX0 + m,      CY0 + CH - m, cr, false, true);
+  vcCorner(ctx, CX0 + CW - m, CY0 + CH - m, cr, true,  true);
+
+  /* ── Logo ──────────────────────────────────────────────────────────── */
+  let y = CY0 + 54;
+  if (d.logo && d.logo.width) {
+    const lw = 190, lh = lw * (d.logo.height / d.logo.width);
+    ctx.drawImage(d.logo, CX - lw / 2, y, lw, lh);
+    y += lh + 6;
+  } else {
+    ctx.fillStyle = INK; ctx.font = "700 36px " + SERIF; ctx.textAlign = "center";
+    ctx.fillText("KUTRALAM EZHILAGAM", CX, y + 30);
+    y += 54;
+  }
+
+  /* The house line, bent the way the reference sets it — but on a 460 radius,
+     not 176. A tight radius rolls the last characters through 60 degrees and
+     drops them into whatever sits below; the sagitta over a 400-wide chord is
+     68px at r=176 and 38px at r=460. */
+  vcArc(ctx, "PREMIUM STAY · RESERVATIONS & SERVICES", CX, y + 486, 480, 18, GOLD, 1.04);
+  y += 72;
+
+  vcOrnament(ctx, CX, y, 70);
+  y += 38;
+
+  /* ── Guest ─────────────────────────────────────────────────────────── */
+  ctx.textAlign = "center";
+  ctx.fillStyle = INK;
+  let gs = vcFit(ctx, d.guestName, CW - 120, "700", 44, SERIF, 26);
+  ctx.font = "700 " + gs + "px " + SERIF;
+  ctx.fillText(d.guestName, CX, y + gs);
+  y += gs + 12;
+
+  ctx.fillStyle = INK_2; ctx.font = "400 22px " + SANS;
+  ctx.fillText(d.guestPhone, CX, y + 12);
+  y += 40;
+
+  /* ── The detail panel ──────────────────────────────────────────────── */
+  const PX = CX0 + 40, PW = CW - 80;
+  /* The panel takes the room that is left once the code block and the terms
+     have been reserved, rather than a number typed in and re-typed every time
+     something above it moves. */
+  const CARD_BOTTOM = CY0 + CH;
+  const codeH  = 148;   /* the reference box, on every card */
+  /* The foot block has to be reserved here, or the panel — which sizes itself
+     from whatever is left — simply eats the height added for the QR and pushes
+     the code off the bottom of the card. Growing H then moves both down
+     together and never converges. */
+  const FOOT_H = (d.qr && d.qr.length) ? 474 : 0;
+  const TERMS_TOP = CARD_BOTTOM - 176 - FOOT_H;
+  const PY = y;
+  const PH = Math.max(636, TERMS_TOP - 26 - codeH - 46 - PY);
+
+  /* Photograph behind the panel, clipped to it, held right down. It is
+     atmosphere; the moment it competes with the type it has failed. */
+  ctx.save();
+  ctx.roundRect(PX, PY, PW, PH, 20); ctx.clip();
+  ctx.fillStyle = "#F2ECE0"; ctx.fillRect(PX, PY, PW, PH);
+  if (d.photo && d.photo.width) {
+    ctx.globalAlpha = 0.16;
+    const s = Math.max(PW / d.photo.width, PH / d.photo.height);
+    const dw = d.photo.width * s, dh = d.photo.height * s;
+    ctx.drawImage(d.photo, PX + (PW - dw) / 2, PY + (PH - dh) / 2, dw, dh);
+    ctx.globalAlpha = 1;
+  }
+  /* near-opaque white over the top: this is what makes the type readable */
+  ctx.fillStyle = "rgba(255,255,255,.88)";
+  ctx.fillRect(PX, PY, PW, PH);
+  ctx.restore();
+
+  ctx.strokeStyle = "rgba(166,129,46,.45)"; ctx.lineWidth = 1;
+  ctx.roundRect(PX, PY, PW, PH, 20); ctx.stroke();
+
+  const IX = PX + 26, IW = PW - 52;
+  let iy = PY + 34;
+
+  /* Booking id and stay, side by side — the reference's two-column head. */
+  const colW = (IW - 30) * 0.38;
+  vcField(ctx, IX, iy, colW, "Booking ID", d.bookingRef,
+          { size: 32, family: SANS, weight: "700" });
+  ctx.save();
+  ctx.strokeStyle = "rgba(166,129,46,.4)"; ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(IX + colW + 15, iy - 16); ctx.lineTo(IX + colW + 15, iy + 118);
+  ctx.stroke(); ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = GOLD; ctx.font = "700 15px " + SANS; ctx.textAlign = "left";
+  ctx.fillText(vcSpaced("Stay Details"), IX + colW + 34, iy);
+  ctx.fillStyle = INK; ctx.font = "700 20px " + SANS;
+  ctx.fillText(d.checkIn,  IX + colW + 34, iy + 32);
+  ctx.fillText(d.checkOut, IX + colW + 34, iy + 60);
+  ctx.fillStyle = INK_2; ctx.font = "400 18px " + SANS;
+  ctx.fillText(d.rooms,  IX + colW + 34, iy + 88);
+  ctx.fillText(d.guests + " · " + d.nights, IX + colW + 34, iy + 114);
+  ctx.restore();
+
+  iy += 152;
+  ctx.save();
+  ctx.strokeStyle = "rgba(166,129,46,.35)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(IX, iy); ctx.lineTo(IX + IW, iy); ctx.stroke();
+  ctx.restore();
+
+  iy += 36;
+  ctx.textAlign = "center"; ctx.fillStyle = INK; ctx.font = "700 22px " + SERIF;
+  ctx.fillText("No 46, Vairams Nagar, Five Falls Road", CX, iy);
+  ctx.fillStyle = INK_2; ctx.font = "400 17px " + SANS;
+  ctx.fillText("Courtallam, Tenkasi District, Tamil Nadu 627802", CX, iy + 28);
+
+  iy += 62;
+  ctx.save();
+  ctx.strokeStyle = "rgba(166,129,46,.35)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(IX, iy); ctx.lineTo(IX + IW, iy); ctx.stroke();
+  ctx.restore();
+
+  /* ── Money ─────────────────────────────────────────────────────────── */
+  iy += 30;
+  ctx.textAlign = "center"; ctx.fillStyle = GOLD; ctx.font = "700 15px " + SANS;
+  ctx.fillText(vcSpaced("Payment Details"), CX, iy);
+
+  iy += 40;
+  ctx.textAlign = "left";
+  const rowL = IX + 6, rowR = IX + IW - 6;
+
+  const money = d.paidInFull
+    ? [["Amount Paid", "₹" + d.advancePaid, GREEN],
+       ["Balance at Check-in", "Nothing", GREEN],
+       ["Status", "Fully Paid", GREEN]]
+    : [["Advance Paid", "₹" + d.advancePaid, GREEN],
+       ["Balance at Check-in", "₹" + d.balanceDue, AMBER],
+       ["Status", "Partial Advance", AMBER]];
+
+  money.forEach(([k, v, col], i) => {
+    ctx.fillStyle = INK_2; ctx.font = "400 20px " + SANS; ctx.textAlign = "left";
+    ctx.fillText(k, rowL, iy + i * 38);
+    ctx.fillStyle = col; ctx.font = "700 23px " + SANS; ctx.textAlign = "right";
+    ctx.fillText(v, rowR, iy + i * 38);
+  });
+  iy += 3 * 38;
+
+  ctx.textAlign = "center"; ctx.fillStyle = GREEN; ctx.font = "400 16px " + SANS;
+  ctx.fillText("✓ Payment confirmed by the hotel" +
+               (d.timestamp ? " · " + d.timestamp : ""), CX, iy + 4);
+
+  iy += 38;
+  ctx.save();
+  ctx.strokeStyle = "rgba(166,129,46,.35)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(IX, iy); ctx.lineTo(IX + IW, iy); ctx.stroke();
+  ctx.restore();
+
+  iy += 42;
+  ctx.textAlign = "center"; ctx.fillStyle = GOLD; ctx.font = "700 15px " + SANS;
+  ctx.fillText(vcSpaced("Included"), CX, iy);
+  ctx.fillStyle = INK; ctx.font = "400 19px " + SANS;
+  const inc = vcWrap(ctx, d.included, IW - 20, 2);
+  inc.forEach((ln, i) => ctx.fillText(ln, CX, iy + 32 + i * 25));
+
+  /* ── The reference block ───────────────────────────────────────────── */
+  /* On every card, token or no token. It is what the desk reads across a
+     counter when the scanner is busy, when the phone is dying, or when the
+     guest has printed the thing out. */
+  let by = PY + PH + 46;
+
+  ctx.save();
+  ctx.strokeStyle = GOLD; ctx.lineWidth = 1.4;
+  ctx.roundRect(CX - 215, by, 430, 112, 16); ctx.stroke();
+  ctx.textAlign = "center";
+  ctx.fillStyle = GOLD; ctx.font = "700 15px " + SANS;
+  ctx.fillText(vcSpaced("Show this at the front desk"), CX, by + 32);
+  ctx.fillStyle = INK;
+  ctx.font = "700 " + vcFit(ctx, d.bookingRef, 380, "700", 48, SANS, 26) + "px " + SANS;
+  ctx.fillText(d.bookingRef, CX, by + 88);
+  ctx.restore();
+  by += 148;
+
+  /* ── Terms ─────────────────────────────────────────────────────────── */
+  ctx.textAlign = "center";
+  ctx.fillStyle = GOLD; ctx.font = "700 15px " + SANS;
+  ctx.fillText(vcSpaced("Terms & Conditions Apply"), CX, by);
+  ctx.fillStyle = INK_2; ctx.font = "400 16px " + SANS;
+  const terms = "Government photo ID is required at check-in for all adults. " +
+                "Wedding proof is mandatory for couples. Check-in from 12:00 PM, " +
+                "check-out strictly by 10:00 AM.";
+  vcWrap(ctx, terms, CW - 110, 3)
+    .forEach((ln, i) => ctx.fillText(ln, CX, by + 30 + i * 23));
+
+  ctx.fillStyle = INK; ctx.font = "700 20px " + SANS;
+  ctx.fillText("WhatsApp front desk  ·  +91 99622 22415", CX, by + 128);
+
+  /* ── The security code, at the foot ────────────────────────────────────
+   *
+   * A QR here is NOT decoration, and this is the one part of the card that
+   * can hurt somebody if it is got wrong.
+   *
+   * claude/tamper-proof-vouchers.md: the desk scanner refuses any code that
+   * carries a booking id without the 16-character token, and it does not
+   * refuse quietly — flashing red banner, error haptics, and a fraud alert to
+   * Rakesh's phone. A guest who has just paid in full would be met with that
+   * at the desk having done nothing wrong. The doc puts it plainly: a card is
+   * never drawn without a token.
+   *
+   * So this block draws only when a token actually came back from
+   * ?action=voucherToken. No token, no code — and the card is still complete,
+   * because the reference box above it is what the desk reads either way.
+   *
+   * The token is printed under the code as well as encoded in it, grouped
+   * four and four. That is not belt-and-braces: the same doc says the desk
+   * will one day read one down a phone line, which is also why the alphabet
+   * excludes I, O, 0 and 1. */
+  if (!d.qr || !d.qr.length) return;
+
+  let qy = by + 176;
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(166,129,46,.45)"; ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(CX0 + 90, qy - 34); ctx.lineTo(CX0 + CW - 90, qy - 34);
+  ctx.stroke(); ctx.restore();
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = GOLD; ctx.font = "700 15px " + SANS;
+  ctx.fillText(vcSpaced("Secure check-in code"), CX, qy);
+
+  /* 208 design units, so 416 real pixels for a 41-module grid plus its
+     4-module quiet zone — about 8.5 px per module. Measured, not guessed: at
+     132 the card stopped decoding as soon as a forward shrank it below
+     1080px, because 49 spans across 264px is 2.7px per module and no scanner
+     reads that. Enlarging it is the only fix; a QR cannot be made more robust
+     by wishing. */
+  const qs = 208;
+  qy += 26;
+  drawQrMatrix(ctx, d.qr, CX - qs / 2, qy, qs);
+  qy += qs + 30;
+
+  ctx.fillStyle = INK_2; ctx.font = "400 16px " + SANS;
+  ctx.fillText("Scan at the front desk", CX, qy);
+
+  if (d.token) {
+    qy += 34;
+    ctx.fillStyle = INK;
+    const tok = d.token.toUpperCase();
+    ctx.font = "700 " + vcFit(ctx, tok, CW - 140, "700", 24, SANS, 14) + "px " + SANS;
+    ctx.fillText(tok, CX, qy);
+  }
+}
+
+function vcGlyphs(ctx) {
+  const has = (ch) => {
+    try {
+      ctx.font = "20px sans-serif";
+      const w = ctx.measureText(ch).width, tofu = ctx.measureText("￿").width;
+      return w > 0 && Math.abs(w - tofu) > 0.5;
+    } catch (e) { return false; }
+  };
+  return {
+    dot:   has("●") ? "●" : "",
+    tick:  has("✓") ? "✓" : "",
+    spark: has("✨") ? "✨" : "◆",
+    chat:  has("💬") ? "💬" : ""
+  };
+}
+
+/* "2026-09-06T02:41:00" is what the sheet writes and it is the hotel's own
+   wall clock, with no zone on it. Handing that to new Date() is the five and
+   a half hour bug this system has already paid for once: a zoneless string is
+   read as LOCAL, which is UTC on a server and IST on a phone. So it is picked
+   apart with a regex and never parsed. */
+function prettyStamp(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/.exec(String(iso || ""));
+  if (!m) return String(iso || "");
+  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  let h = Number(m[4]);
+  const ap = h < 12 ? "AM" : "PM";
+  h = h % 12 || 12;
+  return Number(m[3]) + " " + MON[Number(m[2]) - 1] + " " + m[1] +
+         ", " + h + ":" + m[5] + " " + ap;
+}
+
+/* Draw the check-in code into the card already on screen, once the token
+   arrives. Same rule as the printed card and for the same reason: no token,
+   no code. See the long note in drawPremiumVoucher — an untokenised code is
+   what makes the desk scanner shout fraud at a guest who has just paid. */
+async function paintScanCode(id) {
+  let tok = "";
+  try { tok = String((await WARM.token) || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase(); }
+  catch (e) { tok = ""; }
+  if (tok.length !== 16) return;                 /* the reference block stands */
+
+  const cv = document.getElementById("vQr");
+  if (!cv) return;                               /* guest navigated away */
+
+  try {
+    const g = qrEncode(JSON.stringify({
+      bid: id, name: String(S.guest.name || "").slice(0, 40),
+      cid: S.checkIn, tok: tok
+    }));
+    const n = g.length, quiet = 4, span = n + quiet * 2;
+    /* One canvas pixel per module, enlarged by CSS with image-rendering
+       pixelated. Sizing the canvas in CSS pixels instead lands modules on
+       fractional boundaries and the scanner sees grey edges. */
+    cv.width = cv.height = span;
+    const c = cv.getContext("2d");
+    c.fillStyle = "#FFFFFF"; c.fillRect(0, 0, span, span);
+    c.fillStyle = "#1A1A1A";
+    for (let r = 0; r < n; r++) for (let col = 0; col < n; col++)
+      if (g[r][col]) c.fillRect(col + quiet, r + quiet, 1, 1);
+
+    cv.setAttribute("role", "img");
+    cv.setAttribute("aria-label", "Check-in code for booking " + id);
+    cv.hidden = false;
+    const ref = document.getElementById("vRef"); if (ref) ref.hidden = true;
+    const lbl = document.getElementById("vScanLbl");
+    if (lbl) lbl.textContent = "Secure Check-in Code";
+    const cap = document.getElementById("vScanCap");
+    if (cap) cap.textContent = "Scan at front desk for seamless check-in";
+    const t = document.getElementById("vTok");
+    if (t) { t.textContent = (tok.match(/.{1,4}/g) || []).join("-"); t.hidden = false; }
+  } catch (e) { /* the reference block is already there and is enough */ }
+}
+
+/* ── Warming the voucher ──────────────────────────────────────────────────
+ *
+ * Measured before this existed: 2.4 seconds of blank screen between the desk
+ * phone seeing the money and the guest seeing their voucher, on a 1.2s Apps
+ * Script and a slow image fetch. All of it was work that could have been done
+ * while the guest was watching the "checking your payment" spinner.
+ *
+ * These are deliberately fire-and-forget and never rejected: a token that
+ * does not arrive means a card without a code, which is a complete card, and
+ * an image that does not arrive means the painter falls back to lettering. */
+const WARM = { token: null, logo: null, photo: null, id: null };
+
+function warmVoucher(id) {
+  if (WARM.id === id) return;              /* already warming for this booking */
+  WARM.id = id;
+  WARM.logo  = vcImage("img/logo.webp");
+  WARM.photo = vcImage("img/ke-facade.webp");
+  WARM.token = get("action=voucherToken&bookingId=" + encodeURIComponent(id))
+    .then(t => (t && t.ok !== false && t.token) ? String(t.token) : "")
+    .catch(() => "");
+}
+
+/* The canvas is expensive and both the download button and the n8n hand-off
+   want it. Drawing it twice was drawing it twice — a second token fetch, a
+   second pair of image loads and a second full paint of a six-megapixel
+   canvas. */
+let VOUCHER_CANVAS = null;
+
+async function drawVoucher() {
+  if (VOUCHER_CANVAS) return VOUCHER_CANVAS;
+  VOUCHER_CANVAS = drawVoucherOnce();
+  try { return await VOUCHER_CANVAS; }
+  catch (e) { VOUCHER_CANVAS = null; throw e; }
+}
+
+async function drawVoucherOnce() {
+  const b = S.booking || {};
+  const id = b.bookingId || S.ref;
+  const nights = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
+  const cv = document.getElementById("vcanvas") || (() => {
+    const el = document.createElement("canvas");
+    el.id = "vcanvas"; document.body.appendChild(el); return el;
+  })();
+
+  /* The security token, if the sheet will issue one. Fetched BEFORE anything
+     is drawn, because the card is a different height with a code on it and
+     redrawing it taller after the guest has already looked at it — or worse,
+     screenshotted it — is the thing this whole painter is written to avoid.
+     A failure here is silent and simply means no code: see the long note in
+     the painter about what an untokenised QR does at the desk. */
+  warmVoucher(id);
+  let token = "";
+  try { token = (await WARM.token) || ""; } catch (e) { token = ""; }
+
+  /* The sheet stores the token unhyphenated. It is printed grouped four and
+     four because somebody will read one down a phone line one day — the same
+     reason its alphabet has no I, O, 0 or 1. Grouping here rather than
+     trusting the server to send it pretty: what is encoded in the QR must be
+     the bare characters, so the two forms have to be derived separately. */
+  const tokenPlain = token.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+  const tokenShown = (tokenPlain.match(/.{1,4}/g) || []).join("-");
+
+  const qrPayload = token ? JSON.stringify({
+    /* Short keys on purpose. tamper-proof-vouchers.md: the same data with long
+       keys ran to 200 characters and version 10; this stays inside version 6. */
+    bid: id,
+    name: (S.guest.name || "").slice(0, 40),
+    cid: S.checkIn,
+    tok: tokenPlain
+  }) : "";
+
+  const height = qrPayload ? VC.H_QR : VC.H;
+
+  /* Drawn at twice the design size and scaled. The file that leaves the phone
+     is 1600 wide, which survives WhatsApp re-compressing it on the way to
+     whoever it is forwarded to. At 800 wide the code goes soft after one hop. */
+  cv.width = VC.W * VC.SCALE; cv.height = height * VC.SCALE;
+  const c = cv.getContext("2d");
+  c.setTransform(VC.SCALE, 0, 0, VC.SCALE, 0, 0);
+
+  /* Loaded before the first stroke, so the card is never drawn once without
+     the logo and again with it — a voucher that visibly changes after the
+     guest has already screenshotted it is worse than a slower one. */
+  const [logo, photo] = await Promise.all([WARM.logo, WARM.photo]);
+
+  const digits = String(S.guest.phone || "").replace(/\D/g, "");
+
+  drawPremiumVoucher(c, {
+    logo: logo, photo: photo, height: height,
+    guestName:   S.guest.name || "Your room",
+    guestPhone:  digits.length === 10
+                   ? "+91 " + digits.slice(0, 5) + " " + digits.slice(5)
+                   : (digits ? "+91 " + digits : ""),
+    rooms:       S.pick.join(" + "),
+    checkIn:     fmt(S.checkIn) + " · 12:00 PM",
+    checkOut:    fmt(S.checkOut) + " · 10:00 AM",
+    guests:      S.adults + " Adult" + (S.adults == 1 ? "" : "s") +
+                 (S.children ? " · " + S.children + " Child" + (S.children == 1 ? "" : "ren") : ""),
+    nights:      nights + " Night" + (nights == 1 ? "" : "s") + " Stay",
+    bookingRef:  id,
+    paidInFull:  paidInFull(),
+    advancePaid: Number(payNow()).toLocaleString("en-IN"),
+    balanceDue:  Number(dueLater()).toLocaleString("en-IN"),
+    timestamp:   prettyStamp(S.settleAt),
+    included:    CFG.INCLUDED || "",
+    qr:          qrPayload,
+    token:       tokenShown
+  });
+  return cv;
+}
+
+/* Best-effort. If the canvas will not produce a JPEG the guest still has the
+   card on screen and the WhatsApp button — losing the picture must not lose
+   the booking. */
+async function voucherJpeg() {
+  try {
+    const cv = await drawVoucher();
+    return cv.toDataURL("image/jpeg", 0.92);
+  } catch (e) { return ""; }
+}
+
+async function downloadVoucher(btn) {
+  const was = btn.textContent;
+  btn.textContent = "Drawing your voucher…"; btn.disabled = true;
+  const url = await voucherJpeg();
+  btn.disabled = false; btn.textContent = was;
+  if (!url) { window.print(); return; }
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "Ezhilagam-" + ((S.booking && S.booking.bookingId) || S.ref) + ".jpg";
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ── footer / navigation ──────────────────────────────────────────────── */
+function foot() {
+  const bar = document.getElementById("bar") || $(`<div id="bar"></div>`);
+
+  const nights = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
+  const label = {
+    1: S.pick.length ? `Continue · ${inr(tariff())}` : "Choose a room",
+    2: "Continue to payment",
+    3: `I have paid ${inr(payNow())}`,
+    4: "Book another stay"
+  }[S.step];
+  const ready = { 1: S.pick.length > 0, 2: true, 3: S.payRef.length === 4, 4: true }[S.step];
+  bar.innerHTML = `<div class="in">
+    ${S.step > 1 && S.step < 4 ? `<button id="back">Back</button>` : ""}
+    <button id="next" ${ready ? "" : "disabled"}>${label}</button></div>`;
+  bar.style.display = S.modal ? "none" : "";
+  if (!bar.isConnected) document.body.appendChild(bar);
+  const bk = bar.querySelector("#back"); if (bk) bk.onclick = () => { S.step--; S.error=""; render(); };
+  bar.querySelector("#next").onclick = advanceStep;
+}
+
+async function advanceStep() {
+  S.error = "";
+  if (S.step === 1) { S.step = 2; return render(); }
+  if (S.step === 2) {
+    const g = S.guest;
+    if (g.name.trim().length < 3) return fail("Please give the name the room should be under.");
+    if (g.phone.length !== 10) return fail("A 10-digit WhatsApp number, please — the voucher goes there.");
+    if (g.pin && g.pin.length !== 6) return fail("A PIN code is 6 digits.");
+    if (g.idLast4.length !== 4) return fail("The last 4 digits of the ID you will bring, please — the desk uses them to find your booking.");
+    S.step = 3; return render();
+  }
+  if (S.step === 3) {
+    const btn = document.querySelector("#next");
+    btn.disabled = true; btn.textContent = "Holding your room…";
+    await holdRoom({}, "waiting");
+    btn.disabled = false;
+    return;
+  }
+  location.reload();
+}
+
+/* The one place a booking is written, whichever rail paid for it. Two copies
+   of this — one for UPI, one for cards — would drift, and the thing that
+   drifts is what the desk reads off the register. */
+async function holdRoom(extra, settleState) {
+    try {
+      const d = await post(Object.assign({
+        action: "webBooking",
+        name: S.guest.name.trim(),
+        phone: S.guest.phone,
+        city: [S.guest.address, S.guest.city].filter(Boolean).join(", "),
+        pin: S.guest.pin,
+        room: S.pick.join(","),
+        checkIn: S.checkIn, checkOut: S.checkOut,
+        adults: Number(S.adults) || 0, children: Number(S.children) || 0,
+        total: tariff(), reservationPaid: payNow(), balance: dueLater(),
+        payment: "UPI",
+        /* The desk reads this at check-in to know whether to ask for money.
+           "Fully Paid" is the same string the staff app writes, so a website
+           booking and a walk-in read identically on the register. */
+        paymentStatus: paidInFull() ? "Fully Paid" : "Partial Advance",
+        paymentRef: S.payRef, acPreference: S.wantAc ? "AC" : "Non-AC",
+        enquirySource: "Website", checkInTime: "12:00 PM", checkOutTime: "10:00 AM"
+      }, extra || {}));
+      if (!d || d.ok === false) {
+        /* The sheet re-checks availability as it writes, so this is the one
+           answer that actually matters: somebody else got the room while this
+           guest was typing. Say so plainly and send them back. */
+        if (d && d.reason === "taken") { S.busy = null; S.pick = []; S.step = 1; loadAvail(); }
+        return fail((d && d.message) || "We could not confirm that. Nothing has been charged twice.");
+      }
+      S.booking = d; S.step = 4; S.settleTries = 0;
+      /* The room is held; the booking id exists. Start fetching the security
+         token and warming the images NOW, in parallel with the payment poll,
+         rather than after the money lands. Nothing downstream waits on these
+         promises resolving — they are simply already resolved by the time
+         anybody asks. */
+      warmVoucher(d.bookingId || S.ref);
+      S.settle = settleState || "waiting";
+      render();
+      /* Deliberately not awaited. The guest is already looking at the screen;
+         whether an automation server answered is not their problem. */
+      n8nSend("booking", { paymentStatus: S.settle === "paid"
+        ? "Confirmed - Direct Web" : "Pending payment" });
+      if (S.settle === "paid") {
+        /* A card has already been proved paid by the gateway, so there is
+           nothing to poll for. Skipping the wait is not a shortcut — polling
+           for an answer already in hand is. */
+        n8nSend("paid", { paymentStatus: "Confirmed - Direct Web",
+                          confirmedAmount: S.settleAmount, confirmedAt: S.settleAt });
+      } else {
+        watchPayment(d.bookingId || S.ref);
+      }
+    } catch (e) {
+      fail("The network dropped before we could confirm. Please message us with your payment reference before paying again.");
+    }
+}
+function fail(msg) {
+  S.error = msg; render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+const _render = render;
+render = function () { _render(); foot(); };
+render();
+</script>
+</body></html>

@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kutralam Ezhilagam · Courtallam</title>
+<meta name="description" content="Comfortable stay near Courtallam Main Falls. A/C and Non A/C rooms, family friendly, 24/7 power backup. Book direct.">
+<meta name="theme-color" content="#faf9f7">
+
+<!-- Open Graph. This page exists to be pasted into WhatsApp; the preview card
+     is the first thing anybody sees of it, often before they tap. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kutralam Ezhilagam · Courtallam">
+<meta property="og:description" content="Comfortable Stay • Near Courtallam Main Falls">
+<meta property="og:image" content="img/ke-facade.webp">
+
+<link rel="icon" href="img/logo.webp">
+<link rel="preload" as="image" href="img/logo.webp">
+<link rel="preload" as="image" href="img/ke-facade.webp">
+
+<style>
+/* Hand-written and inlined, for the same reason the booking page is: this
+   page is opened on a phone signal at the falls, and a stylesheet that has to
+   travel before anything is styled is a page that looks broken for a second.
+   The palette is the booking page's, on purpose — the guest taps Book Room Now
+   and lands somewhere that looks like the same hotel. */
+:root{
+  --ink:#1c1917; --mute:#78716c; --faint:#a8a29e; --line:#e7e5e4;
+  --bg:#faf9f7; --card:#fff;
+  --brand:#047857; --brand-dk:#065f46; --gold:#b45309; --gold-lt:#d9a441;
+  --r:16px;
+  --serif:"Cormorant Garamond","Times New Roman",Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:400 15px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+}
+.wrap{max-width:460px;margin:0 auto;padding:22px 16px 40px}
+
+/* Focus: visible, and the same everywhere. Half this page is tappable. */
+a:focus-visible,button:focus-visible{
+  outline:2px solid var(--brand);outline-offset:3px;border-radius:12px;
+}
+
+/* ── Masthead ─────────────────────────────────────────────────────────── */
+.mast{text-align:center;margin-bottom:18px}
+.mast img{height:46px;width:auto;display:block;margin:0 auto 12px}
+h1{
+  margin:0;font-family:var(--serif);font-size:31px;line-height:1.08;
+  font-weight:600;letter-spacing:.03em;text-transform:uppercase;
+}
+.loc{margin:.5em 0 0;font-size:12.5px;color:var(--mute);letter-spacing:.01em}
+
+/* The gold flourish under the name. Two hairlines and a diamond — the
+   reference page uses a filigree glyph here, but a glyph is a font
+   dependency and draws a tofu box on a phone that lacks it. Borders cannot
+   fail to load. */
+.rule{display:flex;align-items:center;gap:10px;margin:14px auto 0;max-width:190px}
+.rule::before,.rule::after{content:"";flex:1;height:1px;background:
+  linear-gradient(90deg,transparent,var(--gold-lt),transparent)}
+.rule i{width:5px;height:5px;transform:rotate(45deg);background:var(--gold-lt)}
+
+/* ── Carousel ─────────────────────────────────────────────────────────── */
+/* Built on CSS scroll-snap rather than a JS gesture handler. The browser
+   already knows how a swipe should feel on the guest's phone — the rubber
+   band at the ends, the momentum, the way it tracks the finger. Every
+   hand-written touch handler is a worse version of that, and it fights the
+   page's own vertical scroll on a diagonal swipe. Here JS only nudges the
+   scroll position on a timer; the swipe itself is the platform's. */
+.gal{
+  position:relative;margin:0 0 14px;border-radius:var(--r);overflow:hidden;
+  background:#e9e6e2;border:1px solid var(--line);
+  aspect-ratio:4/3;                 /* every slide shares one box */
+  touch-action:pan-y pinch-zoom;    /* vertical page scroll still wins */
+}
+.track{
+  display:flex;height:100%;overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none;-ms-overflow-style:none;
+  -webkit-overflow-scrolling:touch;
+}
+.track::-webkit-scrollbar{display:none}
+.slide{
+  flex:0 0 100%;height:100%;scroll-snap-align:center;scroll-snap-stop:always;
+  position:relative;
+}
+.slide img{
+  display:block;width:100%;height:100%;object-fit:cover;
+  background:#e9e6e2;
+}
+/* A slide is a button, not a link: it opens the picture in place. Reset the
+   button chrome that would otherwise draw a border round every photograph. */
+.slide button{
+  display:block;width:100%;height:100%;padding:0;margin:0;border:0;
+  background:none;cursor:zoom-in;font:inherit;
+}
+
+/* Today's date, top-left. The whole point of it is freshness — a guest who
+   was sent this link a fortnight ago should be able to see at a glance that
+   the page is current. */
+.today{
+  position:absolute;top:12px;left:12px;z-index:3;pointer-events:none;
+  display:flex;align-items:baseline;gap:7px;
+  background:rgba(28,25,23,.74);color:#fff;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(217,164,65,.5);
+  padding:6px 12px;border-radius:99px;
+}
+.today .d{font-size:12px;font-weight:800;letter-spacing:.02em}
+.today .w{font-size:10px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--gold-lt)}
+
+/* The quote sits on a gradient rather than a panel, so it reads as part of
+   the photograph rather than a sticker over it — the same decision the daily
+   flier reached after the bordered box read as pasted on. The dots live
+   inside the same scrim, so there is one dark area at the foot of the frame
+   instead of two competing ones. */
+.quote{
+  position:absolute;left:0;right:0;bottom:0;z-index:2;pointer-events:none;
+  padding:40px 16px 26px;
+  background:linear-gradient(transparent,rgba(12,10,9,.30) 38%,rgba(12,10,9,.78));
+  color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.55);
+}
+.quote q{
+  display:block;font-family:var(--serif);font-size:var(--qs,17px);line-height:1.32;
+  font-weight:600;letter-spacing:.005em;
+}
+.quote q::before{content:"\201C"} .quote q::after{content:"\201D"}
+.quote cite{
+  display:block;margin-top:5px;font-size:10px;font-weight:700;font-style:normal;
+  letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.82);
+}
+
+/* Dots. Also the progress indicator, so there is no second widget. */
+.dots{
+  position:absolute;left:0;right:0;bottom:9px;z-index:4;
+  display:flex;justify-content:center;gap:7px;
+}
+.dots button{
+  width:7px;height:7px;padding:0;border:0;border-radius:99px;cursor:pointer;
+  background:rgba(255,255,255,.55);box-shadow:0 0 3px rgba(0,0,0,.45);
+  transition:width .25s,background .25s;
+}
+.dots button[aria-current="true"]{width:20px;background:#fff}
+/* The dot is 7px and a fingertip is not. The hit area is padded out with a
+   pseudo-element so the target is 44px without the dot itself growing. */
+.dots button::after{content:"";position:absolute;width:26px;height:44px;
+  transform:translate(-10px,-19px)}
+.dots button{position:relative}
+
+/* Arrows: desktop and keyboard only. On a phone they cover the photograph
+   and the swipe is better anyway. */
+.arw{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:3;
+  width:38px;height:38px;border:0;border-radius:99px;cursor:pointer;
+  background:rgba(255,255,255,.86);color:var(--ink);
+  display:none;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.18);
+}
+.arw svg{width:17px;height:17px}
+.arw.prev{left:10px} .arw.next{right:10px}
+@media (hover:hover) and (pointer:fine){ .arw{display:flex} }
+.arw:focus-visible{display:flex}
+.gal[data-count="1"] .dots,
+.gal[data-count="1"] .arw{display:none}
+
+/* ── Amenities ────────────────────────────────────────────────────────── */
+.amen{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;
+  margin:0 0 16px;padding:0;list-style:none;
+}
+.amen li{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:13px 6px;text-align:center;
+}
+.amen .ico{font-size:19px;line-height:1;display:block}
+.amen .txt{
+  display:block;margin-top:7px;font-size:11px;font-weight:700;line-height:1.3;
+  color:#44403c;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.cta{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;min-height:54px;padding:15px 18px;margin-bottom:10px;
+  border:1px solid transparent;border-radius:14px;
+  font:inherit;font-size:16px;font-weight:800;letter-spacing:.01em;
+  text-decoration:none;cursor:pointer;transition:transform .12s,box-shadow .12s;
+}
+.cta:active{transform:translateY(1px)}
+.cta-book{background:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(4,120,87,.24)}
+.cta-book:hover{background:var(--brand-dk)}
+.cta-wa{background:var(--card);color:#128C7E;border-color:#bfe3dc}
+.cta-wa:hover{background:#f2fbf8}
+.cta svg{width:20px;height:20px;flex:0 0 auto}
+
+.callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 20px}
+.call{
+  display:block;text-align:center;text-decoration:none;color:var(--ink);
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:11px 8px;min-height:54px;
+}
+.call small{display:block;font-size:10px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--mute)}
+.call b{display:block;margin-top:3px;font-size:15px;font-weight:800;
+  font-variant-numeric:tabular-nums}
+
+/* ── Trust strip ──────────────────────────────────────────────────────── */
+.trust{
+  display:flex;align-items:center;gap:12px;margin:0 0 18px;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:12px 14px;
+}
+.trust img{height:38px;width:auto;flex:0 0 auto}
+.trust p{margin:0;font-size:11.5px;line-height:1.45;color:var(--mute)}
+.trust b{color:var(--ink)}
+
+/* ── Footer notice ────────────────────────────────────────────────────── */
+footer{border-top:1px solid var(--line);padding-top:16px;text-align:center}
+.notice{margin:0 0 12px;font-size:11.5px;line-height:1.6;color:var(--mute)}
+.notice b{color:#9a3412;font-weight:800}
+.addr{margin:0;font-size:11px;line-height:1.55;color:var(--faint)}
+
+/* ── Lightbox ─────────────────────────────────────────────────────────── */
+dialog#full{
+  border:0;padding:0;max-width:100vw;max-height:100vh;width:100vw;height:100vh;
+  background:rgba(12,10,9,.95);
+}
+dialog#full::backdrop{background:rgba(12,10,9,.9)}
+dialog#full img{display:block;width:100%;height:100%;object-fit:contain;padding:16px}
+dialog#full .x{
+  position:fixed;top:14px;right:14px;width:44px;height:44px;border-radius:99px;
+  background:rgba(255,255,255,.14);color:#fff;border:0;font-size:22px;
+  line-height:1;cursor:pointer;
+}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* A phone set to reduce motion gets no auto-advance and no smooth scrolling.
+   This is enforced in JS as well — the media query alone would still leave
+   the slides jumping every few seconds, which is the part that actually
+   causes trouble. */
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .track{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ── Masthead ─────────────────────────────────────────────────────── -->
+  <header class="mast">
+    <img src="img/logo.webp" alt="Kutralam Ezhilagam" width="200" height="46">
+    <h1>Kutralam Ezhilagam</h1>
+    <p class="loc">Comfortable Stay &nbsp;•&nbsp; Near Courtallam Main Falls</p>
+    <div class="rule" aria-hidden="true"><i></i></div>
+  </header>
+
+  <!-- ── Photographs ──────────────────────────────────────────────────── -->
+  <section class="gal" id="gal" aria-roledescription="carousel"
+           aria-label="Photographs of Kutralam Ezhilagam">
+    <div class="track" id="track"></div>
+
+    <p class="today" id="today"></p>
+    <figure class="quote" id="quote"></figure>
+
+    <button class="arw prev" id="prev" aria-label="Previous photograph">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+           stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <button class="arw next" id="next" aria-label="Next photograph">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+           stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="dots" id="dots" role="tablist" aria-label="Choose a photograph"></div>
+  </section>
+  <p class="sr" id="live" aria-live="polite"></p>
+
+  <!-- ── Amenities ────────────────────────────────────────────────────── -->
+  <ul class="amen">
+    <li><span class="ico" aria-hidden="true">❄️</span>
+        <span class="txt">A/C &amp;<br>Non A/C</span></li>
+    <li><span class="ico" aria-hidden="true">👪</span>
+        <span class="txt">Family<br>Friendly</span></li>
+    <li><span class="ico" aria-hidden="true">⚡</span>
+        <span class="txt">24/7 Power<br>Backup</span></li>
+  </ul>
+
+  <!-- ── Calls to action ──────────────────────────────────────────────── -->
+  <a class="cta cta-book" id="bookBtn" href="index.html">
+    Book Room Now
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M5 12h13M13 6l6 6-6 6"/>
+    </svg>
+  </a>
+
+  <a class="cta cta-wa" id="waBtn" href="#" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.6c.1-.2.2-.3.3-.5v-.5c-.1-.2-.7-1.6-.9-2.2-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.3z"/>
+      <path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2z"/>
+    </svg>
+    Chat on WhatsApp
+  </a>
+
+  <div class="callrow">
+    <a class="call" href="tel:+919962222415"><small>Booking</small><b>99622 22415</b></a>
+    <a class="call" href="tel:+918248320685"><small>Reception</small><b>82483 20685</b></a>
+  </div>
+
+  <!-- ── Trust ────────────────────────────────────────────────────────── -->
+  <div class="trust">
+    <img src="img/jd-award.webp" alt="Justdial Users' Choice 2025" width="38" height="38">
+    <p><b>Justdial Users' Choice 2025.</b> Nine rooms — studios and suites,
+       sleeping two to fifteen — a short walk from the Main Falls.</p>
+  </div>
+
+  <!-- ── Footer ───────────────────────────────────────────────────────── -->
+  <footer>
+    <p class="notice">
+      <b>Wedding proof is mandatory for couples.</b><br>
+      Strictly no smoking or alcohol on the premises.
+    </p>
+    <p class="addr">
+      No 46, Vairams Nagar, Five Falls Road, Courtallam<br>
+      Check-in 12:00 PM &nbsp;·&nbsp; Check-out 10:00 AM
+    </p>
+  </footer>
+</div>
+
+<dialog id="full">
+  <button class="x" id="fullX" aria-label="Close">✕</button>
+  <img id="fullImg" alt="">
+</dialog>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════════
+   CONFIG — the only block you need to touch
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* THE PHOTOGRAPHS.
+   To add one: put the file in img/, add a line here, re-drag the folder onto
+   Netlify. Order on this list is the order on the card.
+
+   `alt` is what a guest with images turned off, or a screen reader, gets
+   instead of the picture — describe the room, do not write "photo 3".
+
+   Keep each file under about 300 KB. These load on a phone signal at the
+   falls, and the first one loads before the guest sees anything at all. */
+const SLIDES = [
+  { src:"img/ke-facade.webp",
+    alt:"Kutralam Ezhilagam lit up at dusk, seen from the street" },
+
+  { src:"img/ke-hills-window.webp",
+    alt:"Twin beds beside a wide picture window looking on to the Courtallam hills" },
+
+  { src:"img/ke-balcony.webp",
+    alt:"The hills and forest seen from a balcony, with a room door open beside it" },
+
+  { src:"img/ke-pool.webp",
+    alt:"The rooftop plunge pool lit blue at night under a pergola" },
+
+  { src:"img/ke-double.webp",
+    alt:"A bright double room with a window and curtains" },
+
+  { src:"img/ke-ac-room.webp",
+    alt:"An air-conditioned room with a teak bed and fresh linen" },
+
+  { src:"img/ke-suite-living.webp",
+    alt:"The suite living room, with a sofa, television and a door through to the bedroom" },
+
+  { src:"img/ke-suite-lounge.webp",
+    alt:"The suite lounge with television, washbasin and the bedroom beyond" },
+
+  { src:"img/ke-twin-tv.webp",
+    alt:"A twin room with a television, writing table and chair" },
+
+  { src:"img/ke-room-window.webp",
+    alt:"A non air-conditioned room with a ceiling fan and a curtained window" },
+
+  { src:"img/ke-bed-detail.webp",
+    alt:"A made bed with fresh towels laid out" }
+];
+
+/* THE QUOTES.
+   Every line here is a real quotation by an author long out of copyright,
+   reproduced as written and carrying its author's name. That rule is not
+   decoration: the daily flier settled it already — a card that puts words in
+   somebody's mouth is worse than a card with no quote on it.
+
+   Deliberately left out, however often they appear on hotel pages: "The earth
+   has music for those who listen" (not Shakespeare), "Water is the driving
+   force of all nature" (not da Vinci), "Nature does not hurry, yet everything
+   is accomplished" (not in the Tao Te Ching). All three are misattributed. */
+const QUOTES = [
+  { t:"The mountains are calling and I must go.",                              w:"John Muir" },
+  { t:"Climb the mountains and get their good tidings.",                       w:"John Muir" },
+  { t:"In every walk with nature one receives far more than he seeks.",        w:"John Muir" },
+  { t:"Keep close to Nature's heart, and break clear away once in a while.",   w:"John Muir" },
+  { t:"The clearest way into the Universe is through a forest wilderness.",    w:"John Muir" },
+  { t:"Between every two pines there is a doorway to a new world.",            w:"John Muir" },
+  { t:"I went to the woods because I wished to live deliberately.",            w:"Henry David Thoreau" },
+  { t:"Heaven is under our feet as well as over our heads.",                   w:"Henry David Thoreau" },
+  { t:"We need the tonic of wildness.",                                        w:"Henry David Thoreau" },
+  { t:"Trees are poems that the earth writes upon the sky.",                   w:"Kahlil Gibran" },
+  { t:"The waterfall sings, I find my song when I find my freedom.",           w:"Rabindranath Tagore" },
+  { t:"Clouds come floating into my life, no longer to carry rain or usher storm, but to add colour to my sunset sky.", w:"Rabindranath Tagore" },
+  { t:"Luxury must be comfortable, otherwise it is not luxury.",               w:"Coco Chanel" }
+];
+
+const CFG = {
+  /* Where Book Room Now goes.
+
+     THIS FILE IS index.html — the visiting card is the front door, because
+     Netlify serves index.html at the root and nothing else. The booking
+     wizard is book.html. If you ever swap them back, change BOTH the file
+     names and this line, or Book Room Now points at itself and the page
+     appears to do nothing when tapped.
+
+     Relative, not absolute: it keeps working on a preview deploy, on the
+     ezhilagam.in domain, and off a USB stick. */
+  BOOKING_PAGE: "book.html",
+
+  /* Milliseconds between slides. Below about 4000 a guest cannot finish
+     looking at a photograph before it moves, which reads as impatient. */
+  INTERVAL_MS: 4500,
+
+  /* WhatsApp. 91 + the ten digits, no plus, no spaces — wa.me rejects
+     anything else. This is the booking line. */
+  WA_NUMBER: "919962222415",
+  WA_TEXT: "Hello Kutralam Ezhilagam, I would like to book a room.\n\n" +
+           "Check-in: \nCheck-out: \nGuests: \n\nPlease share availability and tariff."
+};
+
+/* ════════════════════════════════════════════════════════════════════════ */
+
+const $ = id => document.getElementById(id);
+const gal = $("gal"), track = $("track"), dots = $("dots"), live = $("live");
+
+$("bookBtn").href = CFG.BOOKING_PAGE;
+$("waBtn").href =
+  "https://wa.me/" + CFG.WA_NUMBER + "?text=" + encodeURIComponent(CFG.WA_TEXT);
+
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Today, in the hotel's own time zone. A guest reading this from Dubai or
+   Singapore must see the date it is in Courtallam, not the date it is where
+   they are standing — otherwise the card reads as a day stale to the very
+   people most likely to be booking ahead. */
+function istToday(){
+  const f = new Intl.DateTimeFormat("en-GB", {
+    timeZone:"Asia/Kolkata", weekday:"long", day:"numeric",
+    month:"long", year:"numeric"
+  }).formatToParts(new Date());
+  const g = t => (f.find(p => p.type === t) || {}).value || "";
+  return { weekday:g("weekday"), date:g("day")+" "+g("month")+" "+g("year") };
+}
+
+/* Which day it is, counted in IST, as a plain integer. Date arithmetic on a
+   local Date object would roll over at midnight in the browser's zone rather
+   than the hotel's, so the quote would change at half past six in the
+   evening for a guest in London. */
+function istDayNumber(){
+  const iso = new Intl.DateTimeFormat("en-CA", { timeZone:"Asia/Kolkata" })
+                .format(new Date());              // yyyy-mm-dd
+  return Math.floor(Date.parse(iso + "T00:00:00Z") / 86400000);
+}
+
+/* The date picks the quote, so every phone shows the same line on the same
+   morning. If each visit rolled its own dice, two guests comparing the link
+   would see two different cards, and the hotel would look like two hotels —
+   the same reasoning the daily flier is built on.
+
+   The stride is 5 and there are 13 quotes. 13 is prime, so 5 and 13 share no
+   factor and the walk reaches every quote before repeating any. This matters:
+   the flier once had a stride that shared a factor with the bank and quietly
+   reached only two lines in eight, with nothing looking wrong. */
+function quoteOfTheDay(){
+  return QUOTES[(istDayNumber() * 5) % QUOTES.length];
+}
+
+(function paintDay(){
+  const d = istToday();
+  $("today").innerHTML =
+    '<span class="w"></span><span class="d"></span>';
+  $("today").querySelector(".w").textContent = d.weekday;
+  $("today").querySelector(".d").textContent = d.date;
+
+  const q = quoteOfTheDay();
+  const fig = $("quote");
+  const blk = document.createElement("q");
+  blk.textContent = q.t;
+  const who = document.createElement("cite");
+  who.textContent = q.w;
+  fig.append(blk, who);
+  fitQuote();
+})();
+
+/* Shrink the quote until it stops eating the photograph.
+
+   Tagore's cloud line is a hundred and ten characters. Set at a fixed 17px it
+   ran to four lines and covered well over half the frame, which turns a
+   photograph of the hills into a caption with a picture behind it. This is
+   the third time in this system that text at a fixed size in a fixed box has
+   collided with a long string — the voucher had it with guest names, the
+   flier with theme titles — so it is solved the same way here: measure, then
+   step down. A quote added next year is handled without anybody noticing. */
+function fitQuote(){
+  const fig = $("quote"), frame = $("gal");
+  const ceiling = () => frame.getBoundingClientRect().height * 0.52;
+  for (let px = 17; px >= 12; px -= 0.5) {
+    fig.style.setProperty("--qs", px + "px");
+    if (fig.getBoundingClientRect().height <= ceiling()) return;
+  }
+}
+
+/* The frame is sized from the viewport width, so a rotation changes how many
+   lines the quote takes. Re-fit rather than leaving it wrapped for the old
+   width. */
+addEventListener("resize", fitQuote);
+
+/* ── Build ─────────────────────────────────────────────────────────────── */
+SLIDES.forEach((s, i) => {
+  const fig = document.createElement("div");
+  fig.className = "slide";
+  fig.setAttribute("role", "group");
+  fig.setAttribute("aria-roledescription", "slide");
+  fig.setAttribute("aria-label", (i + 1) + " of " + SLIDES.length);
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.setAttribute("aria-label", "View full size: " + s.alt);
+
+  const im = document.createElement("img");
+  im.src = s.src;
+  im.alt = s.alt || "";
+  /* The first photograph is the one holding up the page; the rest can wait
+     until the guest swipes towards them. */
+  im.loading = i === 0 ? "eager" : "lazy";
+  im.decoding = "async";
+  im.fetchPriority = i === 0 ? "high" : "low";
+  /* A missing file must not leave a grey hole with a broken-image glyph in
+     it. Drop the slide and renumber — the card looks intentional either way.
+     But dropping a slide changes every offsetLeft after it, and a lazy image
+     can fail while the guest is mid-swipe: without the re-anchor the track
+     ends up scrolled between two photographs, which reads as the page having
+     broken rather than a file being absent. */
+  im.onerror = () => {
+    const was = slides().indexOf(fig);
+    fig.remove();
+    rebuildDots();
+    const n = slides().length;
+    if (!n) return;
+    go(Math.min(was <= at ? Math.max(at - 1, 0) : at, n - 1), false);
+  };
+
+  btn.appendChild(im);
+  fig.appendChild(btn);
+  btn.addEventListener("click", () => openFull(im.src, im.alt));
+  track.appendChild(fig);
+});
+
+function slides(){ return [...track.querySelectorAll(".slide")]; }
+
+function rebuildDots(){
+  const n = slides().length;
+  gal.dataset.count = n;
+  dots.textContent = "";
+  for (let i = 0; i < n; i++) {
+    const d = document.createElement("button");
+    d.type = "button";
+    d.setAttribute("role", "tab");
+    d.setAttribute("aria-label", "Photograph " + (i + 1));
+    d.addEventListener("click", () => { stop(); go(i); });
+    dots.appendChild(d);
+  }
+  mark();
+}
+
+/* ── Position ──────────────────────────────────────────────────────────── */
+let at = 0;
+
+function go(i, smooth = true){
+  const all = slides();
+  if (!all.length) return;
+  at = (i + all.length) % all.length;
+  track.scrollTo({
+    left: all[at].offsetLeft - track.offsetLeft,
+    behavior: (smooth && !calm) ? "smooth" : "auto"
+  });
+  mark();
+}
+
+function mark(){
+  [...dots.children].forEach((d, i) =>
+    d.setAttribute("aria-current", i === at ? "true" : "false"));
+  live.textContent = "Photograph " + (at + 1) + " of " + slides().length;
+}
+
+/* Follow the guest's own swipe. scrollend is not everywhere yet, so this is
+   a debounced scroll — the timeout is what makes it fire once at the end of
+   a flick rather than forty times during it. */
+let settle;
+track.addEventListener("scroll", () => {
+  clearTimeout(settle);
+  settle = setTimeout(() => {
+    const all = slides();
+    if (!all.length) return;
+    const mid = track.scrollLeft + track.clientWidth / 2;
+    let best = 0, gap = Infinity;
+    all.forEach((s, i) => {
+      const d = Math.abs((s.offsetLeft - track.offsetLeft) + s.clientWidth / 2 - mid);
+      if (d < gap) { gap = d; best = i; }
+    });
+    if (best !== at) { at = best; mark(); }
+  }, 90);
+}, { passive:true });
+
+/* ── Auto-advance ──────────────────────────────────────────────────────── */
+let timer = null;
+
+function start(){
+  /* Never on a phone set to reduce motion — for some people this is a
+     vestibular problem, not a preference. And never for a single picture. */
+  if (calm || timer || slides().length < 2) return;
+  timer = setInterval(() => {
+    if (document.hidden) return;      // a background tab must not race ahead
+    go(at + 1);
+  }, CFG.INTERVAL_MS);
+}
+
+/* Stop for good once the guest takes hold of it. Resuming after a pause
+   moves the photograph out from under somebody who is still looking at it. */
+function stop(){ if (timer) { clearInterval(timer); timer = null; } }
+
+["pointerdown","touchstart","wheel","keydown"].forEach(ev =>
+  gal.addEventListener(ev, stop, { passive:true }));
+
+$("prev").addEventListener("click", () => { stop(); go(at - 1); });
+$("next").addEventListener("click", () => { stop(); go(at + 1); });
+
+gal.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft")  { stop(); go(at - 1); }
+  if (e.key === "ArrowRight") { stop(); go(at + 1); }
+});
+
+/* A resize changes every slide's offsetLeft, and the scroll position is now
+   half way between two pictures. Put it back on the one it was on. */
+addEventListener("resize", () => go(at, false));
+
+/* ── Lightbox ──────────────────────────────────────────────────────────── */
+const dlg = $("full");
+function openFull(src, alt){
+  stop();
+  /* <dialog> is not on every phone in Courtallam. Where it is missing, doing
+     nothing is correct — the guest still has the carousel. */
+  if (typeof dlg.showModal !== "function") return;
+  $("fullImg").src = src;
+  $("fullImg").alt = alt || "";
+  dlg.showModal();
+}
+$("fullX").addEventListener("click", () => dlg.close());
+dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+
+rebuildDots();
+start();
+</script>
+</body></html>

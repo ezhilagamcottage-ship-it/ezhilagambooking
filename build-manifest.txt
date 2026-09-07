@@ -1,0 +1,18 @@
+KUTRALAM EZHILAGAM — WEBSITE BUILD MANIFEST
+version: 1.0
+built:   2026-09-06 08:22 IST
+script:  live Apps Script version 65 at build time
+
+files
+  index.html              31415 bytes  sha256 1a7d946c0be0b562
+  book.html              156734 bytes  sha256 09e09f16db873724
+  voucher.html            93440 bytes  sha256 4366bc257d8c1da5
+  checkin-slip.html       15129 bytes  sha256 66d65554089e6cdd
+  _redirects                586 bytes  sha256 a5b7cfd02dfb3047
+  README.txt               7361 bytes  sha256 fd569c82fe98f3bf
+  CHANGELOG.md             2555 bytes  sha256 a3b70730ca6919f7
+  VERSION                     4 bytes  sha256 5717e7c840171019
+  img/                  1661782 bytes  (16 files)
+
+bundle
+  ezhilagam-site-v1.0.zip  1791703 bytes  sha256 aec1536417aa704a0f256fd1934c2d2b

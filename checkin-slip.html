@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Check-In Slip · Kutralam Ezhilagam</title>
+
+<!-- Deliberately not linked from card.html or index.html. This is the desk's
+     paper register: it carries the extra-charges block and the caution
+     deposit, neither of which a guest should be reading before check-in. -->
+<meta name="robots" content="noindex,nofollow">
+
+<style>
+/* ══════════════════════════════════════════════════════════════════════════
+   PRINT-FIRST. Everything below is measured in millimetres, because this
+   sheet has one job: come out of an A4 printer looking like the pad it
+   replaces. Screen is the preview, paper is the product.
+
+   Two rules govern the whole file:
+
+   1. NOTHING carries meaning by colour. This is printed on a mono laser and
+      photocopied. Every line is black; emphasis is weight and rule width.
+   2. Fill lines are BORDERS, never underscores. A row of "______" wraps at
+      the end of a line and drifts by a millimetre or two between browsers.
+      A bottom border sits exactly where it was put.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@page { size: A4 portrait; margin: 9mm 10mm; }
+
+:root{
+  --hair: .3mm solid #000;     /* inner cell rules */
+  --edge: .45mm solid #000;    /* box outlines     */
+  --pad: 1.4mm;
+}
+
+*{ box-sizing:border-box; }
+
+html,body{ margin:0; padding:0; background:#f1efec; }
+body{
+  font:400 9.6pt/1.32 "Arial","Helvetica Neue",Helvetica,sans-serif;
+  color:#000;
+  -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+
+/* The sheet itself. On screen it floats on grey so the page edge is visible;
+   in print the grey and the shadow go away and it becomes the paper. */
+.sheet{
+  width:190mm; min-height:277mm; margin:8mm auto; padding:0;
+  background:#fff; box-shadow:0 2mm 8mm rgba(0,0,0,.18);
+}
+
+/* Screen-only toolbar. */
+.bar{
+  max-width:190mm; margin:8mm auto -4mm; display:flex; gap:8px;
+  align-items:center; font-family:ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+.bar button{
+  font:700 13px/1 inherit; padding:11px 16px; min-height:44px;
+  background:#047857; color:#fff; border:0; border-radius:10px; cursor:pointer;
+}
+.bar span{ font-size:11.5px; color:#57534e; }
+
+h1,h2,h3,p,table,ul{ margin:0; }
+table{ width:100%; border-collapse:collapse; table-layout:fixed; }
+td,th{ padding:var(--pad); vertical-align:top; text-align:left; font-weight:400; }
+
+/* A label that sits on the baseline with a rule running out from it. */
+.lab{ font-weight:700; white-space:nowrap; }
+.fill{ border-bottom:var(--hair); }
+
+/* ── Masthead ─────────────────────────────────────────────────────────── */
+.head{ text-align:center; padding:0 0 2mm; }
+.head h1{
+  font-size:19pt; font-weight:700; letter-spacing:.06em; line-height:1.1;
+}
+.head .sub{ font-size:8pt; letter-spacing:.03em; margin-top:1mm; }
+.head .kind{
+  margin-top:1.6mm; font-size:8pt; font-weight:700; letter-spacing:.22em;
+  text-transform:uppercase;
+}
+.head hr{ border:0; border-top:.6mm solid #000; margin:2mm 0 0; }
+
+/* ── Meta bar: Sl. No. left, source grid right ────────────────────────── */
+.meta{ display:flex; align-items:flex-end; gap:6mm; margin-top:3mm; }
+.meta .sl{ flex:1 1 auto; display:flex; align-items:baseline; gap:2mm;
+  font-size:11pt; font-weight:700; padding-bottom:1mm; }
+.meta .sl .line{ flex:1; border-bottom:var(--hair); min-width:34mm; }
+.meta .src{ flex:0 0 104mm; }
+.src table{ border:var(--edge); }
+.src td{ border:var(--hair); text-align:center; }
+.src .hd{ font-weight:700; font-size:8.6pt; height:6mm; }
+.src .box{ height:9mm; }
+
+/* ── Guest details + dental kit ───────────────────────────────────────── */
+.guest{ display:flex; gap:5mm; margin-top:3.5mm; align-items:flex-start; }
+.guest .fields{ flex:1 1 auto; }
+.guest .kit{ flex:0 0 62mm; }
+
+.frow{ display:flex; align-items:baseline; gap:2mm; margin-bottom:3.4mm; }
+.frow .lab{ font-size:9.6pt; }
+.frow .line{ flex:1; border-bottom:var(--hair); height:4.6mm; }
+.frow .line.sm{ flex:0 0 26mm; }
+.frow .line.xs{ flex:0 0 15mm; }
+
+.kit table{ border:var(--edge); }
+.kit td{ border:var(--hair); }
+.kit .name{
+  font-weight:700; text-align:center; vertical-align:middle;
+  width:26mm; font-size:9.6pt;
+}
+.kit .slot{ height:8mm; font-weight:700; font-size:9.6pt; }
+.kit .wide{ height:8mm; font-weight:700; font-size:9.6pt; }
+
+/* ── Room details ─────────────────────────────────────────────────────── */
+.rooms{ margin-top:1mm; }
+.rooms table{ border:var(--edge); }
+.rooms th,.rooms td{ border:var(--hair); }
+.rooms th{
+  font-weight:700; font-size:8.6pt; text-align:center; height:6.5mm;
+  vertical-align:middle;
+}
+.rooms td{ height:6.4mm; }
+.rooms .dt{
+  text-align:center; font-weight:700; font-size:8.4pt; vertical-align:middle;
+}
+.rooms .tick{ text-align:center; vertical-align:middle; }
+.rooms .pay{ height:8.5mm; font-weight:700; font-size:9.6pt; }
+
+/* ── Policies ─────────────────────────────────────────────────────────── */
+.policy{ margin-top:3.5mm; display:flex; gap:5mm; align-items:flex-end; }
+.policy ul{ flex:1 1 auto; margin:0; padding-left:4.6mm; font-size:8.8pt;
+  line-height:1.55; }
+.policy li{ margin-bottom:.6mm; }
+.policy .sign{ flex:0 0 62mm; text-align:center; }
+.policy .sign .line{ border-bottom:var(--hair); height:12mm; }
+.policy .sign .cap{ font-size:8.4pt; font-weight:700; margin-top:1.2mm; line-height:1.35; }
+.policy .sign .cap em{ font-style:normal; font-weight:400; font-size:7.8pt; }
+
+/* ── Footer split ─────────────────────────────────────────────────────── */
+.foot{ display:flex; gap:5mm; margin-top:4mm; align-items:stretch; }
+.foot > div{ flex:1 1 0; }
+.panel{ border:var(--edge); height:100%; }
+.panel h3{
+  font-size:8.6pt; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  text-align:center; padding:1.6mm 1mm; border-bottom:var(--hair);
+}
+
+.rate{ padding:3mm 3mm 2mm; }
+.rate .q{ font-size:8.8pt; font-weight:700; margin-bottom:2mm; }
+.rate .q:last-of-type{ margin-bottom:0; }
+.scale{ display:flex; gap:2.2mm; margin:1.6mm 0 4mm; }
+.scale i{
+  flex:0 0 7mm; height:7mm; border:var(--hair); border-radius:50%;
+  font-style:normal; font-size:8.4pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+}
+.rate .hint{ font-size:7.4pt; margin-top:-2.5mm; margin-bottom:3mm; }
+
+.charges table{ }
+.charges td{ border-bottom:var(--hair); height:6.6mm; font-size:9pt; }
+.charges tr:last-child td{ border-bottom:0; }
+.charges .k{ width:52%; font-weight:700; border-right:var(--hair); }
+.charges .total .k,.charges .total td{ border-top:.45mm solid #000; }
+.charges .total .k{ font-weight:700; }
+
+/* ── Print ────────────────────────────────────────────────────────────── */
+@media print{
+  html,body{ background:#fff; }
+  .bar{ display:none !important; }
+  .sheet{
+    width:auto; min-height:0; margin:0; box-shadow:none;
+    /* One slip, one page. If an edit ever pushes it over, the overflow is
+       visible on screen before anybody wastes a ream finding out. */
+    page-break-inside:avoid;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <button type="button" onclick="window.print()">Print this slip</button>
+  <span>A4 · portrait · margins “Default”. Turn <b>off</b> “Headers and footers”
+        in the print dialog.</span>
+</div>
+
+<div class="sheet">
+
+  <!-- ══ Masthead ═══════════════════════════════════════════════════════ -->
+  <div class="head">
+    <h1>KUTRALAM EZHILAGAM</h1>
+    <p class="sub">No 46, Vairams Nagar, Five Falls Road, Courtallam &nbsp;·&nbsp;
+       99622 22415 &nbsp;/&nbsp; 82483 20685</p>
+    <p class="kind">Guest Check-In Slip</p>
+    <hr>
+  </div>
+
+  <!-- ══ Meta bar ═══════════════════════════════════════════════════════ -->
+  <div class="meta">
+    <div class="sl"><span>Sl. No.</span><span class="line"></span></div>
+
+    <div class="src">
+      <table>
+        <tr>
+          <td class="hd">ADB</td>
+          <td class="hd">(walk&nbsp;-&nbsp;in)</td>
+          <td class="hd">T.E.</td>
+          <td class="hd">Online</td>
+        </tr>
+        <tr>
+          <td class="box"></td><td class="box"></td>
+          <td class="box"></td><td class="box"></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ Guest details ══════════════════════════════════════════════════ -->
+  <div class="guest">
+
+    <div class="fields">
+      <div class="frow"><span class="lab">NAME</span><span class="line"></span></div>
+
+      <div class="frow">
+        <span class="lab">Phone</span><span class="line"></span>
+      </div>
+
+      <div class="frow"><span class="lab">ADDRESS</span><span class="line"></span></div>
+      <div class="frow"><span class="line"></span></div>
+
+      <div class="frow">
+        <span class="lab">Pin</span><span class="line sm"></span>
+        <span class="lab">Vehicle No</span><span class="line"></span>
+      </div>
+
+      <div class="frow">
+        <span class="lab">ID Type</span><span class="line sm"></span>
+        <span class="lab">ID No</span><span class="line"></span>
+      </div>
+
+      <div class="frow">
+        <span class="lab">Members :</span>
+        <span class="lab">Male</span><span class="line xs"></span>
+        <span class="lab">Female</span><span class="line xs"></span>
+        <span class="lab">Children</span><span class="line xs"></span>
+      </div>
+    </div>
+
+    <!-- Dental kit. Column 1 spans the two upper rows; the brush gets the
+         full width beneath. -->
+    <div class="kit">
+      <table>
+        <tr>
+          <td class="name" rowspan="2">Dental Kit</td>
+          <td class="slot">Single&nbsp;:</td>
+        </tr>
+        <tr>
+          <td class="slot">Double&nbsp;:</td>
+        </tr>
+        <tr>
+          <td class="wide" colspan="2">Tooth Brush&nbsp;:</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ Room details ═══════════════════════════════════════════════════ -->
+  <div class="rooms">
+    <table>
+      <colgroup>
+        <col style="width:30%"><col style="width:9%"><col style="width:12%">
+        <col style="width:13%"><col style="width:18%"><col style="width:18%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Room Name</th><th>A/C</th><th>Non A/C</th>
+          <th>Date / Time</th><th>Check-In</th><th>Check-Out</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Three rooms. Each is two lines — a date line and a time line —
+             so the desk never has to cram "14/09 12:30 PM" into one cell and
+             then argue about what it said at check-out. -->
+        <tr>
+          <td rowspan="2"></td>
+          <td class="tick" rowspan="2"></td>
+          <td class="tick" rowspan="2"></td>
+          <td class="dt">Date</td><td></td><td></td>
+        </tr>
+        <tr><td class="dt">Time</td><td></td><td></td></tr>
+
+        <tr>
+          <td rowspan="2"></td>
+          <td class="tick" rowspan="2"></td>
+          <td class="tick" rowspan="2"></td>
+          <td class="dt">Date</td><td></td><td></td>
+        </tr>
+        <tr><td class="dt">Time</td><td></td><td></td></tr>
+
+        <tr>
+          <td rowspan="2"></td>
+          <td class="tick" rowspan="2"></td>
+          <td class="tick" rowspan="2"></td>
+          <td class="dt">Date</td><td></td><td></td>
+        </tr>
+        <tr><td class="dt">Time</td><td></td><td></td></tr>
+
+        <tr>
+          <td rowspan="2"></td>
+          <td class="tick" rowspan="2"></td>
+          <td class="tick" rowspan="2"></td>
+          <td class="dt">Date</td><td></td><td></td>
+        </tr>
+        <tr><td class="dt">Time</td><td></td><td></td></tr>
+
+        <tr><td class="pay" colspan="6">UPI Number / Cash&nbsp;:</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ Policies and acknowledgment ════════════════════════════════════ -->
+  <div class="policy">
+    <ul>
+      <li>Wedding proof is <b>mandatory</b> for couples.</li>
+      <li>Smoking or consumption of alcohol on the premises attracts a fine of
+          <b>Rs. 500/-</b>.</li>
+      <li>Room key to be handed over at reception <b>10 minutes prior</b> to
+          check-out time.</li>
+    </ul>
+    <div class="sign">
+      <div class="line"></div>
+      <div class="cap">Customer Signature<br><em>“We accepted at check-in”</em></div>
+    </div>
+  </div>
+
+  <!-- ══ Footer split ═══════════════════════════════════════════════════ -->
+  <div class="foot">
+
+    <div>
+      <div class="panel">
+        <h3>Feedback</h3>
+        <div class="rate">
+          <p class="q">Staff Friendliness</p>
+          <div class="scale"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i></div>
+          <p class="hint">1 = Poor &nbsp;·&nbsp; 5 = Excellent</p>
+
+          <p class="q">Cleanliness</p>
+          <div class="scale"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i></div>
+          <p class="hint">1 = Poor &nbsp;·&nbsp; 5 = Excellent</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel charges">
+        <h3>Extra Charges Paid</h3>
+        <table>
+          <tr><td class="k">Extra Bed</td><td></td></tr>
+          <tr><td class="k">A/C Extra</td><td></td></tr>
+          <tr><td class="k">Extra Hour</td><td></td></tr>
+          <tr><td class="k">Extra Service</td><td></td></tr>
+          <tr class="total"><td class="k">Total</td><td></td></tr>
+          <tr><td class="k">Customer Sign</td><td></td></tr>
+          <tr><td class="k">Caution Deposit Received</td><td></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body></html>

@@ -1,0 +1,13 @@
+# Netlify reads this file from the root of the published folder.
+
+# The card used to live at /card.html and that link has been shared.
+# A 301 keeps every copy of it working instead of returning "Page not found".
+/card.html    /             301
+
+# The booking wizard used to be the root. Anyone holding a deep link to
+# /index.html now lands on the card, which is correct — Book Room Now is
+# one tap away.
+
+# Short link for the booking page, for reading out over the phone.
+# 200 rewrites rather than redirects, so the address bar keeps saying /book.
+/book         /book.html    200
