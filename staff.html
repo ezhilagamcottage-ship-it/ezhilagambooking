@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Desk · Kutralam Ezhilagam</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#7a1520">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="KE Desk">
+<link rel="manifest" href="staff.webmanifest">
+<link rel="icon" href="img/logo.webp">
+
+<style>
+/* Desk UI. Dark, because that is how the phone shade already looks, and the
+   voucher itself stays ivory so a tap still opens the card the guest holds. */
+:root{
+  --bg:#121212; --card:#2c2c2e; --card-2:#3a3a3c; --ink:#f5f5f7; --muted:#aeaeb2;
+  --ke:#7a1520; --ke-2:#9a1c28; --gold:#c5a869; --ok:#34c759; --warn:#ffd60a;
+  --due:#ff453a; --line:rgba(255,255,255,.08);
+  --paper:#fdfbf7; --ink-d:#1a1a1a; --ink-2:#5c5344;
+  --r:18px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font:400 15px/1.45 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+a{color:inherit}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:430px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+
+/* ── top bar ── */
+.top{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
+.top img{width:36px;height:36px;border-radius:9px;background:#5c1018;object-fit:contain}
+.top h1{margin:0;font-size:17px;font-weight:800;letter-spacing:.02em}
+.top p{margin:0;font-size:11px;color:var(--muted);font-weight:600}
+.top .back{min-width:44px;min-height:44px;border:0;border-radius:12px;background:var(--card);
+  color:var(--ink);font-size:20px;display:grid;place-items:center}
+
+/* ── notification cards — same shape as the phone shade ── */
+.shade{padding:6px 12px 24px;display:flex;flex-direction:column;gap:10px}
+.note{display:grid;grid-template-columns:44px 1fr 28px;gap:10px;align-items:center;
+  background:var(--card);border-radius:20px;padding:14px 12px 14px 12px;
+  border:0;color:var(--ink);text-align:left;width:100%;min-height:76px;
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset}
+.note:active{transform:scale(.985)}
+.note .ic{width:44px;height:44px;border-radius:12px;background:#5c1018;object-fit:contain}
+.note .t{font-size:15.5px;font-weight:700;letter-spacing:-.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note .s{font-size:13px;color:var(--muted);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note .ch{color:var(--muted);font-size:18px}
+.note .z{justify-self:end;align-self:end;grid-column:3;width:22px;height:22px;
+  border-radius:99px;border:1.5px solid #5ac8fa;color:#5ac8fa;display:grid;place-items:center;
+  font-size:11px;font-weight:800;margin-top:-8px}
+
+/* ── amount banner (payments / cash) ── */
+.hero{margin:0 12px 12px;padding:18px 16px;border-radius:20px;background:linear-gradient(160deg,#7a1520,#4a0c12);
+  color:#fff}
+.hero .amt{font-size:34px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.hero .lbl{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(255,255,255,.7);margin-bottom:4px}
+.hero .meta{margin-top:8px;font-size:13px;color:rgba(255,255,255,.82)}
+
+/* ── tabs ── */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
+.tabs button{flex:0 0 auto;border:0;background:var(--card);color:var(--muted);border-radius:99px;
+  padding:8px 11px;font-size:12.5px;font-weight:700;min-height:36px}
+.tabs button.on{background:#fff;color:#111}
+.panel{padding:0 12px 28px;flex:1}
+
+/* ── voucher card (ivory, like the guest card) ── */
+.vcard{background:var(--paper);color:var(--ink-d);border-radius:16px;padding:18px 16px 16px;
+  border:1px solid var(--gold);position:relative;overflow:hidden}
+.vcard .st{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;
+  font-size:11px;font-weight:800;letter-spacing:.06em}
+.vcard .st.ok{background:rgba(15,122,61,.1);color:#0f7a3d;border:1px solid rgba(15,122,61,.28)}
+.vcard .st.part{background:rgba(180,90,20,.1);color:#9a5a12;border:1px solid rgba(180,90,20,.28)}
+.vcard .st.out{background:rgba(90,90,90,.1);color:#444;border:1px solid rgba(90,90,90,.28)}
+.vcard .st.in{background:rgba(0,122,255,.1);color:#0050c0;border:1px solid rgba(0,122,255,.28)}
+.vcard h2{margin:10px 0 2px;font-family:Georgia,serif;font-size:22px;font-weight:700}
+.vcard .ph{margin:0 0 12px;color:var(--ink-2);font-size:14px}
+.vcard .row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;
+  border-top:1px solid #ede6d8;font-size:13.5px}
+.vcard .k{color:var(--ink-2);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:10.5px}
+.vcard .v{font-weight:700}
+.vcard .bid{font-variant-numeric:tabular-nums;letter-spacing:.04em}
+
+/* ── lifecycle ── */
+.life{background:var(--card);border-radius:16px;padding:8px 14px 14px}
+.step{display:grid;grid-template-columns:22px 1fr;gap:10px;padding:10px 0;position:relative}
+.step:not(:last-child)::before{content:"";position:absolute;left:10px;top:32px;bottom:-10px;
+  width:2px;background:var(--line)}
+.dot{width:22px;height:22px;border-radius:99px;border:2px solid var(--card-2);background:var(--bg);
+  display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--muted);z-index:1}
+.step.done .dot{background:var(--ok);border-color:var(--ok);color:#082}
+.step.now .dot{background:var(--ke-2);border-color:var(--gold);color:#fff}
+.step .ttl{font-weight:800;font-size:14px}
+.step .sub{font-size:12px;color:var(--muted)}
+.step.now .ttl{color:#fff}
+
+/* ── lists / accounts ── */
+.list{background:var(--card);border-radius:16px;overflow:hidden}
+.li{display:flex;justify-content:space-between;gap:10px;padding:14px 14px;border-top:1px solid var(--line);
+  align-items:flex-start}
+.li:first-child{border-top:0}
+.li .nm{font-weight:700}
+.li .dt{font-size:12px;color:var(--muted)}
+.li .val{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.li.hi{background:rgba(197,168,105,.12);outline:1px solid rgba(197,168,105,.35);outline-offset:-1px}
+
+/* ── actions ── */
+.acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.acts button,.btn{flex:1;min-height:48px;border:0;border-radius:14px;font-weight:800;padding:0 14px}
+.btn-ke{background:var(--ke-2);color:#fff}
+.btn-ok{background:var(--ok);color:#082}
+.btn-ghost{background:var(--card-2);color:var(--ink)}
+.btn-warn{background:var(--warn);color:#3a2a00}
+
+/* ── cleaning prompt ── */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;
+  z-index:20;padding:12px}
+.sheet{width:min(430px,100%);background:#1c1c1e;border-radius:22px 22px 18px 18px;padding:18px 16px 22px;
+  color:#fff}
+.sheet h3{margin:0 0 6px;font-size:18px}
+.sheet p{margin:0 0 16px;color:var(--muted);font-size:14px}
+
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.fine{font-size:12px;color:var(--muted);margin:10px 4px 0}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:800}
+.ok{color:var(--ok)}.due{color:var(--due)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* Same Apps Script the booking page and the staff APK already talk to. */
+const SCRIPT = "https://script.google.com/macros/s/AKfycbwUVyNn9AIKvCpF2SQRsTqyepZgqwhOIeWCJt25YT5wyC3pp0fWayuTSDTvlwmD24Ww/exec";
+const LOGO = "img/logo.webp";
+const STORE = "ke-desk-state-v1";
+
+const $ = (h) => { const d = document.createElement("div"); d.innerHTML = h.trim(); return d.firstElementChild; };
+function esc(v) {
+  return String(v == null ? "" : v)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+const inr = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
+
+/* ── seed: the two notices in the screenshot, plus the other kinds the desk
+   actually receives, so a tap can be tried for every route without waiting
+   for the next live event. Live deep links overlay these. */
+const BOOKINGS = {
+  LSEP11626: {
+    ref:"LSEP11626", guest:"S Peermohamed", phone:"9840213184",
+    room:"Paalai", checkIn:"2026-09-11", checkOut:"2026-09-12",
+    nights:1, pax:2, total:2699, paid:1000, pending:1699,
+    status:"reserved", payStatus:"Partial Advance",
+    payments:[{ id:"p1", via:"GPAY", amount:1000, from:"S PEERM", staff:"Rafi", at:"Today" }]
+  },
+  DBMSEP10226: {
+    ref:"DBMSEP10226", guest:"Vikash", phone:"9962222415",
+    room:"Mullai", checkIn:"2026-09-10", checkOut:"2026-09-11",
+    nights:1, pax:3, total:2199, paid:2199, pending:0,
+    status:"checked-out", payStatus:"Fully Paid",
+    payments:[{ id:"p2", via:"UPI", amount:2199, from:"Vikash", staff:"Rakesh", at:"10 Sep" }]
+  },
+  KESEP11026: {
+    ref:"KESEP11026", guest:"Lakshmi", phone:"9962222415",
+    room:"Vaagai", checkIn:"2026-09-11", checkOut:"2026-09-13",
+    nights:2, pax:8, total:10998, paid:10998, pending:0,
+    status:"in-house", payStatus:"Fully Paid",
+    payments:[{ id:"p3", via:"GPAY", amount:10998, from:"Lakshmi", staff:"Lakshmi", at:"Yesterday" }]
+  },
+  WSEP10061: {
+    ref:"WSEP10061", guest:"Aravind Kumar", phone:"9840112233",
+    room:"Kurinji", checkIn:"2026-09-11", checkOut:"2026-09-12",
+    nights:1, pax:2, total:2899, paid:2899, pending:0,
+    status:"in-house", payStatus:"Fully Paid",
+    payments:[{ id:"p4", via:"UPI", amount:399, from:"Aravind", staff:"Rakesh", at:"6 Sep" }],
+    cash:[{ id:"c1", amount:2500, staff:"Rakesh", at:"Today", note:"Balance collected at desk" }]
+  }
+};
+
+const NOTICES = [
+  { id:"n1", type:"payment", ref:"LSEP11626", title:"Rs 1,000 received from S PEERM…",
+    sub:"GPAY · LSEP11626 · Rafi", amount:1000, via:"GPAY", from:"S PEERM", staff:"Rafi" },
+  { id:"n2", type:"checkout", ref:"DBMSEP10226", title:"Checked out — Vikash",
+    sub:"Mullai · DBMSEP10226 · pending ₹0", pending:0, room:"Mullai", guest:"Vikash" },
+  { id:"n3", type:"checkin", ref:"KESEP11026", title:"Checked in — Lakshmi",
+    sub:"Vaagai · KESEP11026 · in house", room:"Vaagai", guest:"Lakshmi" },
+  { id:"n4", type:"cash", ref:"WSEP10061", title:"Cash ₹2,500 received — Aravind",
+    sub:"Kurinji · WSEP10061 · Rakesh", amount:2500, staff:"Rakesh", guest:"Aravind Kumar" },
+  { id:"n5", type:"cleaning", ref:"DBMSEP10226", title:"Cleaning pending — Mullai",
+    sub:"After Vikash · DBMSEP10226", room:"Mullai", guest:"Vikash" }
+];
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORE) || "{}"); }
+  catch (e) { return {}; }
+}
+function saveState(s) { localStorage.setItem(STORE, JSON.stringify(s)); }
+function bookingOf(ref) {
+  const b = BOOKINGS[ref] ? Object.assign({}, BOOKINGS[ref]) : {
+    ref: ref || "—", guest:"Guest", phone:"", room:"", checkIn:"", checkOut:"",
+    nights:1, pax:1, total:0, paid:0, pending:0, status:"reserved", payStatus:"Unknown",
+    payments:[], cash:[]
+  };
+  const st = loadState();
+  const over = (st.bookings && st.bookings[ref]) || {};
+  return Object.assign(b, over);
+}
+function patchBooking(ref, patch) {
+  const st = loadState();
+  st.bookings = st.bookings || {};
+  st.bookings[ref] = Object.assign({}, st.bookings[ref] || {}, patch);
+  saveState(st);
+}
+
+/* type aliases the APK / Macro / PWA might send */
+function normType(t) {
+  const s = String(t || "").toLowerCase().replace(/[\s_-]+/g, "");
+  if (["payment","gpay","upi","paid","received","credit"].includes(s)) return "payment";
+  if (["checkin","checkedin","ci","arrival"].includes(s)) return "checkin";
+  if (["checkout","checkedout","co","departure"].includes(s)) return "checkout";
+  if (["cash","cashreceived","accounts","account"].includes(s)) return "cash";
+  if (["cleaning","clean","hk","housekeeping","pendingclean"].includes(s)) return "cleaning";
+  if (["voucher","booking","status"].includes(s)) return "voucher";
+  return s || "voucher";
+}
+function tabFor(type) {
+  return ({ payment:"payments", checkin:"checkin", checkout:"checkout",
+            cash:"accounts", cleaning:"cleaning", voucher:"voucher" })[type] || "voucher";
+}
+
+function parseLink() {
+  const q = new URLSearchParams(location.search);
+  let type = q.get("type") || q.get("n") || q.get("kind") || "";
+  let ref = q.get("ref") || q.get("bookingId") || q.get("id") || "";
+  const hash = decodeURIComponent(location.hash.replace(/^#\/?/, ""));
+  if (hash) {
+    const parts = hash.split("/").filter(Boolean);
+    if (parts[0] && !type) type = parts[0];
+    if (parts[1] && !ref) ref = parts[1];
+  }
+  return {
+    type: normType(type),
+    ref: String(ref || "").toUpperCase(),
+    amount: q.get("amount") || q.get("value") || "",
+    via: q.get("via") || q.get("channel") || "",
+    from: q.get("from") || q.get("payer") || "",
+    staff: q.get("staff") || q.get("by") || "",
+    room: q.get("room") || "",
+    guest: q.get("guest") || "",
+    pending: q.get("pending") || ""
+  };
+}
+
+const S = { view:"inbox", tab:"voucher", link:null, askClean:false, flash:"" };
+
+function goNotice(n, extra) {
+  const type = normType(n.type);
+  const ref = String(n.ref || "").toUpperCase();
+  const q = new URLSearchParams();
+  q.set("type", type);
+  if (ref) q.set("ref", ref);
+  ["amount","via","from","staff","room","guest","pending"].forEach((k) => {
+    const v = (extra && extra[k] != null) ? extra[k] : n[k];
+    if (v != null && v !== "") q.set(k, v);
+  });
+  history.pushState({}, "", "staff.html?" + q.toString());
+  openFromLink();
+}
+
+function openFromLink() {
+  const link = parseLink();
+  S.link = link;
+  if (!link.ref && link.type === "voucher") { S.view = "inbox"; return render(); }
+  if (!link.ref && !link.type) { S.view = "inbox"; return render(); }
+  S.view = "booking";
+  S.tab = tabFor(link.type);
+  S.askClean = link.type === "cleaning";
+  /* overlay live payload onto the booking so the amount on the payment
+     notice is the amount shown on top, even before the sheet round-trip. */
+  if (link.ref) {
+    const patch = {};
+    if (link.guest) patch.guest = link.guest;
+    if (link.room) patch.room = link.room;
+    if (link.pending !== "") patch.pending = Number(String(link.pending).replace(/[^\d.-]/g, "")) || 0;
+    if (Object.keys(patch).length) patchBooking(link.ref, patch);
+  }
+  render();
+  if (link.ref) warmToken(link.ref);
+}
+
+async function warmToken(ref) {
+  try {
+    const r = await fetch(SCRIPT + "?action=voucherToken&bookingId=" + encodeURIComponent(ref), { redirect:"follow" });
+    const d = await r.json();
+    if (d && d.ok && d.tok) patchBooking(ref, { token: d.grouped || d.tok });
+  } catch (e) { /* desk still works offline from the notice payload */ }
+}
+
+async function postDesk(payload) {
+  try {
+    await fetch(SCRIPT, {
+      method:"POST", redirect:"follow",
+      headers:{ "Content-Type":"text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+  } catch (e) { /* local state is the source of truth if the sheet is asleep */ }
+}
+
+/* ── views ── */
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  if (S.view === "inbox") app.appendChild(viewInbox());
+  else app.appendChild(viewBooking());
+  if (S.askClean) app.appendChild(cleanPrompt());
+}
+
+function viewInbox() {
+  const el = $(`<div>
+    <header class="top">
+      <img src="${LOGO}" alt="">
+      <div><h1>Desk notices</h1><p>Tap a notice to open the booking</p></div>
+    </header>
+    <div class="shade" id="shade"></div>
+    <p class="fine" style="padding:0 18px 24px">A payment opens Payments with the amount on top.
+      Check-in opens the stay lifecycle. Check-out opens the check-out tab.
+      Cash opens Accounts. Cleaning asks whether the room is done.</p>
+  </div>`);
+  const shade = el.querySelector("#shade");
+  NOTICES.forEach((n) => {
+    const b = $(`<button type="button" class="note" aria-label="${esc(n.title)}">
+      <img class="ic" src="${LOGO}" alt="">
+      <span>
+        <span class="t">${esc(n.title)}</span>
+        <span class="s">${esc(n.sub)}</span>
+      </span>
+      <span class="ch">⌃</span>
+    </button>`);
+    b.onclick = () => goNotice(n);
+    shade.appendChild(b);
+  });
+  return el;
+}
+
+function fmtDay(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso + "T12:00:00Z");
+  return d.toLocaleDateString("en-GB", { day:"numeric", month:"short", timeZone:"UTC" });
+}
+
+function stayStatus(b) {
+  const st = b.cleaning === "complete" ? "ready"
+    : b.cleaning === "progress" ? "cleaning"
+    : b.status;
+  const map = {
+    reserved: ["Reserved", "part"],
+    "in-house": ["In house", "in"],
+    "checked-out": ["Checked out", "out"],
+    cleaning: ["Cleaning", "part"],
+    ready: ["Ready", "ok"]
+  };
+  return map[st] || ["Reserved", "part"];
+}
+
+function viewBooking() {
+  const link = S.link || {};
+  const b = bookingOf(link.ref);
+  const [stLabel, stClass] = stayStatus(b);
+  const el = $(`<div>
+    <header class="top">
+      <button class="back" id="back" aria-label="All notices">‹</button>
+      <img src="${LOGO}" alt="">
+      <div><h1>${esc(b.guest)}</h1><p>${esc(b.room || "Room")} · ${esc(b.ref)}</p></div>
+    </header>
+    <div id="hero"></div>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="panel" id="panel"></div>
+  </div>`);
+  el.querySelector("#back").onclick = () => {
+    history.pushState({}, "", "staff.html");
+    S.view = "inbox"; S.askClean = false; render();
+  };
+
+  const tabs = [
+    ["voucher","Voucher"],
+    ["payments","Payments"],
+    ["checkin","Check-in"],
+    ["checkout","Check-out"],
+    ["accounts","Accounts"],
+    ["cleaning","Cleaning"]
+  ];
+  const nav = el.querySelector("#tabs");
+  tabs.forEach(([id, label]) => {
+    const btn = $(`<button type="button" class="${S.tab===id?"on":""}">${label}</button>`);
+    btn.onclick = () => { S.tab = id; render(); };
+    nav.appendChild(btn);
+  });
+
+  const hero = el.querySelector("#hero");
+  if (S.tab === "payments" && (link.amount || (b.payments && b.payments[0]))) {
+    const amt = Number(link.amount || (b.payments[0] && b.payments[0].amount) || 0);
+    const via = link.via || (b.payments[0] && b.payments[0].via) || "UPI";
+    const from = link.from || (b.payments[0] && b.payments[0].from) || b.guest;
+    const staff = link.staff || (b.payments[0] && b.payments[0].staff) || "";
+    hero.appendChild($(`<div class="hero">
+      <div class="lbl">Received</div>
+      <div class="amt">${inr(amt)}</div>
+      <div class="meta">${esc(via)} · from ${esc(from)}${staff ? " · " + esc(staff) : ""} · ${esc(b.ref)}</div>
+    </div>`));
+  }
+  if (S.tab === "accounts" && (link.type === "cash" || b.cash && b.cash.length)) {
+    const amt = Number(link.amount || (b.cash && b.cash[0] && b.cash[0].amount) || 0);
+    hero.appendChild($(`<div class="hero">
+      <div class="lbl">Cash received</div>
+      <div class="amt">${inr(amt)}</div>
+      <div class="meta">${esc(b.guest)} · ${esc(b.room)} · ${esc(b.ref)}</div>
+    </div>`));
+  }
+
+  const panel = el.querySelector("#panel");
+  if (S.tab === "voucher") panel.appendChild(panelVoucher(b, stLabel, stClass));
+  if (S.tab === "payments") panel.appendChild(panelPayments(b, link));
+  if (S.tab === "checkin") panel.appendChild(panelCheckin(b));
+  if (S.tab === "checkout") panel.appendChild(panelCheckout(b, link));
+  if (S.tab === "accounts") panel.appendChild(panelAccounts(b, link));
+  if (S.tab === "cleaning") panel.appendChild(panelCleaning(b));
+  return el;
+}
+
+function panelVoucher(b, stLabel, stClass) {
+  return $(`<article class="vcard">
+    <span class="st ${stClass}">${esc(stLabel)}</span>
+    <span class="st ${b.pending>0?"part":"ok"}" style="margin-left:6px">${esc(b.payStatus)}</span>
+    <h2>${esc(b.guest)}</h2>
+    <p class="ph">${b.phone ? esc(b.phone) : ""}</p>
+    <div class="row"><span class="k">Booking ID</span><span class="v bid">${esc(b.ref)}</span></div>
+    <div class="row"><span class="k">Room</span><span class="v">${esc(b.room || "—")}</span></div>
+    <div class="row"><span class="k">Check-in</span><span class="v">${esc(fmtDay(b.checkIn))} · 12:00 PM</span></div>
+    <div class="row"><span class="k">Check-out</span><span class="v">${esc(fmtDay(b.checkOut))} · 10:00 AM</span></div>
+    <div class="row"><span class="k">Stay</span><span class="v">${esc(b.pax)} guests · ${esc(b.nights)} night${b.nights===1?"":"s"}</span></div>
+    <div class="row"><span class="k">Paid</span><span class="v ok">${inr(b.paid)}</span></div>
+    <div class="row"><span class="k">Pending</span><span class="v ${b.pending>0?"due":"ok"}">${b.pending>0?inr(b.pending):"₹0"}</span></div>
+    ${b.token ? `<div class="row"><span class="k">Token</span><span class="v bid">${esc(b.token)}</span></div>` : ""}
+  </article>`);
+}
+
+function panelPayments(b, link) {
+  const rows = (b.payments || []).slice();
+  if (link && link.type === "payment" && link.amount && !rows.some((p) => Number(p.amount) === Number(link.amount))) {
+    rows.unshift({ via: link.via || "GPAY", amount: link.amount, from: link.from, staff: link.staff, at:"Just now", hi:true });
+  }
+  const box = $(`<div>
+    ${panelVoucher(b, ...stayStatus(b)).outerHTML}
+    <p class="fine" style="margin:14px 4px 8px">All credits on this booking</p>
+    <div class="list" id="plist"></div>
+  </div>`);
+  const list = box.querySelector("#plist");
+  if (!rows.length) list.appendChild($(`<div class="li"><span>No credits yet</span></div>`));
+  rows.forEach((p, i) => {
+    const hi = p.hi || (i === 0 && S.link && S.link.type === "payment");
+    list.appendChild($(`<div class="li${hi?" hi":""}">
+      <div><div class="nm">${esc(p.via || "UPI")} · ${esc(p.from || b.guest)}</div>
+        <div class="dt">${esc(p.at || "")}${p.staff ? " · " + esc(p.staff) : ""}</div></div>
+      <div class="val">${inr(p.amount)}</div>
+    </div>`));
+  });
+  return box;
+}
+
+function lifeIndex(b) {
+  if (b.cleaning === "complete" || b.status === "ready") return 6;
+  if (b.cleaning === "progress" || b.status === "cleaning") return 5;
+  if (b.status === "checked-out") return 4;
+  if (b.status === "in-house") return 3;
+  if (b.paid > 0) return 2;
+  return 1;
+}
+
+function panelCheckin(b) {
+  const idx = lifeIndex(b);
+  const steps = [
+    ["Booked", b.ref],
+    ["Payment", b.payStatus + " · " + inr(b.paid)],
+    ["Check-in", fmtDay(b.checkIn) + " · 12:00 PM · " + (b.room || "")],
+    ["In house", b.guest],
+    ["Check-out", fmtDay(b.checkOut) + " · 10:00 AM"],
+    ["Cleaning", b.cleaning === "complete" ? "Complete" : b.cleaning === "progress" ? "In progress" : "Pending"],
+    ["Ready", "Room can take the next guest"]
+  ];
+  const box = $(`<div>
+    <p class="fine" style="margin:0 4px 10px">Check-in and check-out lifecycle for this stay</p>
+    <div class="life" id="life"></div>
+    <div class="acts" id="acts"></div>
+  </div>`);
+  const life = box.querySelector("#life");
+  steps.forEach((s, i) => {
+    const cls = i < idx ? "done" : i === idx ? "now" : "";
+    life.appendChild($(`<div class="step ${cls}">
+      <span class="dot">${i < idx ? "✓" : i+1}</span>
+      <div><div class="ttl">${esc(s[0])}</div><div class="sub">${esc(s[1])}</div></div>
+    </div>`));
+  });
+  const acts = box.querySelector("#acts");
+  if (b.status === "reserved") {
+    const btn = $(`<button class="btn-ok" type="button">Mark checked in</button>`);
+    btn.onclick = () => setStatus(b.ref, "in-house");
+    acts.appendChild(btn);
+  } else if (b.status === "in-house") {
+    const btn = $(`<button class="btn-ke" type="button">Mark checked out</button>`);
+    btn.onclick = () => setStatus(b.ref, "checked-out");
+    acts.appendChild(btn);
+  }
+  return box;
+}
+
+function panelCheckout(b, link) {
+  const pending = link.pending !== "" && link.pending != null
+    ? Number(String(link.pending).replace(/[^\d.-]/g, "")) || 0
+    : b.pending;
+  const box = $(`<div>
+    <article class="vcard">
+      <span class="st out">Check-out</span>
+      <h2>${esc(b.guest)}</h2>
+      <p class="ph">${esc(b.room)} · ${esc(b.ref)}</p>
+      <div class="row"><span class="k">Due out</span><span class="v">${esc(fmtDay(b.checkOut))} · 10:00 AM</span></div>
+      <div class="row"><span class="k">Pending</span><span class="v ${pending>0?"due":"ok"}">${pending>0?inr(pending):"₹0"}</span></div>
+      <div class="row"><span class="k">Stay status</span><span class="v">${esc(stayStatus(b)[0])}</span></div>
+    </article>
+    <div class="acts" id="acts"></div>
+    <p class="fine">Pending ₹0 means the bill is clear — collect the key and send the room to cleaning.</p>
+  </div>`);
+  const acts = box.querySelector("#acts");
+  if (b.status !== "checked-out" && b.status !== "ready") {
+    const btn = $(`<button class="btn-ke" type="button">Confirm check-out</button>`);
+    btn.onclick = () => setStatus(b.ref, "checked-out");
+    acts.appendChild(btn);
+  } else {
+    const btn = $(`<button class="btn-warn" type="button">Send to cleaning</button>`);
+    btn.onclick = () => { S.tab = "cleaning"; S.askClean = true; render(); };
+    acts.appendChild(btn);
+  }
+  return box;
+}
+
+function panelAccounts(b, link) {
+  const cash = (b.cash || []).slice();
+  if (link && link.type === "cash" && link.amount && !cash.some((c) => Number(c.amount) === Number(link.amount))) {
+    cash.unshift({ amount: link.amount, staff: link.staff || "", at:"Just now", note:"Cash at desk", hi:true });
+  }
+  const box = $(`<div>
+    <p class="fine" style="margin:0 4px 8px">Cash book for this booking</p>
+    <div class="list" id="clist"></div>
+    <p class="fine">UPI credits sit on Payments. Cash handed at the desk sits here.</p>
+  </div>`);
+  const list = box.querySelector("#clist");
+  if (!cash.length) {
+    list.appendChild($(`<div class="li"><span>No cash entries</span><span class="val">₹0</span></div>`));
+  }
+  cash.forEach((c, i) => {
+    const hi = c.hi || (i === 0 && S.link && S.link.type === "cash");
+    list.appendChild($(`<div class="li${hi?" hi":""}">
+      <div><div class="nm">${esc(c.note || "Cash")}</div>
+        <div class="dt">${esc(c.at || "")}${c.staff ? " · " + esc(c.staff) : ""}</div></div>
+      <div class="val">${inr(c.amount)}</div>
+    </div>`));
+  });
+  return box;
+}
+
+function panelCleaning(b) {
+  const label = b.cleaning === "complete" ? "Complete"
+    : b.cleaning === "progress" ? "In progress" : "Pending";
+  const box = $(`<div>
+    <article class="vcard">
+      <span class="st ${b.cleaning==="complete"?"ok":"part"}">${esc(label)}</span>
+      <h2>${esc(b.room || "Room")}</h2>
+      <p class="ph">After ${esc(b.guest)} · ${esc(b.ref)}</p>
+      <div class="row"><span class="k">Housekeeping</span><span class="v">${esc(label)}</span></div>
+    </article>
+    <div class="acts">
+      <button type="button" class="btn-ghost" id="prog">In progress</button>
+      <button type="button" class="btn-ok" id="done">Cleaning complete</button>
+    </div>
+  </div>`);
+  box.querySelector("#prog").onclick = () => setCleaning(b.ref, "progress");
+  box.querySelector("#done").onclick = () => setCleaning(b.ref, "complete");
+  return box;
+}
+
+function cleanPrompt() {
+  const link = S.link || {};
+  const b = bookingOf(link.ref);
+  const el = $(`<div class="mask" role="dialog" aria-modal="true" aria-labelledby="cq">
+    <div class="sheet">
+      <h3 id="cq">Is cleaning finished?</h3>
+      <p>${esc(b.room || "This room")} · ${esc(b.ref)} · after ${esc(b.guest)}. Mark it complete, or leave it in progress.</p>
+      <div class="acts">
+        <button type="button" class="btn-ghost" id="prog">In progress</button>
+        <button type="button" class="btn-ok" id="done">Cleaning complete</button>
+      </div>
+    </div>
+  </div>`);
+  el.querySelector("#prog").onclick = () => setCleaning(b.ref, "progress");
+  el.querySelector("#done").onclick = () => setCleaning(b.ref, "complete");
+  return el;
+}
+
+function setStatus(ref, status) {
+  patchBooking(ref, { status });
+  if (status === "checked-out") patchBooking(ref, { cleaning: "" });
+  postDesk({ action:"deskStatus", bookingId:ref, status });
+  S.askClean = false;
+  render();
+}
+function setCleaning(ref, cleaning) {
+  patchBooking(ref, {
+    cleaning,
+    status: cleaning === "complete" ? "ready" : "checked-out"
+  });
+  postDesk({ action:"deskCleaning", bookingId:ref, cleaning });
+  S.askClean = false;
+  S.tab = "cleaning";
+  render();
+}
+
+/* ── boot ── */
+window.addEventListener("popstate", openFromLink);
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("staff-sw.js").catch(() => {});
+}
+openFromLink();
+</script>
+</body></html>

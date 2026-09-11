@@ -1,0 +1,13 @@
+{
+  "name": "Ezhilagam Desk",
+  "short_name": "KE Desk",
+  "description": "Staff desk for Kutralam Ezhilagam — booking vouchers, payments, check-in and housekeeping.",
+  "start_url": "/staff.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#7a1520",
+  "icons": [
+    { "src": "img/logo.webp", "sizes": "192x192", "type": "image/webp", "purpose": "any" }
+  ]
+}

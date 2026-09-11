@@ -11,3 +11,7 @@
 # Short link for the booking page, for reading out over the phone.
 # 200 rewrites rather than redirects, so the address bar keeps saying /book.
 /book         /book.html    200
+
+# Staff desk. Notification taps land here with ?type=&ref= (or #/type/ref).
+# Unlinked from the guest pages on purpose — same rule as the check-in slip.
+/staff        /staff.html   200
