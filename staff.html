@@ -64,9 +64,9 @@ button{font:inherit;cursor:pointer}
 .hero .meta{margin-top:8px;font-size:13px;color:rgba(255,255,255,.82)}
 
 /* ── tabs ── */
-.tabs{display:flex;gap:4px;padding:0 12px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
 .tabs button{flex:0 0 auto;border:0;background:var(--card);color:var(--muted);border-radius:99px;
-  padding:8px 12px;font-size:12.5px;font-weight:700;min-height:36px}
+  padding:8px 11px;font-size:12.5px;font-weight:700;min-height:36px}
 .tabs button.on{background:#fff;color:#111}
 .panel{padding:0 12px 28px;flex:1}
 
@@ -119,7 +119,7 @@ button{font:inherit;cursor:pointer}
 .btn-warn{background:var(--warn);color:#3a2a00}
 
 /* ── cleaning prompt ── */
-.mask{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:end center;
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;
   z-index:20;padding:12px}
 .sheet{width:min(430px,100%);background:#1c1c1e;border-radius:22px 22px 18px 18px;padding:18px 16px 22px;
   color:#fff}
