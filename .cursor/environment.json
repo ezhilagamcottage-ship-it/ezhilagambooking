@@ -1,0 +1,11 @@
+{
+  "name": "Kutralam Ezhilagam guest website",
+  "install": "npx --yes netlify@27 --version",
+  "terminals": [
+    {
+      "name": "netlify-dev",
+      "command": "npx --yes netlify@27 dev --offline --dir . --port 8888"
+    }
+  ],
+  "ports": [8888]
+}
