@@ -1719,7 +1719,7 @@ async function payByCard(btn) {
     amount: lockedPaise, currency: d.currency || "INR",
     name: CFG.BRAND,
     description: S.pick.join(" + ") + " · " + fmt(S.checkIn) + " to " + fmt(S.checkOut),
-    prefill: { name: S.guest.name.trim(), contact: "91" + S.guest.phone },
+    prefill: { name: S.guest.name.trim(), contact: "+91" + S.guest.phone },
     readonly: { name: true, contact: true },
     notes: { ref: S.ref },
     /* Cards and net banking only. See the note above — this is the line that
