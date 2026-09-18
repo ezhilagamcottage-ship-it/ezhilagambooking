@@ -665,9 +665,6 @@ const ROOMS = [
     desc:"The largest room in the house \u2014 ground-floor suite, sleeps up to fifteen." },
 ];
 const AC_ADDON = { Studio: 500, Suite: 1000 };
-/* Same four the staff app offers, so the register reads identically whether
-   the booking came from the desk or from this page. */
-const ID_TYPES = ["Aadhaar", "Driving License", "Passport", "Voter ID"];
 </script>
 
 <script>
@@ -999,7 +996,9 @@ const S = {
      flight while the guest is still tapping the guest counts. By the time
      they press Find Available Rooms it has almost always landed. */
   prefetch: null,
-  guest: { name:"", phone:"", address:"", city:"", pin:"", idType:"Aadhaar", idLast4:"" },
+  /* Address / city / PIN / ID were dropped from the public form to cut
+     booking drop-offs. Empty strings keep the sheet and n8n payloads stable. */
+  guest: { name:"", phone:"", address:"", city:"", pin:"", idType:"", idLast4:"" },
   payRef: "", booking: null, error: "",
   /* Rakesh, 1 Sep 2026: "should always ask for full payment or 60 percent as
      advance if the select checkbox advance else it should always keep full
@@ -1496,35 +1495,15 @@ function stepGuest(app) {
   const box = $(`<section class="step">
     <div class="card stack">
       ${[["name","Full name","text","As on your ID"],
-         ["phone","WhatsApp number","tel","10 digits"],
-         ["address","Address","text","House / street"],
-         ["city","City","text","e.g. Chennai"],
-         ["pin","PIN code","tel","6 digits"]].map(([k,l,t,ph]) => `
+         ["phone","WhatsApp number","tel","10 digits"]].map(([k,l,t,ph]) => `
         <label><span class="lbl">${l}</span>
           <input data-f="${k}" type="${t}" value="${f[k]}" placeholder="${ph}"></label>`).join("")}
-
-      <label><span class="lbl">ID you will bring</span>
-        <select data-f="idType">${ID_TYPES.map((x) =>
-          `<option${x === f.idType ? " selected" : ""}>${x}</option>`).join("")}</select></label>
-
-      <label><span class="lbl">Last 4 digits of that ID</span>
-        <input data-f="idLast4" type="tel" inputmode="numeric" maxlength="4"
-          value="${f.idLast4}" placeholder="4821"></label>
-      <p class="fine">Four digits only — enough for the desk to match you to your
-        booking. Your full ID is checked in person at check-in and is never typed
-        into this page.</p>
+      <p class="fine">Government photo ID is checked in person at check-in.
+        No address is needed to hold the room.</p>
     </div></section>`);
-  box.querySelectorAll("select[data-f]").forEach((i) => i.onchange = (e) => {
-    S.guest[e.target.dataset.f] = e.target.value;
-  });
   box.querySelectorAll("input[data-f]").forEach((i) => i.oninput = (e) => {
-    if (e.target.dataset.f === "idLast4") {
-      S.guest.idLast4 = e.target.value.replace(/\D/g, "").slice(0, 4);
-      e.target.value = S.guest.idLast4; return;
-    }
     const k = i.dataset.f; let v = e.target.value;
     if (k === "phone") v = v.replace(/\D/g, "").slice(-10);
-    if (k === "pin") v = v.replace(/\D/g, "").slice(0, 6);
     S.guest[k] = v;
   });
   app.appendChild(box);
@@ -1728,19 +1707,26 @@ async function payByCard(btn) {
   }
 
   S.rzp = { orderId: d.orderId, amount: d.amount };
+  /* Amount is locked by the server-created order_id. The paise figure is
+     repeated here so the checkout chrome shows the same total; Razorpay
+     refuses any attempt to pay a different amount against this order.
+     accept_partial does not apply to Orders checkout — that flag is for
+     Payment Links — but order_id + amount together make the total fixed. */
+  const lockedPaise = Number(d.amount) || Math.round(payNow() * 100);
   const rz = new window.Razorpay({
     key: d.keyId,                     /* publishable; the secret never leaves the sheet */
     order_id: d.orderId,
-    amount: d.amount, currency: d.currency || "INR",
+    amount: lockedPaise, currency: d.currency || "INR",
     name: CFG.BRAND,
     description: S.pick.join(" + ") + " · " + fmt(S.checkIn) + " to " + fmt(S.checkOut),
-    prefill: { name: S.guest.name.trim(), contact: "91" + S.guest.phone },
+    prefill: { name: S.guest.name.trim(), contact: "+91" + S.guest.phone },
+    readonly: { name: true, contact: true },
     notes: { ref: S.ref },
     /* Cards and net banking only. See the note above — this is the line that
        keeps UPI off the gateway. */
     method: { card: true, netbanking: true, upi: false, wallet: false,
               emi: false, paylater: false, cardless_emi: false },
-    theme: { color: "#0f766e" },
+    theme: { color: "#1B382B" },
     modal: { ondismiss: () => done("") },
     handler: (r) => { finishCard(r, btn, was); }
   });
@@ -1820,10 +1806,15 @@ function stepPay(app) {
       </label>
     </div>
 
+    ${CFG.RZP_ENABLED ? `
+    <button id="paycard" class="pay">Pay ${inr(amt)}</button>
+    <p class="fine" style="margin-top:8px;text-align:center">Card or net banking · amount locked · opens Razorpay instantly</p>
+    <div class="railsplit"><span>or pay by UPI — no fee</span></div>
+` : `<p class="railhead">Pay by UPI — straight to the hotel, no fee</p>`}
+
     ${!upi ? `<p class="warn">UPI address not set. Fill <code>CFG.UPI</code> before this page goes live — otherwise Pay does nothing.</p>` : ""}
 
-    <p class="railhead">Pay by UPI — straight to the hotel, no fee</p>
-    <button id="pay" class="pay ${upi ? "" : "off"}" ${upi ? "" : "disabled"}>${payLabel}</button>
+    <button id="pay" class="paycard ${upi ? "" : "off"}" ${upi ? "" : "disabled"}>${payLabel}</button>
 
     <div id="qrbox" class="qrbox" ${S.qrOpen ? "" : "hidden"}>
       <p class="qrhead">Scan with any UPI app</p>
@@ -1842,11 +1833,6 @@ function stepPay(app) {
       <p class="fine" style="margin-top:10px">Works with GPay, PhonePe, Paytm, BHIM
         and any bank app. Quote <b>${S.ref}</b> if you are asked for a note.</p>
     </div>
-
-    ${CFG.RZP_ENABLED ? `
-    <div class="railsplit"><span>or</span></div>
-    <button id="paycard" class="paycard">Pay by Card / Net Banking</button>
-` : ""}
 
     <div class="card">
       <p class="note">Paying by UPI? Your app will open. After paying, come back here and type the
@@ -2140,10 +2126,10 @@ function n8nPayload(extra) {
     guest: S.guest.name.trim(),
     phone: S.guest.phone,
     waNumber: "91" + S.guest.phone,
-    address: [S.guest.address, S.guest.city].filter(Boolean).join(", "),
-    pin: S.guest.pin,
-    idType: S.guest.idType,
-    idLast4: S.guest.idLast4,
+    address: "",
+    pin: "",
+    idType: S.guest.idType || "",
+    idLast4: S.guest.idLast4 || "",
     rooms: S.pick.join(", "),
     checkIn: S.checkIn, checkOut: S.checkOut,
     nights: Math.max(1, nightsBetween(S.checkIn, S.checkOut)),
@@ -3210,8 +3196,6 @@ async function advanceStep() {
     const g = S.guest;
     if (g.name.trim().length < 3) return fail("Please give the name the room should be under.");
     if (g.phone.length !== 10) return fail("A 10-digit WhatsApp number, please — the voucher goes there.");
-    if (g.pin && g.pin.length !== 6) return fail("A PIN code is 6 digits.");
-    if (g.idLast4.length !== 4) return fail("The last 4 digits of the ID you will bring, please — the desk uses them to find your booking.");
     S.step = 3; return render();
   }
   if (S.step === 3) {
@@ -3233,8 +3217,9 @@ async function holdRoom(extra, settleState) {
         action: "webBooking",
         name: S.guest.name.trim(),
         phone: S.guest.phone,
-        city: [S.guest.address, S.guest.city].filter(Boolean).join(", "),
-        pin: S.guest.pin,
+        city: "",
+        pin: "",
+        address: "",
         room: S.pick.join(","),
         checkIn: S.checkIn, checkOut: S.checkOut,
         adults: Number(S.adults) || 0, children: Number(S.children) || 0,
