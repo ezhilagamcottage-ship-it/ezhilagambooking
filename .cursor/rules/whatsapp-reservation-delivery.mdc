@@ -1,0 +1,101 @@
+---
+description: Delivery order, 2-minute fallback and no-duplicate rules for every WhatsApp reservation confirmation (voucher) sent to the guest and the Booking Team group. Applies to the Prime staff app, the Apps Script (Kutralam sheet / SendPace), the Supabase dispatch/outbox, and book.html.
+alwaysApply: true
+---
+
+# WhatsApp reservation confirmation — delivery contract
+
+A reservation confirmation is the voucher image + its text, sent to the
+**guest**, then copied to the **Booking Team group**
+(`readWaConfig().teamChatId`, `...@g.us`, posted from the group line
+`rockyjio`). Any change that touches this path must keep every rule below.
+
+## 1. Order — guest first, group second
+
+1. Guest voucher image, then the guest voucher text (one line, sticky per
+   guest — `glLineFor_` / `glRemember_`).
+2. Booking Team group copy (`tplGroupCopy_`), image then text.
+3. Policy cards (`policyQueueBehind_`) behind the guest voucher. They are not
+   part of the confirmation and never delay steps 1–2.
+
+The group copy is released only after the guest voucher is **delivered**, or
+when the guest deadline in §3 expires. It must never go out ahead of the
+guest. (2 Oct 2026, RDEC10726 and RDEC10826: the group copies went out at
+2:04 PM and the guests' at 2:14–2:16 PM.)
+
+## 2. "Delivered" means sent, not queued
+
+- Delivered means Evolution accepted the send. In the Send Queue tab that is
+  `Status = sent`. `{ ok:true, queued:true }` from `sendTpl` only means
+  "written to the queue".
+- `sheet_sync_outbox.status = done` only means Apps Script answered. Never
+  show "sent" in the app, or skip a fallback, because of it.
+- The app shows queued → sent / failed for the guest and the group
+  separately, from the Send Queue state for that booking ID.
+
+## 3. Fallback within 2 minutes (T = the moment staff tap send)
+
+| By | Must be true |
+|---|---|
+| T + 60 s | Guest voucher sent. If not, move it once to the next live line (`paceMoveOffDeadLine_` / `paceLiveLine_`), and move the guest's whole remaining thread with it. |
+| T + 120 s | Guest voucher sent, **or** marked `failed` and the desk alerted with the booking ID. |
+| T + 120 s | Group copy sent. If the guest is still not delivered, send the group copy anyway with a line saying guest delivery is pending/failed, so the desk can act. |
+
+- Voucher rows (`why` starts `voucher <ID>` / `voucher copy <ID>`) jump
+  ahead of every other row in `paceQueueSweep`. Policy cards, fliers,
+  Justdial and similar rows may wait. Pacing gaps (30 s per guest, 15 s per
+  line, ±5 s jitter) must still fit inside the 2 minutes.
+- Delivery must never depend on the 1-minute time trigger alone. A voucher
+  enqueued when its clocks allow is sent inline at enqueue. A watchdog
+  outside Apps Script (Supabase) drains any voucher row that is more than
+  60 s overdue. A stalled trigger is an incident, not a delay. (2 Oct 2026:
+  RDEC10926's rows were due at 2:19 PM and were still queued at 2:30 PM.
+  Earlier vouchers arrived 40–70 minutes late, all in one burst.)
+- A fallback **moves** the existing row (new line, new due time, note
+  `moved off X to Y`). It never appends a second row for the same message.
+
+## 4. No duplication — one message per key
+
+Idempotency key: `bookingId | recipient (guest digits or group JID) | part`,
+where `part` ∈ `voucher-image`, `voucher-text`, `group-image`, `group-text`,
+`policy-1..3`.
+
+- Before enqueueing, retrying or falling back, look the key up (Send Queue /
+  delivery ledger):
+  - `sent` → skip it.
+  - `queued` → do not add another row. Expedite the existing one.
+  - `failed` → re-send on the same row.
+- A re-tap of **Send Voucher on WhatsApp**, Save/Share, or the
+  booking-saved auto-send resends only the parts not yet `sent`. A full
+  second copy needs an explicit "send again" confirmation from staff.
+  (2 Oct 2026: re-taps added rows 3386–3389 for RDEC10926. The guest had
+  extra copies queued from both Receptionist and rockyjio.)
+- The guest hears from one number end to end. A fallback moves the thread;
+  it never sends the same part from a second line.
+- Supabase `sheet-sync` never re-forwards a WhatsApp action
+  (`sendTpl`, `guestMsg`, `sendDoc`, re-share) once Apps Script has
+  answered. Retry only when the request failed before reaching Apps Script.
+  Any other retry is a duplicate.
+
+## 5. Action names must exist on both sides
+
+- Every action the app dispatches for WhatsApp must have a handler in
+  `doPost` in the live Apps Script. The re-share button currently dispatches
+  `welcomeShare`, which Apps Script rejects with `Unknown action:
+  welcomeShare`, so the re-share never sends anything. Rename it to a
+  handled action, or add the handler, in the same release.
+- `sheet-sync` marks `Unknown action` as a permanent failure and surfaces
+  it. It does not retry it up to 12 times.
+
+## 6. Checklist for any change to this path
+
+- [ ] A new booking: the guest voucher is `sent` before the group copy, and
+      both are `sent` within 2 minutes (check `?action=sendQueue&by=Rakesh`).
+- [ ] Guest line down: the voucher moves to the next live line once, and the
+      group still gets its copy within 2 minutes.
+- [ ] Sweep trigger disabled: the voucher still goes within 2 minutes, via the
+      inline send or the watchdog.
+- [ ] Tapping Send Voucher twice adds no new Send Queue rows for parts already
+      queued or sent.
+- [ ] The re-share action reaches a real handler (no `Unknown action` in
+      `sheet_sync_outbox.last_error`).
