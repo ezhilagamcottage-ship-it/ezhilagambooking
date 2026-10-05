@@ -52,6 +52,8 @@ test("bundle parses as a script and is the analogue clock", () => {
   const src = clockSheetBundle();
   assert.match(src, /ezh-analogue-clock/);
   assert.match(src, /function ClockPickSheet/);
+  assert.match(src, /it saves and closes/);
   assert.doesNotMatch(src, /Set time/);
+  assert.doesNotMatch(src, /moves on/);
   new Function(src + "\nreturn ClockPickSheet;");
 });

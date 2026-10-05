@@ -305,7 +305,7 @@ export function ClockPickSheet({ open, title, value, accent, liveRate, onPick, o
       }, (liveRate ? liveRate + " · " : "") + rate.text),
       React.createElement("p", {
         style: { margin: "2px 0 8px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#94a3b8" },
-      }, phase === "hour" ? "Slide the hour hand" : "Slide the minute hand — it saves and moves on"),
+      }, phase === "hour" ? "Slide the hour hand" : "Slide the minute hand — it saves and closes"),
       React.createElement("div", {
         ref: faceRef,
         "data-clock-face": true,
