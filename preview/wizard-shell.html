@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Wizard shell preview</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, sans-serif; background: #e8eef5; color: #0f172a; }
+  .desk-header { position: sticky; top: 0; z-index: 60; background: #0f172a; color: #fff; }
+  .desk-top { display: flex; align-items: center; gap: 10px; padding: 10px 14px 8px; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #334155; display: grid; place-items: center; font-weight: 800; }
+  .desk-name { font-weight: 800; font-size: 15px; }
+  .desk-sub { font-size: 11px; color: #94a3b8; }
+  .datebar { margin: 0 12px 12px; background: #111827; border-radius: 16px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .datebar strong { display: block; font-size: 13px; }
+  .datebar span { display: block; font-size: 11px; color: #86efac; font-weight: 700; }
+  .desk-main { padding: 16px; max-width: 32rem; margin: 0 auto; }
+  .desk-main h1 { font-size: 18px; margin: 0 0 6px; }
+  .desk-main p { margin: 0 0 14px; color: #475569; font-size: 13px; line-height: 1.45; }
+  .open-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .open-row button { border: 0; border-radius: 14px; padding: 14px 10px; font-weight: 800; background: #0f172a; color: #fff; }
+  .open-row button.alt { background: #fff; color: #0f172a; border: 1px solid #cbd5e1; }
+
+  .wizard-shell-root { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+  .wizard-shell-scrim { position: fixed; inset: 0; background: rgba(0,0,0,.7); backdrop-filter: blur(2px); }
+  .wizard-shell-sheet { position: relative; width: 100%; max-width: 32rem; height: 92dvh; background: #F8FAFC; border-radius: 32px 32px 0 0; box-shadow: 0 24px 60px rgba(15,23,42,.35); display: flex; flex-direction: column; overflow: hidden; border-top: 1px solid #e2e8f0; animation: wizardSlideUp .28s cubic-bezier(.32,.72,.35,1); }
+  @keyframes wizardSlideUp { from { transform: translateY(28px); opacity: .55; } to { transform: none; opacity: 1; } }
+  .wizard-shell-bar { padding: 16px 20px 12px; background: #fff; border-bottom: 1px solid rgba(226,232,240,.9); flex: none; }
+  .wizard-shell-grab { width: 40px; height: 4px; border-radius: 99px; background: #cbd5e1; margin: 0 auto 8px; }
+  .wizard-shell-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .wizard-shell-title-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .wizard-shell-title { margin: 0; font-size: 16px; font-weight: 900; color: #0f172a; line-height: 1.15; }
+  .wizard-shell-badge { padding: 2px 8px; border-radius: 99px; background: #f0fdfa; color: #0f766e; font-size: 10px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; border: 1px solid #99f6e4; white-space: nowrap; }
+  .wizard-shell-sub { margin: 2px 0 0; font-size: 11px; font-weight: 600; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wizard-shell-x { width: 32px; height: 32px; border: 0; border-radius: 99px; background: #f1f5f9; color: #64748b; font-weight: 800; cursor: pointer; flex: none; }
+  .wizard-shell-steps { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; margin-top: 10px; }
+  .wizard-shell-step { height: 6px; border-radius: 99px; background: #e2e8f0; }
+  .wizard-shell-step.is-on { background: #0d9488; }
+  .wizard-shell-body { flex: 1; overflow-y: auto; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+  .wizard-shell-foot { flex: none; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid rgba(226,232,240,.9); }
+  .card { background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 1px 2px rgba(15,23,42,.06); }
+  .label { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #64748b; margin-bottom: 6px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  input[type="date"], input[type="text"], input[type="tel"], select { width: 100%; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 12px; font-weight: 700; font-size: 14px; background: #fff; }
+  .duration { font-size: 12px; font-weight: 800; color: #334155; }
+  .room { border: 1px solid #e2e8f0; background: #fff; border-radius: 12px; padding: 8px 6px; text-align: center; }
+  .room[disabled] { opacity: .45; background: #f8fafc; }
+  .room.is-on { background: #10b981; border-color: #10b981; color: #fff; }
+  .room .nm { display: block; font-size: 11px; font-weight: 800; }
+  .room .rt { display: block; font-size: 10px; font-weight: 700; color: #64748b; }
+  .room.is-on .rt { color: #ecfdf5; }
+  .pill { margin-top: 4px; display: inline-flex; border-radius: 99px; padding: 1px 6px; font-size: 8px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+  .note { font-size: 12px; font-weight: 700; color: #475569; }
+  .pay { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .pay button, .status button { border: 1px solid #e2e8f0; background: #fff; border-radius: 12px; padding: 10px 6px; font-weight: 800; font-size: 12px; }
+  .pay button.is-on, .status button.is-on { background: #0f172a; color: #fff; border-color: #0f172a; }
+  .tariff { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 16px; padding: 10px; }
+  .tariff b { display: block; font-size: 15px; }
+  .tariff span { font-size: 9px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: #c2410c; }
+  .next { width: 100%; border: 0; border-radius: 14px; background: #0f172a; color: #fff; font-weight: 800; font-size: 15px; padding: 14px; }
+  .next:disabled { background: #94a3b8; }
+  .foot-row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; }
+  .back { border: 1px solid #cbd5e1; background: #fff; border-radius: 14px; font-weight: 800; }
+  .err { color: #be123c; font-size: 12px; font-weight: 800; margin: 0; }
+  .charge { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 700; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
+</style>
+</head>
+<body>
+  <header class="desk-header" data-app-top-shell>
+    <div class="desk-top">
+      <div class="avatar">R</div>
+      <div>
+        <div class="desk-name">Kutralam Ezhilagam</div>
+        <div class="desk-sub">Rakesh</div>
+      </div>
+    </div>
+    <div class="datebar">
+      <div>
+        <strong>Monday, 5 Oct 2026</strong>
+        <span data-datebar-avail>TODAY · 8 of 9 rooms free</span>
+      </div>
+    </div>
+  </header>
+  <main class="desk-main">
+    <h1>Desk</h1>
+    <p>Check-in, reservation, enquiry, and check-out open in their own sheet. The desk header stays behind it.</p>
+    <div class="open-row">
+      <button type="button" data-open="reservation">Reservation</button>
+      <button type="button" data-open="checkin">Check-In</button>
+      <button type="button" class="alt" data-open="enquiry">Enquiry</button>
+      <button type="button" class="alt" data-open="checkout">Check-Out</button>
+    </div>
+  </main>
+  <div id="mount"></div>
+<script>
+const ROOMS = [
+  {name:"Thillai", rate:1899, max:4},
+  {name:"Aambal", rate:1199, max:2},
+  {name:"Vaagai", rate:5499, max:15},
+  {name:"Shenbagam", rate:4599, max:10},
+  {name:"Mavval", rate:4899, max:10},
+  {name:"Kurinji", rate:2899, max:5},
+  {name:"Mullai", rate:2199, max:4},
+  {name:"Marutham", rate:2099, max:4},
+  {name:"Paalai", rate:2699, max:5}
+];
+const BOOKINGS = [
+  {room:"Mavval", checkIn:"2026-10-05", checkOut:"2026-10-07"},
+  {room:"Vaagai", checkIn:"2026-10-03", checkOut:"2026-10-05"},
+  {room:"Kurinji", checkIn:"2026-10-08", checkOut:"2026-10-10"}
+];
+const inr = n => "₹" + Number(n||0).toLocaleString("en-IN");
+function overlaps(aIn,aOut,bIn,bOut){ return aIn < bOut && bIn < aOut; }
+function verdict(name, cin, cout){
+  let overlap=false, turnover=false;
+  BOOKINGS.forEach(b=>{
+    if(b.room!==name) return;
+    if(b.checkOut===cin) turnover=true;
+    if(overlaps(cin, cout, b.checkIn, b.checkOut)) overlap=true;
+  });
+  if(overlap) return "Occupied";
+  if(turnover) return "Turnover";
+  return "Available";
+}
+function nightsOf(cin, cout){
+  const a=new Date(cin+"T00:00:00"), b=new Date(cout+"T00:00:00");
+  return Math.round((b-a)/86400000);
+}
+const state = {
+  open: null,
+  step: 1,
+  cin: "2026-10-07",
+  cout: "2026-10-08",
+  rooms: ["Mavval"],
+  room: "Mavval",
+  adults: 2,
+  children: 0,
+  guest: "",
+  phone: "",
+  pay: "UPI",
+  status: "Paid",
+  error: "",
+  leaving: ["Mavval"],
+  extra: 0
+};
+const TITLES = {reservation:"New Reservation", checkin:"Check In", enquiry:"Telephone Enquiry", checkout:"Check-Out"};
+const BADGES = {reservation:"Walk-in", checkin:"Walk-in", enquiry:"Stay & room", checkout:"Departure"};
+
+function selectedRooms(){
+  if(state.open==="enquiry") return state.room ? [state.room] : [];
+  if(state.open==="checkout") return state.leaving.slice();
+  return state.rooms.slice();
+}
+function tariff(){
+  const n = Math.max(state.cin===state.cout?0:nightsOf(state.cin, state.cout), state.cin===state.cout?0:1);
+  const nights = state.cin===state.cout ? 0.5 : Math.max(1, n);
+  return selectedRooms().reduce((s,name)=>{
+    const r=ROOMS.find(x=>x.name===name);
+    return s + (r?r.rate:0) * (state.open==="checkout"?1:nights);
+  }, 0) + (state.open==="checkout"?Number(state.extra)||0:0);
+}
+
+function render(){
+  const mount=document.getElementById("mount");
+  if(!state.open){ mount.innerHTML=""; return; }
+  const kind=state.open;
+  const phaseStay = state.step<2;
+  const sub = kind==="checkout"
+    ? (phaseStay?"Rooms leaving and charges":"Payment and confirm")
+    : (phaseStay?"Dates, rooms and head count":"Guest, tariff and settlement");
+  const badge = kind==="enquiry" ? (phaseStay?"Stay & room":"Guest") : BADGES[kind];
+  mount.innerHTML = `
+    <div class="wizard-shell-root" data-wizard-shell="true" data-wizard-kind="${kind}">
+      <div class="wizard-shell-scrim" data-wizard-scrim></div>
+      <div class="wizard-shell-sheet">
+        <div class="wizard-shell-bar">
+          <div class="wizard-shell-grab" aria-hidden="true"></div>
+          <div class="wizard-shell-title-row">
+            <div class="min-w-0">
+              <div class="wizard-shell-title-line">
+                <h3 class="wizard-shell-title" data-wizard-title>${TITLES[kind]}</h3>
+                <span class="wizard-shell-badge">${badge}</span>
+              </div>
+              <p class="wizard-shell-sub">${sub}</p>
+            </div>
+            <button type="button" class="wizard-shell-x" data-close aria-label="Close">✕</button>
+          </div>
+          <div class="wizard-shell-steps" data-wizard-steps="2">
+            <div class="wizard-shell-step ${state.step>=1?"is-on":""}"></div>
+            <div class="wizard-shell-step ${state.step>=2?"is-on":""}"></div>
+          </div>
+        </div>
+        <div class="wizard-shell-body" data-wizard-body>${phaseStay?phaseOne(kind):phaseTwo(kind)}</div>
+        <div class="wizard-shell-foot" data-wizard-footer>${footer(kind, phaseStay)}</div>
+      </div>
+    </div>`;
+  mount.querySelector("[data-wizard-scrim]").onclick = close;
+  mount.querySelector("[data-close]").onclick = close;
+  bind(mount, kind, phaseStay);
+}
+
+function phaseOne(kind){
+  if(kind==="checkout"){
+    return `<div class="card">
+      <div class="label">Rooms leaving</div>
+      <div class="grid-3" data-room-matrix="checkout">
+        ${["Mavval","Mullai","Marutham"].map(name=>roomButton(name, state.leaving.includes(name), false, "checkout")).join("")}
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">Extra charges</div>
+      <label class="charge">Tea <input data-extra type="text" inputmode="numeric" value="${state.extra||""}" style="width:7rem" /></label>
+      <div class="charge"><span>Room tariff</span><b>${inr(tariff()- (Number(state.extra)||0))}</b></div>
+    </div>`;
+  }
+  const n = nightsOf(state.cin, state.cout);
+  const dur = state.cin && state.cout
+    ? (state.cout===state.cin ? "Day use · same day" : (n+" night"+(n>1?"s":"")+" · "+state.cin+" → "+state.cout))
+    : "Choose both dates — the nine rooms update immediately";
+  const picks = kind==="enquiry" ? (state.room?[state.room]:[]) : state.rooms;
+  const cap = picks.reduce((m,name)=>{ const r=ROOMS.find(x=>x.name===name); return r?Math.max(m,r.max):m; }, picks.length?0:10);
+  const head = (Number(state.adults)||0)+(Number(state.children)||0);
+  return `<div class="card">
+      <div class="label">Stay dates</div>
+      <div class="grid-2">
+        <div><div class="label">Check-in</div><input data-cin type="date" value="${state.cin}" /></div>
+        <div><div class="label">Check-out</div><input data-cout type="date" value="${state.cout}" /></div>
+      </div>
+    </div>
+    <p class="card duration" data-stay-duration>${dur}</p>
+    <div class="card">
+      <div class="label">Rooms</div>
+      <div class="grid-3" data-room-matrix="${kind}">
+        ${ROOMS.map(r=>{
+          const v=verdict(r.name, state.cin, state.cout);
+          const on=picks.includes(r.name);
+          return roomButton(r.name, on, v==="Occupied", kind, v);
+        }).join("")}
+      </div>
+    </div>
+    <div class="card" data-reserve-wizard="pax">
+      <div class="label">Head count</div>
+      <div class="grid-2">
+        <div><div class="label">Adults</div><select data-adults>${opts(1,10,state.adults)}</select></div>
+        <div><div class="label">Children</div><select data-children>${opts(0,8,state.children)}</select></div>
+      </div>
+      <p class="note" data-pax-note>${head} of ${cap||10} allowed in ${picks.join(" + ")||"the room"}</p>
+    </div>`;
+}
+function roomButton(name, on, disabled, kind, v){
+  const r=ROOMS.find(x=>x.name===name);
+  const status=v||"Available";
+  const bg=on?"rgba(255,255,255,.22)":status==="Occupied"?"#fee2e2":status==="Turnover"?"#ffedd5":"#d1fae5";
+  const color=on?"#fff":status==="Occupied"?"#b91c1c":status==="Turnover"?"#c2410c":"#047857";
+  return `<button type="button" class="room${on?" is-on":""}" data-room-pick="${name}" data-room-status="${status}" ${disabled?"disabled":""}>
+    <span class="nm">${name}</span>
+    <span class="rt">${inr(r.rate)}/night</span>
+    <span class="pill" data-room-pill="${status}" style="background:${bg};color:${color}">${status}</span>
+  </button>`;
+}
+function opts(a,b,cur){ let s=""; for(let i=a;i<=b;i++) s+=`<option ${Number(cur)===i?"selected":""}>${i}</option>`; return s; }
+function phaseTwo(kind){
+  if(kind==="checkout"){
+    return `<div class="tariff"><div><span>Collected</span><b>${inr(tariff())}</b></div><div><span>Mode</span><b>${state.pay}</b></div><div><span>Rooms</span><b>${state.leaving.length}</b></div></div>
+      <div class="card"><div class="label">Payment method</div><div class="pay">${["UPI","Cash","Card"].map(p=>`<button type="button" data-pay="${p}" class="${state.pay===p?"is-on":""}">${p}</button>`).join("")}</div></div>
+      <div class="card"><div class="label">Review</div><p class="note">${state.leaving.join(", ")||"No room selected"} leaving. Confirm sends the balance to the desk group.</p></div>
+      ${state.error?`<p class="err" data-wizard-error>${state.error}</p>`:""}`;
+  }
+  const total=tariff();
+  return `<div class="card">
+      <div class="label">Guest</div>
+      <div style="display:grid;gap:10px">
+        <input data-guest type="text" placeholder="Guest name" value="${state.guest}" />
+        <input data-phone type="tel" inputmode="numeric" placeholder="WhatsApp number" value="${state.phone}" />
+      </div>
+    </div>
+    <div class="tariff" data-tariff-card>
+      <div><span>Total tariff</span><b>${inr(total)}</b></div>
+      <div><span>Nights</span><b>${state.cin===state.cout?"Day":nightsOf(state.cin,state.cout)}</b></div>
+      <div><span>Rooms</span><b>${selectedRooms().length}</b></div>
+    </div>
+    <div class="card">
+      <div class="label">Payment method</div>
+      <div class="pay">${["UPI","Cash","Card"].map(p=>`<button type="button" data-pay="${p}" class="${state.pay===p?"is-on":""}">${p}</button>`).join("")}</div>
+      <div class="label" style="margin-top:12px">Settlement</div>
+      <div class="status pay">${["Paid","Partial","Pending"].map(p=>`<button type="button" data-status="${p}" class="${state.status===p?"is-on":""}">${p}</button>`).join("")}</div>
+      <p class="note">Pending stays with Rakesh or Lakshmi. Other desks settle now.</p>
+    </div>
+    ${state.error?`<p class="err" data-wizard-error>${state.error}</p>`:""}`;
+}
+function footer(kind, phaseStay){
+  if(phaseStay) return `<button class="next" type="button" data-next>Next &gt;</button>`;
+  const label = kind==="checkout"?"Confirm check-out":kind==="enquiry"?"Save enquiry":"Confirm";
+  return `<div class="foot-row"><button class="back" type="button" data-back>Back</button><button class="next" type="button" data-next>${label}</button></div>`;
+}
+function close(){ state.open=null; state.step=1; state.error=""; render(); }
+function bind(mount, kind, phaseStay){
+  const cin=mount.querySelector("[data-cin]");
+  const cout=mount.querySelector("[data-cout]");
+  if(cin) cin.onchange=e=>{ state.cin=e.target.value; if(state.cout<=state.cin){ const d=new Date(state.cin+"T00:00:00"); d.setDate(d.getDate()+1); state.cout=d.toISOString().slice(0,10);} dropBlocked(); render(); };
+  if(cout) cout.onchange=e=>{ state.cout=e.target.value; dropBlocked(); render(); };
+  mount.querySelectorAll("[data-room-pick]").forEach(btn=>{
+    btn.onclick=()=>{
+      const name=btn.getAttribute("data-room-pick");
+      if(kind==="checkout"){
+        state.leaving=state.leaving.includes(name)?state.leaving.filter(x=>x!==name):state.leaving.concat(name);
+      }else if(kind==="enquiry"){
+        state.room=name;
+      }else{
+        state.rooms=state.rooms.includes(name)?state.rooms.filter(x=>x!==name):state.rooms.concat(name);
+      }
+      render();
+    };
+  });
+  const adults=mount.querySelector("[data-adults]");
+  const children=mount.querySelector("[data-children]");
+  if(adults) adults.onchange=e=>{ state.adults=e.target.value; render(); };
+  if(children) children.onchange=e=>{ state.children=e.target.value; render(); };
+  const extra=mount.querySelector("[data-extra]");
+  if(extra) extra.oninput=e=>{ state.extra=e.target.value.replace(/\D/g,""); };
+  const guest=mount.querySelector("[data-guest]");
+  const phone=mount.querySelector("[data-phone]");
+  if(guest) guest.oninput=e=>{ state.guest=e.target.value; };
+  if(phone) phone.oninput=e=>{ state.phone=e.target.value.replace(/\D/g,"").slice(0,10); e.target.value=state.phone; };
+  mount.querySelectorAll("[data-pay]").forEach(b=>b.onclick=()=>{ state.pay=b.getAttribute("data-pay"); render(); });
+  mount.querySelectorAll("[data-status]").forEach(b=>b.onclick=()=>{ state.status=b.getAttribute("data-status"); render(); });
+  const back=mount.querySelector("[data-back]");
+  if(back) back.onclick=()=>{ state.step=1; state.error=""; render(); };
+  mount.querySelector("[data-next]").onclick=()=>{
+    state.error="";
+    if(phaseStay){
+      if(kind==="checkout" && !state.leaving.length){ state.error="Choose a room that is leaving."; render(); return; }
+      if(kind!=="checkout" && !selectedRooms().length){ state.error="Select at least one room."; render(); return; }
+      state.step=2; render(); return;
+    }
+    if(kind!=="checkout" && (!state.guest.trim() || state.phone.length<10)){
+      state.error="Enter guest name and a 10-digit WhatsApp number."; render(); return;
+    }
+    close();
+  };
+}
+function dropBlocked(){
+  state.rooms=state.rooms.filter(name=>verdict(name,state.cin,state.cout)!=="Occupied");
+  if(state.room && verdict(state.room,state.cin,state.cout)==="Occupied") state.room="";
+}
+document.querySelectorAll("[data-open]").forEach(b=>{
+  b.onclick=()=>{ state.open=b.getAttribute("data-open"); state.step=1; state.error=""; render(); };
+});
+const q=new URLSearchParams(location.search).get("open");
+if(q){ state.open=q; render(); }
+</script>
+</body>
+</html>
