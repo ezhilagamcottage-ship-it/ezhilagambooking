@@ -266,22 +266,22 @@ dialog.sb::backdrop{background:rgba(12,10,9,.55)}
 
 /* her face. Every move is CSS on the inline SVG; a phone set to reduce motion
    gets the still pose (the global rule at the end of this sheet). */
-.sa-body,.sa-head,.sa-eyes,.sa-brows,.sa-mopen{transform-box:fill-box;transform-origin:center}
+.sa-body,.sa-head,.sa-lid,.sa-mopen,.sa-jaw{transform-box:fill-box;transform-origin:center}
 .sa-head{transform-origin:50% 100%}
-.sa-mopen{opacity:0;transform-origin:50% 0}
-/* idle: blink every few seconds and a small breath */
-.sa-eyes{animation:saBlink 4.6s infinite}
+/* idle: a blink every few seconds (her own eyelids close over the photo) and a small breath */
+.sa-lid{transform-origin:50% 0;transform:scaleY(0);animation:saBlink 4.6s infinite}
 .sa-body{animation:saBreath 4.2s ease-in-out infinite}
-@keyframes saBlink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.1)}}
-@keyframes saBreath{50%{transform:translateY(-1.2px) scale(1.012)}}
-/* listening: attentive brows, slight nod */
+@keyframes saBlink{0%,92.5%,98%,100%{transform:scaleY(0)}95%{transform:scaleY(1)}}
+@keyframes saBreath{50%{transform:translateY(-.8px) scale(1.008)}}
+/* listening: attentive, a slight nod */
 .sa-dock.listening .sa-head{animation:saNod 2.2s ease-in-out infinite}
-.sa-dock.listening .sa-brows{transform:translateY(-1.2px)}
-@keyframes saNod{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-2deg) translateY(.8px)}60%{transform:rotate(1deg)}}
-/* speaking: a short mouth cycle, only while the agent is speaking */
-.sa-dock.speaking .sa-mclosed{opacity:0}
+@keyframes saNod{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-1.6deg) translateY(.6px)}60%{transform:rotate(.8deg)}}
+/* speaking: the lips part and the jaw drops in a short cycle, only while the agent is speaking */
+.sa-mopen{opacity:0;transform-origin:50% 30%}
 .sa-dock.speaking .sa-mopen{opacity:1;animation:saMouth .42s steps(1,end) infinite}
-@keyframes saMouth{0%{transform:scaleY(.35)}25%{transform:scaleY(1)}50%{transform:scaleY(.55)}75%{transform:scaleY(.85)}}
+.sa-dock.speaking .sa-jaw{animation:saJaw .42s steps(1,end) infinite}
+@keyframes saMouth{0%{transform:scaleY(.5)}25%{transform:scaleY(1.2)}50%{transform:scaleY(.75)}75%{transform:scaleY(1)}}
+@keyframes saJaw{0%{transform:translateY(.6px)}25%{transform:translateY(1.8px)}50%{transform:translateY(1px)}75%{transform:translateY(1.4px)}}
 @media (min-width:560px){.sa-dock{right:20px;bottom:20px}}
 
 .callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 20px}
@@ -448,59 +448,22 @@ dialog#full .x{
 <!-- Shenba, the property's voice assistant: the only voice launcher on the page -->
 <aside class="sa-dock" id="saDock" aria-label="Shenba, voice assistant">
   <button type="button" class="sa-face" id="saFace" aria-pressed="false" aria-label="Talk with Shenba">
-    <svg viewBox="0 0 120 120" aria-hidden="true">
+    <svg viewBox="40 28 120 120" aria-hidden="true">
       <defs>
-        <radialGradient id="saSkin" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#e6b38b"/><stop offset=".7" stop-color="#d49a6f"/><stop offset="1" stop-color="#bf8459"/></radialGradient>
-        <linearGradient id="saHair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e1d14"/><stop offset="1" stop-color="#110a07"/></linearGradient>
-        <linearGradient id="saSaree" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b9468"/><stop offset="1" stop-color="#04583b"/></linearGradient>
-        <linearGradient id="saGold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9c46a"/><stop offset=".5" stop-color="#f6dc95"/><stop offset="1" stop-color="#c99a3b"/></linearGradient>
-        <radialGradient id="saBg" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#f3fbf7"/><stop offset="1" stop-color="#d7efe3"/></radialGradient>
+        <linearGradient id="saLidG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b98168"/><stop offset=".7" stop-color="#a86f58"/><stop offset=".92" stop-color="#6b4334"/><stop offset="1" stop-color="#2a1a14"/></linearGradient>
+        <filter id="saSoft" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation=".45"/></filter>
+        <radialGradient id="saJawF"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+        <mask id="saJawM" maskUnits="userSpaceOnUse" x="60" y="110" width="80" height="40"><ellipse cx="98.5" cy="127" rx="24" ry="12" fill="url(#saJawF)"/></mask>
       </defs>
-      <circle cx="60" cy="60" r="60" fill="url(#saBg)"/>
-      <g class="sa-body">
-        <path d="M27 92c-6 6-10 16-11 30h88c-1-14-5-24-11-30-9-6-20-8-33-8s-24 2-33 8z" fill="#7a1f2b"/>
-        <path d="M16 122c2-14 6-23 13-29 7 3 13 9 17 16l6 13z" fill="url(#saSaree)"/>
-        <path d="M44 86c12 4 30 14 46 36H64c-6-12-14-22-24-30z" fill="url(#saSaree)"/>
-        <path d="M44 86c12 4 30 14 46 36h-6c-15-20-30-29-42-33z" fill="url(#saGold)"/>
-        <path d="M50 75c0 6-2 10-6 12 5 3 10 5 16 5s11-2 16-5c-4-2-6-6-6-12z" fill="url(#saSkin)"/>
-        <path d="M50 76c3 4 6 6 10 6s7-2 10-6v3c-3 3-6 5-10 5s-7-2-10-5z" fill="#a8704a" opacity=".55"/>
-        <path d="M47 88q13 8 26 0" stroke="url(#saGold)" stroke-width="1.6" fill="none"/>
-        <circle cx="60" cy="92" r="1.8" fill="#b91c1c" stroke="#f6dc95" stroke-width=".8"/>
-      </g>
-      <g class="sa-head">
-        <path d="M29 54c-2-24 12-38 31-38s33 14 31 38c-1 14-3 26-7 36l-8-16H44l-8 16c-4-10-6-22-7-36z" fill="url(#saHair)"/>
-        <ellipse cx="38.6" cy="55" rx="3.2" ry="5.4" fill="#c98c62"/><ellipse cx="81.4" cy="55" rx="3.2" ry="5.4" fill="#c98c62"/>
-        <path d="M39 50c0-16 9-23 21-23s21 7 21 23c0 15-7 27-21 30-14-3-21-15-21-30z" fill="url(#saSkin)"/>
-        <path d="M60 25c-12 0-21 8-22 23 4-9 11-15 21-16zM60 25c12 0 21 8 22 23-4-9-11-15-21-16z" fill="url(#saHair)"/>
-        <g fill="url(#saGold)"><circle cx="38" cy="61.5" r="1.6"/><path d="M35.6 63.5h4.8l-2.4 5z"/><circle cx="82" cy="61.5" r="1.6"/><path d="M79.6 63.5h4.8l-2.4 5z"/></g>
-        <ellipse cx="48.5" cy="62" rx="4.5" ry="2.6" fill="#e3816c" opacity=".22"/><ellipse cx="71.5" cy="62" rx="4.5" ry="2.6" fill="#e3816c" opacity=".22"/>
-        <g class="sa-brows" stroke="#2a1a12" stroke-width="1.5" stroke-linecap="round" fill="none">
-          <path d="M45.5 46.2q5-3.2 10.2-.6"/><path d="M64.3 45.6q5.2-2.6 10.2.6"/>
-        </g>
+      <g class="sa-body"><g class="sa-head">
+        <image href="img/shenba.webp" x="0" y="0" width="200" height="200"/>
         <g class="sa-eyes">
-          <path d="M45.8 52.4q5-4 10.4 0q-5.2 3.2-10.4 0z" fill="#fbf7f2"/>
-          <path d="M63.8 52.4q5.2-4 10.4 0q-5.2 3.2-10.4 0z" fill="#fbf7f2"/>
-          <circle cx="51" cy="52.1" r="2.5" fill="#4a2c19"/><circle cx="69" cy="52.1" r="2.5" fill="#4a2c19"/>
-          <circle cx="51" cy="52.1" r="1.15" fill="#120a06"/><circle cx="69" cy="52.1" r="1.15" fill="#120a06"/>
-          <circle cx="51.8" cy="51.3" r=".55" fill="#fff"/><circle cx="69.8" cy="51.3" r=".55" fill="#fff"/>
-          <path d="M45.2 52.6q5.4-4.6 11.2-.2M63.6 52.4q5.8-4.4 11.2.2" stroke="#1a100a" stroke-width="1.25" fill="none" stroke-linecap="round"/>
-          <path d="M45.2 52.6l-1.3-.9M74.8 52.6l1.3-.9" stroke="#1a100a" stroke-width="1" stroke-linecap="round"/>
+          <g class="sa-lid"><ellipse cx="80" cy="78.4" rx="7.9" ry="4.1" fill="#b27c5f"/><path d="M72.1 81.6q7.9 2.6 15.8 0" stroke="#2a1712" stroke-width="1.1" fill="none" stroke-linecap="round"/></g>
+          <g class="sa-lid"><ellipse cx="117" cy="78.4" rx="7.9" ry="4.1" fill="#b27c5f"/><path d="M109.1 81.6q7.9 2.6 15.8 0" stroke="#2a1712" stroke-width="1.1" fill="none" stroke-linecap="round"/></g>
         </g>
-        <circle cx="60" cy="43.5" r="1.4" fill="#b91c1c"/>
-        <path d="M59.2 50.5c-.4 4-1.6 7-2.4 8.6" stroke="#b37a52" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".7"/>
-        <path d="M56.8 60.4q1.4 1 3.2.6q1.8.4 3.2-.6" stroke="#a86d4b" stroke-width="1" fill="none" stroke-linecap="round"/>
-        <g class="sa-mclosed">
-          <path d="M53.2 65.9q3.6-1.8 6.8-.6q3.2-1.2 6.8.6q-6.8 2-13.6 0z" fill="#a4423a"/>
-          <path d="M53.2 65.9q6.8 6.2 13.6 0q-6.8 2.4-13.6 0z" fill="#b9564b"/>
-          <path d="M57.5 68.6q2.5.8 5 0" stroke="#d98a7f" stroke-width=".6" fill="none" opacity=".7"/>
-        </g>
-        <g class="sa-mopen">
-          <path d="M54 66.2q6-2.4 12 0q-.4 6.4-6 7q-5.6-.6-6-7z" fill="#4f1410"/>
-          <path d="M55.6 66.4q4.4-1 8.8 0v1.4q-4.4.8-8.8 0z" fill="#f4eee8"/>
-          <path d="M53.4 66.2q3.4-2.2 6.6-1q3.2-1.2 6.6 1q-6.6.6-13.2 0z" fill="#a4423a"/>
-          <path d="M54.2 70.4q5.8 5.2 11.6 0q-5.8 3.4-11.6 0z" fill="#b9564b"/>
-        </g>
-      </g>
+        <ellipse class="sa-mopen" cx="98.5" cy="116.5" rx="9.5" ry="1.7" fill="#4a1714" filter="url(#saSoft)"/>
+        <g class="sa-jaw" mask="url(#saJawM)"><image href="img/shenba.webp" x="0" y="0" width="200" height="200"/></g>
+      </g></g>
     </svg>
   </button>
   <div class="sa-txt">
