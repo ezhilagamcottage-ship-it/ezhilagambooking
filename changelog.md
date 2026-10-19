@@ -7,6 +7,17 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v1.5 — 19 Oct 2026
+
+**New — two floating Shenba buttons.** Chat with Shenba (left, green) and Talk with
+Shenba (right, gold, with her face) float at the foot of the screen with a soft glow,
+and move to the top while Book Room Now is under them.
+
+**New — the Talk with Shenba page.** Logo on top, Shenba in the centre, and a booking
+card that fills in as the guest speaks (name, check-in, stay, room, adults, children,
+rate). Proceed to pay opens the Razorpay link for that room; after payment the page
+shows the booking ID. Lip sync uses six mouth shapes picked from her voice.
+
 ## v1.4 — 19 Oct 2026
 
 **New — Shenba's face.** A photo of Shenba sits in the bottom corner as the one
