@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v1.2 — 19 Oct 2026
+
+"Chat on WhatsApp" is now "Chat with Shenba": a text chat on the page where Shenba introduces the property, asks the stay dates and guests, and quotes live rooms and prices. New "Talk with Shenba" button below it starts a voice call with Shenba right on the page. If the website Shenba is unavailable (e.g. ElevenLabs subscription ends), both buttons hand the guest to WhatsApp Shenba on the rockyjio number (63742 13184).
+
 ## v1.1 — 7 Sep 2026
 
 UPI payments now go to 9840213184@hdfc by default, with the Google Pay Business handle kept as a second option.

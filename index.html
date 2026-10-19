@@ -196,6 +196,53 @@ h1{
 .cta-wa{background:var(--card);color:#128C7E;border-color:#bfe3dc}
 .cta-wa:hover{background:#f2fbf8}
 .cta svg{width:20px;height:20px;flex:0 0 auto}
+.cta-talk{background:#fff7ed;color:var(--gold);border-color:#f3d7b0}
+.cta-talk:hover{background:#ffedd5}
+
+/* ── Shenba chat & voice ─────────────────────────────────────────────── */
+dialog.sb{
+  width:100%;max-width:480px;height:min(640px,92dvh);margin:auto auto 0;padding:0;border:0;
+  border-radius:18px 18px 0 0;background:var(--bg);color:var(--ink);
+  display:none;flex-direction:column;overflow:hidden;
+}
+dialog.sb[open]{display:flex}
+@media (min-width:560px){dialog.sb{margin:auto;border-radius:18px}}
+dialog.sb::backdrop{background:rgba(12,10,9,.55)}
+.sb-head{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--brand);color:#fff}
+.sb-av{width:38px;height:38px;border-radius:50%;background:#fff;color:var(--brand);
+  display:grid;place-items:center;font-weight:800;font-size:17px;flex:0 0 auto}
+.sb-who{flex:1;min-width:0;line-height:1.25}
+.sb-who b{display:block;font-size:15px}
+.sb-who small{font-size:12px;opacity:.85}
+.sb-x{background:none;border:0;color:#fff;font-size:22px;line-height:1;padding:6px;cursor:pointer}
+.sb-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;
+  -webkit-overflow-scrolling:touch}
+.sb-m{max-width:85%;padding:9px 12px;border-radius:14px;font-size:14.5px;line-height:1.45;
+  white-space:pre-wrap;word-wrap:break-word}
+.sb-m.ai{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+.sb-m.me{align-self:flex-end;background:#dcfce7;border-bottom-right-radius:4px}
+.sb-m.note{align-self:center;background:none;color:var(--mute);font-size:12.5px;text-align:center}
+.sb-m a{color:var(--brand);font-weight:700}
+.sb-typing{align-self:flex-start;color:var(--mute);font-size:13px;padding:2px 4px}
+.sb-bar{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:var(--card)}
+.sb-bar input{flex:1;min-width:0;border:1px solid var(--line);border-radius:22px;padding:11px 14px;
+  font:inherit;font-size:15px;background:var(--bg);color:var(--ink)}
+.sb-bar input:focus{outline:2px solid var(--brand);outline-offset:-1px}
+.sb-send{border:0;border-radius:50%;width:44px;height:44px;background:var(--brand);color:#fff;
+  font-size:18px;cursor:pointer;flex:0 0 auto}
+.sb-send:disabled{opacity:.45}
+.sb-alt{display:block;width:100%;border:0;border-top:1px solid var(--line);background:#fff7ed;
+  color:var(--gold);font:inherit;font-weight:800;font-size:14px;padding:11px;cursor:pointer}
+.sb-voice{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center}
+.sb-orb{width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#a7f3d0,#047857 60%,#064e3b);
+  box-shadow:0 10px 40px rgba(4,120,87,.35);transition:transform .25s}
+.sb-orb.speaking{animation:sbPulse 1.1s ease-in-out infinite}
+@keyframes sbPulse{50%{transform:scale(1.08)}}
+@media (prefers-reduced-motion: reduce){.sb-orb.speaking{animation:none}}
+.sb-vstat{font-weight:700;color:var(--ink)}
+.sb-vhint{color:var(--mute);font-size:13px;max-width:300px}
+.sb-end{border:0;border-radius:28px;padding:13px 28px;background:#b91c1c;color:#fff;font:inherit;font-weight:800;cursor:pointer}
 
 .callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 20px}
 .call{
@@ -301,13 +348,23 @@ dialog#full .x{
     </svg>
   </a>
 
-  <a class="cta cta-wa" id="waBtn" href="#" rel="noopener">
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.6c.1-.2.2-.3.3-.5v-.5c-.1-.2-.7-1.6-.9-2.2-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.3z"/>
-      <path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2z"/>
+  <button type="button" class="cta cta-wa" id="chatBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/>
+      <path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/>
     </svg>
-    Chat on WhatsApp
-  </a>
+    Chat with Shenba
+  </button>
+
+  <button type="button" class="cta cta-talk" id="talkBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="9" y="3" width="6" height="11" rx="3"/>
+      <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+    </svg>
+    Talk with Shenba
+  </button>
 
   <div class="callrow">
     <a class="call" href="tel:+919962222415"><small>Booking</small><b>99622 22415</b></a>
@@ -333,6 +390,34 @@ dialog#full .x{
     </p>
   </footer>
 </div>
+
+<dialog id="sbChat" class="sb" aria-label="Chat with Shenba">
+  <div class="sb-head">
+    <div class="sb-av" aria-hidden="true">S</div>
+    <div class="sb-who"><b>Shenba</b><small id="sbChatStat">Front desk · Kutralam Ezhilagam</small></div>
+    <button class="sb-x" id="sbChatX" aria-label="Close chat">✕</button>
+  </div>
+  <div class="sb-log" id="sbLog" aria-live="polite"></div>
+  <form class="sb-bar" id="sbForm" autocomplete="off">
+    <input id="sbIn" type="text" placeholder="Type your message…" aria-label="Message" enterkeyhint="send">
+    <button class="sb-send" id="sbSend" aria-label="Send">➤</button>
+  </form>
+  <button type="button" class="sb-alt" id="sbToVoice">🎙️ Prefer to talk? Talk with Shenba</button>
+</dialog>
+
+<dialog id="sbTalk" class="sb" aria-label="Talk with Shenba">
+  <div class="sb-head">
+    <div class="sb-av" aria-hidden="true">S</div>
+    <div class="sb-who"><b>Shenba</b><small>Voice · Tamil / English</small></div>
+    <button class="sb-x" id="sbTalkX" aria-label="Close">✕</button>
+  </div>
+  <div class="sb-voice">
+    <div class="sb-orb" id="sbOrb"></div>
+    <div class="sb-vstat" id="sbVStat">Connecting…</div>
+    <div class="sb-vhint">Allow the microphone when asked. Ask about rooms, prices for your dates, or how to reach us.</div>
+    <button type="button" class="sb-end" id="sbEnd">End call</button>
+  </div>
+</dialog>
 
 <dialog id="full">
   <button class="x" id="fullX" aria-label="Close">✕</button>
@@ -444,8 +529,6 @@ const $ = id => document.getElementById(id);
 const gal = $("gal"), track = $("track"), dots = $("dots"), live = $("live");
 
 $("bookBtn").href = CFG.BOOKING_PAGE;
-$("waBtn").href =
-  "https://wa.me/" + CFG.WA_NUMBER + "?text=" + encodeURIComponent(CFG.WA_TEXT);
 
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -670,5 +753,172 @@ dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
 
 rebuildDots();
 start();
+</script>
+<script type="module">
+/* ── Shenba: text chat and voice, both the same ElevenLabs agent ───────────
+   The agent already has the live room / price / enquiry tools, so the website
+   chat answers exactly like the voice line. The SDK loads only on first tap. */
+const AGENT = "agent_2101m57dd7z8fvnva0erjk0h0va2";
+const SDK = "https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.28.0/+esm";
+const VOICE_LINK = "https://n8n.ezhilagam.cloud/webhook/shenba";
+/* Fallback: if the website Shenba (ElevenLabs) is switched off or stops working —
+   e.g. the subscription runs out — guests chat with WhatsApp Shenba instead,
+   on the rockyjio number. Set SHENBA_WEB = false to send everyone there. */
+const SHENBA_WEB = true;
+const WA_SHENBA = "https://wa.me/916374213184?text=" +
+  encodeURIComponent("Hi Shenba, I'd like to know about rooms at Kutralam Ezhilagam.");
+const OPENING =
+  "Vanakkam 🙏 I'm Shenba, front desk manager at Kutralam Ezhilagam, Courtallam.\n\n" +
+  "We're a short walk from the Main Falls, near the Vairams Nagar arch — nine studios and suites " +
+  "for 2 to 15 guests, home food on order, safe for families, and fully alcohol- and smoke-free.\n\n" +
+  "When are you planning to stay, and how many guests? I'll check available rooms and prices for you.";
+const CONTEXT =
+  "This guest is chatting by TEXT on the hotel website (ezhilagam.cloud), not on a phone call. " +
+  "Keep replies short and friendly, reply in the guest's language (English, Tamil or Tanglish), " +
+  "never use spoken-only phrasing. Ask for stay dates and number of guests, then use your tools " +
+  "for live rooms and prices. If the guest would rather talk, or the conversation gets long, tell them " +
+  "they can tap the 'Talk with Shenba' button on this page, or open " + VOICE_LINK + " . " +
+  "Online booking: https://ezhilagam.cloud/book . Booking team 99622 22415, reception 082483 20685.";
+
+const $ = id => document.getElementById(id);
+let mod, chat = null, voice = null, history = [], typingEl = null, fellBack = false;
+function toWhatsApp(note) {
+  if (fellBack) return; fellBack = true;
+  chat = null;
+  add("note", note || "Shenba will continue with you on WhatsApp…");
+  stat("Opening WhatsApp…");
+  setTimeout(() => { location.href = WA_SHENBA; }, 1200);
+}
+const sdk = async () => (mod ||= await import(SDK));
+
+const openDlg = d => { try { d.showModal(); } catch (e) { d.setAttribute("open", ""); } };
+const closeDlg = d => { try { d.close(); } catch (e) { d.removeAttribute("open"); } };
+
+function esc(t) { return t.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function linkify(t) {
+  return esc(t).replace(/(https?:\/\/[^\s)]+)/g, u =>
+    u.indexOf(VOICE_LINK) === 0
+      ? '<a href="#" data-talk="1">Click here to talk to Shenba</a>'
+      : '<a href="' + u + '" target="_blank" rel="noopener">' + u + "</a>");
+}
+function add(role, text) {
+  if (typingEl) { typingEl.remove(); typingEl = null; }
+  const el = document.createElement("div");
+  el.className = "sb-m " + role;
+  el.innerHTML = role === "note" ? esc(text) : linkify(text);
+  $("sbLog").appendChild(el);
+  $("sbLog").scrollTop = $("sbLog").scrollHeight;
+  if (role !== "note") history.push((role === "me" ? "Guest: " : "Shenba: ") + text);
+}
+function typing() {
+  if (typingEl) return;
+  typingEl = document.createElement("div");
+  typingEl.className = "sb-typing"; typingEl.textContent = "Shenba is typing…";
+  $("sbLog").appendChild(typingEl); $("sbLog").scrollTop = $("sbLog").scrollHeight;
+}
+const stat = t => { $("sbChatStat").textContent = t; };
+
+async function startChat(resume) {
+  stat("Connecting…");
+  const { Conversation } = await sdk();
+  const first = resume ? "I'm back 🙂 Please go on — where were we?" : OPENING;
+  chat = await Conversation.startSession({
+    agentId: AGENT,
+    textOnly: true,
+    overrides: { agent: { firstMessage: first }, conversation: { textOnly: true } },
+    onMessage: m => { if ((m.role || m.source) !== "user") add("ai", m.message); },
+    onStatusChange: s => stat(s.status === "connected" ? "Online · usually replies in seconds" : "Front desk · Kutralam Ezhilagam"),
+    onDisconnect: d => { chat = null;
+      if (d && d.reason === "error") toWhatsApp();
+      else stat("Chat paused — send a message to continue"); },
+    onError: () => toWhatsApp()
+  });
+  chat.sendContextualUpdate(CONTEXT + (resume && history.length
+    ? " Earlier in this chat:\n" + history.slice(-12).join("\n") : ""));
+}
+
+$("chatBtn").addEventListener("click", async () => {
+  if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
+  fellBack = false;
+  openDlg($("sbChat"));
+  if (!chat && !history.length) {
+    typing();
+    try { await startChat(false); }
+    catch (e) { toWhatsApp(); }
+  }
+  setTimeout(() => $("sbIn").focus(), 150);
+});
+
+$("sbForm").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const t = $("sbIn").value.trim();
+  if (!t) return;
+  $("sbIn").value = "";
+  add("me", t);
+  typing();
+  try {
+    if (!chat) await startChat(true);
+    chat.sendUserMessage(t);
+  } catch (e) { toWhatsApp(); }
+});
+
+$("sbChatX").addEventListener("click", () => closeDlg($("sbChat")));
+$("sbLog").addEventListener("click", e => { if (e.target.dataset.talk) { e.preventDefault(); goVoice(); } });
+$("sbToVoice").addEventListener("click", () => goVoice());
+
+async function endChat() { if (chat) { try { await chat.endSession(); } catch (e) {} chat = null; } }
+
+async function goVoice() {
+  closeDlg($("sbChat"));
+  await endChat();
+  startVoice();
+}
+
+async function startVoice() {
+  openDlg($("sbTalk"));
+  $("sbVStat").textContent = "Connecting…";
+  $("sbOrb").classList.remove("speaking");
+  try {
+    await navigator.mediaDevices.getUserMedia({ audio: true });
+    const { Conversation } = await sdk();
+    voice = await Conversation.startSession({
+      agentId: AGENT,
+      connectionType: "webrtc",
+      onModeChange: m => {
+        const sp = m.mode === "speaking";
+        $("sbOrb").classList.toggle("speaking", sp);
+        $("sbVStat").textContent = sp ? "Shenba is speaking…" : "Listening… go ahead";
+      },
+      onDisconnect: () => { voice = null; $("sbVStat").textContent = "Call ended"; $("sbOrb").classList.remove("speaking"); },
+      onError: () => { $("sbVStat").textContent = "Voice is not available right now."; showWaInVoice(); }
+    });
+  } catch (e) {
+    $("sbVStat").textContent = e && e.name === "NotAllowedError"
+      ? "Microphone is blocked. Allow it in your browser, or call 99622 22415."
+      : "Voice is not available right now.";
+    if (!(e && e.name === "NotAllowedError")) showWaInVoice();
+  }
+}
+function showWaInVoice() {
+  if ($("sbWa")) return;
+  const a = document.createElement("a");
+  a.id = "sbWa"; a.href = WA_SHENBA; a.className = "sb-end";
+  a.style.background = "#128C7E"; a.style.textDecoration = "none";
+  a.textContent = "Chat with Shenba on WhatsApp";
+  $("sbEnd").before(a);
+}
+async function endVoice() { if (voice) { try { await voice.endSession(); } catch (e) {} voice = null; } closeDlg($("sbTalk")); }
+
+$("talkBtn").addEventListener("click", async () => {
+  if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
+  await endChat(); startVoice();
+});
+$("sbEnd").addEventListener("click", endVoice);
+$("sbTalkX").addEventListener("click", endVoice);
+$("sbTalk").addEventListener("close", () => { if (voice) endVoice(); });
+
+/* Deep link: ezhilagam.cloud/#talk opens voice, #chat opens chat. */
+if (location.hash === "#chat") $("chatBtn").click();
+if (location.hash === "#talk") $("talkBtn").click();
 </script>
 </body></html>
