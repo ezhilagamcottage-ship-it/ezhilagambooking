@@ -584,12 +584,10 @@ footer{padding-top:8px}
   .gb-stars{font-size:13px}
 }
 
-/* phone: the lens is computer-only; Book now carries the movement instead —
+/* phone: the lens is computer-only; Reserve now carries the movement instead —
    a light sweeps across the button and a soft green ring pulses out from it */
-.bk-short{display:none}
 @media (max-width:899px){
   .lens{display:none}
-  .bk-long{display:none}.bk-short{display:inline}
   .hero #bookBtn{position:relative;overflow:hidden;isolation:isolate;animation:bookPulse 2.4s ease-out infinite}
   .hero #bookBtn::before{content:"";position:absolute;inset:0;z-index:-1;transform:translateX(-110%);
     background:linear-gradient(110deg,transparent 25%,rgba(4,120,87,.14) 42%,rgba(167,243,208,.9) 50%,rgba(4,120,87,.14) 58%,transparent 75%);
@@ -674,7 +672,7 @@ footer{padding-top:8px}
 </button>
 </div>
   <a class="cta cta-book" id="bookBtn" href="index.html">
-    <span class="bk-long">Book Room Now</span><span class="bk-short">Book now</span>
+    Reserve now
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M5 12h13M13 6l6 6-6 6"/>
