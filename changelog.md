@@ -7,6 +7,15 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v1.4 — 19 Oct 2026
+
+**New — Shenba's face.** A photo of Shenba sits in the bottom corner as the one
+voice launcher (the green ball pop-up is gone). Tap her face to talk, tap again
+to end; same ElevenLabs agent and tools. She blinks and breathes while waiting,
+nods while the guest talks, and her lips follow her voice while she speaks. She
+moves to the top while Book Room Now is under her, shrinks with the – button,
+and asks for the microphone only after the tap. Still pose for reduced motion.
+
 ## v1.3 — 19 Oct 2026
 
 New branded page ezhilagam.cloud/shenba: Ezhilagam logo, "Talk with Shenba", call button and a Switch to Chat view — replaces the ElevenLabs page that opened from WhatsApp links. The Talk with Shenba pop-up on the home page now shows the logo and tagline too.
