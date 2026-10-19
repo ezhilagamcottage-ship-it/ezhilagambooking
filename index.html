@@ -584,6 +584,20 @@ footer{padding-top:8px}
   .gb-stars{font-size:13px}
 }
 
+/* phone: the lens is computer-only; Book now carries the movement instead —
+   a light sweeps across the button and a soft green ring pulses out from it */
+.bk-short{display:none}
+@media (max-width:899px){
+  .lens{display:none}
+  .bk-long{display:none}.bk-short{display:inline}
+  .hero #bookBtn{position:relative;overflow:hidden;isolation:isolate;animation:bookPulse 2.4s ease-out infinite}
+  .hero #bookBtn::before{content:"";position:absolute;inset:0;z-index:-1;transform:translateX(-110%);
+    background:linear-gradient(110deg,transparent 25%,rgba(4,120,87,.14) 42%,rgba(167,243,208,.9) 50%,rgba(4,120,87,.14) 58%,transparent 75%);
+    animation:bookShine 2.4s ease-in-out infinite}
+}
+@keyframes bookShine{0%{transform:translateX(-110%)}55%,100%{transform:translateX(110%)}}
+@keyframes bookPulse{0%{box-shadow:0 0 0 0 rgba(4,120,87,.40)}70%,100%{box-shadow:0 0 0 10px rgba(4,120,87,0)}}
+
 /* A phone set to reduce motion gets no auto-advance and no smooth scrolling.
    This is enforced in JS as well — the media query alone would still leave
    the slides jumping every few seconds, which is the part that actually
@@ -660,7 +674,7 @@ footer{padding-top:8px}
 </button>
 </div>
   <a class="cta cta-book" id="bookBtn" href="index.html">
-    Book Room Now
+    <span class="bk-long">Book Room Now</span><span class="bk-short">Book now</span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M5 12h13M13 6l6 6-6 6"/>
@@ -1518,7 +1532,7 @@ if (location.hash === "#talk") openCall(false);
    centre point, so the magnified letters always match the ones underneath. */
 (function () {
   var wrap = document.querySelector(".logo-wrap"), lens = wrap && wrap.querySelector(".lens");
-  if (!lens || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!lens || matchMedia("(prefers-reduced-motion: reduce)").matches || matchMedia("(max-width: 899px)").matches) return;
   var Z = 1.9, PERIOD = 7000, t0 = performance.now();
   function frame(now) {
     var W = wrap.clientWidth, H = wrap.clientHeight;

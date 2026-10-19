@@ -240,3 +240,31 @@ assert s.count("</body></html>") == 1
 s = s.replace("</body></html>", LENS_JS + "</body></html>")
 open(P, "w", encoding="utf-8").write(s)
 print("badge added")
+
+# ── phone: no lens; "Book now" with a highlight (Rakesh, 20 Oct 2026) ─────
+s = open(P, encoding="utf-8").read()
+old = '  <a class="cta cta-book" id="bookBtn" href="index.html">\n    Book Room Now\n'
+assert s.count(old) == 1
+s = s.replace(old, '  <a class="cta cta-book" id="bookBtn" href="index.html">\n'
+                   '    <span class="bk-long">Book Room Now</span><span class="bk-short">Book now</span>\n')
+s = s.replace('if (!lens || matchMedia("(prefers-reduced-motion: reduce)").matches) return;',
+              'if (!lens || matchMedia("(prefers-reduced-motion: reduce)").matches || matchMedia("(max-width: 899px)").matches) return;')
+CSS3 = """/* phone: the lens is computer-only; Book now carries the movement instead —
+   a light sweeps across the button and a soft green ring pulses out from it */
+.bk-short{display:none}
+@media (max-width:899px){
+  .lens{display:none}
+  .bk-long{display:none}.bk-short{display:inline}
+  .hero #bookBtn{position:relative;overflow:hidden;isolation:isolate;animation:bookPulse 2.4s ease-out infinite}
+  .hero #bookBtn::before{content:"";position:absolute;inset:0;z-index:-1;transform:translateX(-110%);
+    background:linear-gradient(110deg,transparent 25%,rgba(4,120,87,.14) 42%,rgba(167,243,208,.9) 50%,rgba(4,120,87,.14) 58%,transparent 75%);
+    animation:bookShine 2.4s ease-in-out infinite}
+}
+@keyframes bookShine{0%{transform:translateX(-110%)}55%,100%{transform:translateX(110%)}}
+@keyframes bookPulse{0%{box-shadow:0 0 0 0 rgba(4,120,87,.40)}70%,100%{box-shadow:0 0 0 10px rgba(4,120,87,0)}}
+
+"""
+anchor = '/* A phone set to reduce motion gets no auto-advance'
+s = s.replace(anchor, CSS3 + anchor)
+open(P, "w", encoding="utf-8").write(s)
+print("book highlight added")
