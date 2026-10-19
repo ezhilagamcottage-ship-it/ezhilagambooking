@@ -38,7 +38,7 @@ body{
   font:400 15px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
   -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
 }
-.wrap{max-width:460px;margin:0 auto;padding:22px 16px 40px}
+.wrap{max-width:460px;margin:0 auto;padding:22px 16px 112px} /* room under the last line for Shenba */
 
 /* Focus: visible, and the same everywhere. Half this page is tappable. */
 a:focus-visible,button:focus-visible{
@@ -233,16 +233,56 @@ dialog.sb::backdrop{background:rgba(12,10,9,.55)}
 .sb-send:disabled{opacity:.45}
 .sb-alt{display:block;width:100%;border:0;border-top:1px solid var(--line);background:#fff7ed;
   color:var(--gold);font:inherit;font-weight:800;font-size:14px;padding:11px;cursor:pointer}
-.sb-voice{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center}
-.sb-orb{width:150px;height:150px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,#a7f3d0,#047857 60%,#064e3b);
-  box-shadow:0 10px 40px rgba(4,120,87,.35);transition:transform .25s}
-.sb-orb.speaking{animation:sbPulse 1.1s ease-in-out infinite}
-@keyframes sbPulse{50%{transform:scale(1.08)}}
-@media (prefers-reduced-motion: reduce){.sb-orb.speaking{animation:none}}
-.sb-vstat{font-weight:700;color:var(--ink)}
-.sb-vhint{color:var(--mute);font-size:13px;max-width:300px}
-.sb-end{border:0;border-radius:28px;padding:13px 28px;background:#b91c1c;color:#fff;font:inherit;font-weight:800;cursor:pointer}
+/* ── Shenba avatar dock (v1.4) ────────────────────────────────────────────
+   The one voice launcher on the page. Tap her face to start the call, tap
+   again to end it. Same ElevenLabs agent and tools as before; the old orb
+   pop-up is gone. She floats above the page, never over the booking button
+   (she moves to the top while it is under her), and can be shrunk to a dot. */
+.sa-dock{position:fixed;z-index:40;right:max(12px,env(safe-area-inset-right));
+  bottom:max(12px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;
+  max-width:calc(100vw - 24px);padding:8px 10px 8px 8px;background:var(--card);
+  border:1px solid var(--line);border-radius:44px;box-shadow:0 10px 30px rgba(28,25,23,.16);
+  transition:top .25s,bottom .25s,opacity .2s}
+.sa-dock.dodge{bottom:auto;top:max(12px,env(safe-area-inset-top))}
+.sa-face{position:relative;width:64px;height:64px;flex:0 0 auto;padding:0;border:0;border-radius:50%;
+  background:#e7f5ee;cursor:pointer;box-shadow:0 0 0 3px #fff,0 0 0 5px #d1fae5}
+.sa-face svg{display:block;width:100%;height:100%;border-radius:50%}
+.sa-dock.on .sa-face{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--brand)}
+.sa-dock.speaking .sa-face{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--gold-lt)}
+.sa-txt{min-width:0;line-height:1.25;padding-right:2px}
+.sa-txt b{display:block;font-size:15px}
+.sa-txt small{display:block;font-size:11px;color:var(--mute)}
+.sa-stat{display:block;margin-top:2px;font-size:12.5px;font-weight:700;color:var(--brand)}
+.sa-dock.err .sa-stat{color:#b91c1c}
+.sa-stat a{color:#128C7E}
+.sa-min{border:0;background:none;color:var(--mute);font-size:20px;line-height:1;width:32px;height:32px;
+  border-radius:50%;cursor:pointer;flex:0 0 auto;align-self:flex-start}
+.sa-min:hover{background:#f5f5f4}
+.sa-dock.mini{padding:5px;gap:0}
+.sa-dock.mini .sa-txt{display:none}
+.sa-dock.mini .sa-face{width:52px;height:52px}
+.sa-dock.mini .sa-min{position:absolute;top:-8px;left:-8px;width:24px;height:24px;font-size:13px;
+  background:var(--card);border:1px solid var(--line)}
+
+/* her face. Every move is CSS on the inline SVG; a phone set to reduce motion
+   gets the still pose (the global rule at the end of this sheet). */
+.sa-body,.sa-head,.sa-eyes,.sa-brows,.sa-mopen{transform-box:fill-box;transform-origin:center}
+.sa-head{transform-origin:50% 100%}
+.sa-mopen{opacity:0;transform-origin:50% 0}
+/* idle: blink every few seconds and a small breath */
+.sa-eyes{animation:saBlink 4.6s infinite}
+.sa-body{animation:saBreath 4.2s ease-in-out infinite}
+@keyframes saBlink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.1)}}
+@keyframes saBreath{50%{transform:translateY(-1.2px) scale(1.012)}}
+/* listening: attentive brows, slight nod */
+.sa-dock.listening .sa-head{animation:saNod 2.2s ease-in-out infinite}
+.sa-dock.listening .sa-brows{transform:translateY(-1.2px)}
+@keyframes saNod{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-2deg) translateY(.8px)}60%{transform:rotate(1deg)}}
+/* speaking: a short mouth cycle, only while the agent is speaking */
+.sa-dock.speaking .sa-mclosed{opacity:0}
+.sa-dock.speaking .sa-mopen{opacity:1;animation:saMouth .42s steps(1,end) infinite}
+@keyframes saMouth{0%{transform:scaleY(.35)}25%{transform:scaleY(1)}50%{transform:scaleY(.55)}75%{transform:scaleY(.85)}}
+@media (min-width:560px){.sa-dock{right:20px;bottom:20px}}
 
 .callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 20px}
 .call{
@@ -405,21 +445,71 @@ dialog#full .x{
   <button type="button" class="sb-alt" id="sbToVoice">🎙️ Prefer to talk? Talk with Shenba</button>
 </dialog>
 
-<dialog id="sbTalk" class="sb" aria-label="Talk with Shenba">
-  <div class="sb-head">
-    <div class="sb-av" aria-hidden="true">S</div>
-    <div class="sb-who"><b>Shenba</b><small>Voice · Tamil / English</small></div>
-    <button class="sb-x" id="sbTalkX" aria-label="Close">✕</button>
+<!-- Shenba, the property's voice assistant: the only voice launcher on the page -->
+<aside class="sa-dock" id="saDock" aria-label="Shenba, voice assistant">
+  <button type="button" class="sa-face" id="saFace" aria-pressed="false" aria-label="Talk with Shenba">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <defs>
+        <radialGradient id="saSkin" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#e6b38b"/><stop offset=".7" stop-color="#d49a6f"/><stop offset="1" stop-color="#bf8459"/></radialGradient>
+        <linearGradient id="saHair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e1d14"/><stop offset="1" stop-color="#110a07"/></linearGradient>
+        <linearGradient id="saSaree" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b9468"/><stop offset="1" stop-color="#04583b"/></linearGradient>
+        <linearGradient id="saGold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9c46a"/><stop offset=".5" stop-color="#f6dc95"/><stop offset="1" stop-color="#c99a3b"/></linearGradient>
+        <radialGradient id="saBg" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#f3fbf7"/><stop offset="1" stop-color="#d7efe3"/></radialGradient>
+      </defs>
+      <circle cx="60" cy="60" r="60" fill="url(#saBg)"/>
+      <g class="sa-body">
+        <path d="M27 92c-6 6-10 16-11 30h88c-1-14-5-24-11-30-9-6-20-8-33-8s-24 2-33 8z" fill="#7a1f2b"/>
+        <path d="M16 122c2-14 6-23 13-29 7 3 13 9 17 16l6 13z" fill="url(#saSaree)"/>
+        <path d="M44 86c12 4 30 14 46 36H64c-6-12-14-22-24-30z" fill="url(#saSaree)"/>
+        <path d="M44 86c12 4 30 14 46 36h-6c-15-20-30-29-42-33z" fill="url(#saGold)"/>
+        <path d="M50 75c0 6-2 10-6 12 5 3 10 5 16 5s11-2 16-5c-4-2-6-6-6-12z" fill="url(#saSkin)"/>
+        <path d="M50 76c3 4 6 6 10 6s7-2 10-6v3c-3 3-6 5-10 5s-7-2-10-5z" fill="#a8704a" opacity=".55"/>
+        <path d="M47 88q13 8 26 0" stroke="url(#saGold)" stroke-width="1.6" fill="none"/>
+        <circle cx="60" cy="92" r="1.8" fill="#b91c1c" stroke="#f6dc95" stroke-width=".8"/>
+      </g>
+      <g class="sa-head">
+        <path d="M29 54c-2-24 12-38 31-38s33 14 31 38c-1 14-3 26-7 36l-8-16H44l-8 16c-4-10-6-22-7-36z" fill="url(#saHair)"/>
+        <ellipse cx="38.6" cy="55" rx="3.2" ry="5.4" fill="#c98c62"/><ellipse cx="81.4" cy="55" rx="3.2" ry="5.4" fill="#c98c62"/>
+        <path d="M39 50c0-16 9-23 21-23s21 7 21 23c0 15-7 27-21 30-14-3-21-15-21-30z" fill="url(#saSkin)"/>
+        <path d="M60 25c-12 0-21 8-22 23 4-9 11-15 21-16zM60 25c12 0 21 8 22 23-4-9-11-15-21-16z" fill="url(#saHair)"/>
+        <g fill="url(#saGold)"><circle cx="38" cy="61.5" r="1.6"/><path d="M35.6 63.5h4.8l-2.4 5z"/><circle cx="82" cy="61.5" r="1.6"/><path d="M79.6 63.5h4.8l-2.4 5z"/></g>
+        <ellipse cx="48.5" cy="62" rx="4.5" ry="2.6" fill="#e3816c" opacity=".22"/><ellipse cx="71.5" cy="62" rx="4.5" ry="2.6" fill="#e3816c" opacity=".22"/>
+        <g class="sa-brows" stroke="#2a1a12" stroke-width="1.5" stroke-linecap="round" fill="none">
+          <path d="M45.5 46.2q5-3.2 10.2-.6"/><path d="M64.3 45.6q5.2-2.6 10.2.6"/>
+        </g>
+        <g class="sa-eyes">
+          <path d="M45.8 52.4q5-4 10.4 0q-5.2 3.2-10.4 0z" fill="#fbf7f2"/>
+          <path d="M63.8 52.4q5.2-4 10.4 0q-5.2 3.2-10.4 0z" fill="#fbf7f2"/>
+          <circle cx="51" cy="52.1" r="2.5" fill="#4a2c19"/><circle cx="69" cy="52.1" r="2.5" fill="#4a2c19"/>
+          <circle cx="51" cy="52.1" r="1.15" fill="#120a06"/><circle cx="69" cy="52.1" r="1.15" fill="#120a06"/>
+          <circle cx="51.8" cy="51.3" r=".55" fill="#fff"/><circle cx="69.8" cy="51.3" r=".55" fill="#fff"/>
+          <path d="M45.2 52.6q5.4-4.6 11.2-.2M63.6 52.4q5.8-4.4 11.2.2" stroke="#1a100a" stroke-width="1.25" fill="none" stroke-linecap="round"/>
+          <path d="M45.2 52.6l-1.3-.9M74.8 52.6l1.3-.9" stroke="#1a100a" stroke-width="1" stroke-linecap="round"/>
+        </g>
+        <circle cx="60" cy="43.5" r="1.4" fill="#b91c1c"/>
+        <path d="M59.2 50.5c-.4 4-1.6 7-2.4 8.6" stroke="#b37a52" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".7"/>
+        <path d="M56.8 60.4q1.4 1 3.2.6q1.8.4 3.2-.6" stroke="#a86d4b" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <g class="sa-mclosed">
+          <path d="M53.2 65.9q3.6-1.8 6.8-.6q3.2-1.2 6.8.6q-6.8 2-13.6 0z" fill="#a4423a"/>
+          <path d="M53.2 65.9q6.8 6.2 13.6 0q-6.8 2.4-13.6 0z" fill="#b9564b"/>
+          <path d="M57.5 68.6q2.5.8 5 0" stroke="#d98a7f" stroke-width=".6" fill="none" opacity=".7"/>
+        </g>
+        <g class="sa-mopen">
+          <path d="M54 66.2q6-2.4 12 0q-.4 6.4-6 7q-5.6-.6-6-7z" fill="#4f1410"/>
+          <path d="M55.6 66.4q4.4-1 8.8 0v1.4q-4.4.8-8.8 0z" fill="#f4eee8"/>
+          <path d="M53.4 66.2q3.4-2.2 6.6-1q3.2-1.2 6.6 1q-6.6.6-13.2 0z" fill="#a4423a"/>
+          <path d="M54.2 70.4q5.8 5.2 11.6 0q-5.8 3.4-11.6 0z" fill="#b9564b"/>
+        </g>
+      </g>
+    </svg>
+  </button>
+  <div class="sa-txt">
+    <b>Shenba</b>
+    <small>Kutralam Ezhilagam's voice assistant (AI)</small>
+    <span class="sa-stat" id="saStat" aria-live="polite">Tap me to talk · Tamil / English</span>
   </div>
-  <div class="sb-voice">
-    <img src="img/logo.webp" alt="Kutralam Ezhilagam" width="166" height="38" style="height:34px;width:auto">
-    <div style="font-size:22px;font-weight:800">Talk with <span style="color:var(--brand)">Shenba</span></div>
-    <div class="sb-orb" id="sbOrb"></div>
-    <div class="sb-vstat" id="sbVStat">Connecting…</div>
-    <div class="sb-vhint">Allow the microphone when asked. Ask about rooms, prices for your dates, or how to reach us.</div>
-    <button type="button" class="sb-end" id="sbEnd">End call</button>
-  </div>
-</dialog>
+  <button type="button" class="sa-min" id="saMin" aria-label="Minimise Shenba" aria-expanded="true">–</button>
+</aside>
 
 <dialog id="full">
   <button class="x" id="fullX" aria-label="Close">✕</button>
@@ -876,10 +966,28 @@ async function goVoice() {
   startVoice();
 }
 
+/* ── Shenba's face: idle (call closed), listening, speaking ── */
+const dock = $("saDock"), face = $("saFace");
+let calling = false, starting = false;
+function saState(st, text) {
+  dock.classList.toggle("on", st === "listening" || st === "speaking" || st === "connecting");
+  dock.classList.toggle("listening", st === "listening");
+  dock.classList.toggle("speaking", st === "speaking");
+  dock.classList.toggle("err", st === "error");
+  face.setAttribute("aria-pressed", String(calling));
+  face.setAttribute("aria-label", calling ? "End the call with Shenba" : "Talk with Shenba");
+  if (text != null) $("saStat").textContent = text;
+}
+function saWhatsApp(msg) {
+  $("saStat").innerHTML = esc(msg) + ' <a href="' + WA_SHENBA + '">WhatsApp her</a>';
+}
+
+/* mic permission is asked only here, after the guest taps */
 async function startVoice() {
-  openDlg($("sbTalk"));
-  $("sbVStat").textContent = "Connecting…";
-  $("sbOrb").classList.remove("speaking");
+  if (calling || starting) return;
+  starting = true; calling = true;
+  setMini(false);
+  saState("connecting", "Connecting…");
   try {
     await navigator.mediaDevices.getUserMedia({ audio: true });
     const { Conversation } = await sdk();
@@ -887,40 +995,70 @@ async function startVoice() {
       agentId: AGENT,
       connectionType: "webrtc",
       onModeChange: m => {
+        if (!calling) return;
         const sp = m.mode === "speaking";
-        $("sbOrb").classList.toggle("speaking", sp);
-        $("sbVStat").textContent = sp ? "Shenba is speaking…" : "Listening… go ahead";
+        saState(sp ? "speaking" : "listening", sp ? "Shenba is speaking…" : "Listening… go ahead · tap to end");
       },
-      onDisconnect: () => { voice = null; $("sbVStat").textContent = "Call ended"; $("sbOrb").classList.remove("speaking"); },
-      onError: () => { $("sbVStat").textContent = "Voice is not available right now."; showWaInVoice(); }
+      onDisconnect: () => { voice = null; calling = false; saState("idle", "Call ended · tap to talk again"); },
+      onError: () => { voice = null; calling = false; saState("error"); saWhatsApp("Voice is not available right now."); }
     });
+    if (!calling) { try { await voice.endSession(); } catch (e) {} voice = null; }
+    else saState("listening", "Listening… go ahead · tap to end");
   } catch (e) {
-    $("sbVStat").textContent = e && e.name === "NotAllowedError"
-      ? "Microphone is blocked. Allow it in your browser, or call 99622 22415."
-      : "Voice is not available right now.";
-    if (!(e && e.name === "NotAllowedError")) showWaInVoice();
-  }
+    voice = null; calling = false;
+    saState("error");
+    if (e && e.name === "NotAllowedError") $("saStat").textContent = "Microphone is blocked. Allow it, or call 99622 22415.";
+    else saWhatsApp("Voice is not available right now.");
+  } finally { starting = false; }
 }
-function showWaInVoice() {
-  if ($("sbWa")) return;
-  const a = document.createElement("a");
-  a.id = "sbWa"; a.href = WA_SHENBA; a.className = "sb-end";
-  a.style.background = "#128C7E"; a.style.textDecoration = "none";
-  a.textContent = "Chat with Shenba on WhatsApp";
-  $("sbEnd").before(a);
+async function endVoice() {
+  calling = false;
+  if (voice) { try { await voice.endSession(); } catch (e) {} voice = null; }
+  saState("idle", "Tap me to talk · Tamil / English");
 }
-async function endVoice() { if (voice) { try { await voice.endSession(); } catch (e) {} voice = null; } closeDlg($("sbTalk")); }
 
-$("talkBtn").addEventListener("click", async () => {
+face.addEventListener("click", async () => {
   if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
+  if (calling) { endVoice(); return; }
   await endChat(); startVoice();
 });
-$("sbEnd").addEventListener("click", endVoice);
-$("sbTalkX").addEventListener("click", endVoice);
-$("sbTalk").addEventListener("close", () => { if (voice) endVoice(); });
+$("talkBtn").addEventListener("click", async () => {
+  if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
+  if (calling) { setMini(false); return; }
+  await endChat(); startVoice();
+});
+
+/* minimise (remembered on this phone only) */
+function setMini(on) {
+  dock.classList.toggle("mini", on);
+  $("saMin").textContent = on ? "+" : "–";
+  $("saMin").setAttribute("aria-expanded", String(!on));
+  $("saMin").setAttribute("aria-label", on ? "Show Shenba" : "Minimise Shenba");
+  try { localStorage.setItem("saMini", on ? "1" : "0"); } catch (e) {}
+  dodge();
+}
+$("saMin").addEventListener("click", () => setMini(!dock.classList.contains("mini")));
+try { if (localStorage.getItem("saMini") === "1") setMini(true); } catch (e) {}
+
+/* never sit on the booking button: while it is under her, she moves to the top */
+const book = $("bookBtn");
+let dodgeQ = false;
+function dodge() {
+  if (dodgeQ) return; dodgeQ = true;
+  requestAnimationFrame(() => {
+    dodgeQ = false;
+    const b = book.getBoundingClientRect(), h = dock.offsetHeight + 24;
+    const under = b.bottom > innerHeight - h && b.top < innerHeight;
+    dock.classList.toggle("dodge", under);
+  });
+}
+addEventListener("scroll", dodge, { passive: true });
+addEventListener("resize", dodge);
+dodge();
 
 /* Deep link: ezhilagam.cloud/#talk opens voice, #chat opens chat. */
 if (location.hash === "#chat") $("chatBtn").click();
-if (location.hash === "#talk") $("talkBtn").click();
+/* #talk only shows her; the call (and the mic question) waits for a tap */
+if (location.hash === "#talk") { setMini(false); $("saStat").textContent = "Tap my face to start talking"; }
 </script>
 </body></html>
