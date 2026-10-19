@@ -286,18 +286,61 @@ dialog.sb::backdrop{background:rgba(12,10,9,.55)}
 @keyframes saBlink{0%,100%{opacity:0}93%{opacity:1}95.8%{opacity:0}}
 @keyframes saBreath{50%{transform:translateY(-.8px) scale(1.008)}}
 /* listening: attentive, a slight nod */
-.sa-dock.listening .sa-head{animation:saNod 2.2s ease-in-out infinite}
-.sa-dock.speaking .sa-head{animation:saTalkHead 3.4s ease-in-out infinite}
-.sa-dock.speaking .sa-body{transform:translateY(calc(var(--jaw,0) * -0.6px))}
+.sa-anim.listening .sa-head{animation:saNod 2.2s ease-in-out infinite}
+.sa-anim.speaking .sa-head{animation:saTalkHead 3.4s ease-in-out infinite}
+.sa-anim.speaking .sa-body{transform:translateY(calc(var(--jaw,0) * -0.6px))}
 @keyframes saTalkHead{0%,100%{transform:rotate(0)}30%{transform:rotate(-1deg) translateY(-.3px)}65%{transform:rotate(.7deg)}}
 @keyframes saNod{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-1.6deg) translateY(.6px)}60%{transform:rotate(.8deg)}}
 /* speaking: her mouth takes the shape of the sound she is making (six photos: talk, aa, oo, ee, m/b/p, f/v),
    read from her voice many times a second; the plain cycle below is only the fallback */
 .sa-v{opacity:0}
-.sa-dock.speaking .sa-mopen{animation:saMouth .48s ease-in-out infinite}
+.sa-anim.speaking .sa-mopen{animation:saMouth .48s ease-in-out infinite}
 @keyframes saMouth{0%,100%{opacity:.15}30%{opacity:1}55%{opacity:.45}78%{opacity:.9}}
 @media (min-width:560px){.sa-bar{left:50%;right:auto;transform:translateX(-50%);width:min(560px,calc(100vw - 40px));bottom:20px}}
 @media (max-width:360px){.sa-txt small{display:none}}
+
+/* ── Talk with Shenba: the call page (v1.5) ──────────────────────────────
+   Opens when Talk is tapped. Logo on top, Shenba in the middle, and the
+   booking details filling in as the guest says them; Proceed to pay opens
+   the Razorpay link for that room; the confirmation shows here too. */
+dialog.sc{height:100dvh;max-height:100dvh;max-width:480px;margin:0 auto;border-radius:0}
+@media (min-width:560px){dialog.sc{height:min(820px,96dvh);margin:auto;border-radius:20px}}
+.sc-top{display:flex;align-items:center;justify-content:center;position:relative;
+  padding:max(14px,env(safe-area-inset-top)) 52px 6px;background:var(--bg)}
+.sc-top img{height:40px;width:auto}
+.sc-top .sb-x{position:absolute;right:8px;top:max(8px,env(safe-area-inset-top));color:var(--mute)}
+.sc-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:14px;
+  padding:4px 16px 12px;-webkit-overflow-scrolling:touch}
+.sc-main{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px}
+.sc-face{width:168px;height:168px;border-radius:50%;overflow:hidden;padding:0;border:0;cursor:pointer;
+  background:#e7f5ee;box-shadow:0 0 0 5px #fff,0 0 0 8px #f3d7b0,0 16px 40px rgba(28,25,23,.18);margin:10px 0 10px}
+.sc-face svg{display:block;width:100%;height:100%}
+.sc-main.listening .sc-face{box-shadow:0 0 0 5px #fff,0 0 0 8px var(--brand),0 16px 40px rgba(4,120,87,.25)}
+.sc-main.speaking .sc-face{box-shadow:0 0 0 5px #fff,0 0 0 8px var(--gold-lt),0 16px 40px rgba(180,83,9,.25)}
+.sc-main b{font-size:20px}
+.sc-main small{font-size:12px;color:var(--mute)}
+.sc-stat{margin-top:6px;font-weight:800;font-size:14px;color:var(--brand);min-height:1.4em}
+.sc-stat a{color:#128C7E}
+.sc-card{width:100%;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px 14px}
+.sc-card h3{margin:8px 0 2px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.sc-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
+.sc-card h3+.sc-row{border-top:0}
+.sc-row span{color:var(--mute)}
+.sc-row b{text-align:right;font-variant-numeric:tabular-nums;min-width:0;transition:background .6s}
+.sc-row b.empty{color:var(--faint);font-weight:500}
+.sc-row b.new{background:#fef3c7;border-radius:6px}
+.sc-row.total b{font-size:17px;color:var(--brand)}
+.sc-note{margin:8px 0 6px;font-size:12px;color:var(--mute);text-align:center}
+.sc-note.ok{color:var(--brand);font-weight:800;font-size:13.5px}
+.sc-actions{display:flex;gap:10px;padding:10px 16px max(12px,env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);background:var(--card)}
+.sc-pay{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border-radius:14px;
+  background:var(--brand);color:#fff;font-weight:800;font-size:16px;text-decoration:none;
+  box-shadow:0 6px 18px rgba(4,120,87,.28)}
+.sc-pay[aria-disabled="true"]{background:#d6d3d1;color:#78716c;box-shadow:none;pointer-events:none}
+.sc-pay.done{font-size:14px;text-align:center;background:#ecfdf5;color:var(--brand);border:1.5px solid #a7f3d0;box-shadow:none;pointer-events:none}
+.sc-end{border:0;border-radius:14px;padding:0 16px;min-height:52px;background:#b91c1c;color:#fff;font:inherit;font-weight:800;cursor:pointer}
+.sc-end[hidden]{display:none}
 
 .callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 20px}
 .call{
@@ -452,7 +495,7 @@ dialog#full .x{
   </svg>
   <span>Chat with<b>Shenba</b></span>
 </button>
-<aside class="sa-dock" id="saDock" aria-label="Talk with Shenba, voice assistant">
+<aside class="sa-dock sa-anim" id="saDock" aria-label="Talk with Shenba, voice assistant">
   <button type="button" class="sa-face" id="saFace" aria-pressed="false" aria-label="Talk with Shenba">
     <svg viewBox="40 28 120 120" aria-hidden="true">
       <defs>
@@ -477,6 +520,36 @@ dialog#full .x{
   <button type="button" class="sa-min" id="saMin" aria-label="Minimise Shenba" aria-expanded="true">–</button>
 </aside>
 </div>
+
+<dialog id="sbCall" class="sb sc" aria-label="Talk with Shenba">
+  <div class="sc-top">
+    <img src="img/logo.webp" alt="Kutralam Ezhilagam" width="166" height="38">
+    <button class="sb-x" id="scX" aria-label="Close">✕</button>
+  </div>
+  <div class="sc-body">
+    <div class="sc-main sa-anim" id="scMain">
+      <button type="button" class="sc-face" id="scFace" aria-label="Start talking with Shenba"></button>
+      <b>Shenba</b>
+      <small>Kutralam Ezhilagam's voice assistant (AI)</small>
+      <div class="sc-stat" id="scStat" aria-live="polite">Connecting…</div>
+    </div>
+    <div class="sc-card" id="scCard">
+      <h3>Your booking</h3>
+      <div class="sc-row"><span>Name</span><b data-f="name" class="empty">—</b></div>
+      <div class="sc-row"><span>Check-in</span><b data-f="checkin" class="empty">—</b></div>
+      <div class="sc-row"><span>Stay</span><b data-f="stay" class="empty">—</b></div>
+      <div class="sc-row"><span>Room</span><b data-f="room" class="empty">—</b></div>
+      <div class="sc-row"><span>Adults</span><b data-f="adults" class="empty">—</b></div>
+      <div class="sc-row"><span>Children</span><b data-f="children" class="empty">—</b></div>
+      <div class="sc-row total"><span>Rate (incl. tax)</span><b data-f="rate" class="empty">—</b></div>
+      <p class="sc-note" id="scNote">Details appear here as you tell Shenba.</p>
+    </div>
+  </div>
+  <div class="sc-actions">
+    <a class="sc-pay" id="scPay" aria-disabled="true" target="_blank" rel="noopener">Proceed to pay</a>
+    <button type="button" class="sc-end" id="scEnd">End call</button>
+  </div>
+</dialog>
 
 <dialog id="full">
   <button class="x" id="fullX" aria-label="Close">✕</button>
@@ -930,23 +1003,29 @@ async function endChat() { if (chat) { try { await chat.endSession(); } catch (e
 async function goVoice() {
   closeDlg($("sbChat"));
   await endChat();
-  startVoice();
+  openCall(true);
 }
 
 /* ── Shenba's face: idle (call closed), listening, speaking ── */
-const dock = $("saDock"), face = $("saFace");
+const dock = $("saDock"), face = $("saFace"), scMain = $("scMain");
+/* the call page shows the same animated Shenba, larger (a copy of the corner picture with its own ids) */
+$("scFace").innerHTML = face.querySelector("svg").outerHTML.replace(/id="sa/g, 'id="sc').replace(/url\(#sa/g, "url(#sc");
 let calling = false, starting = false;
 function saState(st, text) {
-  dock.classList.toggle("on", st === "listening" || st === "speaking" || st === "connecting");
-  dock.classList.toggle("listening", st === "listening");
-  dock.classList.toggle("speaking", st === "speaking");
-  dock.classList.toggle("err", st === "error");
+  for (const el of [dock, scMain]) {
+    el.classList.toggle("on", st === "listening" || st === "speaking" || st === "connecting");
+    el.classList.toggle("listening", st === "listening");
+    el.classList.toggle("speaking", st === "speaking");
+    el.classList.toggle("err", st === "error");
+  }
   face.setAttribute("aria-pressed", String(calling));
-  face.setAttribute("aria-label", calling ? "End the call with Shenba" : "Talk with Shenba");
-  if (text != null) $("saStat").textContent = text;
+  face.setAttribute("aria-label", calling ? "Open the call with Shenba" : "Talk with Shenba");
+  $("scEnd").hidden = !calling;
+  if (text != null) { $("saStat").textContent = text; $("scStat").textContent = text; }
 }
 function saWhatsApp(msg) {
-  $("saStat").innerHTML = esc(msg) + ' <a href="' + WA_SHENBA + '">WhatsApp her</a>';
+  const h = esc(msg) + ' <a href="' + WA_SHENBA + '">WhatsApp her</a>';
+  $("saStat").innerHTML = h; $("scStat").innerHTML = h;
 }
 
 /* Lip sync: her mouth follows the sound of her own voice. Six photos of the same Shenba saying different sounds
@@ -955,7 +1034,8 @@ function saWhatsApp(msg) {
    mostly hiss above 4 kHz, and a sudden dip after a loud sound closes the lips (m/b/p). Volume sets how far
    the mouth opens (thresholds set from her real voice note). Without frequency data it falls back to volume only; without any reading, the CSS cycle. */
 const VIS = ["talk", "aa", "oo", "ee", "mbp", "fv"];
-const visEl = {}; document.querySelectorAll(".sa-v").forEach(el => { visEl[el.dataset.v] = el; });
+const visEl = {}; document.querySelectorAll(".sa-v").forEach(el => { (visEl[el.dataset.v] ||= []).push(el); });
+const setJaw = v => { face.style.setProperty("--jaw", v); scMain.style.setProperty("--jaw", v); };
 const visW = Object.fromEntries(VIS.map(v => [v, 0]));
 let lipRaf = 0, volHist = [0, 0, 0], dipHold = 0;
 function saViseme(b, vol) {          // b: band levels {low, mid, high, fric} on the analyser's 0-255 scale; vol 0..1
@@ -972,9 +1052,9 @@ function saMouthFrame(target, vol) {   // ease every shape toward its target wei
   for (const v of VIS) {
     const goal = v === target ? Math.min(1, .25 + vol * 1.4) : 0;
     visW[v] += (goal - visW[v]) * .55;
-    visEl[v].style.opacity = visW[v] < .02 ? "0" : visW[v].toFixed(3);
+    const o = visW[v] < .02 ? "0" : visW[v].toFixed(3); visEl[v].forEach(e => { e.style.opacity = o; });
   }
-  face.style.setProperty("--jaw", (target ? vol : 0).toFixed(3));
+  setJaw((target ? vol : 0).toFixed(3));
   volHist = [vol, volHist[0], volHist[1]];
 }
 let freq = null;
@@ -985,11 +1065,11 @@ function saBands(v) {
 function lipSync() {
   if (lipRaf || !voice || typeof voice.getOutputVolume !== "function") return;
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  visEl.talk.style.animation = "none";
+  visEl.talk.forEach(e => { e.style.animation = "none"; });
   const step = () => {
     if (!voice || !dock.classList.contains("speaking")) {
-      lipRaf = 0; VIS.forEach(v => { visW[v] = 0; visEl[v].style.opacity = ""; }); visEl.talk.style.animation = "";
-      face.style.setProperty("--jaw", "0"); return;
+      lipRaf = 0; VIS.forEach(v => { visW[v] = 0; visEl[v].forEach(e => { e.style.opacity = ""; }); }); visEl.talk.forEach(e => { e.style.animation = ""; });
+      setJaw("0"); return;
     }
     let vol = 0, target = null;
     try { vol = Math.min(1, voice.getOutputVolume() * 3); } catch (e) {}
@@ -1006,6 +1086,82 @@ function lipSync() {
 }
 window.__saLip = { saViseme, saMouthFrame };   /* used by the preview recorder only */
 
+/* ── the booking card on the call page ──
+   Two sources: Shenba's display tool (show_booking_details, sent the moment she learns a detail) and Prime's
+   own record of this call's quote (voiceCard, by this call's conversation id), which wins when it exists and
+   carries the Razorpay link and, after payment, the booking id. */
+const PRIME = "https://script.google.com/macros/s/AKfycbwUVyNn9AIKvCpF2SQRsTqyepZgqwhOIeWCJt25YT5wyC3pp0fWayuTSDTvlwmD24Ww/exec";
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DAY = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+let card = {}, convId = "", cardTimer = 0, cardFinal = false;
+const fmtDay = iso => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || "")); if (!m) return String(iso || "");
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])); return DAY[d.getUTCDay()] + ", " + (+m[3]) + " " + MON[+m[2] - 1] + " " + m[1]; };
+const inr = n => "₹" + Math.round(Number(n) || 0).toLocaleString("en-IN");
+const nightsOf = (a, b) => { const x = Date.parse(a + "T00:00:00Z"), y = Date.parse(b + "T00:00:00Z"); return x && y && y > x ? Math.round((y - x) / 864e5) : 0; };
+function cardSet(f, text) {
+  const el = document.querySelector('#scCard [data-f="' + f + '"]');
+  if (!el || text == null || text === "" || el.textContent === String(text)) return;
+  el.textContent = text; el.classList.remove("empty"); el.classList.add("new");
+  setTimeout(() => el.classList.remove("new"), 1400);
+}
+function cardMerge(o) {
+  if (!o || typeof o !== "object") return;
+  const pick = (...k) => { for (const x of k) if (o[x] != null && o[x] !== "") return o[x]; };
+  const v = { name: pick("guest_name", "name"), checkIn: pick("check_in", "checkin"), checkOut: pick("check_out", "checkout"),
+    nights: pick("nights"), room: pick("room", "room_name", "room_code"), ac: pick("ac"), adults: pick("adults"),
+    children: pick("children"), total: pick("total", "rate_total", "rate"), payUrl: pick("pay_url"),
+    status: pick("status"), holdUntil: pick("hold_until"), bookingId: pick("booking_id"), ref: pick("reference") };
+  for (const k in v) if (v[k] != null) card[k] = v[k];
+  if (card.checkIn && card.checkOut && !v.nights) card.nights = nightsOf(card.checkIn, card.checkOut) || card.nights;
+  cardSet("name", card.name);
+  cardSet("checkin", card.checkIn ? fmtDay(card.checkIn) : null);
+  if (card.nights) cardSet("stay", card.nights + (+card.nights === 1 ? " night" : " nights") + (card.checkOut ? " · out " + fmtDay(card.checkOut).replace(/, \d{4}$/, "") : ""));
+  if (card.room) cardSet("room", String(card.room).replace(/^\w/, c => c.toUpperCase()) + (card.ac ? " · " + (/^non/i.test(card.ac) ? "Non-AC" : "AC") : ""));
+  if (card.adults != null) cardSet("adults", String(card.adults));
+  if (card.children != null) cardSet("children", String(card.children));
+  if (card.total) cardSet("rate", inr(card.total));
+  const pay = $("scPay"), note = $("scNote");
+  if (card.status === "confirmed" && card.bookingId) {
+    cardFinal = true;
+    pay.className = "sc-pay done"; pay.removeAttribute("href"); pay.setAttribute("aria-disabled", "true");
+    pay.textContent = "✓ Booking confirmed · " + card.bookingId;
+    note.className = "sc-note ok"; note.textContent = "Payment received. Your confirmation is on its way to your WhatsApp.";
+  } else if (card.payUrl && card.status === "pending_payment") {
+    pay.className = "sc-pay"; pay.href = card.payUrl; pay.setAttribute("aria-disabled", "false");
+    pay.textContent = "Proceed to pay " + inr(card.total);
+    note.className = "sc-note"; note.textContent = "Room held for you until " + (card.holdUntil || "a few minutes") + ". Secure payment by Razorpay.";
+  } else if (card.status === "expired" || card.status === "cancelled") {
+    pay.className = "sc-pay"; pay.removeAttribute("href"); pay.setAttribute("aria-disabled", "true"); pay.textContent = "Proceed to pay";
+    note.className = "sc-note"; note.textContent = "The hold has ended. Ask Shenba to hold the room again.";
+  } else if (card.status === "quoted") {
+    note.className = "sc-note"; note.textContent = "Say yes to Shenba to hold the room, then pay here.";
+  }
+}
+function cardReset() {
+  card = {}; convId = ""; cardFinal = false; clearTimeout(cardTimer); cardTimer = 0;
+  document.querySelectorAll("#scCard [data-f]").forEach(el => { el.textContent = "—"; el.className = "empty"; });
+  const pay = $("scPay"); pay.className = "sc-pay"; pay.removeAttribute("href"); pay.setAttribute("aria-disabled", "true"); pay.textContent = "Proceed to pay";
+  $("scNote").className = "sc-note"; $("scNote").textContent = "Details appear here as you tell Shenba.";
+}
+async function cardPoll() {
+  clearTimeout(cardTimer); cardTimer = 0;
+  if (!convId || cardFinal || !$("sbCall").open) return;
+  try {
+    const r = await fetch(PRIME + "?action=voiceCard&conv=" + encodeURIComponent(convId), { cache: "no-store" });
+    const j = await r.json();
+    if (j && j.ok && j.status && j.status !== "none") cardMerge(j);
+  } catch (e) {}
+  cardTimer = setTimeout(cardPoll, calling ? 3000 : 5000);
+}
+function openCall(start) {
+  if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
+  openDlg($("sbCall"));
+  if (calling || starting) return;
+  if (start) { cardReset(); startVoice(); }
+  else { saState("idle", "Tap Shenba to start talking"); }
+}
+window.__saCard = { cardMerge, cardReset };   /* used by the preview only */
+
 /* mic permission is asked only here, after the guest taps */
 async function startVoice() {
   if (calling || starting) return;
@@ -1018,35 +1174,42 @@ async function startVoice() {
     voice = await Conversation.startSession({
       agentId: AGENT,
       connectionType: "webrtc",
+      /* display only: Shenba shows each detail on this page as she learns it (no booking happens here) */
+      clientTools: { show_booking_details: async p => { cardMerge(p); return "shown"; } },
       onModeChange: m => {
         if (!calling) return;
         const sp = m.mode === "speaking";
-        saState(sp ? "speaking" : "listening", sp ? "Shenba is speaking…" : "Listening… tap to end");
+        saState(sp ? "speaking" : "listening", sp ? "Shenba is speaking…" : "Listening… go ahead");
         if (sp) lipSync(); 
       },
-      onDisconnect: () => { voice = null; calling = false; saState("idle", "Call ended · tap to talk"); },
+      onDisconnect: () => { voice = null; calling = false; saState("idle", "Call ended · tap Shenba to talk again"); if (convId && !cardFinal) cardPoll(); },
       onError: () => { voice = null; calling = false; saState("error"); saWhatsApp("Voice is not available right now."); }
     });
     if (!calling) { try { await voice.endSession(); } catch (e) {} voice = null; }
-    else saState("listening", "Listening… tap to end");
+    else {
+      saState("listening", "Listening… go ahead");
+      try { convId = typeof voice.getId === "function" ? voice.getId() : ""; } catch (e) { convId = ""; }
+      cardPoll();
+    }
   } catch (e) {
     voice = null; calling = false;
     saState("error");
-    if (e && e.name === "NotAllowedError") $("saStat").textContent = "Mic blocked · call 99622 22415";
+    if (e && e.name === "NotAllowedError") { $("saStat").textContent = "Mic blocked · call 99622 22415"; $("scStat").textContent = "Microphone is blocked. Allow it in your browser, or call 99622 22415."; }
     else saWhatsApp("Voice is not available right now.");
   } finally { starting = false; }
 }
 async function endVoice() {
   calling = false;
   if (voice) { try { await voice.endSession(); } catch (e) {} voice = null; }
-  saState("idle", "Tap her face to talk");
+  saState("idle", $("sbCall").open ? "Call ended · tap Shenba to talk again" : "Tap her face to talk");
 }
 
-face.addEventListener("click", async () => {
-  if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
-  if (calling) { endVoice(); return; }
-  await endChat(); startVoice();
-});
+/* Talk opens the call page; the call (and the mic question) starts with that tap */
+face.addEventListener("click", async () => { await endChat(); openCall(true); });
+$("scFace").addEventListener("click", () => { if (!calling && !starting) startVoice(); });
+$("scEnd").addEventListener("click", endVoice);
+$("scX").addEventListener("click", async () => { await endVoice(); clearTimeout(cardTimer); closeDlg($("sbCall")); });
+$("sbCall").addEventListener("close", () => { if (calling) endVoice(); clearTimeout(cardTimer); });
 
 /* minimise (remembered on this phone only) */
 function setMini(on) {
@@ -1079,6 +1242,6 @@ dodge();
 /* Deep link: ezhilagam.cloud/#talk opens voice, #chat opens chat. */
 if (location.hash === "#chat") $("chatBtn").click();
 /* #talk only shows her; the call (and the mic question) waits for a tap */
-if (location.hash === "#talk") { setMini(false); $("saStat").textContent = "Tap my face to start talking"; }
+if (location.hash === "#talk") openCall(false);
 </script>
 </body></html>
