@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Talk with Shenba · Kutralam Ezhilagam</title>
+<meta name="description" content="Talk or chat with Shenba, the front desk of Kutralam Ezhilagam, Courtallam — rooms, prices for your dates and directions, in Tamil or English.">
+<meta property="og:title" content="Talk with Shenba · Kutralam Ezhilagam">
+<meta property="og:description" content="Ask Shenba about rooms, prices for your dates and how to reach us — Tamil or English.">
+<meta property="og:image" content="https://ezhilagam.cloud/img/hero.webp">
+<link rel="icon" href="img/logo.webp">
+<style>
+:root{
+  --ink:#1c1917; --mute:#78716c; --line:#e7e5e4; --bg:#faf9f7; --card:#fff;
+  --brand:#047857; --brand-dk:#065f46; --gold:#b45309;
+  --sky:#3fb6dc; --teal:#14a3a3; --leaf:#2e9e4f; --navy:#1f5f7a; --red:#e8443a;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:400 15px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+  display:flex;flex-direction:column;min-height:100dvh;
+}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;max-width:560px;width:100%;margin:0 auto}
+.top a.home{display:block;line-height:0}
+.top img{height:38px;width:auto}
+.switch{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--card);color:var(--ink);
+  border-radius:22px;padding:9px 14px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.switch svg{width:18px;height:18px}
+main{flex:1;display:flex;flex-direction:column;max-width:560px;width:100%;margin:0 auto;padding:0 16px}
+
+/* ── Voice view ─────────────────────────────────────────── */
+.voice{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:12px 0 18px}
+.tag{margin:0;font-size:28px;font-weight:800;letter-spacing:-.01em}
+.tag span{color:var(--brand)}
+.sub{margin:0;color:var(--mute);font-size:14.5px;max-width:340px}
+.orb-wrap{position:relative;width:min(78vw,320px);aspect-ratio:1;margin:16px 0 8px}
+.orb{position:absolute;inset:0;border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 28%,rgba(255,255,255,.85),rgba(255,255,255,0) 32%),
+    radial-gradient(circle at 70% 30%,var(--sky),transparent 55%),
+    radial-gradient(circle at 30% 75%,var(--leaf),transparent 55%),
+    radial-gradient(circle at 75% 75%,var(--navy),transparent 60%),
+    linear-gradient(135deg,var(--teal),var(--brand));
+  box-shadow:0 18px 50px rgba(4,120,87,.28),inset 0 0 40px rgba(255,255,255,.25);
+  animation:drift 14s ease-in-out infinite alternate;background-size:140% 140%}
+@keyframes drift{0%{background-position:0% 0%}100%{background-position:100% 100%}}
+.orb-wrap.listening .orb{animation:drift 14s ease-in-out infinite alternate, breathe 3s ease-in-out infinite}
+.orb-wrap.speaking .orb{animation:drift 6s ease-in-out infinite alternate, talk .9s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.03)}}
+@keyframes talk{50%{transform:scale(1.08)}}
+.ring{position:absolute;inset:-10px;border-radius:50%;border:2px solid rgba(4,120,87,.25);opacity:0}
+.orb-wrap.speaking .ring{animation:ring 1.4s ease-out infinite}
+@keyframes ring{0%{opacity:.8;transform:scale(.96)}100%{opacity:0;transform:scale(1.12)}}
+@media (prefers-reduced-motion: reduce){.orb,.orb-wrap .orb,.ring{animation:none!important}}
+.call{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:10px;
+  border:0;border-radius:40px;padding:8px 22px 8px 8px;background:rgba(255,255,255,.92);color:var(--ink);
+  font:inherit;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.12);white-space:nowrap}
+.call .ic{width:42px;height:42px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center}
+.call .ic svg{width:20px;height:20px}
+.call.end .ic{background:#b91c1c}
+.stat{min-height:22px;font-weight:700}
+.hint{color:var(--mute);font-size:13px;max-width:320px;margin:0}
+.wa{display:none;align-items:center;gap:8px;border-radius:26px;padding:12px 20px;background:#128C7E;color:#fff;text-decoration:none;font-weight:800}
+
+/* ── Chat view ──────────────────────────────────────────── */
+.chat{flex:1;display:none;flex-direction:column;min-height:0;padding-bottom:12px}
+body.chatting .voice{display:none}
+body.chatting .chat{display:flex}
+.chat-head{display:flex;align-items:center;gap:10px;padding:8px 2px 12px;border-bottom:1px solid var(--line)}
+.av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--brand));color:#fff;display:grid;place-items:center;font-weight:800}
+.chat-head b{display:block}
+.chat-head small{color:var(--mute)}
+.log{flex:1;overflow-y:auto;padding:14px 2px;display:flex;flex-direction:column;gap:8px;min-height:240px}
+.m{max-width:85%;padding:9px 12px;border-radius:14px;font-size:14.5px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
+.m.ai{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+.m.me{align-self:flex-end;background:#dcfce7;border-bottom-right-radius:4px}
+.m.note{align-self:center;background:none;color:var(--mute);font-size:12.5px;text-align:center}
+.m a{color:var(--brand);font-weight:700}
+.typing{align-self:flex-start;color:var(--mute);font-size:13px}
+.bar{display:flex;gap:8px;padding-top:8px}
+.bar input{flex:1;min-width:0;border:1px solid var(--line);border-radius:22px;padding:12px 14px;font:inherit;font-size:16px;background:var(--card)}
+.bar input:focus{outline:2px solid var(--brand);outline-offset:-1px}
+.send{border:0;border-radius:50%;width:46px;height:46px;background:var(--brand);color:#fff;font-size:18px;cursor:pointer}
+
+footer{text-align:center;color:var(--mute);font-size:13px;padding:10px 16px calc(14px + env(safe-area-inset-bottom))}
+footer a{color:var(--brand);font-weight:700;text-decoration:none}
+footer .row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:4px}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="home" href="/" aria-label="Kutralam Ezhilagam home"><img src="img/logo.webp" alt="Kutralam Ezhilagam" width="166" height="38"></a>
+  <button type="button" class="switch" id="switchBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/></svg>
+    <span id="switchTxt">Switch to Chat</span>
+  </button>
+</header>
+
+<main>
+  <section class="voice" id="voiceView">
+    <h1 class="tag">Talk with <span>Shenba</span></h1>
+    <p class="sub">Front desk of Kutralam Ezhilagam, Courtallam — rooms, prices for your dates and directions. Tamil or English.</p>
+    <div class="orb-wrap" id="orbWrap">
+      <div class="ring"></div>
+      <div class="orb"></div>
+      <button type="button" class="call" id="callBtn">
+        <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>
+        <span id="callTxt">Call Shenba</span>
+      </button>
+    </div>
+    <div class="stat" id="stat" aria-live="polite"></div>
+    <p class="hint" id="hint">Tap “Call Shenba” and allow the microphone.</p>
+    <a class="wa" id="waBtn" href="#">Chat with Shenba on WhatsApp</a>
+  </section>
+
+  <section class="chat" id="chatView" aria-label="Chat with Shenba">
+    <div class="chat-head">
+      <div class="av" aria-hidden="true">S</div>
+      <div><b>Shenba</b><small id="chatStat">Front desk · Kutralam Ezhilagam</small></div>
+    </div>
+    <div class="log" id="log" aria-live="polite"></div>
+    <form class="bar" id="form" autocomplete="off">
+      <input id="inp" type="text" placeholder="Type your message…" aria-label="Message" enterkeyhint="send">
+      <button class="send" aria-label="Send">➤</button>
+    </form>
+  </section>
+</main>
+
+<footer>
+  Near the Vairams Nagar arch, Courtallam
+  <div class="row">
+    <a href="/book">Book online</a>
+    <a href="tel:+919962222415">Booking 99622 22415</a>
+    <a href="tel:+918248320685">Reception 82483 20685</a>
+  </div>
+</footer>
+
+<script type="module">
+/* Same ElevenLabs agent as the website buttons and the voice line.
+   If it is unavailable (e.g. subscription ended) guests go to WhatsApp Shenba (rockyjio). */
+const AGENT = "agent_2101m57dd7z8fvnva0erjk0h0va2";
+const SDK = "https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.28.0/+esm";
+const SHENBA_WEB = true;
+const WA_SHENBA = "https://wa.me/916374213184?text=" +
+  encodeURIComponent("Hi Shenba, I'd like to know about rooms at Kutralam Ezhilagam.");
+const OPENING =
+  "Vanakkam 🙏 I'm Shenba, front desk manager at Kutralam Ezhilagam, Courtallam.\n\n" +
+  "We're a short walk from the Main Falls, near the Vairams Nagar arch — nine studios and suites " +
+  "for 2 to 15 guests, home food on order, safe for families, and fully alcohol- and smoke-free.\n\n" +
+  "When are you planning to stay, and how many guests? I'll check available rooms and prices for you.";
+const CONTEXT =
+  "This guest is chatting by TEXT on the hotel website (ezhilagam.cloud/shenba), not on a phone call. " +
+  "Keep replies short and friendly, reply in the guest's language (English, Tamil or Tanglish). " +
+  "Ask for stay dates and number of guests, then use your tools for live rooms and prices. " +
+  "If the guest would rather talk, tell them to tap 'Switch to Voice' at the top of this page. " +
+  "Online booking: https://ezhilagam.cloud/book . Booking team 99622 22415, reception 082483 20685.";
+
+const $ = id => document.getElementById(id);
+$("waBtn").href = WA_SHENBA;
+let mod, voice = null, chat = null, history = [], typingEl = null, fellBack = false;
+const sdk = async () => (mod ||= await import(SDK));
+
+/* ── Voice ── */
+function setCall(on) {
+  $("callBtn").classList.toggle("end", on);
+  $("callTxt").textContent = on ? "End call" : "Call Shenba";
+  if (!on) { $("orbWrap").classList.remove("speaking", "listening"); }
+}
+function voiceDown(msg) {
+  voice = null; setCall(false);
+  $("stat").textContent = msg || "";
+}
+async function startVoice() {
+  if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
+  await endChat();
+  setCall(true);
+  $("stat").textContent = "Connecting…";
+  $("hint").textContent = "Allow the microphone when your browser asks.";
+  try {
+    await navigator.mediaDevices.getUserMedia({ audio: true });
+    const { Conversation } = await sdk();
+    voice = await Conversation.startSession({
+      agentId: AGENT,
+      connectionType: "webrtc",
+      onConnect: () => { $("stat").textContent = "Connected"; $("orbWrap").classList.add("listening"); },
+      onModeChange: m => {
+        const sp = m.mode === "speaking";
+        $("orbWrap").classList.toggle("speaking", sp);
+        $("orbWrap").classList.toggle("listening", !sp);
+        $("stat").textContent = sp ? "Shenba is speaking…" : "Listening… go ahead";
+      },
+      onDisconnect: () => { voiceDown("Call ended"); $("hint").textContent = "Tap “Call Shenba” to talk again."; },
+      onError: () => { voiceDown("Voice is not available right now."); $("waBtn").style.display = "inline-flex"; }
+    });
+  } catch (e) {
+    const blocked = e && e.name === "NotAllowedError";
+    voiceDown(blocked ? "Microphone is blocked — allow it in your browser settings." : "Voice is not available right now.");
+    if (!blocked) $("waBtn").style.display = "inline-flex";
+  }
+}
+async function endVoice() { if (voice) { try { await voice.endSession(); } catch (e) {} } voiceDown("Call ended"); }
+$("callBtn").addEventListener("click", () => voice ? endVoice() : startVoice());
+
+/* ── Chat ── */
+function esc(t) { return t.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function linkify(t) { return esc(t).replace(/(https?:\/\/[^\s)]+)/g, u => '<a href="' + u + '" target="_blank" rel="noopener">' + u + "</a>"); }
+function add(role, text) {
+  if (typingEl) { typingEl.remove(); typingEl = null; }
+  const el = document.createElement("div");
+  el.className = "m " + role;
+  el.innerHTML = role === "note" ? esc(text) : linkify(text);
+  $("log").appendChild(el); $("log").scrollTop = $("log").scrollHeight;
+  if (role !== "note") history.push((role === "me" ? "Guest: " : "Shenba: ") + text);
+}
+function typing() {
+  if (typingEl) return;
+  typingEl = document.createElement("div"); typingEl.className = "typing"; typingEl.textContent = "Shenba is typing…";
+  $("log").appendChild(typingEl); $("log").scrollTop = $("log").scrollHeight;
+}
+const cstat = t => { $("chatStat").textContent = t; };
+function toWhatsApp() {
+  if (fellBack) return; fellBack = true; chat = null;
+  add("note", "Shenba will continue with you on WhatsApp…");
+  setTimeout(() => { location.href = WA_SHENBA; }, 1200);
+}
+async function startChat(resume) {
+  cstat("Connecting…");
+  const { Conversation } = await sdk();
+  chat = await Conversation.startSession({
+    agentId: AGENT, textOnly: true,
+    overrides: { agent: { firstMessage: resume ? "I'm back 🙂 Please go on — where were we?" : OPENING }, conversation: { textOnly: true } },
+    onMessage: m => { if ((m.role || m.source) !== "user") add("ai", m.message); },
+    onStatusChange: s => cstat(s.status === "connected" ? "Online · usually replies in seconds" : "Front desk · Kutralam Ezhilagam"),
+    onDisconnect: d => { chat = null; if (d && d.reason === "error") toWhatsApp(); else cstat("Chat paused — send a message to continue"); },
+    onError: () => toWhatsApp()
+  });
+  chat.sendContextualUpdate(CONTEXT + (resume && history.length ? " Earlier in this chat:\n" + history.slice(-12).join("\n") : ""));
+}
+async function endChat() { if (chat) { try { await chat.endSession(); } catch (e) {} chat = null; } }
+async function openChat() {
+  if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
+  if (voice) await endVoice();
+  document.body.classList.add("chatting");
+  $("switchTxt").textContent = "Switch to Voice";
+  if (!chat && !history.length) { typing(); try { await startChat(false); } catch (e) { toWhatsApp(); } }
+  setTimeout(() => $("inp").focus(), 150);
+}
+async function openVoice() {
+  await endChat();
+  document.body.classList.remove("chatting");
+  $("switchTxt").textContent = "Switch to Chat";
+}
+$("switchBtn").addEventListener("click", () => document.body.classList.contains("chatting") ? openVoice() : openChat());
+$("form").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const t = $("inp").value.trim(); if (!t) return;
+  $("inp").value = ""; add("me", t); typing();
+  try { if (!chat) await startChat(true); chat.sendUserMessage(t); } catch (e) { toWhatsApp(); }
+});
+addEventListener("pagehide", () => { if (voice) voice.endSession(); if (chat) chat.endSession(); });
+if (location.hash === "#chat") openChat();
+</script>
+</body>
+</html>
