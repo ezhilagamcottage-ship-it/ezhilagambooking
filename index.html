@@ -275,9 +275,13 @@ dialog.sb::backdrop{background:rgba(12,10,9,.55)}
 @keyframes saBreath{50%{transform:translateY(-.8px) scale(1.008)}}
 /* listening: attentive, a slight nod */
 .sa-dock.listening .sa-head{animation:saNod 2.2s ease-in-out infinite}
+.sa-dock.speaking .sa-head{animation:saTalkHead 3.4s ease-in-out infinite}
+.sa-dock.speaking .sa-body{transform:translateY(calc(var(--jaw,0) * -0.6px))}
+@keyframes saTalkHead{0%,100%{transform:rotate(0)}30%{transform:rotate(-1deg) translateY(-.3px)}65%{transform:rotate(.7deg)}}
 @keyframes saNod{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-1.6deg) translateY(.6px)}60%{transform:rotate(.8deg)}}
-/* speaking: her lips part and close in a short cycle, only while the agent is speaking */
-.sa-mopen{opacity:0}
+/* speaking: her mouth takes the shape of the sound she is making (six photos: talk, aa, oo, ee, m/b/p, f/v),
+   read from her voice many times a second; the plain cycle below is only the fallback */
+.sa-v{opacity:0}
 .sa-dock.speaking .sa-mopen{animation:saMouth .48s ease-in-out infinite}
 @keyframes saMouth{0%,100%{opacity:.15}30%{opacity:1}55%{opacity:.45}78%{opacity:.9}}
 @media (min-width:560px){.sa-dock{right:20px;bottom:20px}}
@@ -451,13 +455,13 @@ dialog#full .x{
         <radialGradient id="saFadeE"><stop offset=".6" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
         <radialGradient id="saFadeM"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
         <mask id="saEyesM" maskUnits="userSpaceOnUse" x="40" y="28" width="120" height="120"><ellipse cx="98.5" cy="78" rx="38" ry="12" fill="url(#saFadeE)"/></mask>
-        <mask id="saMouthM" maskUnits="userSpaceOnUse" x="40" y="28" width="120" height="120"><ellipse cx="98.5" cy="118" rx="24" ry="13" fill="url(#saFadeM)"/></mask>
+        <mask id="saMouthM" maskUnits="userSpaceOnUse" x="40" y="28" width="120" height="120"><ellipse cx="98.5" cy="123" rx="27" ry="21" fill="url(#saFadeM)"/></mask>
       </defs>
       <g class="sa-body"><g class="sa-head">
         <image href="img/shenba.webp" x="0" y="0" width="200" height="200"/>
         <!-- the same photo with her eyes closed / lips parted, shown only over the eyes / mouth -->
         <g mask="url(#saEyesM)"><image class="sa-lid" href="img/shenba-closed.webp" x="0" y="0" width="200" height="200"/></g>
-        <g mask="url(#saMouthM)"><image class="sa-mopen" href="img/shenba-talk.webp" x="0" y="0" width="200" height="200"/></g>
+        <g mask="url(#saMouthM)"><image class="sa-v sa-mopen" data-v="talk" href="img/shenba-talk.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="aa" href="img/shenba-aa.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="oo" href="img/shenba-oo.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="ee" href="img/shenba-ee.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="mbp" href="img/shenba-mbp.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="fv" href="img/shenba-fv.webp" x="0" y="0" width="200" height="200"/></g>
       </g></g>
     </svg></g></g>
           <g mask="url(#saEyeR)"><g class="sa-lid"><svg x="107" y="74.3" width="20" height="7.7" viewBox="107 74.3 20 7.7" preserveAspectRatio="none" overflow="hidden"><image href="img/shenba.webp" x="0" y="0" width="200" height="200" transform="matrix(1 0 0 1.674 0 -41.2)"/><rect x="107" y="79.6" width="20" height="2.4" fill="url(#saLash)"/></svg></g></g>
@@ -946,23 +950,62 @@ function saWhatsApp(msg) {
   $("saStat").innerHTML = esc(msg) + ' <a href="' + WA_SHENBA + '">WhatsApp her</a>';
 }
 
-/* her lips follow the loudness of her own voice while she speaks; without a volume reading
-   the CSS mouth cycle runs instead. Stops the moment she stops speaking. */
-const mouth = document.querySelector(".sa-mopen");
-let lipRaf = 0, lipLvl = 0;
+/* Lip sync: her mouth follows the sound of her own voice. Six photos of the same Shenba saying different sounds
+   are blended over the mouth. The shape is picked from the voice's frequency bands many times a second:
+   open vowels (aa) carry their energy low, "ee" lifts the 2-4 kHz band, "oo" is low and soft, "f/s" is
+   mostly hiss above 4 kHz, and a sudden dip after a loud sound closes the lips (m/b/p). Volume sets how far
+   the mouth opens (thresholds set from her real voice note). Without frequency data it falls back to volume only; without any reading, the CSS cycle. */
+const VIS = ["talk", "aa", "oo", "ee", "mbp", "fv"];
+const visEl = {}; document.querySelectorAll(".sa-v").forEach(el => { visEl[el.dataset.v] = el; });
+const visW = Object.fromEntries(VIS.map(v => [v, 0]));
+let lipRaf = 0, volHist = [0, 0, 0], dipHold = 0;
+function saViseme(b, vol) {          // b: band levels {low, mid, high, fric} on the analyser's 0-255 scale; vol 0..1
+  if (vol < .07) return null;
+  const prev = Math.max(volHist[0], volHist[1]);
+  if (dipHold > 0 || (prev > .45 && vol < prev * .4)) { dipHold = dipHold > 0 ? dipHold - 1 : 1; return "mbp"; }
+  if (b.fric - b.high > -18 && vol < .6) return "fv";
+  if (b.high - b.mid > 0) return "ee";
+  if (vol > .7 && b.low - b.mid > 55) return "aa";
+  if (b.mid - b.high > 32 && vol < .55) return "oo";
+  return "talk";
+}
+function saMouthFrame(target, vol) {   // ease every shape toward its target weight
+  for (const v of VIS) {
+    const goal = v === target ? Math.min(1, .25 + vol * 1.4) : 0;
+    visW[v] += (goal - visW[v]) * .55;
+    visEl[v].style.opacity = visW[v] < .02 ? "0" : visW[v].toFixed(3);
+  }
+  face.style.setProperty("--jaw", (target ? vol : 0).toFixed(3));
+  volHist = [vol, volHist[0], volHist[1]];
+}
+let freq = null;
+function saBands(v) {
+  const n = v.length, hz = 24000 / n, band = (a, z) => { let t = 0, c = 0; for (let i = Math.floor(a / hz); i < Math.min(n, Math.ceil(z / hz)); i++) { t += v[i]; c++; } return c ? t / c : 0; };
+  return { low: band(200, 900), mid: band(900, 2200), high: band(2200, 3800), fric: band(4000, 8000) };
+}
 function lipSync() {
   if (lipRaf || !voice || typeof voice.getOutputVolume !== "function") return;
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  mouth.style.animation = "none";
+  visEl.talk.style.animation = "none";
   const step = () => {
-    if (!voice || !dock.classList.contains("speaking")) { lipRaf = 0; lipLvl = 0; mouth.style.opacity = ""; mouth.style.animation = ""; return; }
-    let v = 0; try { v = Math.min(1, voice.getOutputVolume() * 3); } catch (e) {}
-    lipLvl = lipLvl * .35 + v * .65;
-    mouth.style.opacity = String(Math.max(0, Math.min(1, (lipLvl - .06) * 1.7)));
+    if (!voice || !dock.classList.contains("speaking")) {
+      lipRaf = 0; VIS.forEach(v => { visW[v] = 0; visEl[v].style.opacity = ""; }); visEl.talk.style.animation = "";
+      face.style.setProperty("--jaw", "0"); return;
+    }
+    let vol = 0, target = null;
+    try { vol = Math.min(1, voice.getOutputVolume() * 3); } catch (e) {}
+    try {
+      if (typeof voice.getOutputByteFrequencyData === "function") {
+        freq = voice.getOutputByteFrequencyData();
+        target = saViseme(saBands(freq), vol);
+      } else target = vol < .07 ? null : vol > .55 ? "aa" : "talk";
+    } catch (e) { target = vol < .07 ? null : "talk"; }
+    saMouthFrame(target, vol);
     lipRaf = requestAnimationFrame(step);
   };
   lipRaf = requestAnimationFrame(step);
 }
+window.__saLip = { saViseme, saMouthFrame };   /* used by the preview recorder only */
 
 /* mic permission is asked only here, after the guest taps */
 async function startVoice() {
