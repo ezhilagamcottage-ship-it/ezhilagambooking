@@ -538,10 +538,22 @@ footer{padding-top:8px}
 @media (min-width:900px){.thumbs button{flex-basis:76px;height:54px}}
 
 /* Google Reviews badge: top right, beside the logo on a phone, after the numbers on a computer */
-.mast-top{display:grid;grid-template-columns:minmax(0,2.909fr) minmax(0,.762fr);gap:12px;align-items:center;width:100%}
+.mast-top{display:grid;grid-template-columns:minmax(0,2.524fr) minmax(0,.762fr);gap:14px;align-items:center;width:100%}
 /* the logo is exactly as tall as the badge beside it, edge to edge with the content */
-/* logo and badge share the row edge to edge; the column split matches their shapes, so both come out the same height */
+/* logo and badge share the row edge to edge; the split makes the logo 85% of the badge's height, centred beside it */
 .mast .mast-top .logo{width:100%;height:auto;max-height:none}
+.logo-wrap{position:relative;display:block;min-width:0}
+/* a green laser runs along the edges of the letters, again and again.
+   logo-edge.webp is the outline of the letters (6px of padding round the logo);
+   the moving bright band shows only where that outline is. */
+.laser{position:absolute;inset:calc(-6 / 163 * 100%) calc(-6 / 484 * 100%);pointer-events:none;
+  filter:drop-shadow(0 0 2px #22ff7a) drop-shadow(0 0 5px rgba(34,255,122,.55))}
+.laser i{position:absolute;inset:0;display:block;
+  -webkit-mask:url(img/logo-edge.webp) center/100% 100% no-repeat;mask:url(img/logo-edge.webp) center/100% 100% no-repeat;
+  background:linear-gradient(100deg,transparent 0 42%,#1aff74 47%,#eafff3 50%,#1aff74 53%,transparent 58% 100%) 0 0/300% 100% no-repeat;
+  animation:laserRun 3.2s linear infinite}
+@keyframes laserRun{from{background-position:100% 0}to{background-position:0% 0}}
+@media (prefers-reduced-motion:reduce){.laser{display:none}}
 .gbadge{position:relative;width:100%;height:auto;aspect-ratio:64/84;overflow:hidden;container-type:inline-size;
   background:#fff;border:1px solid #eceae8;border-radius:10px;box-shadow:0 4px 14px rgba(28,25,23,.08);line-height:1}
 /* five badges in one box: Google, Justdial Users' Choice, Justdial stars, Goibibo, MakeMyTrip. Each shows 2 s, fading in and out, forever. */
@@ -564,7 +576,7 @@ footer{padding-top:8px}
 .gb-stars i+i{position:absolute;inset:0 auto 0 0;overflow:hidden;color:#f5b301;width:calc(var(--r) / 5 * 100%)}
 @media (min-width:900px){
   .mast-top{display:contents}
-  .mast .mast-top .logo{order:0;width:314px;max-height:108px}
+  .mast .logo-wrap{order:0;width:272px}
   .mast .callrow{order:1;margin-left:auto}
   .gbadge{order:2;width:84px;height:108px;aspect-ratio:auto}
   .gb-g{padding:6px}
@@ -589,7 +601,7 @@ footer{padding-top:8px}
   <!-- ── Masthead: logo + contact strip (v1.6) ─────────────────────────── -->
   <header class="mast">
     <div class="mast-top">
-      <img class="logo" src="img/logo.webp" alt="Kutralam Ezhilagam" width="200" height="69">
+      <span class="logo-wrap"><img class="logo" src="img/logo-hd.webp" alt="Kutralam Ezhilagam" width="484" height="163"><span class="laser" aria-hidden="true"><i></i></span></span>
       <div class="gbadge" role="img" aria-label="Guest ratings: Google 4.7 out of 5, Justdial Users Choice 2026, Goibibo 4.4 out of 5, MakeMyTrip 4.3 out of 5">
         <div class="gb-slide gb-g" aria-hidden="true">
           <img src="img/google-reviews-badge.webp" alt="" width="178" height="114">
