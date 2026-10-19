@@ -245,8 +245,8 @@ dialog.sb::backdrop{background:rgba(12,10,9,.55)}
   transition:top .25s,bottom .25s,opacity .2s}
 .sa-dock.dodge{bottom:auto;top:max(12px,env(safe-area-inset-top))}
 .sa-face{position:relative;width:64px;height:64px;flex:0 0 auto;padding:0;border:0;border-radius:50%;
-  background:#e7f5ee;cursor:pointer;box-shadow:0 0 0 3px #fff,0 0 0 5px #d1fae5}
-.sa-face svg{display:block;width:100%;height:100%;border-radius:50%}
+  background:#e7f5ee;cursor:pointer;overflow:hidden;box-shadow:0 0 0 3px #fff,0 0 0 5px #d1fae5}
+.sa-face svg{display:block;width:100%;height:100%;border-radius:50%;overflow:hidden}
 .sa-dock.on .sa-face{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--brand)}
 .sa-dock.speaking .sa-face{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--gold-lt)}
 .sa-txt{min-width:0;line-height:1.25;padding-right:2px}
@@ -266,22 +266,20 @@ dialog.sb::backdrop{background:rgba(12,10,9,.55)}
 
 /* her face. Every move is CSS on the inline SVG; a phone set to reduce motion
    gets the still pose (the global rule at the end of this sheet). */
-.sa-body,.sa-head,.sa-lid,.sa-mopen,.sa-jaw{transform-box:fill-box;transform-origin:center}
+.sa-body,.sa-head{transform-box:fill-box;transform-origin:center}
 .sa-head{transform-origin:50% 100%}
-/* idle: a blink every few seconds (her own eyelids close over the photo) and a small breath */
-.sa-lid{transform-origin:50% 0;transform:scaleY(0);animation:saBlink 4.6s infinite}
+/* idle: a natural blink every few seconds (her own closed-eye photo, shown over the eyes) and a small breath */
+.sa-lid{opacity:0;animation:saBlink 4.6s steps(1,end) infinite}
 .sa-body{animation:saBreath 4.2s ease-in-out infinite}
-@keyframes saBlink{0%,92.5%,98%,100%{transform:scaleY(0)}95%{transform:scaleY(1)}}
+@keyframes saBlink{0%,100%{opacity:0}93%{opacity:1}95.8%{opacity:0}}
 @keyframes saBreath{50%{transform:translateY(-.8px) scale(1.008)}}
 /* listening: attentive, a slight nod */
 .sa-dock.listening .sa-head{animation:saNod 2.2s ease-in-out infinite}
 @keyframes saNod{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-1.6deg) translateY(.6px)}60%{transform:rotate(.8deg)}}
-/* speaking: the lips part and the jaw drops in a short cycle, only while the agent is speaking */
-.sa-mopen{opacity:0;transform-origin:50% 30%}
-.sa-dock.speaking .sa-mopen{opacity:1;animation:saMouth .42s steps(1,end) infinite}
-.sa-dock.speaking .sa-jaw{animation:saJaw .42s steps(1,end) infinite}
-@keyframes saMouth{0%{transform:scaleY(.5)}25%{transform:scaleY(1.2)}50%{transform:scaleY(.75)}75%{transform:scaleY(1)}}
-@keyframes saJaw{0%{transform:translateY(.6px)}25%{transform:translateY(1.8px)}50%{transform:translateY(1px)}75%{transform:translateY(1.4px)}}
+/* speaking: her lips part and close in a short cycle, only while the agent is speaking */
+.sa-mopen{opacity:0}
+.sa-dock.speaking .sa-mopen{animation:saMouth .48s ease-in-out infinite}
+@keyframes saMouth{0%,100%{opacity:.15}30%{opacity:1}55%{opacity:.45}78%{opacity:.9}}
 @media (min-width:560px){.sa-dock{right:20px;bottom:20px}}
 
 .callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 20px}
@@ -450,16 +448,19 @@ dialog#full .x{
   <button type="button" class="sa-face" id="saFace" aria-pressed="false" aria-label="Talk with Shenba">
     <svg viewBox="40 28 120 120" aria-hidden="true">
       <defs>
-        <linearGradient id="saLidG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b98168"/><stop offset=".7" stop-color="#a86f58"/><stop offset=".92" stop-color="#6b4334"/><stop offset="1" stop-color="#2a1a14"/></linearGradient>
-        <filter id="saSoft" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation=".45"/></filter>
-        <radialGradient id="saJawF"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-        <mask id="saJawM" maskUnits="userSpaceOnUse" x="60" y="110" width="80" height="40"><ellipse cx="98.5" cy="127" rx="24" ry="12" fill="url(#saJawF)"/></mask>
+        <radialGradient id="saFadeE"><stop offset=".6" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+        <radialGradient id="saFadeM"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+        <mask id="saEyesM" maskUnits="userSpaceOnUse" x="40" y="28" width="120" height="120"><ellipse cx="98.5" cy="78" rx="38" ry="12" fill="url(#saFadeE)"/></mask>
+        <mask id="saMouthM" maskUnits="userSpaceOnUse" x="40" y="28" width="120" height="120"><ellipse cx="98.5" cy="118" rx="24" ry="13" fill="url(#saFadeM)"/></mask>
       </defs>
       <g class="sa-body"><g class="sa-head">
         <image href="img/shenba.webp" x="0" y="0" width="200" height="200"/>
-        <g class="sa-eyes">
-          <g class="sa-lid"><ellipse cx="80" cy="78.4" rx="7.9" ry="4.1" fill="#b27c5f"/><path d="M72.1 81.6q7.9 2.6 15.8 0" stroke="#2a1712" stroke-width="1.1" fill="none" stroke-linecap="round"/></g>
-          <g class="sa-lid"><ellipse cx="117" cy="78.4" rx="7.9" ry="4.1" fill="#b27c5f"/><path d="M109.1 81.6q7.9 2.6 15.8 0" stroke="#2a1712" stroke-width="1.1" fill="none" stroke-linecap="round"/></g>
+        <!-- the same photo with her eyes closed / lips parted, shown only over the eyes / mouth -->
+        <g mask="url(#saEyesM)"><image class="sa-lid" href="img/shenba-closed.webp" x="0" y="0" width="200" height="200"/></g>
+        <g mask="url(#saMouthM)"><image class="sa-mopen" href="img/shenba-talk.webp" x="0" y="0" width="200" height="200"/></g>
+      </g></g>
+    </svg></g></g>
+          <g mask="url(#saEyeR)"><g class="sa-lid"><svg x="107" y="74.3" width="20" height="7.7" viewBox="107 74.3 20 7.7" preserveAspectRatio="none" overflow="hidden"><image href="img/shenba.webp" x="0" y="0" width="200" height="200" transform="matrix(1 0 0 1.674 0 -41.2)"/><rect x="107" y="79.6" width="20" height="2.4" fill="url(#saLash)"/></svg></g></g>
         </g>
         <ellipse class="sa-mopen" cx="98.5" cy="116.5" rx="9.5" ry="1.7" fill="#4a1714" filter="url(#saSoft)"/>
         <g class="sa-jaw" mask="url(#saJawM)"><image href="img/shenba.webp" x="0" y="0" width="200" height="200"/></g>
