@@ -146,7 +146,7 @@ s = open(P, encoding="utf-8").read()
 OLD = ('    <img src="img/logo.webp" alt="Kutralam Ezhilagam" width="200" height="69">\n')
 NEW = ('    <div class="mast-top">\n'
        '      <span class="logo-wrap"><img class="logo" src="img/logo-hd.webp" alt="Kutralam Ezhilagam" width="484" height="163">'
-       '<span class="laser" aria-hidden="true"><i></i></span></span>\n'
+       '<span class="lens" aria-hidden="true"></span></span>\n'
        '      <div class="gbadge" role="img" aria-label="Guest ratings: Google 4.7 out of 5, Justdial Users Choice 2026, Goibibo 4.4 out of 5, MakeMyTrip 4.3 out of 5">\n'
        '        <div class="gb-slide gb-g" aria-hidden="true">\n'
        '          <img src="img/google-reviews-badge.webp" alt="" width="178" height="114">\n'
@@ -167,17 +167,17 @@ CSS2 = """/* Google Reviews badge: top right, beside the logo on a phone, after 
 /* logo and badge share the row edge to edge; the split makes the logo 85% of the badge's height, centred beside it */
 .mast .mast-top .logo{width:100%;height:auto;max-height:none}
 .logo-wrap{position:relative;display:block;min-width:0}
-/* a green laser runs along the edges of the letters, again and again.
-   logo-edge.webp is the outline of the letters (6px of padding round the logo);
-   the moving bright band shows only where that outline is. */
-.laser{position:absolute;inset:calc(-6 / 163 * 100%) calc(-6 / 484 * 100%);pointer-events:none;
-  filter:drop-shadow(0 0 2px #22ff7a) drop-shadow(0 0 5px rgba(34,255,122,.55))}
-.laser i{position:absolute;inset:0;display:block;
-  -webkit-mask:url(img/logo-edge.webp) center/100% 100% no-repeat;mask:url(img/logo-edge.webp) center/100% 100% no-repeat;
-  background:linear-gradient(100deg,transparent 0 42%,#1aff74 47%,#eafff3 50%,#1aff74 53%,transparent 58% 100%) 0 0/300% 100% no-repeat;
-  animation:laserRun 3.2s linear infinite}
-@keyframes laserRun{from{background-position:100% 0}to{background-position:0% 0}}
-@media (prefers-reduced-motion:reduce){.laser{display:none}}
+/* a magnifying lens glides over the logo; inside it the logo is shown larger,
+   lined up with what is under the lens, so it reads like real glass. */
+.lens{position:absolute;left:0;top:0;width:var(--d,60px);height:var(--d,60px);border-radius:50%;pointer-events:none;
+  background:#fff url(img/logo-hd.webp) no-repeat;will-change:transform,background-position;
+  box-shadow:0 0 0 2px rgba(255,255,255,.95),0 0 0 3px rgba(4,120,87,.35),0 8px 18px rgba(28,25,23,.22),inset 0 0 10px rgba(28,25,23,.12);
+  opacity:0;transition:opacity .4s}
+.lens.on{opacity:1}
+.lens::after{content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.75),rgba(255,255,255,0) 38%),
+             radial-gradient(circle at 70% 78%,rgba(255,255,255,.18),rgba(255,255,255,0) 45%)}
+@media (prefers-reduced-motion:reduce){.lens{display:none}}
 .gbadge{position:relative;width:100%;height:auto;aspect-ratio:64/84;overflow:hidden;container-type:inline-size;
   background:#fff;border:1px solid #eceae8;border-radius:10px;box-shadow:0 4px 14px rgba(28,25,23,.08);line-height:1}
 /* five badges in one box: Google, Justdial Users' Choice, Justdial stars, Goibibo, MakeMyTrip. Each shows 2 s, fading in and out, forever. */
@@ -211,5 +211,32 @@ CSS2 = """/* Google Reviews badge: top right, beside the logo on a phone, after 
 """
 anchor = '/* A phone set to reduce motion gets no auto-advance'
 s = s.replace(anchor, CSS2 + anchor)
+LENS_JS = """<script>
+/* Lens over the logo (v1.6). One loop every 7 s: left to right and back on a
+   gentle wave. The zoomed logo inside the lens is positioned from the same
+   centre point, so the magnified letters always match the ones underneath. */
+(function () {
+  var wrap = document.querySelector(".logo-wrap"), lens = wrap && wrap.querySelector(".lens");
+  if (!lens || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var Z = 1.9, PERIOD = 7000, t0 = performance.now();
+  function frame(now) {
+    var W = wrap.clientWidth, H = wrap.clientHeight;
+    if (W && H) {
+      var D = Math.round(H * 0.92), a = ((now - t0) % PERIOD) / PERIOD * 2 * Math.PI;
+      var cx = W * (0.14 + 0.72 * (0.5 - 0.5 * Math.cos(a))), cy = H * (0.5 + 0.18 * Math.sin(2 * a));
+      lens.style.setProperty("--d", D + "px");
+      lens.style.transform = "translate(" + (cx - D / 2) + "px," + (cy - D / 2) + "px)";
+      lens.style.backgroundSize = (W * Z) + "px " + (H * Z) + "px";
+      lens.style.backgroundPosition = (D / 2 - cx * Z) + "px " + (D / 2 - cy * Z) + "px";
+      lens.classList.add("on");
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+"""
+assert s.count("</body></html>") == 1
+s = s.replace("</body></html>", LENS_JS + "</body></html>")
 open(P, "w", encoding="utf-8").write(s)
 print("badge added")
