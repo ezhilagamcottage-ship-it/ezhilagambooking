@@ -179,7 +179,7 @@ CSS2 = """/* Google Reviews badge: top right, beside the logo on a phone, after 
              radial-gradient(circle at 70% 78%,rgba(255,255,255,.18),rgba(255,255,255,0) 45%)}
 @media (prefers-reduced-motion:reduce){.lens{display:none}}
 .gbadge{position:relative;width:100%;height:auto;aspect-ratio:64/84;overflow:hidden;container-type:inline-size;
-  background:#fff;border:1px solid #eceae8;border-radius:10px;box-shadow:0 4px 14px rgba(28,25,23,.08);line-height:1}
+  background:none;border:0;line-height:1}  /* no frame: only the badges themselves fade in and out */
 /* five badges in one box: Google, Justdial Users' Choice, Justdial stars, Goibibo, MakeMyTrip. Each shows 2 s, fading in and out, forever. */
 .gb-slide{position:absolute;inset:0;opacity:0;animation:gbCycle 10s ease-in-out infinite}
 /* one 10 s loop shared by all five, each offset by exactly 2 s, so every change
@@ -193,7 +193,7 @@ CSS2 = """/* Google Reviews badge: top right, beside the logo on a phone, after 
 @keyframes gbCycle{0%{opacity:0}3.5%{opacity:1}17.5%{opacity:1}21.5%{opacity:0}100%{opacity:0}}
 .gb-g{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px}
 .gb-g img{display:block;width:100%;height:auto;padding-bottom:3px;border-bottom:1px solid #e7e5e4}
-.gbadge .gb-pic{display:block;width:100%;height:100%;object-fit:cover;background:#fff}
+.gbadge .gb-pic{display:block;width:100%;height:100%;object-fit:contain;background:none}
 .gb-n{font-size:16px;font-size:25cqw;font-weight:800;color:#1c1917;margin:3px 0 2px;font-variant-numeric:tabular-nums}
 .gb-stars{position:relative;display:block;font-size:10px;font-size:15.5cqw;letter-spacing:0;white-space:nowrap}
 .gb-stars i{font-style:normal;display:block;color:#d6d3d1}
