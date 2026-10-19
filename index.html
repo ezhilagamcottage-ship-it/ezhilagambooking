@@ -38,7 +38,7 @@ body{
   font:400 15px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
   -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
 }
-.wrap{max-width:460px;margin:0 auto;padding:22px 16px 112px} /* room under the last line for Shenba */
+.wrap{max-width:460px;margin:0 auto;padding:22px 16px 36px}
 
 /* Focus: visible, and the same everywhere. Half this page is tappable. */
 a:focus-visible,button:focus-visible{
@@ -384,6 +384,193 @@ dialog#full .x{
 
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
+/* ══ v1.6 homepage layout ═══════════════════════════════════════════════
+   Logo and numbers on top; the three actions in order of weight (Talk,
+   Chat, Book); the real facade beside them on a wide screen and under them
+   on a phone. Shenba no longer floats, so nothing on the page is covered. */
+body{background:#fff}
+.wrap{max-width:480px;padding:18px 16px 36px}
+.mast{display:flex;flex-direction:column;align-items:center;gap:14px;margin:0 0 18px}
+.mast img{height:54px;width:auto;margin:0}
+.mast .callrow{width:100%;margin:0}
+.call{display:flex;align-items:center;justify-content:center;gap:10px;text-align:left;
+  border-color:#eceae8;box-shadow:0 2px 10px rgba(28,25,23,.05);padding:10px 12px}
+.call svg{width:34px;height:34px;flex:0 0 auto;padding:8px;border-radius:50%;background:#ecfdf5;color:var(--brand)}
+.call b{margin-top:1px;font-size:15.5px;white-space:nowrap}
+.call span{min-width:0}
+@media (max-width:440px){.call{gap:8px;padding:10px 8px}.call svg{width:28px;height:28px;padding:6px}.call b{font-size:14.5px}}
+.call:hover{border-color:#a7f3d0}
+
+.hero{display:flex;flex-direction:column;gap:16px;margin:0 0 26px}
+.hero-act{display:flex;flex-direction:column;gap:12px}
+.hero .sa-bar,.hero .sa-bar.dodge{position:static;transform:none;width:auto;left:auto;right:auto;top:auto;bottom:auto;
+  display:flex;flex-direction:column;align-items:stretch;gap:12px;pointer-events:auto}
+.hero .sa-dock,.hero .sa-dock.mini{padding:16px 16px 16px 14px;gap:16px;border-radius:22px;cursor:pointer;
+  background:linear-gradient(135deg,#fffaf3,#fff1dd);border:1.5px solid #f1d3a6;
+  box-shadow:0 14px 34px rgba(120,72,10,.12)}
+.hero .sa-face,.hero .sa-dock.mini .sa-face{width:92px;height:92px;box-shadow:0 0 0 4px #fff,0 0 0 7px #f3d7b0}
+.hero .sa-dock.on .sa-face{box-shadow:0 0 0 4px #fff,0 0 0 7px var(--brand)}
+.hero .sa-dock.speaking .sa-face{box-shadow:0 0 0 4px #fff,0 0 0 7px var(--gold-lt)}
+.hero .sa-txt,.hero .sa-dock.mini .sa-txt{display:block;flex:1}
+.hero .sa-txt b{font-size:22px;line-height:1.15;color:#9a4a07;white-space:normal;font-weight:800}
+.hero .sa-txt small{display:block;margin-top:4px;font-size:13px;white-space:normal;color:#78716c}
+.hero .sa-stat{font-size:13px}
+.hero .sa-stat:empty{display:none}
+.hero .sa-min{display:none}
+.sa-go{flex:0 0 auto;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  background:var(--gold);color:#fff;box-shadow:0 6px 16px rgba(180,83,9,.32)}
+.sa-go svg{width:22px;height:22px}
+.hero .sa-chat{justify-content:center;gap:10px;min-height:58px;padding:14px 18px;border-radius:16px;
+  background:var(--brand);font-size:16.5px;font-weight:800;animation:none;
+  box-shadow:0 10px 22px rgba(4,120,87,.28)}
+.hero .sa-chat b{display:inline;font-size:inherit}
+.hero .sa-chat:hover{background:var(--brand-dk)}
+.hero .cta-book{margin:0;min-height:56px;background:#fff;color:var(--brand);border:1.5px solid var(--brand);box-shadow:none}
+.hero .cta-book:hover{background:#ecfdf5}
+.hero-pic{margin:0;border-radius:20px;overflow:hidden;background:#e9e6e2;aspect-ratio:4/3;
+  box-shadow:0 18px 40px rgba(28,25,23,.14)}
+.hero-pic img{display:block;width:100%;height:100%;object-fit:cover}
+
+.more-l .gal{margin-bottom:16px}
+@media (max-width:360px){.hero .sa-face{width:76px;height:76px}.hero .sa-txt b{font-size:19px}.sa-go{display:none}}
+
+@media (min-width:900px){
+  .wrap{max-width:1120px;padding:26px 32px 48px}
+  .mast{flex-direction:row;justify-content:space-between;margin-bottom:28px}
+  .mast img{height:60px}
+  .mast .callrow{width:auto;grid-template-columns:repeat(2,minmax(210px,auto));gap:12px}
+  .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:36px;align-items:center;margin-bottom:40px}
+  .hero-act{justify-content:center;gap:14px}
+  .hero .sa-dock{padding:22px 22px 22px 18px;gap:20px}
+  .hero .sa-face{width:116px;height:116px}
+  .hero .sa-txt b{font-size:27px}
+  .hero .sa-txt small{font-size:14px}
+  .sa-go{width:54px;height:54px}
+  .more{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:36px;align-items:start}
+  .more-l .gal{margin:0}
+}
+
+/* ══ v1.6b: one screen, no scrolling ═══════════════════════════════════
+   Rakesh, 20 Oct 2026: no facade block, and the page must not scroll.
+   The page is exactly the height of the screen; the photo slider takes
+   whatever height is left, and on short screens the smaller extras step
+   aside (trust strip first, then amenities) instead of pushing past the
+   bottom. A phone held sideways is too short for that, so it may scroll. */
+html,body{height:100%;overflow:hidden}
+.wrap{height:100vh;height:100dvh;display:flex;flex-direction:column;
+  padding:max(12px,env(safe-area-inset-top)) 16px max(10px,env(safe-area-inset-bottom))}
+.mast{gap:10px;margin:0 0 12px;flex:0 0 auto}
+.mast img{height:44px}
+.call{min-height:0;padding:8px 10px}
+.hero{margin:0 0 12px;flex:0 0 auto}
+.hero-act,.hero .sa-bar{gap:10px}
+.hero .sa-dock,.hero .sa-dock.mini{padding:12px 14px 12px 12px;gap:14px}
+.hero .sa-face,.hero .sa-dock.mini .sa-face{width:78px;height:78px}
+.hero .sa-txt b{font-size:20px}
+.hero .sa-chat{min-height:52px;padding:12px 16px}
+.hero .cta-book{min-height:50px;padding:12px 16px}
+.more{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px}
+.more-l{flex:1 1 auto;min-height:0;display:flex}
+.more-l .gal{flex:1;margin:0;aspect-ratio:auto;height:auto;min-height:0}
+.more-r{flex:0 0 auto;display:flex;flex-direction:column;gap:8px}
+.amen{margin:0;gap:6px}
+.amen li{padding:7px 4px;display:flex;align-items:center;justify-content:center;gap:6px}
+.amen .ico{font-size:16px}
+.amen .txt{margin:0;font-size:10.5px;text-align:left}
+.trust{margin:0;padding:8px 12px}
+.trust img{height:30px}
+.trust p{font-size:11px;line-height:1.35}
+footer{padding-top:8px}
+.notice{margin:0 0 4px;font-size:11px;line-height:1.45}
+.addr{font-size:10.5px;line-height:1.4}
+@media (max-width:899px) and (max-height:860px){.trust{display:none}}
+@media (max-width:899px) and (max-height:760px){.amen{display:none}.mast img{height:38px}
+  .hero .sa-face,.hero .sa-dock.mini .sa-face{width:64px;height:64px}.hero .sa-txt b{font-size:18px}}
+
+@media (min-width:900px){
+  .wrap{max-width:1180px;padding:22px 32px 18px;display:grid;
+    grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:auto 1fr auto;
+    grid-template-areas:"mast mast" "gal act" "gal info";column-gap:36px}
+  .mast{grid-area:mast;margin-bottom:18px}
+  .hero{grid-area:act;margin:0 0 16px;display:block;align-self:center}
+  .more{display:contents}
+  .more-l{grid-area:gal;min-height:0}
+  .more-r{grid-area:info;justify-content:flex-end;gap:10px;min-height:0}
+  .hero .sa-face{width:104px;height:104px}
+  .hero .sa-txt b{font-size:26px}
+  .hero .sa-chat{min-height:56px}
+  .hero .cta-book{min-height:54px}
+  .amen li{padding:10px 6px}
+  .amen .txt{font-size:11.5px}
+  footer{text-align:left}
+}
+@media (min-width:900px) and (max-height:700px){.trust{display:none}}
+@media (max-height:520px){html,body{height:auto;overflow:auto}.wrap{height:auto}.more-l .gal{aspect-ratio:4/3}}
+
+/* ══ v1.6c: slider D (wipe + thumbnails) and the phone order ══════════════ */
+.track{display:block;position:relative;overflow:hidden;scroll-snap-type:none}
+.slide{position:absolute;inset:0;clip-path:inset(0 0 0 100%)}
+.slide.on{clip-path:inset(0 0 0 0);z-index:2;transition:clip-path 1s cubic-bezier(.77,0,.18,1)}
+.slide.on.instant{transition:none}
+.slide.prev{clip-path:inset(0 0 0 0);z-index:1}
+.slide.on img{animation:kbZoom 7s ease-out both}
+@keyframes kbZoom{from{transform:scale(1.07)}to{transform:scale(1)}}
+.dots{display:none}
+.quote{margin:0;padding-bottom:16px}
+.more-l{flex-direction:column;gap:8px}
+.thumbs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:0 0 auto;padding:3px}
+.thumbs::-webkit-scrollbar{display:none}
+.thumbs button{flex:0 0 64px;height:46px;padding:0;border:0;border-radius:9px;overflow:hidden;cursor:pointer;
+  background:#e9e6e2;opacity:.5;outline:2px solid transparent;outline-offset:1px;transition:opacity .3s,outline-color .3s}
+.thumbs button[aria-current="true"]{opacity:1;outline-color:var(--brand)}
+.thumbs img{display:block;width:100%;height:100%;object-fit:cover}
+@media (max-width:899px){
+  .wrap{gap:10px}
+  .mast,.hero{margin:0}
+  .hero,.hero-act,.more{display:contents}
+  .mast{order:0}
+  #bookBtn{order:1;flex:0 0 auto}
+  .more-l{order:2}
+  .hero .sa-bar{order:3;flex:0 0 auto}
+  .more-r{order:4}
+}
+@media (max-width:899px) and (max-height:700px){.thumbs{display:none}}
+@media (min-width:900px){.thumbs button{flex-basis:76px;height:54px}}
+
+/* Google Reviews badge: top right, beside the logo on a phone, after the numbers on a computer */
+.mast-top{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%}
+/* the logo is exactly as tall as the badge beside it, edge to edge with the content */
+.mast .mast-top .logo{height:auto;width:min(244px,calc(100% - 80px));max-height:84px;object-fit:contain;object-position:left center}
+.gbadge{flex:0 0 auto;position:relative;width:64px;height:84px;overflow:hidden;
+  background:#fff;border:1px solid #eceae8;border-radius:10px;box-shadow:0 4px 14px rgba(28,25,23,.08);line-height:1}
+/* five badges in one box: Google, Justdial Users' Choice, Justdial stars, Goibibo, MakeMyTrip. Each shows 2 s, fading in and out, forever. */
+.gb-slide{position:absolute;inset:0;opacity:0;animation:gbCycle 10s ease-in-out infinite}
+/* one 10 s loop shared by all five, each offset by exactly 2 s, so every change
+   (including the one from the last badge back to the first) comes after the same
+   gap. Shifted by -0.4 s so the first badge is already showing when the page opens. */
+.gb-slide:nth-child(1){opacity:1;animation-delay:-.4s}
+.gb-slide:nth-child(2){animation-delay:1.6s}
+.gb-slide:nth-child(3){animation-delay:3.6s}
+.gb-slide:nth-child(4){animation-delay:5.6s}
+.gb-slide:nth-child(5){animation-delay:7.6s}
+@keyframes gbCycle{0%{opacity:0}3.5%{opacity:1}17.5%{opacity:1}21.5%{opacity:0}100%{opacity:0}}
+.gb-g{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px}
+.gb-g img{display:block;width:100%;height:auto;padding-bottom:3px;border-bottom:1px solid #e7e5e4}
+.gbadge .gb-pic{display:block;width:100%;height:100%;object-fit:cover;background:#fff}
+.gb-n{font-size:16px;font-weight:800;color:#1c1917;margin:3px 0 2px;font-variant-numeric:tabular-nums}
+.gb-stars{position:relative;display:block;font-size:10px;letter-spacing:0;white-space:nowrap}
+.gb-stars i{font-style:normal;display:block;color:#d6d3d1}
+.gb-stars i+i{position:absolute;inset:0 auto 0 0;overflow:hidden;color:#f5b301;width:calc(var(--r) / 5 * 100%)}
+@media (min-width:900px){
+  .mast-top{display:contents}
+  .mast .mast-top .logo{order:0;width:314px;max-height:108px}
+  .mast .callrow{order:1;margin-left:auto}
+  .gbadge{order:2;width:84px;height:108px}
+  .gb-g{padding:6px}
+  .gb-n{font-size:21px}
+  .gb-stars{font-size:13px}
+}
+
 /* A phone set to reduce motion gets no auto-advance and no smooth scrolling.
    This is enforced in JS as well — the media query alone would still leave
    the slides jumping every few seconds, which is the part that actually
@@ -398,13 +585,79 @@ dialog#full .x{
 
 <div class="wrap">
 
-  <!-- ── Masthead ─────────────────────────────────────────────────────── -->
+  <!-- ── Masthead: logo + contact strip (v1.6) ─────────────────────────── -->
   <header class="mast">
-    <img src="img/logo.webp" alt="Kutralam Ezhilagam" width="200" height="46">
-    <h1>Kutralam Ezhilagam</h1>
-    <p class="loc">Comfortable Stay &nbsp;•&nbsp; Near Courtallam Main Falls</p>
-    <div class="rule" aria-hidden="true"><i></i></div>
+    <div class="mast-top">
+      <img class="logo" src="img/logo.webp" alt="Kutralam Ezhilagam" width="200" height="69">
+      <div class="gbadge" role="img" aria-label="Guest ratings: Google 4.7 out of 5, Justdial Users Choice 2026, Goibibo 4.4 out of 5, MakeMyTrip 4.3 out of 5">
+        <div class="gb-slide gb-g" aria-hidden="true">
+          <img src="img/google-reviews-badge.webp" alt="" width="178" height="114">
+          <b class="gb-n">4.7</b>
+          <span class="gb-stars" style="--r:4.7"><i>★★★★★</i><i>★★★★★</i></span>
+        </div>
+        <img class="gb-slide gb-pic" src="img/justdial-users-choice.webp" alt="" width="400" height="526" aria-hidden="true">
+        <img class="gb-slide gb-pic" src="img/justdial-rating.webp" alt="" width="400" height="526" aria-hidden="true">
+        <img class="gb-slide gb-pic" src="img/goibibo-rating.webp" alt="" width="320" height="372" aria-hidden="true">
+        <img class="gb-slide gb-pic" src="img/makemytrip-rating.webp" alt="" width="320" height="382" aria-hidden="true">
+      </div>
+    </div>
+    <h1 class="sr">Kutralam Ezhilagam · Comfortable Stay near Courtallam Main Falls</h1>
+    <div class="callrow">
+    <a class="call" href="tel:+919962222415"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span><small>Booking</small><b>99622 22415</b></span></a>
+    <a class="call" href="tel:+918248320685"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span><small>Reception</small><b>82483 20685</b></span></a>
+    </div>
   </header>
+
+  <!-- ── Hero: Talk, Chat, Book + the building ────────────────────────── -->
+  <section class="hero" aria-label="Book with Shenba">
+    <div class="hero-act">
+<div class="sa-bar" id="saBar">
+<aside class="sa-dock sa-anim" id="saDock" aria-label="Talk with Shenba, voice assistant">
+  <button type="button" class="sa-face" id="saFace" aria-pressed="false" aria-label="Talk with Shenba">
+    <svg viewBox="40 28 120 120" aria-hidden="true">
+      <defs>
+        <radialGradient id="saFadeE"><stop offset=".6" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+        <radialGradient id="saFadeM"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+        <mask id="saEyesM" maskUnits="userSpaceOnUse" x="40" y="28" width="120" height="120"><ellipse cx="98.5" cy="78" rx="38" ry="12" fill="url(#saFadeE)"/></mask>
+        <mask id="saMouthM" maskUnits="userSpaceOnUse" x="40" y="28" width="120" height="120"><ellipse cx="98.5" cy="123" rx="27" ry="21" fill="url(#saFadeM)"/></mask>
+      </defs>
+      <g class="sa-body"><g class="sa-head">
+        <image href="img/shenba.webp" x="0" y="0" width="200" height="200"/>
+        <!-- the same photo with her eyes closed / lips parted, shown only over the eyes / mouth -->
+        <g mask="url(#saEyesM)"><image class="sa-lid" href="img/shenba-closed.webp" x="0" y="0" width="200" height="200"/></g>
+        <g mask="url(#saMouthM)"><image class="sa-v sa-mopen" data-v="talk" href="img/shenba-talk.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="aa" href="img/shenba-aa.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="oo" href="img/shenba-oo.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="ee" href="img/shenba-ee.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="mbp" href="img/shenba-mbp.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="fv" href="img/shenba-fv.webp" x="0" y="0" width="200" height="200"/></g>
+      </g></g>
+    </svg>
+  </button>
+  <div class="sa-txt">
+    <b>Talk with Shenba</b>
+    <small>Our voice assistant (AI) · Tap to talk</small>
+    <span class="sa-stat" id="saStat" aria-live="polite"></span>
+  </div>
+  <span class="sa-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg></span>
+  <button type="button" class="sa-min" id="saMin" aria-label="Minimise Shenba" aria-expanded="true">–</button>
+</aside>
+<button type="button" class="sa-chat" id="chatBtn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/>
+    <path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/>
+  </svg>
+  <span>Chat with <b>Shenba</b></span>
+</button>
+</div>
+  <a class="cta cta-book" id="bookBtn" href="index.html">
+    Book Room Now
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M5 12h13M13 6l6 6-6 6"/>
+    </svg>
+  </a>
+    </div>
+  </section>
+
+  <div class="more">
+  <div class="more-l">
 
   <!-- ── Photographs ──────────────────────────────────────────────────── -->
   <section class="gal" id="gal" aria-roledescription="carousel"
@@ -425,7 +678,10 @@ dialog#full .x{
 
     <div class="dots" id="dots" role="tablist" aria-label="Choose a photograph"></div>
   </section>
+  <div class="thumbs" id="thumbs" aria-label="Choose a photograph"></div>
   <p class="sr" id="live" aria-live="polite"></p>
+  </div>
+  <div class="more-r">
 
   <!-- ── Amenities ────────────────────────────────────────────────────── -->
   <ul class="amen">
@@ -437,19 +693,7 @@ dialog#full .x{
         <span class="txt">24/7 Power<br>Backup</span></li>
   </ul>
 
-  <!-- ── Calls to action ──────────────────────────────────────────────── -->
-  <a class="cta cta-book" id="bookBtn" href="index.html">
-    Book Room Now
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M5 12h13M13 6l6 6-6 6"/>
-    </svg>
-  </a>
 
-  <div class="callrow">
-    <a class="call" href="tel:+919962222415"><small>Booking</small><b>99622 22415</b></a>
-    <a class="call" href="tel:+918248320685"><small>Reception</small><b>82483 20685</b></a>
-  </div>
 
   <!-- ── Trust ────────────────────────────────────────────────────────── -->
   <div class="trust">
@@ -469,6 +713,8 @@ dialog#full .x{
       Check-in 12:00 PM &nbsp;·&nbsp; Check-out 10:00 AM
     </p>
   </footer>
+  </div>
+  </div>
 </div>
 
 <dialog id="sbChat" class="sb" aria-label="Chat with Shenba">
@@ -485,41 +731,6 @@ dialog#full .x{
   <button type="button" class="sb-alt" id="sbToVoice">🎙️ Prefer to talk? Talk with Shenba</button>
 </dialog>
 
-<!-- Shenba, the property's voice assistant: the only voice launcher on the page -->
-<div class="sa-bar" id="saBar">
-<button type="button" class="sa-chat" id="chatBtn">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/>
-    <path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/>
-  </svg>
-  <span>Chat with<b>Shenba</b></span>
-</button>
-<aside class="sa-dock sa-anim" id="saDock" aria-label="Talk with Shenba, voice assistant">
-  <button type="button" class="sa-face" id="saFace" aria-pressed="false" aria-label="Talk with Shenba">
-    <svg viewBox="40 28 120 120" aria-hidden="true">
-      <defs>
-        <radialGradient id="saFadeE"><stop offset=".6" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-        <radialGradient id="saFadeM"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
-        <mask id="saEyesM" maskUnits="userSpaceOnUse" x="40" y="28" width="120" height="120"><ellipse cx="98.5" cy="78" rx="38" ry="12" fill="url(#saFadeE)"/></mask>
-        <mask id="saMouthM" maskUnits="userSpaceOnUse" x="40" y="28" width="120" height="120"><ellipse cx="98.5" cy="123" rx="27" ry="21" fill="url(#saFadeM)"/></mask>
-      </defs>
-      <g class="sa-body"><g class="sa-head">
-        <image href="img/shenba.webp" x="0" y="0" width="200" height="200"/>
-        <!-- the same photo with her eyes closed / lips parted, shown only over the eyes / mouth -->
-        <g mask="url(#saEyesM)"><image class="sa-lid" href="img/shenba-closed.webp" x="0" y="0" width="200" height="200"/></g>
-        <g mask="url(#saMouthM)"><image class="sa-v sa-mopen" data-v="talk" href="img/shenba-talk.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="aa" href="img/shenba-aa.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="oo" href="img/shenba-oo.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="ee" href="img/shenba-ee.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="mbp" href="img/shenba-mbp.webp" x="0" y="0" width="200" height="200"/><image class="sa-v" data-v="fv" href="img/shenba-fv.webp" x="0" y="0" width="200" height="200"/></g>
-      </g></g>
-    </svg>
-  </button>
-  <div class="sa-txt">
-    <b>Talk with Shenba</b>
-    <small>Our voice assistant (AI)</small>
-    <span class="sa-stat" id="saStat" aria-live="polite">Tap her face to talk</span>
-  </div>
-  <button type="button" class="sa-min" id="saMin" aria-label="Minimise Shenba" aria-expanded="true">–</button>
-</aside>
-</div>
 
 <dialog id="sbCall" class="sb sc" aria-label="Talk with Shenba">
   <div class="sc-top">
@@ -777,7 +988,7 @@ SLIDES.forEach((s, i) => {
 
   btn.appendChild(im);
   fig.appendChild(btn);
-  btn.addEventListener("click", () => openFull(im.src, im.alt));
+  btn.addEventListener("click", () => { if (swiped) { swiped = false; return; } openFull(im.src, im.alt); });
   track.appendChild(fig);
 });
 
@@ -795,20 +1006,42 @@ function rebuildDots(){
     d.addEventListener("click", () => { stop(); go(i); });
     dots.appendChild(d);
   }
+  /* v1.6: the thumbnail strip under the photo, one per slide */
+  const th = $("thumbs");
+  if (th) {
+    th.textContent = "";
+    slides().forEach((f, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-label", "Show photograph " + (i + 1));
+      const im = document.createElement("img");
+      im.src = f.querySelector("img").src; im.alt = ""; im.loading = "lazy"; im.decoding = "async";
+      b.appendChild(im);
+      b.addEventListener("click", () => { stop(); go(i); });
+      th.appendChild(b);
+    });
+  }
   mark();
 }
 
 /* ── Position ──────────────────────────────────────────────────────────── */
 let at = 0;
 
+/* v1.6 slider D: the next photo wipes in over the last one. */
+let swiped = false;
 function go(i, smooth = true){
   const all = slides();
   if (!all.length) return;
+  const old = at;
   at = (i + all.length) % all.length;
-  track.scrollTo({
-    left: all[at].offsetLeft - track.offsetLeft,
-    behavior: (smooth && !calm) ? "smooth" : "auto"
-  });
+  all.forEach((s, k) => { s.classList.remove("prev"); if (k !== at) s.classList.remove("on"); });
+  if (old !== at && all[old]) all[old].classList.add("prev");
+  const cur = all[at];
+  if (!cur.classList.contains("on")) {
+    cur.classList.toggle("instant", !(smooth && !calm));
+    void cur.offsetWidth;
+    cur.classList.add("on");
+  }
   mark();
 }
 
@@ -816,7 +1049,27 @@ function mark(){
   [...dots.children].forEach((d, i) =>
     d.setAttribute("aria-current", i === at ? "true" : "false"));
   live.textContent = "Photograph " + (at + 1) + " of " + slides().length;
+  const th = $("thumbs");
+  if (th) {
+    [...th.children].forEach((b, i) => b.setAttribute("aria-current", i === at ? "true" : "false"));
+    const b = th.children[at];
+    if (b) th.scrollTo({ left: b.offsetLeft - th.offsetLeft - (th.clientWidth - b.clientWidth) / 2,
+                         behavior: calm ? "auto" : "smooth" });
+  }
 }
+
+/* swipe left / right on the photo */
+let sx = null;
+track.addEventListener("pointerdown", e => { sx = e.clientX; }, { passive:true });
+track.addEventListener("pointerup", e => {
+  if (sx == null) return;
+  const dx = e.clientX - sx; sx = null;
+  if (Math.abs(dx) > 40) {
+    swiped = true; stop(); go(at + (dx < 0 ? 1 : -1));
+    setTimeout(() => { swiped = false; }, 400);
+  }
+}, { passive:true });
+track.addEventListener("pointercancel", () => { sx = null; }, { passive:true });
 
 /* Follow the guest's own swipe. scrollend is not everywhere yet, so this is
    a debounced scroll — the timeout is what makes it fire once at the end of
@@ -884,6 +1137,7 @@ $("fullX").addEventListener("click", () => dlg.close());
 dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
 
 rebuildDots();
+go(0, false);
 start();
 </script>
 <script type="module">
@@ -1206,6 +1460,7 @@ async function endVoice() {
 
 /* Talk opens the call page; the call (and the mic question) starts with that tap */
 face.addEventListener("click", async () => { await endChat(); openCall(true); });
+dock.addEventListener("click", e => { if (!face.contains(e.target) && !$("saMin").contains(e.target)) face.click(); });
 $("scFace").addEventListener("click", () => { if (!calling && !starting) startVoice(); });
 $("scEnd").addEventListener("click", endVoice);
 $("scX").addEventListener("click", async () => { await endVoice(); clearTimeout(cardTimer); closeDlg($("sbCall")); });
