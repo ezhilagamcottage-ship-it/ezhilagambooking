@@ -946,6 +946,24 @@ function saWhatsApp(msg) {
   $("saStat").innerHTML = esc(msg) + ' <a href="' + WA_SHENBA + '">WhatsApp her</a>';
 }
 
+/* her lips follow the loudness of her own voice while she speaks; without a volume reading
+   the CSS mouth cycle runs instead. Stops the moment she stops speaking. */
+const mouth = document.querySelector(".sa-mopen");
+let lipRaf = 0, lipLvl = 0;
+function lipSync() {
+  if (lipRaf || !voice || typeof voice.getOutputVolume !== "function") return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  mouth.style.animation = "none";
+  const step = () => {
+    if (!voice || !dock.classList.contains("speaking")) { lipRaf = 0; lipLvl = 0; mouth.style.opacity = ""; mouth.style.animation = ""; return; }
+    let v = 0; try { v = Math.min(1, voice.getOutputVolume() * 3); } catch (e) {}
+    lipLvl = lipLvl * .35 + v * .65;
+    mouth.style.opacity = String(Math.max(0, Math.min(1, (lipLvl - .06) * 1.7)));
+    lipRaf = requestAnimationFrame(step);
+  };
+  lipRaf = requestAnimationFrame(step);
+}
+
 /* mic permission is asked only here, after the guest taps */
 async function startVoice() {
   if (calling || starting) return;
@@ -962,6 +980,7 @@ async function startVoice() {
         if (!calling) return;
         const sp = m.mode === "speaking";
         saState(sp ? "speaking" : "listening", sp ? "Shenba is speaking…" : "Listening… go ahead · tap to end");
+        if (sp) lipSync(); 
       },
       onDisconnect: () => { voice = null; calling = false; saState("idle", "Call ended · tap to talk again"); },
       onError: () => { voice = null; calling = false; saState("error"); saWhatsApp("Voice is not available right now."); }
