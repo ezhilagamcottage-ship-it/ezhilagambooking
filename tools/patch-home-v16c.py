@@ -161,10 +161,11 @@ NEW = ('    <div class="mast-top">\n'
 assert s.count(OLD) == 1
 s = s.replace(OLD, NEW)
 CSS2 = """/* Google Reviews badge: top right, beside the logo on a phone, after the numbers on a computer */
-.mast-top{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%}
+.mast-top{display:grid;grid-template-columns:minmax(0,2.909fr) minmax(0,.762fr);gap:12px;align-items:center;width:100%}
 /* the logo is exactly as tall as the badge beside it, edge to edge with the content */
-.mast .mast-top .logo{height:auto;width:min(244px,calc(100% - 80px));max-height:84px;object-fit:contain;object-position:left center}
-.gbadge{flex:0 0 auto;position:relative;width:64px;height:84px;overflow:hidden;
+/* logo and badge share the row edge to edge; the column split matches their shapes, so both come out the same height */
+.mast .mast-top .logo{width:100%;height:auto;max-height:none}
+.gbadge{position:relative;width:100%;height:auto;aspect-ratio:64/84;overflow:hidden;container-type:inline-size;
   background:#fff;border:1px solid #eceae8;border-radius:10px;box-shadow:0 4px 14px rgba(28,25,23,.08);line-height:1}
 /* five badges in one box: Google, Justdial Users' Choice, Justdial stars, Goibibo, MakeMyTrip. Each shows 2 s, fading in and out, forever. */
 .gb-slide{position:absolute;inset:0;opacity:0;animation:gbCycle 10s ease-in-out infinite}
@@ -180,15 +181,15 @@ CSS2 = """/* Google Reviews badge: top right, beside the logo on a phone, after 
 .gb-g{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px}
 .gb-g img{display:block;width:100%;height:auto;padding-bottom:3px;border-bottom:1px solid #e7e5e4}
 .gbadge .gb-pic{display:block;width:100%;height:100%;object-fit:cover;background:#fff}
-.gb-n{font-size:16px;font-weight:800;color:#1c1917;margin:3px 0 2px;font-variant-numeric:tabular-nums}
-.gb-stars{position:relative;display:block;font-size:10px;letter-spacing:0;white-space:nowrap}
+.gb-n{font-size:16px;font-size:25cqw;font-weight:800;color:#1c1917;margin:3px 0 2px;font-variant-numeric:tabular-nums}
+.gb-stars{position:relative;display:block;font-size:10px;font-size:15.5cqw;letter-spacing:0;white-space:nowrap}
 .gb-stars i{font-style:normal;display:block;color:#d6d3d1}
 .gb-stars i+i{position:absolute;inset:0 auto 0 0;overflow:hidden;color:#f5b301;width:calc(var(--r) / 5 * 100%)}
 @media (min-width:900px){
   .mast-top{display:contents}
   .mast .mast-top .logo{order:0;width:314px;max-height:108px}
   .mast .callrow{order:1;margin-left:auto}
-  .gbadge{order:2;width:84px;height:108px}
+  .gbadge{order:2;width:84px;height:108px;aspect-ratio:auto}
   .gb-g{padding:6px}
   .gb-n{font-size:21px}
   .gb-stars{font-size:13px}
