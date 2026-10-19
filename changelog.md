@@ -7,6 +7,21 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v1.6 — 20 Oct 2026
+
+**New homepage layout, one screen, no scrolling.** Logo and a cycling trust badge on
+top (Google 4.7, Justdial Users' Choice 2026, Justdial stars, Goibibo 4.4, MakeMyTrip
+4.3, 2 seconds each), Booking and Reception numbers that open the phone dialer, then
+Reserve now, the photo slider, Talk with Shenba and Chat with Shenba. On a computer the
+photos are on the left and Shenba and Reserve now on the right. Shenba no longer floats
+over the page, so nothing is covered.
+
+**New — photo slider.** Each photo wipes in with a slow zoom, with a row of small photos
+underneath to jump to any room; swipe and full-size tap still work.
+
+**New — touches.** Sharper logo with a magnifying lens gliding over it on computers;
+on phones Reserve now has a light sweep and a pulsing ring.
+
 ## v1.5 — 19 Oct 2026
 
 **New — two floating Shenba buttons.** Chat with Shenba (left, green) and Talk with
