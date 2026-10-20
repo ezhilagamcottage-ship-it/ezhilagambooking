@@ -1451,7 +1451,7 @@ window.__saCard = { cardMerge, cardReset };   /* used by the preview only */
    while she speaks stops her and lets the guest talk. `voice` is a small stand-in object with the two readings the lip
    sync above already uses (volume and frequency bands of her voice). The mic question is asked only after the tap. */
 let ac = null, mic = null, micAn = null, outAn = null, src = null, rec = null, session = "", playDone = null;
-const MAX_TURN_MS = 20000, SILENCE_MS = 1100, NOBODY_MS = 30000;
+const MAX_TURN_MS = 20000, SILENCE_MS = 700, NOBODY_MS = 30000;   // 21 Oct: 0.7 s of quiet ends the guest's turn (was 1.1 s)
 function b64ToBuf(b64) { const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u.buffer; }
 function blobToB64(blob) { return new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1] || ""); r.onerror = no; r.readAsDataURL(blob); }); }
 const td = new Float32Array(2048);
