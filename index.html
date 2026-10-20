@@ -1275,11 +1275,12 @@ $("sbForm").addEventListener("submit", async ev => {
   catch (e) { toWhatsApp(); }
 });
 
-$("sbChatX").addEventListener("click", () => closeDlg($("sbChat")));
+$("sbChatX").addEventListener("click", () => { closeDlg($("sbChat")); bye(chat); });
+addEventListener("pagehide", () => { bye(chat); bye(session); });
 $("sbLog").addEventListener("click", e => { if (e.target.dataset.talk) { e.preventDefault(); goVoice(); } });
 $("sbToVoice").addEventListener("click", () => goVoice());
 
-async function endChat() { chat = null; }
+async function endChat() { bye(chat); chat = null; }
 
 async function goVoice() {
   closeDlg($("sbChat"));
@@ -1541,7 +1542,10 @@ async function startVoice() {
     else saWhatsApp("Voice is not available right now.");
   } finally { starting = false; }
 }
+/* tells the server the call or chat is over, so it can note the enquiry if Shenba had the guest's number (v1.7) */
+function bye(id) { if (!id) return; try { navigator.sendBeacon(API + "/end", JSON.stringify({ session: id })); } catch (e) {} }
 async function endVoice(msg) {
+  bye(session);
   calling = false;
   stopPlay();
   if (rec) { try { rec.stop(); } catch (e) {} }
