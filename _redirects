@@ -14,3 +14,6 @@
 
 # Shenba (voice + chat) page, branded. Linked from WhatsApp messages.
 /shenba       /shenba.html  200
+
+# Checkout page for a room Shenba has held (WhatsApp link + Razorpay return). 21 Oct 2026.
+/pay          /pay.html     200

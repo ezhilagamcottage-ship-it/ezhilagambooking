@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your booking · Kutralam Ezhilagam</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#faf9f7">
+<meta property="og:title" content="Your room at Kutralam Ezhilagam">
+<meta property="og:description" content="Booking details and secure payment">
+<meta property="og:image" content="img/ke-facade.webp">
+<link rel="icon" href="img/logo.webp">
+<link rel="preload" as="image" href="img/logo-hd.webp">
+<style>
+/* Checkout page for a room Shenba has held (Rakesh, 21 Oct 2026): the guest's WhatsApp link and Razorpay's
+   return address both land here, so the guest sees the hotel's own page, not a bare payment form. The palette
+   and type are the website's. Data: Prime ?action=voiceCard&q=<quote id> (read-only, no phone or email). */
+:root{
+  --ink:#1c1917; --mute:#78716c; --faint:#a8a29e; --line:#e7e5e4;
+  --bg:#faf9f7; --card:#fff;
+  --brand:#047857; --brand-dk:#065f46; --gold:#b45309; --gold-lt:#d9a441;
+  --r:16px;
+  --serif:"Cormorant Garamond","Times New Roman",Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:400 15px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:440px;margin:0 auto;padding:20px 16px 36px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:12px}
+
+.mast{text-align:center;margin-bottom:16px}
+.mast a{display:inline-block}
+.mast img{height:52px;width:auto;display:block;margin:0 auto}
+.rule{display:flex;align-items:center;gap:10px;margin:12px auto 0;max-width:170px}
+.rule::before,.rule::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-lt),transparent)}
+.rule i{width:5px;height:5px;transform:rotate(45deg);background:var(--gold-lt)}
+.kick{margin:10px 0 0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+
+/* status strip */
+.st{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;margin-bottom:12px;
+  border:1px solid var(--line);background:var(--card)}
+.st .ic{width:38px;height:38px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  font-size:19px;font-weight:700;color:#fff}
+.st b{display:block;font-size:15.5px;line-height:1.25}
+.st>div>span{display:block;font-size:13px;color:var(--mute);margin-top:1px}
+.st.hold{background:#fffbeb;border-color:#fde68a}.st.hold .ic{background:var(--gold)}
+.st.ok{background:#ecfdf5;border-color:#a7f3d0}.st.ok .ic{background:var(--brand)}
+.st.wait .ic{background:var(--gold)}
+.st.bad{background:#fef2f2;border-color:#fecaca}.st.bad .ic{background:#b91c1c}
+.clock{font-variant-numeric:tabular-nums;font-weight:800;color:var(--gold)}
+.sp{width:18px;height:18px;border:2.5px solid #fff;border-top-color:transparent;border-radius:50%;animation:r 1s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+
+/* the cart */
+.cart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+  box-shadow:0 1px 2px rgba(28,25,23,.04),0 8px 24px rgba(28,25,23,.06)}
+.item{display:flex;gap:13px;padding:14px;align-items:center}
+.ph{width:92px;height:92px;flex:none;border-radius:12px;overflow:hidden;background:#e9e6e2;position:relative}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph em{position:absolute;left:6px;bottom:6px;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.06em;
+  background:rgba(28,25,23,.72);color:#fff;padding:2px 7px;border-radius:99px}
+.item h2{margin:0;font-family:var(--serif);font-size:25px;line-height:1.05;font-weight:700;letter-spacing:.01em}
+.item .sub{font-size:12.5px;color:var(--mute);margin-top:3px}
+.item .dt{font-size:13px;font-weight:600;margin-top:7px;color:var(--brand-dk)}
+.sec{border-top:1px dashed var(--line);padding:12px 14px}
+.row{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:4px 0}
+.row span:first-child{color:var(--mute)}
+.row span:last-child{text-align:right;font-weight:600}
+.tot{display:flex;justify-content:space-between;align-items:baseline;padding:13px 14px;background:#f5f3ef;border-top:1px solid var(--line)}
+.tot b{font-size:14px}.tot small{display:block;font-size:11.5px;color:var(--mute);font-weight:400}
+.tot strong{font-size:24px;font-weight:800;letter-spacing:-.01em}
+.ref{font-size:11.5px;color:var(--faint);text-align:center;padding:9px 0 0;letter-spacing:.04em}
+
+.pay{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;margin-top:14px;padding:15px 18px;
+  border:0;border-radius:14px;background:var(--brand);color:#fff;font:700 16.5px/1.2 inherit;font-family:inherit;
+  text-decoration:none;box-shadow:0 6px 18px rgba(4,120,87,.28);cursor:pointer}
+.pay:active{background:var(--brand-dk);transform:translateY(1px)}
+.pay svg{width:18px;height:18px}
+.trust{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 12px;margin-top:10px;font-size:11.5px;color:var(--mute)}
+.trust span{display:flex;align-items:center;gap:4px}
+.note{margin-top:12px;font-size:13px;color:var(--mute);line-height:1.55;text-align:center}
+.note.ok{background:#ecfdf5;color:#065f46;border-radius:12px;padding:12px;text-align:left}
+.ghost{display:block;text-align:center;margin-top:12px;padding:13px;border-radius:14px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink);font-weight:700;text-decoration:none}
+
+.foot{text-align:center;color:var(--mute);font-size:12.5px;margin-top:22px;line-height:1.7}
+.foot a{color:var(--ink);font-weight:600;text-decoration:none}
+.skel{height:280px;border-radius:var(--r);background:linear-gradient(90deg,#efece7 0%,#f7f5f1 50%,#efece7 100%);
+  background-size:200% 100%;animation:sk 1.2s ease-in-out infinite}
+@keyframes sk{to{background-position:-200% 0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <a href="/"><img src="img/logo-hd.webp" alt="Kutralam Ezhilagam" width="484" height="163"></a>
+    <div class="rule"><i></i></div>
+    <p class="kick" id="kick">Your booking</p>
+  </header>
+  <main id="app"><div class="skel"></div></main>
+  <footer class="foot">
+    Plot 46, Five Falls Main Road, Vairams Nagar, Courtallam 627802<br>
+    Booking <a href="tel:+919962222415">99622 22415</a> · Reception <a href="tel:+918248320685">082483 20685</a>
+  </footer>
+</div>
+<script>
+"use strict";
+const PRIME = "https://script.google.com/macros/s/AKfycbwUVyNn9AIKvCpF2SQRsTqyepZgqwhOIeWCJt25YT5wyC3pp0fWayuTSDTvlwmD24Ww/exec";
+const ROOMS = {   // first photo of each room, from the booking page's rate card
+  Aambal:   ["1Q0XMZxhI0p9kvVHtaPquFPk4cdkuUdL6", "Studio · Ground floor"],
+  Thillai:  ["19sS4VUH5c9rmW_Q2x9QC8WkU5A8ADOhu", "Studio · Ground floor"],
+  Marutham: ["1rVz-A0WTs4YtjLGUn8CYuHuAQ3pGKKlg", "Studio · Second floor · Balcony"],
+  Mullai:   ["1BYNx533kDTUQ3hvmVKwZPdCAU4IuW8tA", "Studio · Second floor · Quiet side"],
+  Paalai:   ["1w0pfUMNecnKvaQSMN4pzXs66nrxZa_Vn", "Studio · First floor"],
+  Kurinji:  ["1BQUwK1qb5HTYFXqflPSXprEFF20MMNhV", "Studio · Second floor · Mountain view"],
+  Shenbagam:["1D45yMWOpOViryCRSuiYRbIH9921v3Ek-", "Suite · First floor · Kitchen"],
+  Mavval:   ["1BeUaSgD6X35Hs1MiGZLDhZL1wcKtVeBD", "Suite · First floor"],
+  Vaagai:   ["1nkvq8Ft_f-LtukBmDOTeSijV1Eq2XbEL", "Suite · Ground floor · Largest room"]
+};
+const qs = new URLSearchParams(location.search);
+const id = (qs.get("q") || qs.get("id") || "").replace(/[^a-f0-9]/gi, "").slice(0, 40);
+const fromPay = qs.has("razorpay_payment_id") || qs.has("razorpay_payment_link_status");
+const app = document.getElementById("app");
+let data = null, tick = null, polls = 0;
+
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const inr = n => "₹" + Math.round(Number(n) || 0).toLocaleString("en-IN");
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DAY = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function day(iso, long) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ""); if (!m) return esc(iso);
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  return DAY[d.getUTCDay()] + ", " + (+m[3]) + " " + MON[+m[2] - 1] + (long ? " " + m[1] : "");
+}
+function photo(room) {
+  const r = ROOMS[room];
+  return r ? "https://drive.google.com/thumbnail?id=" + r[0] + "&sz=w400" : "img/ke-ac-room.webp";
+}
+
+function status(d) {
+  const s = d.status;
+  if (s === "confirmed") return `<div class="st ok"><div class="ic">✓</div><div><b>Payment successful</b><span>Your booking is confirmed${d.booking_id ? " · ID " + esc(d.booking_id) : ""}</span></div></div>`;
+  if (s === "pending_payment" && fromPay) return `<div class="st wait"><div class="ic"><div class="sp"></div></div><div><b>Confirming your payment…</b><span>This takes a few seconds. Please keep this page open.</span></div></div>`;
+  if (s === "pending_payment" && d.pay_url) return `<div class="st hold"><div class="ic">⏳</div><div><b>Room held for you</b><span>Pay within <span class="clock" id="clock">--:--</span> to confirm (until ${esc(d.hold_until)})</span></div></div>`;
+  if (s === "needs_review") return `<div class="st wait"><div class="ic">✓</div><div><b>Payment received</b><span>Our team will call you shortly to complete your booking</span></div></div>`;
+  if (s === "quoted") return `<div class="st wait"><div class="ic">₹</div><div><b>Your tariff</b><span>Not reserved yet</span></div></div>`;
+  return `<div class="st bad"><div class="ic">!</div><div><b>${s === "cancelled" ? "Hold cancelled" : "Hold expired"}</b><span>The room was released. Please call us to book again.</span></div></div>`;
+}
+
+function render(d) {
+  data = d;
+  const nights = Math.max(1, Number(d.nights) || 1);
+  const per = Math.round((Number(d.total) || 0) / nights);
+  const guests = (d.adults || 0) + ((d.adults || 0) === 1 ? " adult" : " adults") +
+    (d.children ? ", " + d.children + (d.children === 1 ? " child" : " children") : "");
+  const sub = (ROOMS[d.room] ? ROOMS[d.room][1] : "Room") + " · " + (d.ac === "AC" ? "AC" : "Non-AC");
+  const paid = d.status === "confirmed";
+  const canPay = d.status === "pending_payment" && d.pay_url && !fromPay;
+  document.getElementById("kick").textContent = paid ? "Booking confirmed" : canPay ? "Review & pay" : "Your booking";
+  app.innerHTML = status(d) + `
+  <section class="cart" aria-label="Booking summary">
+    <div class="item">
+      <div class="ph"><img src="${photo(d.room)}" alt="${esc(d.room)} room" onerror="this.src='img/ke-ac-room.webp'"><em>${d.ac === "AC" ? "AC" : "NON-AC"}</em></div>
+      <div>
+        <h2>${esc(d.room)}</h2>
+        <div class="sub">${esc(sub)}</div>
+        <div class="dt">${day(d.check_in)} → ${day(d.check_out)}</div>
+      </div>
+    </div>
+    <div class="sec">
+      ${paid && d.booking_id ? `<div class="row"><span>Booking ID</span><span>${esc(d.booking_id)}</span></div>` : ""}
+      <div class="row"><span>Guest</span><span>${esc(d.guest_name)}</span></div>
+      <div class="row"><span>Check-in</span><span>${day(d.check_in, true)} · 12 noon</span></div>
+      <div class="row"><span>Check-out</span><span>${day(d.check_out, true)} · 10 am</span></div>
+      <div class="row"><span>Guests</span><span>${esc(guests)}</span></div>
+    </div>
+    <div class="sec">
+      <div class="row"><span>${inr(per)} × ${nights} ${nights === 1 ? "night" : "nights"}${nights > 1 ? " (avg)" : ""}</span><span>${inr(d.total)}</span></div>
+      <div class="row"><span>Taxes</span><span>Included</span></div>
+    </div>
+    <div class="tot"><b>${paid ? "Amount paid" : "Total payable"}<small>incl. all taxes</small></b><strong>${inr(d.total)}</strong></div>
+  </section>
+  ${d.reference ? `<div class="ref">REF ${esc(d.reference)}</div>` : ""}
+  ${canPay ? `<a class="pay" id="pay" href="${esc(d.pay_url)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Pay ${inr(d.total)} securely</a>
+  <div class="trust"><span>🔒 Secured by Razorpay</span><span>UPI · Cards · Netbanking</span></div>
+  <p class="note">Your booking is confirmed only after payment. The voucher comes to your WhatsApp right after.</p>` : ""}
+  ${paid ? `<p class="note ok">Your reservation voucher has been sent to your WhatsApp. Please show it at check-in with an original photo ID for every adult. See you in Courtallam!</p>
+  <a class="ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Kutralam+Ezhilagam+Courtallam">📍 Directions to the hotel</a>` : ""}
+  ${/expired|cancelled/.test(d.status) ? `<a class="ghost" href="tel:+919962222415">📞 Call the booking team</a>` : ""}`;
+  startClock();
+}
+
+function startClock() {
+  clearInterval(tick);
+  const el = document.getElementById("clock");
+  if (!el || !data || !data.hold_ms) { if (el) el.textContent = data && data.hold_until || ""; return; }
+  const f = () => {
+    const left = Math.max(0, Number(data.hold_ms) - Date.now());
+    const m = Math.floor(left / 60000), s = Math.floor(left / 1000) % 60;
+    el.textContent = m + ":" + String(s).padStart(2, "0");
+    if (!left) { clearInterval(tick); load(); }
+  };
+  f(); tick = setInterval(f, 1000);
+}
+
+function fail(msg) {
+  app.innerHTML = `<div class="st bad"><div class="ic">!</div><div><b>${esc(msg)}</b><span>Please call our booking team on 99622 22415.</span></div></div>
+  <a class="ghost" href="tel:+919962222415">📞 Call the booking team</a>`;
+}
+
+async function load() {
+  if (qs.get("demo") === "1") return render({ status: qs.get("s") || "pending_payment", room: qs.get("room") || "Marutham", ac: "AC",
+    guest_name: "Rakesh", check_in: "2026-10-22", check_out: "2026-10-24", nights: 2, adults: 2, children: 0, total: 5198,
+    reference: "V1012", pay_url: "#", hold_until: "6:45 PM", hold_ms: Date.now() + 14 * 60000, booking_id: "EZ-2210" });
+  if (!/^[a-f0-9]{32}$/i.test(id)) return fail("This link is not complete");
+  try {
+    const r = await fetch(PRIME + "?action=voiceCard&q=" + id, { cache: "no-store" });
+    const d = await r.json();
+    if (!d || d.ok === false || d.status === "none" || d.status === "bad_request") return fail("This link is not valid");
+    render(d);
+    if (d.status === "pending_payment" && (fromPay || !d.pay_url) && polls++ < 40) setTimeout(load, 4000);
+  } catch (e) {
+    if (polls++ < 5) setTimeout(load, 3000); else fail("Could not load your booking");
+  }
+}
+load();
+</script>
+</body></html>
