@@ -7,6 +7,15 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v1.7 — 20 Oct 2026
+
+**Shenba works without ElevenLabs.** Talk with Shenba and Chat with Shenba now run on our
+own server: what the guest says is turned into text by Google, Shenba answers with the
+same prompt, knowledge and live room, price and booking tools as before (Claude), and she
+speaks in her Google voice (Leda: warm, smiling, Chennai-style Tanglish). The booking card
+and Proceed to pay work as before. Tap her face while she speaks to interrupt her. The old
+/shenba link opens her on the homepage.
+
 ## v1.6 — 20 Oct 2026
 
 **New homepage layout, one screen, no scrolling.** Logo and a cycling trust badge on

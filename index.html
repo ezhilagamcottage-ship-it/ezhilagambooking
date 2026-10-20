@@ -235,7 +235,7 @@ dialog.sb::backdrop{background:rgba(12,10,9,.55)}
   color:var(--gold);font:inherit;font-weight:800;font-size:14px;padding:11px;cursor:pointer}
 /* ── Shenba avatar dock (v1.4) ────────────────────────────────────────────
    The one voice launcher on the page. Tap her face to start the call, tap
-   again to end it. Same ElevenLabs agent and tools as before; the old orb
+   again to end it. Same Shenba brain and tools as before (v1.7: our own server, no ElevenLabs); the old orb
    pop-up is gone. She floats above the page, never over the booking button
    (she moves to the top while it is under her), and can be shrunk to a dot. */
 /* v1.5: Chat (left) and Talk (right) float together at the foot of the screen */
@@ -1166,13 +1166,13 @@ go(0, false);
 start();
 </script>
 <script type="module">
-/* ── Shenba: text chat and voice, both the same ElevenLabs agent ───────────
-   The agent already has the live room / price / enquiry tools, so the website
-   chat answers exactly like the voice line. The SDK loads only on first tap. */
-const AGENT = "agent_2101m57dd7z8fvnva0erjk0h0va2";
-const SDK = "https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.28.0/+esm";
+/* ── Shenba: text chat and voice ───────────────────────────────────────────
+   v1.7 (20 Oct 2026): no ElevenLabs. Both talk to our own server (shenba_tts / web.js on the VPS): her words come
+   from Claude with the same prompt, knowledge and live room / price / booking tools as before, her voice is
+   Google's Leda, and what the guest says is turned into text by Google. Nothing secret is in this page. */
+const API = "https://n8n.ezhilagam.cloud/shenba-web";
 const VOICE_LINK = "https://n8n.ezhilagam.cloud/webhook/shenba";
-/* Fallback: if the website Shenba (ElevenLabs) is switched off or stops working —
+/* Fallback: if the website Shenba is switched off or stops working —
    e.g. the subscription runs out — guests chat with WhatsApp Shenba instead,
    on the rockyjio number. Set SHENBA_WEB = false to send everyone there. */
 const SHENBA_WEB = true;
@@ -1192,7 +1192,7 @@ const CONTEXT =
   "Online booking: https://ezhilagam.cloud/book . Booking team 99622 22415, reception 082483 20685.";
 
 const $ = id => document.getElementById(id);
-let mod, chat = null, voice = null, history = [], typingEl = null, fellBack = false;
+let chat = null, voice = null, history = [], typingEl = null, fellBack = false;
 function toWhatsApp(note) {
   if (fellBack) return; fellBack = true;
   chat = null;
@@ -1200,7 +1200,13 @@ function toWhatsApp(note) {
   stat("Opening WhatsApp…");
   setTimeout(() => { location.href = WA_SHENBA; }, 1200);
 }
-const sdk = async () => (mod ||= await import(SDK));
+async function api(path, body) {
+  const r = await fetch(API + path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 410) { const e = new Error("gone"); e.gone = true; throw e; }
+  if (!r.ok || j.ok === false) throw new Error(j.error || ("HTTP " + r.status));
+  return j;
+}
 
 const openDlg = d => { try { d.showModal(); } catch (e) { d.setAttribute("open", ""); } };
 const closeDlg = d => { try { d.close(); } catch (e) { d.removeAttribute("open"); } };
@@ -1229,23 +1235,21 @@ function typing() {
 }
 const stat = t => { $("sbChatStat").textContent = t; };
 
+/* chat = the server session id. A resumed chat (session expired) carries the last lines so Shenba knows them. */
 async function startChat(resume) {
   stat("Connecting…");
-  const { Conversation } = await sdk();
-  const first = resume ? "I'm back 🙂 Please go on — where were we?" : OPENING;
-  chat = await Conversation.startSession({
-    agentId: AGENT,
-    textOnly: true,
-    overrides: { agent: { firstMessage: first }, conversation: { textOnly: true } },
-    onMessage: m => { if ((m.role || m.source) !== "user") add("ai", m.message); },
-    onStatusChange: s => stat(s.status === "connected" ? "Online · usually replies in seconds" : "Front desk · Kutralam Ezhilagam"),
-    onDisconnect: d => { chat = null;
-      if (d && d.reason === "error") toWhatsApp();
-      else stat("Chat paused — send a message to continue"); },
-    onError: () => toWhatsApp()
-  });
-  chat.sendContextualUpdate(CONTEXT + (resume && history.length
-    ? " Earlier in this chat:\n" + history.slice(-12).join("\n") : ""));
+  const opening = resume && history.length ? "Earlier in this chat:\n" + history.slice(-12).join("\n") : OPENING;
+  const j = await api("/start", { mode: "chat", opening });
+  chat = j.session;
+  if (!resume) add("ai", OPENING);
+  stat("Online · usually replies in seconds");
+}
+async function chatSend(t) {
+  if (!chat) await startChat(true);
+  let j;
+  try { j = await api("/turn", { session: chat, text: t }); }
+  catch (e) { if (!e.gone) throw e; chat = null; await startChat(true); j = await api("/turn", { session: chat, text: t }); }
+  add("ai", j.reply || "Sorry, could you say that again?");
 }
 
 $("chatBtn").addEventListener("click", async () => {
@@ -1267,17 +1271,15 @@ $("sbForm").addEventListener("submit", async ev => {
   $("sbIn").value = "";
   add("me", t);
   typing();
-  try {
-    if (!chat) await startChat(true);
-    chat.sendUserMessage(t);
-  } catch (e) { toWhatsApp(); }
+  try { await chatSend(t); }
+  catch (e) { toWhatsApp(); }
 });
 
 $("sbChatX").addEventListener("click", () => closeDlg($("sbChat")));
 $("sbLog").addEventListener("click", e => { if (e.target.dataset.talk) { e.preventDefault(); goVoice(); } });
 $("sbToVoice").addEventListener("click", () => goVoice());
 
-async function endChat() { if (chat) { try { await chat.endSession(); } catch (e) {} chat = null; } }
+async function endChat() { chat = null; }
 
 async function goVoice() {
   closeDlg($("sbChat"));
@@ -1441,53 +1443,119 @@ function openCall(start) {
 }
 window.__saCard = { cardMerge, cardReset };   /* used by the preview only */
 
-/* mic permission is asked only here, after the guest taps */
+/* ── the call (v1.7, our own server) ──
+   Turn by turn: she speaks (her Leda voice comes back from the server as audio), then she listens. The phone's mic is
+   read only while she listens, so she never hears herself. A turn ends after about a second of quiet; the recording goes
+   to the server, which turns it into text, asks her brain, and sends back her words and her voice. Tapping her face
+   while she speaks stops her and lets the guest talk. `voice` is a small stand-in object with the two readings the lip
+   sync above already uses (volume and frequency bands of her voice). The mic question is asked only after the tap. */
+let ac = null, mic = null, micAn = null, outAn = null, src = null, rec = null, session = "", playDone = null;
+const MAX_TURN_MS = 20000, SILENCE_MS = 1100, NOBODY_MS = 30000;
+function b64ToBuf(b64) { const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u.buffer; }
+function blobToB64(blob) { return new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1] || ""); r.onerror = no; r.readAsDataURL(blob); }); }
+const td = new Float32Array(2048);
+function level(an) { an.getFloatTimeDomainData(td); let t = 0; for (let i = 0; i < td.length; i++) t += td[i] * td[i]; return Math.sqrt(t / td.length); }
+
+function play(b64) {
+  return new Promise(async ok => {
+    playDone = ok;
+    if (!b64 || !calling) return ok();
+    try {
+      const buf = await ac.decodeAudioData(b64ToBuf(b64));
+      if (!calling) return ok();
+      src = ac.createBufferSource(); src.buffer = buf; src.connect(outAn);
+      src.onended = () => { src = null; playDone = null; ok(); };
+      saState("speaking", "Shenba is speaking… tap her to interrupt");
+      lipSync();
+      src.start();
+    } catch (e) { src = null; ok(); }
+  });
+}
+function stopPlay() {
+  if (src) { try { src.onended = null; src.stop(); } catch (e) {} src = null; }
+  if (playDone) { const d = playDone; playDone = null; d(); }
+}
+
+/* records one guest turn; resolves with a Blob, or null if nobody spoke */
+function listen() {
+  return new Promise(ok => {
+    if (!calling) return ok(null);
+    saState("listening", "Listening… go ahead");
+    const type = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"].find(t => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || "";
+    const chunks = []; let spoke = false, loudFor = 0, quiet = 0, floor = 0, n = 0;
+    const t0 = performance.now();
+    rec = new MediaRecorder(mic, type ? { mimeType: type } : undefined);
+    rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = () => { rec = null; ok(spoke && chunks.length ? new Blob(chunks, { type: chunks[0].type || type || "audio/webm" }) : null); };
+    rec.start(250);
+    const tick = () => {
+      if (!rec) return;
+      if (!calling) { rec.stop(); return; }
+      const v = level(micAn), now = performance.now();
+      if (n < 6) { floor = (floor * n + v) / (n + 1); n++; }
+      const thr = Math.max(0.012, floor * 3);
+      if (v > thr) { loudFor += 50; quiet = 0; if (loudFor >= 150) spoke = true; }
+      else { loudFor = 0; quiet += 50; }
+      if ((spoke && quiet >= SILENCE_MS) || now - t0 > MAX_TURN_MS || (!spoke && now - t0 > NOBODY_MS)) { rec.stop(); return; }
+      setTimeout(tick, 50);
+    };
+    setTimeout(tick, 50);
+  });
+}
+
 async function startVoice() {
   if (calling || starting) return;
   starting = true; calling = true;
   setMini(false);
   saState("connecting", "Connecting…");
   try {
-    await navigator.mediaDevices.getUserMedia({ audio: true });
-    const { Conversation } = await sdk();
-    voice = await Conversation.startSession({
-      agentId: AGENT,
-      connectionType: "webrtc",
-      /* display only: Shenba shows each detail on this page as she learns it (no booking happens here) */
-      clientTools: { show_booking_details: async p => { cardMerge(p); return "shown"; } },
-      onModeChange: m => {
-        if (!calling) return;
-        const sp = m.mode === "speaking";
-        saState(sp ? "speaking" : "listening", sp ? "Shenba is speaking…" : "Listening… go ahead");
-        if (sp) lipSync(); 
-      },
-      onDisconnect: () => { voice = null; calling = false; saState("idle", "Call ended · tap Shenba to talk again"); if (convId && !cardFinal) cardPoll(); },
-      onError: () => { voice = null; calling = false; saState("error"); saWhatsApp("Voice is not available right now."); }
-    });
-    if (!calling) { try { await voice.endSession(); } catch (e) {} voice = null; }
-    else {
-      saState("listening", "Listening… go ahead");
-      try { convId = typeof voice.getId === "function" ? voice.getId() : ""; } catch (e) { convId = ""; }
-      cardPoll();
+    mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === "suspended") await ac.resume();
+    micAn = ac.createAnalyser(); micAn.fftSize = 4096; ac.createMediaStreamSource(mic).connect(micAn);
+    outAn = ac.createAnalyser(); outAn.fftSize = 1024; outAn.smoothingTimeConstant = .3; outAn.connect(ac.destination);
+    const fq = new Uint8Array(outAn.frequencyBinCount);
+    voice = { getOutputVolume: () => level(outAn) * 2.2, getOutputByteFrequencyData: () => { outAn.getByteFrequencyData(fq); return fq; } };
+    const j = await api("/start", { mode: "voice" });
+    session = j.session; convId = j.conversation_id || ""; cardPoll();
+    starting = false;
+    await play(j.audio_b64);
+    while (calling) {
+      const blob = await listen();
+      if (!calling) break;
+      if (!blob) { saState("listening", "Still there? Tap Shenba to talk again"); await endVoice("Call ended · tap Shenba to talk again"); break; }
+      saState("connecting", "Shenba is thinking…");
+      let r;
+      try { r = await api("/turn", { session, audio_b64: await blobToB64(blob), audio_mime: blob.type }); }
+      catch (e) { if (e.gone) { await endVoice("Call ended · tap Shenba to talk again"); break; } throw e; }
+      if (!calling) break;
+      if (r.card) cardMerge(r.card);
+      if (r.silent || !r.reply) continue;
+      await play(r.audio_b64);
+      if (r.end) { await endVoice("Call ended · thank you!"); break; }
     }
   } catch (e) {
-    voice = null; calling = false;
+    calling = false; stopPlay(); if (rec) { try { rec.stop(); } catch (x) {} }
     saState("error");
     if (e && e.name === "NotAllowedError") { $("saStat").textContent = "Mic blocked · call 99622 22415"; $("scStat").textContent = "Microphone is blocked. Allow it in your browser, or call 99622 22415."; }
     else saWhatsApp("Voice is not available right now.");
   } finally { starting = false; }
 }
-async function endVoice() {
+async function endVoice(msg) {
   calling = false;
-  if (voice) { try { await voice.endSession(); } catch (e) {} voice = null; }
-  saState("idle", $("sbCall").open ? "Call ended · tap Shenba to talk again" : "Tap her face to talk");
+  stopPlay();
+  if (rec) { try { rec.stop(); } catch (e) {} }
+  if (mic) { mic.getTracks().forEach(t => t.stop()); mic = null; }
+  voice = null; session = "";
+  saState("idle", typeof msg === "string" ? msg : ($("sbCall").open ? "Call ended · tap Shenba to talk again" : "Tap her face to talk"));
+  if (convId && !cardFinal) cardPoll();
 }
 
 /* Talk opens the call page; the call (and the mic question) starts with that tap */
 face.addEventListener("click", async () => { await endChat(); openCall(true); });
 dock.addEventListener("click", e => { if (!face.contains(e.target) && !$("saMin").contains(e.target)) face.click(); });
-$("scFace").addEventListener("click", () => { if (!calling && !starting) startVoice(); });
-$("scEnd").addEventListener("click", endVoice);
+$("scFace").addEventListener("click", () => { if (src) { stopPlay(); return; } if (!calling && !starting) startVoice(); });
+$("scEnd").addEventListener("click", () => endVoice());
 $("scX").addEventListener("click", async () => { await endVoice(); clearTimeout(cardTimer); closeDlg($("sbCall")); });
 $("sbCall").addEventListener("close", () => { if (calling) endVoice(); clearTimeout(cardTimer); });
 
