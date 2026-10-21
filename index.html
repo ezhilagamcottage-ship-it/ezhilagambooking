@@ -1521,14 +1521,28 @@ async function startVoice() {
     session = j.session; convId = j.conversation_id || ""; cardPoll();
     starting = false;
     await play(j.audio_b64);
+    let fails = 0;
     while (calling) {
       const blob = await listen();
       if (!calling) break;
       if (!blob) { saState("listening", "Still there? Tap Shenba to talk again"); await endVoice("Call ended · tap Shenba to talk again"); break; }
       saState("connecting", "Shenba is thinking…");
       let r;
-      try { r = await api("/turn", { session, audio_b64: await blobToB64(blob), audio_mime: blob.type }); }
-      catch (e) { if (e.gone) { await endVoice("Call ended · tap Shenba to talk again"); break; } throw e; }
+      /* 21 Oct 2026: one failed turn (network blip, server busy) no longer ends the call - retry, then keep listening */
+      const b64 = await blobToB64(blob);
+      let gone = false;
+      for (let k = 0; k < 2 && !r && !gone; k++) {
+        try { r = await api("/turn", { session, audio_b64: b64, audio_mime: blob.type }); }
+        catch (e) { if (e.gone) gone = true; else if (k === 0) await new Promise(z => setTimeout(z, 1500)); }
+      }
+      if (gone) { await endVoice("Call ended · tap Shenba to talk again"); break; }
+      if (!r && !calling) break;
+      if (!r) {
+        if (++fails >= 3) throw new Error("turn failed");
+        saState("listening", "Sorry, I missed that. Please say it again");
+        continue;
+      }
+      fails = 0;
       if (!calling) break;
       if (r.card) cardMerge(r.card);
       if (r.silent || !r.reply) continue;

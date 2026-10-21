@@ -7,6 +7,15 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v1.8 — 21 Oct 2026
+
+**No call time limit on Talk with Shenba.** Shenba stays on the call until the booking is held,
+the enquiry is noted, or the guest says bye. Only after 4 minutes of off-topic questions does she
+politely end it. A single network or server hiccup no longer ends the call: she asks the guest to
+say it again. New branded checkout page /pay for rooms Shenba holds.
+
+---
+
 ## v1.7 — 20 Oct 2026
 
 **Shenba works without ElevenLabs.** Talk with Shenba and Chat with Shenba now run on our
