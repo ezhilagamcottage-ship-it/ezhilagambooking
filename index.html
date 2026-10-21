@@ -342,7 +342,7 @@ dialog.sc{height:100dvh;max-height:100dvh;max-width:480px;margin:0 auto;border-r
 .sc-end{border:0;border-radius:14px;padding:0 16px;min-height:52px;background:#b91c1c;color:#fff;font:inherit;font-weight:800;cursor:pointer}
 .sc-end[hidden]{display:none}
 /* 22 Oct 2026: the guest types the mobile number (no voice mistakes) and confirms it with a WhatsApp code */
-dialog.ph{max-width:360px;width:calc(100% - 32px);border:0;border-radius:20px;padding:20px 18px 16px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog.ph{margin:max(14px,env(safe-area-inset-top)) auto auto;max-width:360px;width:calc(100% - 32px);border:0;border-radius:20px;padding:20px 18px 16px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
 dialog.ph::backdrop{background:rgba(28,25,23,.45)}
 .ph h4{margin:0 0 4px;font-size:17px}
 .ph p{margin:0 0 12px;font-size:13px;color:var(--mute);line-height:1.45}
@@ -360,7 +360,24 @@ dialog.ph::backdrop{background:rgba(28,25,23,.45)}
 .ph-alt{display:block;margin-top:10px;text-align:center;font-size:12.5px;color:var(--mute);background:none;border:0;width:100%;text-decoration:underline;cursor:pointer}
 .sc-row b s{color:var(--faint);font-weight:500;font-size:13px;margin-right:6px}
 .sc-row.save b{color:#b45309}
+.sc-row[hidden]{display:none}
 .sc-row b .vf{color:var(--brand);font-size:12px;margin-left:4px}
+/* 22 Oct 2026: leaving while Shenba is taking details asks first - OK on the left, Stay (default) on the right */
+dialog.lv{margin:auto;max-width:340px;width:calc(100% - 40px);border:0;border-radius:18px;padding:20px 18px 16px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog.lv::backdrop{background:rgba(28,25,23,.5)}
+.lv h4{margin:0 0 6px;font-size:16.5px}.lv p{margin:0 0 14px;font-size:13.5px;color:var(--mute);line-height:1.45}
+.lv-b{display:flex;gap:8px}.lv-b button{flex:1;min-height:46px;border-radius:12px;border:0;font:inherit;font-weight:800;cursor:pointer}
+.lv-ok{background:#f5f5f4;color:#b91c1c}.lv-stay{background:var(--brand);color:#fff}
+/* the thank-you at the end of a call: Shenba in her silk saree, hands joined */
+.ty{position:absolute;inset:0;z-index:30;background:#fffdf8;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;overflow:hidden}
+.ty[hidden]{display:none}
+.ty img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top}
+.ty .cap{position:relative;width:100%;padding:70px 18px max(22px,env(safe-area-inset-bottom));text-align:center;color:#fff;
+  background:linear-gradient(transparent,rgba(6,78,59,.55) 35%,rgba(6,78,59,.92))}
+.ty .cap b{display:block;font-size:21px;line-height:1.25;text-shadow:0 1px 6px rgba(0,0,0,.35)}
+.ty .cap span{display:block;margin-top:6px;font-size:14px;opacity:.95}
+.ty .cap em{display:block;margin-top:10px;font-family:var(--serif);font-style:normal;font-size:28px;font-weight:700;color:#fde68a}
+.ty button{position:relative;margin-top:14px;border:0;border-radius:12px;padding:12px 22px;font:inherit;font-weight:800;background:#fff;color:var(--brand-dk);cursor:pointer}
 
 .callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 20px}
 .call{
@@ -803,6 +820,11 @@ footer{padding-top:8px}
       <p class="sc-note" id="scNote">Details appear here as you tell Shenba.</p>
     </div>
   </div>
+  <div class="ty" id="scThanks" hidden>
+    <img src="img/shenba-namaste.webp" alt="Shenba, hands joined, in a white silk saree with a green border">
+    <div class="cap"><b id="tyHead">Unga enquiry register aagiduchu!</b><span id="tyLine">Room details WhatsApp-la vandhudum. Booking team seekiram call pannuvanga 😊</span><em>Nandri! 🙏</em>
+      <button type="button" id="tyClose">Close</button></div>
+  </div>
   <div class="sc-actions">
     <a class="sc-pay" id="scPay" aria-disabled="true" target="_blank" rel="noopener">Proceed to pay</a>
     <button type="button" class="sc-end" id="scEnd">End call</button>
@@ -813,18 +835,24 @@ footer{padding-top:8px}
   <div id="phStep1">
     <h4>Your mobile number</h4>
     <p>Shenba sends the room photos, details and payment link to this number on WhatsApp.</p>
-    <div class="ph-in"><span>+91</span><input id="phNum" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="98765 43210" aria-label="10-digit mobile number"></div>
+    <div class="ph-in"><span>+91</span><input id="phNum" type="tel" inputmode="numeric" enterkeyhint="send" autocomplete="tel-national" maxlength="10" placeholder="98765 43210" aria-label="10-digit mobile number"></div>
     <div class="ph-err" id="phErr1" aria-live="polite"></div>
     <div class="ph-btns"><button type="button" class="ph-no" id="phCancel">Not now</button><button type="button" class="ph-go" id="phSend">Send code</button></div>
   </div>
   <div id="phStep2" hidden>
     <h4>Enter the code</h4>
     <p>We sent a 4-digit code to <b id="phTo"></b> on WhatsApp. It shows at the top of your screen — no need to open WhatsApp.</p>
-    <div class="ph-in ph-code"><input id="phCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="4" placeholder="••••" aria-label="4-digit code"></div>
+    <div class="ph-in ph-code"><input id="phCode" type="text" inputmode="numeric" enterkeyhint="done" autocomplete="one-time-code" maxlength="4" placeholder="••••" aria-label="4-digit code"></div>
     <div class="ph-err" id="phErr2" aria-live="polite"></div>
     <div class="ph-btns"><button type="button" class="ph-no" id="phBack">Change number</button><button type="button" class="ph-go" id="phVerify">Verify</button></div>
     <button type="button" class="ph-alt" id="phResend">Send the code again</button>
   </div>
+</dialog>
+
+<dialog id="lvDlg" class="lv" aria-label="Close Shenba?">
+  <h4>Should this window be closed?</h4>
+  <p>You may lose the booking message Shenba is preparing for you.</p>
+  <div class="lv-b"><button type="button" class="lv-ok" id="lvOk">OK</button><button type="button" class="lv-stay" id="lvStay" autofocus>Stay</button></div>
 </dialog>
 
 <dialog id="full">
@@ -1330,8 +1358,9 @@ function askPhone(sess) {
     $("phSend").onclick = send; $("phResend").onclick = () => { step(1); send(); };
     $("phVerify").onclick = verify; $("phBack").onclick = () => step(1);
     $("phCancel").onclick = () => finish(false);
-    num.onkeydown = e => { if (e.key === "Enter") send(); };
+    num.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); send(); } };
     code.oninput = () => { if (code.value.replace(/\D/g, "").length === 4) verify(); };
+    code.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); verify(); } };   // the keypad's Enter / Go verifies
     d.onclose = () => done(false);
     num.value = ""; err(1, ""); err(2, ""); openDlg(d); step(1);
   });
@@ -1340,7 +1369,7 @@ function askPhone(sess) {
 $("chatBtn").addEventListener("click", async () => {
   if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
   fellBack = false;
-  openDlg($("sbChat"));
+  openDlg($("sbChat")); trapBack();
   if (!chat && !history.length) {
     typing();
     try { await startChat(false); }
@@ -1360,7 +1389,7 @@ $("sbForm").addEventListener("submit", async ev => {
   catch (e) { toWhatsApp(); }
 });
 
-$("sbChatX").addEventListener("click", () => { closeDlg($("sbChat")); bye(chat); });
+$("sbChatX").addEventListener("click", async () => { if (await closeShenba("chat")) untrap(); });
 addEventListener("pagehide", () => { bye(chat); bye(session); });
 $("sbLog").addEventListener("click", e => { if (e.target.dataset.talk) { e.preventDefault(); goVoice(); } });
 $("sbToVoice").addEventListener("click", () => goVoice());
@@ -1532,14 +1561,59 @@ async function cardPoll() {
   } catch (e) {}
   cardTimer = setTimeout(cardPoll, calling ? 3000 : 5000);
 }
+/* Leaving while Shenba is taking details asks first (Rakesh, 22 Oct 2026): the phone's Back button, the ✕, Escape, and
+   closing / reloading the tab (that last one is the browser's own question - its wording cannot be changed). */
+function collecting() {
+  const callOn = $("sbCall").open && $("scThanks").hidden && (calling || starting || Object.keys(card).length > 0);
+  const chatOn = $("sbChat").open && !!chat && !!document.querySelector("#sbLog .sb-m.me");
+  return callOn || chatOn;
+}
+function confirmLeave() {
+  return new Promise(done => {
+    const d = $("lvDlg");
+    const fin = ok => { d.onclose = null; closeDlg(d); done(ok); };
+    $("lvOk").onclick = () => fin(true); $("lvStay").onclick = () => fin(false);
+    d.onclose = () => done(false);
+    openDlg(d); setTimeout(() => $("lvStay").focus(), 30);
+  });
+}
+async function closeShenba(which) {   // which: "call" | "chat"; returns true if closed
+  if (collecting() && !(await confirmLeave())) return false;
+  if (which === "call" || $("sbCall").open) { await endVoice(); clearTimeout(cardTimer); closeDlg($("sbCall")); }
+  if (which === "chat" || $("sbChat").open) { closeDlg($("sbChat")); bye(chat); }
+  return true;
+}
+let backTrap = false;
+function trapBack() { if (backTrap) return; backTrap = true; try { window.history.pushState({ shenba: 1 }, ""); } catch (e) {} }
+addEventListener("popstate", async () => {
+  if (!backTrap) return;
+  backTrap = false;
+  if (!$("sbCall").open && !$("sbChat").open) return;
+  if (collecting() && !(await confirmLeave())) { trapBack(); return; }
+  if ($("sbCall").open) { await endVoice(); clearTimeout(cardTimer); closeDlg($("sbCall")); }
+  if ($("sbChat").open) { closeDlg($("sbChat")); bye(chat); }
+});
+function untrap() { if (backTrap) { backTrap = false; try { window.history.back(); } catch (e) {} } }
+["sbCall", "sbChat"].forEach(id => $(id).addEventListener("cancel", async e => {   // Escape key
+  e.preventDefault(); if (await closeShenba(id === "sbCall" ? "call" : "chat")) untrap();
+}));
+addEventListener("beforeunload", e => { if (collecting()) { e.preventDefault(); e.returnValue = ""; } });
+function showThanks(booked) {
+  $("tyHead").textContent = booked ? "Unga room hold pannirukkom!" : "Unga enquiry register aagiduchu!";
+  $("tyLine").textContent = booked ? "Payment link WhatsApp-la vandhudum. Pay pannina udane voucher varum 😊"
+                                   : "Room details WhatsApp-la vandhudum. Booking team seekiram call pannuvanga 😊";
+  $("scThanks").hidden = false;
+}
+$("tyClose").addEventListener("click", () => { $("scThanks").hidden = true; closeDlg($("sbCall")); untrap(); });
+
 function openCall(start) {
   if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
-  openDlg($("sbCall"));
+  openDlg($("sbCall")); trapBack(); $("scThanks").hidden = true;
   if (calling || starting) return;
   if (start) { cardReset(); startVoice(); }
   else { saState("idle", "Tap Shenba to start talking"); }
 }
-window.__saCard = { cardMerge, cardReset, askPhone };   /* used by the preview only */
+window.__saCard = { cardMerge, cardReset, askPhone, showThanks, confirmLeave };   /* used by the preview only */
 
 /* ── the call (v1.7, our own server) ──
    Turn by turn: she speaks (her Leda voice comes back from the server as audio), then she listens. The phone's mic is
@@ -1644,7 +1718,7 @@ async function startVoice() {
       if (r.card) cardMerge(r.card);
       if (r.silent || !r.reply) continue;
       await play(r.audio_b64);
-      if (r.end) { await endVoice("Call ended · thank you!"); break; }
+      if (r.end) { await endVoice("Call ended · thank you!"); if (r.registered || card.phone) showThanks(card.status === "pending_payment"); break; }
       if (r.ask_phone) {   // the mic waits while the guest types the number and the code
         saState("listening", "Type your mobile number in the box");
         const ok = await askPhone(session);
@@ -1680,7 +1754,7 @@ face.addEventListener("click", async () => { await endChat(); openCall(true); })
 dock.addEventListener("click", e => { if (!face.contains(e.target) && !$("saMin").contains(e.target)) face.click(); });
 $("scFace").addEventListener("click", () => { if (src) { stopPlay(); return; } if (!calling && !starting) startVoice(); });
 $("scEnd").addEventListener("click", () => endVoice());
-$("scX").addEventListener("click", async () => { await endVoice(); clearTimeout(cardTimer); closeDlg($("sbCall")); });
+$("scX").addEventListener("click", async () => { if (await closeShenba("call")) untrap(); });
 $("sbCall").addEventListener("close", () => { if (calling) endVoice(); clearTimeout(cardTimer); });
 
 /* minimise (remembered on this phone only) */

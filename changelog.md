@@ -7,6 +7,17 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v2.1 — 22 Oct 2026
+
+**Returning guests, safe closing, thank-you.** Shenba asks the mobile number first; once verified she knows if the
+number stayed or enquired before and welcomes them back ("Same head count-a varangala, illa new count-a?"). The code
+box sits at the top (the keypad no longer hides Verify) and the keypad's Enter verifies. Closing Shenba, the Back
+button or Escape while she is taking details asks "Should this window be closed?" (OK on the left, Stay is the
+default). A call that ends with an enquiry shows Shenba in her silk saree, hands joined: "Unga enquiry register
+aagiduchu! Nandri!".
+
+---
+
 ## v2.0 — 22 Oct 2026
 
 **Talk with Shenba: typed and verified mobile number, live card, discounts.** When Shenba needs the mobile number a
