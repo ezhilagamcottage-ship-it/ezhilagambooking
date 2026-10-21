@@ -1184,12 +1184,12 @@ const OPENING =
   "for 2 to 15 guests, home food on order, safe for families, and fully alcohol- and smoke-free.\n\n" +
   "When are you planning to stay, and how many guests? I'll check available rooms and prices for you.";
 const CONTEXT =
-  "This guest is chatting by TEXT on the hotel website (ezhilagam.cloud), not on a phone call. " +
+  "This guest is chatting by TEXT on the hotel website (kutralamezhilagam.com), not on a phone call. " +
   "Keep replies short and friendly, reply in the guest's language (English, Tamil or Tanglish), " +
   "never use spoken-only phrasing. Ask for stay dates and number of guests, then use your tools " +
   "for live rooms and prices. If the guest would rather talk, or the conversation gets long, tell them " +
   "they can tap the 'Talk with Shenba' button on this page, or open " + VOICE_LINK + " . " +
-  "Online booking: https://ezhilagam.cloud/book . Booking team 99622 22415, reception 082483 20685.";
+  "Online booking: https://kutralamezhilagam.com/book . Booking team 99622 22415, reception 082483 20685.";
 
 const $ = id => document.getElementById(id);
 let chat = null, voice = null, history = [], typingEl = null, fellBack = false;
@@ -1605,7 +1605,7 @@ addEventListener("scroll", dodge, { passive: true });
 addEventListener("resize", dodge);
 dodge();
 
-/* Deep link: ezhilagam.cloud/#talk opens voice, #chat opens chat. */
+/* Deep link: kutralamezhilagam.com/#talk opens voice, #chat opens chat. */
 if (location.hash === "#chat") $("chatBtn").click();
 /* #talk only shows her; the call (and the mic question) waits for a tap */
 if (location.hash === "#talk") openCall(false);
