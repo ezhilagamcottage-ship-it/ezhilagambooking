@@ -341,6 +341,26 @@ dialog.sc{height:100dvh;max-height:100dvh;max-width:480px;margin:0 auto;border-r
 .sc-pay.done{font-size:14px;text-align:center;background:#ecfdf5;color:var(--brand);border:1.5px solid #a7f3d0;box-shadow:none;pointer-events:none}
 .sc-end{border:0;border-radius:14px;padding:0 16px;min-height:52px;background:#b91c1c;color:#fff;font:inherit;font-weight:800;cursor:pointer}
 .sc-end[hidden]{display:none}
+/* 22 Oct 2026: the guest types the mobile number (no voice mistakes) and confirms it with a WhatsApp code */
+dialog.ph{max-width:360px;width:calc(100% - 32px);border:0;border-radius:20px;padding:20px 18px 16px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog.ph::backdrop{background:rgba(28,25,23,.45)}
+.ph h4{margin:0 0 4px;font-size:17px}
+.ph p{margin:0 0 12px;font-size:13px;color:var(--mute);line-height:1.45}
+.ph-in{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;padding:0 12px;background:#fff}
+.ph-in:focus-within{border-color:var(--brand)}
+.ph-in span{color:var(--mute);font-weight:700;margin-right:6px}
+.ph-in input{flex:1;border:0;outline:0;font:700 20px/1 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.06em;padding:13px 0;min-width:0;background:transparent}
+.ph-code input{text-align:center;letter-spacing:.5em}
+.ph-err{min-height:18px;margin:8px 0 0;font-size:12.5px;color:#b91c1c}
+.ph-ok{color:var(--brand);font-weight:700}
+.ph-btns{display:flex;gap:8px;margin-top:10px}
+.ph-btns button{flex:1;min-height:46px;border-radius:12px;border:0;font:inherit;font-weight:800;cursor:pointer}
+.ph-go{background:var(--brand);color:#fff}.ph-go[disabled]{opacity:.6}
+.ph-no{background:#f5f5f4;color:var(--ink)}
+.ph-alt{display:block;margin-top:10px;text-align:center;font-size:12.5px;color:var(--mute);background:none;border:0;width:100%;text-decoration:underline;cursor:pointer}
+.sc-row b s{color:var(--faint);font-weight:500;font-size:13px;margin-right:6px}
+.sc-row.save b{color:#b45309}
+.sc-row b .vf{color:var(--brand);font-size:12px;margin-left:4px}
 
 .callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 20px}
 .call{
@@ -772,18 +792,38 @@ footer{padding-top:8px}
     <div class="sc-card" id="scCard">
       <h3>Your booking</h3>
       <div class="sc-row"><span>Name</span><b data-f="name" class="empty">—</b></div>
+      <div class="sc-row"><span>Mobile</span><b data-f="phone" class="empty">—</b></div>
       <div class="sc-row"><span>Check-in</span><b data-f="checkin" class="empty">—</b></div>
       <div class="sc-row"><span>Stay</span><b data-f="stay" class="empty">—</b></div>
       <div class="sc-row"><span>Room</span><b data-f="room" class="empty">—</b></div>
       <div class="sc-row"><span>Adults</span><b data-f="adults" class="empty">—</b></div>
       <div class="sc-row"><span>Children</span><b data-f="children" class="empty">—</b></div>
       <div class="sc-row total"><span>Rate (incl. tax)</span><b data-f="rate" class="empty">—</b></div>
+      <div class="sc-row save" id="scSave" hidden><span>Special price</span><b data-f="save">—</b></div>
       <p class="sc-note" id="scNote">Details appear here as you tell Shenba.</p>
     </div>
   </div>
   <div class="sc-actions">
     <a class="sc-pay" id="scPay" aria-disabled="true" target="_blank" rel="noopener">Proceed to pay</a>
     <button type="button" class="sc-end" id="scEnd">End call</button>
+  </div>
+</dialog>
+
+<dialog id="phDlg" class="ph" aria-label="Your mobile number">
+  <div id="phStep1">
+    <h4>Your mobile number</h4>
+    <p>Shenba sends the room photos, details and payment link to this number on WhatsApp.</p>
+    <div class="ph-in"><span>+91</span><input id="phNum" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="98765 43210" aria-label="10-digit mobile number"></div>
+    <div class="ph-err" id="phErr1" aria-live="polite"></div>
+    <div class="ph-btns"><button type="button" class="ph-no" id="phCancel">Not now</button><button type="button" class="ph-go" id="phSend">Send code</button></div>
+  </div>
+  <div id="phStep2" hidden>
+    <h4>Enter the code</h4>
+    <p>We sent a 4-digit code to <b id="phTo"></b> on WhatsApp. It shows at the top of your screen — no need to open WhatsApp.</p>
+    <div class="ph-in ph-code"><input id="phCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="4" placeholder="••••" aria-label="4-digit code"></div>
+    <div class="ph-err" id="phErr2" aria-live="polite"></div>
+    <div class="ph-btns"><button type="button" class="ph-no" id="phBack">Change number</button><button type="button" class="ph-go" id="phVerify">Verify</button></div>
+    <button type="button" class="ph-alt" id="phResend">Send the code again</button>
   </div>
 </dialog>
 
@@ -1250,6 +1290,51 @@ async function chatSend(t) {
   try { j = await api("/turn", { session: chat, text: t }); }
   catch (e) { if (!e.gone) throw e; chat = null; await startChat(true); j = await api("/turn", { session: chat, text: t }); }
   add("ai", j.reply || "Sorry, could you say that again?");
+  if (j.ask_phone && await askPhone(chat)) {
+    const k = await api("/turn", { session: chat, verified: true });
+    add("ai", k.reply || "Thank you!");
+  }
+}
+
+/* The guest types the mobile number and confirms it with the 4-digit code Shenba sends on WhatsApp (v2.0, 22 Oct 2026).
+   Resolves true once verified, false if the guest chose "Not now" (then they can still say or type it to Shenba). */
+function askPhone(sess) {
+  return new Promise(done => {
+    const d = $("phDlg"), num = $("phNum"), code = $("phCode");
+    const step = n => { $("phStep1").hidden = n !== 1; $("phStep2").hidden = n !== 2; (n === 1 ? num : code).focus(); };
+    const err = (n, t) => { $("phErr" + n).textContent = t || ""; };
+    let busy = false;
+    const finish = ok => { d.onclose = null; closeDlg(d); done(ok); };
+    const send = async () => {
+      const p = num.value.replace(/\D/g, "").replace(/^(91|0)(?=\d{10}$)/, "");
+      if (!/^[6-9]\d{9}$/.test(p)) return err(1, "Please type your 10-digit mobile number.");
+      if (busy) return; busy = true; $("phSend").disabled = true; err(1, "");
+      try {
+        const j = await fetch(API + "/otp", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ session: sess, phone: p }) }).then(r => r.json());
+        if (!j.ok) err(1, j.error || "Could not send the code.");
+        else { $("phTo").textContent = "+91 " + p.slice(0, 5) + " " + p.slice(5); code.value = ""; err(2, ""); step(2); }
+      } catch (e) { err(1, "Could not send the code. Please try again."); }
+      busy = false; $("phSend").disabled = false;
+    };
+    const verify = async () => {
+      const c = code.value.replace(/\D/g, "");
+      if (c.length !== 4 || busy) return;
+      busy = true; $("phVerify").disabled = true; err(2, "");
+      try {
+        const j = await fetch(API + "/verify", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ session: sess, code: c }) }).then(r => r.json());
+        if (j.ok) { cardMerge({ phone: j.phone, phone_verified: true }); $("phErr2").innerHTML = '<span class="ph-ok">✓ Number verified</span>'; setTimeout(() => finish(true), 700); }
+        else err(2, j.error || "That code is not right.");
+      } catch (e) { err(2, "Could not check the code. Please try again."); }
+      busy = false; $("phVerify").disabled = false;
+    };
+    $("phSend").onclick = send; $("phResend").onclick = () => { step(1); send(); };
+    $("phVerify").onclick = verify; $("phBack").onclick = () => step(1);
+    $("phCancel").onclick = () => finish(false);
+    num.onkeydown = e => { if (e.key === "Enter") send(); };
+    code.oninput = () => { if (code.value.replace(/\D/g, "").length === 4) verify(); };
+    d.onclose = () => done(false);
+    num.value = ""; err(1, ""); err(2, ""); openDlg(d); step(1);
+  });
 }
 
 $("chatBtn").addEventListener("click", async () => {
@@ -1392,7 +1477,9 @@ function cardMerge(o) {
   const v = { name: pick("guest_name", "name"), checkIn: pick("check_in", "checkin"), checkOut: pick("check_out", "checkout"),
     nights: pick("nights"), room: pick("room", "room_name", "room_code"), ac: pick("ac"), adults: pick("adults"),
     children: pick("children"), total: pick("total", "rate_total", "rate"), payUrl: pick("pay_page", "pay_url"),
-    status: pick("status"), holdUntil: pick("hold_until"), bookingId: pick("booking_id"), ref: pick("reference") };
+    status: pick("status"), holdUntil: pick("hold_until"), bookingId: pick("booking_id"), ref: pick("reference"),
+    phone: pick("phone"), phoneOk: pick("phone_verified"), listTotal: pick("list_total"), discount: pick("discount") };
+  if (v.total != null && v.discount == null) v.discount = 0;   // a new price without a discount clears the old one
   for (const k in v) if (v[k] != null) card[k] = v[k];
   if (card.checkIn && card.checkOut && !v.nights) card.nights = nightsOf(card.checkIn, card.checkOut) || card.nights;
   cardSet("name", card.name);
@@ -1401,7 +1488,16 @@ function cardMerge(o) {
   if (card.room) cardSet("room", String(card.room).replace(/^\w/, c => c.toUpperCase()) + (card.ac ? " · " + (/^non/i.test(card.ac) ? "Non-AC" : "AC") : ""));
   if (card.adults != null) cardSet("adults", String(card.adults));
   if (card.children != null) cardSet("children", String(card.children));
-  if (card.total) cardSet("rate", inr(card.total));
+  if (card.phone) { const p = String(card.phone).replace(/\D/g, "").slice(-10); cardSet("phone", "+91 " + p.slice(0, 5) + " " + p.slice(5));
+    if (card.phoneOk) { const el = document.querySelector('#scCard [data-f="phone"]'); if (el && !el.querySelector(".vf")) el.insertAdjacentHTML("beforeend", '<span class="vf">✓ verified</span>'); } }
+  if (card.total) {
+    const disc = +card.discount > 0 && +card.listTotal > +card.total;
+    const el = document.querySelector('#scCard [data-f="rate"]');
+    const html = (disc ? "<s>" + inr(card.listTotal) + "</s>" : "") + inr(card.total);
+    if (el && el.innerHTML !== html) { el.innerHTML = html; el.classList.remove("empty"); el.classList.add("new"); setTimeout(() => el.classList.remove("new"), 1400); }
+    $("scSave").hidden = !disc;
+    if (disc) cardSet("save", inr(card.discount) + " off");
+  }
   const pay = $("scPay"), note = $("scNote");
   if (card.status === "confirmed" && card.bookingId) {
     cardFinal = true;
@@ -1410,7 +1506,7 @@ function cardMerge(o) {
     note.className = "sc-note ok"; note.textContent = "Payment received. Your confirmation is on its way to your WhatsApp.";
   } else if (card.payUrl && card.status === "pending_payment") {
     pay.className = "sc-pay"; pay.href = card.payUrl; pay.setAttribute("aria-disabled", "false");
-    pay.textContent = "Proceed to pay " + inr(card.total);
+    pay.textContent = "Proceed to pay " + inr(card.total) + (+card.discount > 0 ? " · " + inr(card.discount) + " off" : "");
     note.className = "sc-note"; note.textContent = "Room held for you until " + (card.holdUntil || "a few minutes") + ". Secure payment by Razorpay.";
   } else if (card.status === "expired" || card.status === "cancelled") {
     pay.className = "sc-pay"; pay.removeAttribute("href"); pay.setAttribute("aria-disabled", "true"); pay.textContent = "Proceed to pay";
@@ -1422,6 +1518,7 @@ function cardMerge(o) {
 function cardReset() {
   card = {}; convId = ""; cardFinal = false; clearTimeout(cardTimer); cardTimer = 0;
   document.querySelectorAll("#scCard [data-f]").forEach(el => { el.textContent = "—"; el.className = "empty"; });
+  $("scSave").hidden = true;
   const pay = $("scPay"); pay.className = "sc-pay"; pay.removeAttribute("href"); pay.setAttribute("aria-disabled", "true"); pay.textContent = "Proceed to pay";
   $("scNote").className = "sc-note"; $("scNote").textContent = "Details appear here as you tell Shenba.";
 }
@@ -1442,7 +1539,7 @@ function openCall(start) {
   if (start) { cardReset(); startVoice(); }
   else { saState("idle", "Tap Shenba to start talking"); }
 }
-window.__saCard = { cardMerge, cardReset };   /* used by the preview only */
+window.__saCard = { cardMerge, cardReset, askPhone };   /* used by the preview only */
 
 /* ── the call (v1.7, our own server) ──
    Turn by turn: she speaks (her Leda voice comes back from the server as audio), then she listens. The phone's mic is
@@ -1548,6 +1645,15 @@ async function startVoice() {
       if (r.silent || !r.reply) continue;
       await play(r.audio_b64);
       if (r.end) { await endVoice("Call ended · thank you!"); break; }
+      if (r.ask_phone) {   // the mic waits while the guest types the number and the code
+        saState("listening", "Type your mobile number in the box");
+        const ok = await askPhone(session);
+        if (!calling) break;
+        if (ok) {
+          saState("connecting", "Shenba is thinking…");
+          try { const k = await api("/turn", { session, verified: true }); if (k.card) cardMerge(k.card); if (k.reply) await play(k.audio_b64); if (k.end) { await endVoice("Call ended · thank you!"); break; } } catch (e) {}
+        }
+      }
     }
   } catch (e) {
     calling = false; stopPlay(); if (rec) { try { rec.stop(); } catch (x) {} }

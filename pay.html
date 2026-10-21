@@ -205,7 +205,8 @@ function status(d) {
 function render(d) {
   data = d;
   const nights = Math.max(1, Number(d.nights) || 1);
-  const per = Math.round((Number(d.total) || 0) / nights);
+  const disc = Number(d.discount) > 0 && Number(d.list_total) > Number(d.total);   // 22 Oct 2026: a discount Shenba agreed
+  const per = Math.round((Number(disc ? d.list_total : d.total) || 0) / nights);
   const guests = (d.adults || 0) + ((d.adults || 0) === 1 ? " adult" : " adults") +
     (d.children ? ", " + d.children + (d.children === 1 ? " child" : " children") : "");
   const sub = ROOMS[d.room] ? ROOMS[d.room][1] : "Room";
@@ -230,10 +231,11 @@ function render(d) {
       <div class="row"><span>${I.ppl}Guests</span><span>${esc(guests)}</span></div>
     </div>
     <div class="sec">
-      <div class="row"><span>${inr(per)} × ${nights} ${nights === 1 ? "night" : "nights"}${nights > 1 ? " (avg)" : ""}</span><span>${inr(d.total)}</span></div>
+      <div class="row"><span>${inr(per)} × ${nights} ${nights === 1 ? "night" : "nights"}${nights > 1 ? " (avg)" : ""}</span><span>${inr(disc ? d.list_total : d.total)}</span></div>
+      ${disc ? `<div class="row" style="color:var(--brand)"><span style="color:var(--brand)">🏷️ Special price discount</span><span>− ${inr(d.discount)}</span></div>` : ""}
       <div class="row"><span>Taxes &amp; fees</span><span>Included</span></div>
     </div>
-    <div class="tot"><b>${paid ? "Amount paid" : "Total payable"}<small>incl. all taxes</small></b><strong>${inr(d.total)}</strong></div>
+    <div class="tot"><b>${paid ? "Amount paid" : "Total payable"}<small>${disc ? "you save " + inr(d.discount) : "incl. all taxes"}</small></b><strong>${disc ? `<s style="font-size:14px;color:var(--faint);font-weight:500;margin-right:6px">${inr(d.list_total)}</s>` : ""}${inr(d.total)}</strong></div>
   </section>
   ${d.reference ? `<div class="ref">BOOKING REF ${esc(d.reference)}</div>` : ""}
   ${canPay ? `<div class="trust">${I.lock.replace("<svg", '<svg style="width:12px;height:12px"')}<span>Secured by Razorpay</span><span class="pm"><span>UPI</span><span>Cards</span><span>Net banking</span></span></div>
@@ -305,7 +307,8 @@ function fail(msg) {
 
 async function load(afterPay) {
   if (qs.get("demo") === "1") return render({ status: qs.get("s") || "pending_payment", room: qs.get("room") || "Vaagai", ac: "AC",
-    guest_name: "Rakesh", check_in: "2026-10-21", check_out: "2026-10-22", nights: 1, adults: 2, children: 0, total: 6499,
+    guest_name: "Rakesh", check_in: "2026-10-21", check_out: "2026-10-22", nights: 1, adults: 2, children: 0,
+    total: qs.get("disc") ? 6175 : 6499, list_total: 6499, discount: qs.get("disc") ? 324 : 0,
     reference: "V1013", pay_url: "#", hold_until: "2:12 PM", hold_ms: Date.now() + 14 * 60000, booking_id: "EZ-2210" });
   if (!/^[a-f0-9]{32}$/i.test(id)) return fail("This link is not complete");
   try {

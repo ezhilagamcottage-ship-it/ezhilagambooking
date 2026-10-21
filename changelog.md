@@ -7,6 +7,15 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v2.0 — 22 Oct 2026
+
+**Talk with Shenba: typed and verified mobile number, live card, discounts.** When Shenba needs the mobile number a
+box opens to type it; a 4-digit code goes to that WhatsApp (shown in the phone's notification) to verify it. The booking
+card fills in as the guest speaks (name, mobile, dates, adults, kids). A discount Shenba agrees shows at once: the old
+price struck out, the saving, and "Proceed to pay" with the new amount (the /pay page shows the discount too).
+
+---
+
 ## v1.9 — 21 Oct 2026
 
 **Pay on our own page.** The /pay checkout page is redesigned in the website's style (progress steps, room photo
