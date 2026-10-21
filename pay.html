@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Your booking · Kutralam Ezhilagam</title>
+<title>Secure checkout · Kutralam Ezhilagam</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#faf9f7">
 <meta property="og:title" content="Your room at Kutralam Ezhilagam">
@@ -10,15 +10,17 @@
 <meta property="og:image" content="img/ke-facade.webp">
 <link rel="icon" href="img/logo.webp">
 <link rel="preload" as="image" href="img/logo-hd.webp">
+<link rel="preconnect" href="https://checkout.razorpay.com">
 <style>
-/* Checkout page for a room Shenba has held (Rakesh, 21 Oct 2026): the guest's WhatsApp link and Razorpay's
-   return address both land here, so the guest sees the hotel's own page, not a bare payment form. The palette
-   and type are the website's. Data: Prime ?action=voiceCard&q=<quote id> (read-only, no phone or email). */
+/* Checkout for a room Shenba has held (Rakesh, 21 Oct 2026). v2 13:57 "Redesign this page with a better ui with ezhilagam
+   website theme for all future bookings": the guest pays HERE with Razorpay Checkout (our logo, our green) instead of
+   being sent to Razorpay's own blue page. The WhatsApp link and Razorpay's return both land here.
+   Data: Prime ?action=voiceCard&q=<quote id> (read-only); the order: ?action=voiceCard&op=order&q=<quote id>. */
 :root{
   --ink:#1c1917; --mute:#78716c; --faint:#a8a29e; --line:#e7e5e4;
-  --bg:#faf9f7; --card:#fff;
-  --brand:#047857; --brand-dk:#065f46; --gold:#b45309; --gold-lt:#d9a441;
-  --r:16px;
+  --bg:#faf9f7; --card:#fff; --soft:#f5f3ef;
+  --brand:#047857; --brand-dk:#065f46; --brand-lt:#ecfdf5; --gold:#b45309; --gold-lt:#d9a441;
+  --r:18px;
   --serif:"Cormorant Garamond","Times New Roman",Georgia,serif;
   color-scheme:light;
 }
@@ -27,69 +29,103 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);
   font:400 15px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
   -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
-.wrap{max-width:440px;margin:0 auto;padding:20px 16px 36px}
+.wrap{max-width:440px;margin:0 auto;padding:18px 16px 130px}
 a:focus-visible,button:focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:12px}
 
-.mast{text-align:center;margin-bottom:16px}
+/* masthead */
+.mast{text-align:center;margin-bottom:14px}
 .mast a{display:inline-block}
-.mast img{height:52px;width:auto;display:block;margin:0 auto}
-.rule{display:flex;align-items:center;gap:10px;margin:12px auto 0;max-width:170px}
+.mast img{height:48px;width:auto;display:block;margin:0 auto}
+.rule{display:flex;align-items:center;gap:10px;margin:10px auto 0;max-width:170px}
 .rule::before,.rule::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-lt),transparent)}
 .rule i{width:5px;height:5px;transform:rotate(45deg);background:var(--gold-lt)}
-.kick{margin:10px 0 0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.kick{margin:9px 0 0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);
+  display:flex;align-items:center;justify-content:center;gap:6px}
+.kick svg{width:13px;height:13px}
 
-/* status strip */
-.st{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;margin-bottom:12px;
-  border:1px solid var(--line);background:var(--card)}
-.st .ic{width:38px;height:38px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
-  font-size:19px;font-weight:700;color:#fff}
-.st b{display:block;font-size:15.5px;line-height:1.25}
-.st>div>span{display:block;font-size:13px;color:var(--mute);margin-top:1px}
+/* steps */
+.steps{display:flex;align-items:center;margin:4px 2px 14px}
+.step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:none;width:64px}
+.step i{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 12px/1 inherit;
+  font-style:normal;background:var(--card);border:1.5px solid var(--line);color:var(--faint)}
+.step span{font-size:11px;font-weight:600;color:var(--faint)}
+.step.done i{background:var(--brand);border-color:var(--brand);color:#fff}
+.step.now i{border-color:var(--brand);color:var(--brand);box-shadow:0 0 0 4px var(--brand-lt)}
+.step.done span,.step.now span{color:var(--ink)}
+.bar{flex:1;height:2px;background:var(--line);margin:0 -10px 18px;border-radius:2px}
+.bar.done{background:var(--brand)}
+
+/* status */
+.st{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;margin-bottom:12px;border:1px solid var(--line);background:var(--card)}
+.st .ic{width:36px;height:36px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff}
+.st b{display:block;font-size:15px;line-height:1.25}
+.st>div>span{display:block;font-size:12.5px;color:var(--mute);margin-top:1px}
 .st.hold{background:#fffbeb;border-color:#fde68a}.st.hold .ic{background:var(--gold)}
-.st.ok{background:#ecfdf5;border-color:#a7f3d0}.st.ok .ic{background:var(--brand)}
+.st.ok{background:var(--brand-lt);border-color:#a7f3d0}.st.ok .ic{background:var(--brand)}
 .st.wait .ic{background:var(--gold)}
 .st.bad{background:#fef2f2;border-color:#fecaca}.st.bad .ic{background:#b91c1c}
 .clock{font-variant-numeric:tabular-nums;font-weight:800;color:var(--gold)}
+.tbar{height:4px;border-radius:4px;background:#fde68a;margin-top:7px;overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--gold);border-radius:4px;transition:width 1s linear}
 .sp{width:18px;height:18px;border:2.5px solid #fff;border-top-color:transparent;border-radius:50%;animation:r 1s linear infinite}
 @keyframes r{to{transform:rotate(360deg)}}
 
-/* the cart */
+/* cart */
 .cart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
-  box-shadow:0 1px 2px rgba(28,25,23,.04),0 8px 24px rgba(28,25,23,.06)}
+  box-shadow:0 1px 2px rgba(28,25,23,.04),0 10px 28px rgba(28,25,23,.07)}
 .item{display:flex;gap:13px;padding:14px;align-items:center}
-.ph{width:92px;height:92px;flex:none;border-radius:12px;overflow:hidden;background:#e9e6e2;position:relative}
+.ph{width:96px;height:96px;flex:none;border-radius:14px;overflow:hidden;background:#e9e6e2;position:relative}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
-.ph em{position:absolute;left:6px;bottom:6px;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.06em;
+.ph em{position:absolute;left:6px;top:6px;font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.06em;
   background:rgba(28,25,23,.72);color:#fff;padding:2px 7px;border-radius:99px}
-.item h2{margin:0;font-family:var(--serif);font-size:25px;line-height:1.05;font-weight:700;letter-spacing:.01em}
-.item .sub{font-size:12.5px;color:var(--mute);margin-top:3px}
-.item .dt{font-size:13px;font-weight:600;margin-top:7px;color:var(--brand-dk)}
-.sec{border-top:1px dashed var(--line);padding:12px 14px}
-.row{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:4px 0}
-.row span:first-child{color:var(--mute)}
+.item h2{margin:0;font-family:var(--serif);font-size:26px;line-height:1.05;font-weight:700;letter-spacing:.01em}
+.item .sub{font-size:12px;color:var(--mute);margin-top:3px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--brand-lt);color:var(--brand-dk)}
+.sec{border-top:1px dashed var(--line);padding:11px 14px}
+.row{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:4px 0;align-items:baseline}
+.row span:first-child{color:var(--mute);display:flex;align-items:center;gap:7px}
+.row span:first-child svg{width:15px;height:15px;color:var(--faint);flex:none}
 .row span:last-child{text-align:right;font-weight:600}
-.tot{display:flex;justify-content:space-between;align-items:baseline;padding:13px 14px;background:#f5f3ef;border-top:1px solid var(--line)}
+.tot{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;background:var(--soft);border-top:1px solid var(--line)}
 .tot b{font-size:14px}.tot small{display:block;font-size:11.5px;color:var(--mute);font-weight:400}
-.tot strong{font-size:24px;font-weight:800;letter-spacing:-.01em}
-.ref{font-size:11.5px;color:var(--faint);text-align:center;padding:9px 0 0;letter-spacing:.04em}
+.tot strong{font-size:25px;font-weight:800;letter-spacing:-.01em}
+.ref{font-size:11px;color:var(--faint);text-align:center;padding:9px 0 0;letter-spacing:.06em}
 
-.pay{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;margin-top:14px;padding:15px 18px;
-  border:0;border-radius:14px;background:var(--brand);color:#fff;font:700 16.5px/1.2 inherit;font-family:inherit;
-  text-decoration:none;box-shadow:0 6px 18px rgba(4,120,87,.28);cursor:pointer}
+/* highlights + trust */
+.hl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.hl div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 10px;font-size:12px;color:var(--mute);line-height:1.35}
+.hl b{display:block;color:var(--ink);font-size:12.5px}
+.trust{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;margin-top:12px;font-size:11.5px;color:var(--mute)}
+.trust .pm{display:inline-flex;gap:5px}
+.trust .pm span{border:1px solid var(--line);background:var(--card);border-radius:6px;padding:2px 7px;font-weight:700;font-size:10.5px;color:var(--ink)}
+.note{margin-top:12px;font-size:12.5px;color:var(--mute);line-height:1.55;text-align:center}
+.note.ok{background:var(--brand-lt);color:var(--brand-dk);border-radius:12px;padding:12px;text-align:left;font-size:13.5px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.ghost{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;border-radius:14px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink);font-weight:700;font-size:14px;text-decoration:none}
+
+/* sticky pay bar */
+.paybar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.96);border-top:1px solid var(--line);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.paybar .in{max-width:440px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.paybar .amt{flex:none;line-height:1.15}
+.paybar .amt small{display:block;font-size:11px;color:var(--mute)}
+.paybar .amt b{font-size:19px;font-weight:800}
+.pay{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 16px;border:0;border-radius:14px;
+  background:var(--brand);color:#fff;font:700 16px/1.2 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
+  box-shadow:0 6px 18px rgba(4,120,87,.28);cursor:pointer;text-decoration:none}
 .pay:active{background:var(--brand-dk);transform:translateY(1px)}
-.pay svg{width:18px;height:18px}
-.trust{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 12px;margin-top:10px;font-size:11.5px;color:var(--mute)}
-.trust span{display:flex;align-items:center;gap:4px}
-.note{margin-top:12px;font-size:13px;color:var(--mute);line-height:1.55;text-align:center}
-.note.ok{background:#ecfdf5;color:#065f46;border-radius:12px;padding:12px;text-align:left}
-.ghost{display:block;text-align:center;margin-top:12px;padding:13px;border-radius:14px;border:1px solid var(--line);
-  background:var(--card);color:var(--ink);font-weight:700;text-decoration:none}
+.pay[disabled]{opacity:.7;cursor:wait}
+.pay svg{width:17px;height:17px}
 
-.foot{text-align:center;color:var(--mute);font-size:12.5px;margin-top:22px;line-height:1.7}
+.foot{text-align:center;color:var(--mute);font-size:12px;margin-top:20px;line-height:1.7}
 .foot a{color:var(--ink);font-weight:600;text-decoration:none}
-.skel{height:280px;border-radius:var(--r);background:linear-gradient(90deg,#efece7 0%,#f7f5f1 50%,#efece7 100%);
+.skel{height:300px;border-radius:var(--r);background:linear-gradient(90deg,#efece7 0%,#f7f5f1 50%,#efece7 100%);
   background-size:200% 100%;animation:sk 1.2s ease-in-out infinite}
 @keyframes sk{to{background-position:-200% 0}}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 14px;border-radius:12px;
+  font-size:13px;max-width:calc(100% - 32px);z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 </style>
 </head>
 <body>
@@ -97,17 +133,19 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--brand);outline-offs
   <header class="mast">
     <a href="/"><img src="img/logo-hd.webp" alt="Kutralam Ezhilagam" width="484" height="163"></a>
     <div class="rule"><i></i></div>
-    <p class="kick" id="kick">Your booking</p>
+    <p class="kick" id="kick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Secure checkout</span></p>
   </header>
   <main id="app"><div class="skel"></div></main>
   <footer class="foot">
-    Plot 46, Five Falls Main Road, Vairams Nagar, Courtallam 627802<br>
+    Kutralam Ezhilagam · Plot 46, Five Falls Main Road, Vairams Nagar, Courtallam 627802<br>
     Booking <a href="tel:+919962222415">99622 22415</a> · Reception <a href="tel:+918248320685">082483 20685</a>
   </footer>
 </div>
+<div id="bar"></div>
 <script>
 "use strict";
 const PRIME = "https://script.google.com/macros/s/AKfycbwUVyNn9AIKvCpF2SQRsTqyepZgqwhOIeWCJt25YT5wyC3pp0fWayuTSDTvlwmD24Ww/exec";
+const SITE = "https://www.kutralamezhilagam.com";
 const ROOMS = {   // first photo of each room, from the booking page's rate card
   Aambal:   ["1Q0XMZxhI0p9kvVHtaPquFPk4cdkuUdL6", "Studio · Ground floor"],
   Thillai:  ["19sS4VUH5c9rmW_Q2x9QC8WkU5A8ADOhu", "Studio · Ground floor"],
@@ -115,15 +153,15 @@ const ROOMS = {   // first photo of each room, from the booking page's rate card
   Mullai:   ["1BYNx533kDTUQ3hvmVKwZPdCAU4IuW8tA", "Studio · Second floor · Quiet side"],
   Paalai:   ["1w0pfUMNecnKvaQSMN4pzXs66nrxZa_Vn", "Studio · First floor"],
   Kurinji:  ["1BQUwK1qb5HTYFXqflPSXprEFF20MMNhV", "Studio · Second floor · Mountain view"],
-  Shenbagam:["1D45yMWOpOViryCRSuiYRbIH9921v3Ek-", "Suite · First floor · Kitchen"],
+  Shenbagam:["1D45yMWOpOViryCRSuiYRbIH9921v3Ek-", "Suite · First floor · Own kitchen"],
   Mavval:   ["1BeUaSgD6X35Hs1MiGZLDhZL1wcKtVeBD", "Suite · First floor"],
   Vaagai:   ["1nkvq8Ft_f-LtukBmDOTeSijV1Eq2XbEL", "Suite · Ground floor · Largest room"]
 };
 const qs = new URLSearchParams(location.search);
 const id = (qs.get("q") || qs.get("id") || "").replace(/[^a-f0-9]/gi, "").slice(0, 40);
-const fromPay = qs.has("razorpay_payment_id") || qs.has("razorpay_payment_link_status");
-const app = document.getElementById("app");
-let data = null, tick = null, polls = 0;
+let paying = qs.has("razorpay_payment_id") || qs.has("razorpay_payment_link_status");   // came back from a payment
+const app = document.getElementById("app"), barEl = document.getElementById("bar");
+let data = null, tick = null, polls = 0, total0 = 0;
 
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const inr = n => "₹" + Math.round(Number(n) || 0).toLocaleString("en-IN");
@@ -134,19 +172,34 @@ function day(iso, long) {
   const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
   return DAY[d.getUTCDay()] + ", " + (+m[3]) + " " + MON[+m[2] - 1] + (long ? " " + m[1] : "");
 }
-function photo(room) {
-  const r = ROOMS[room];
-  return r ? "https://drive.google.com/thumbnail?id=" + r[0] + "&sz=w400" : "img/ke-ac-room.webp";
+const photo = room => ROOMS[room] ? "https://drive.google.com/thumbnail?id=" + ROOMS[room][0] + "&sz=w400" : "img/ke-ac-room.webp";
+const I = {
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+  in: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>',
+  out: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>',
+  ppl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14a6.5 6.5 0 0 1 3.5 6"/></svg>',
+  id: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10h6M7 14h10"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
+};
+
+function steps(s) {
+  const paid = s === "confirmed", held = s === "pending_payment" || s === "needs_review" || paid;
+  const st = (on, now) => on ? "step done" : now ? "step now" : "step";
+  return `<div class="steps" aria-label="Booking progress">
+    <div class="${st(held, !held)}"><i>${held ? "✓" : "1"}</i><span>Room held</span></div><div class="bar ${held ? "done" : ""}"></div>
+    <div class="${st(paid, held && !paid)}"><i>${paid ? "✓" : "2"}</i><span>Payment</span></div><div class="bar ${paid ? "done" : ""}"></div>
+    <div class="${st(paid, false)}"><i>${paid ? "✓" : "3"}</i><span>Voucher</span></div>
+  </div>`;
 }
 
 function status(d) {
   const s = d.status;
   if (s === "confirmed") return `<div class="st ok"><div class="ic">✓</div><div><b>Payment successful</b><span>Your booking is confirmed${d.booking_id ? " · ID " + esc(d.booking_id) : ""}</span></div></div>`;
-  if (s === "pending_payment" && fromPay) return `<div class="st wait"><div class="ic"><div class="sp"></div></div><div><b>Confirming your payment…</b><span>This takes a few seconds. Please keep this page open.</span></div></div>`;
-  if (s === "pending_payment" && d.pay_url) return `<div class="st hold"><div class="ic">⏳</div><div><b>Room held for you</b><span>Pay within <span class="clock" id="clock">--:--</span> to confirm (until ${esc(d.hold_until)})</span></div></div>`;
+  if (s === "pending_payment" && paying) return `<div class="st wait"><div class="ic"><div class="sp"></div></div><div><b>Confirming your payment…</b><span>This takes a few seconds. Please keep this page open.</span></div></div>`;
+  if (s === "pending_payment") return `<div class="st hold"><div class="ic">⏳</div><div style="flex:1"><b>Room held for you</b><span>Pay within <span class="clock" id="clock">--:--</span> to confirm (until ${esc(d.hold_until)})</span><div class="tbar"><i id="tbar" style="width:100%"></i></div></div></div>`;
   if (s === "needs_review") return `<div class="st wait"><div class="ic">✓</div><div><b>Payment received</b><span>Our team will call you shortly to complete your booking</span></div></div>`;
   if (s === "quoted") return `<div class="st wait"><div class="ic">₹</div><div><b>Your tariff</b><span>Not reserved yet</span></div></div>`;
-  return `<div class="st bad"><div class="ic">!</div><div><b>${s === "cancelled" ? "Hold cancelled" : "Hold expired"}</b><span>The room was released. Please call us to book again.</span></div></div>`;
+  return `<div class="st bad"><div class="ic">!</div><div><b>${s === "cancelled" ? "Hold cancelled" : "Hold expired"}</b><span>The room was released. Call or WhatsApp us to book again.</span></div></div>`;
 }
 
 function render(d) {
@@ -155,72 +208,113 @@ function render(d) {
   const per = Math.round((Number(d.total) || 0) / nights);
   const guests = (d.adults || 0) + ((d.adults || 0) === 1 ? " adult" : " adults") +
     (d.children ? ", " + d.children + (d.children === 1 ? " child" : " children") : "");
-  const sub = (ROOMS[d.room] ? ROOMS[d.room][1] : "Room") + " · " + (d.ac === "AC" ? "AC" : "Non-AC");
+  const sub = ROOMS[d.room] ? ROOMS[d.room][1] : "Room";
   const paid = d.status === "confirmed";
-  const canPay = d.status === "pending_payment" && d.pay_url && !fromPay;
-  document.getElementById("kick").textContent = paid ? "Booking confirmed" : canPay ? "Review & pay" : "Your booking";
-  app.innerHTML = status(d) + `
+  const canPay = d.status === "pending_payment" && !paying;
+  document.querySelector("#kick span").textContent = paid ? "Booking confirmed" : canPay ? "Secure checkout" : "Your booking";
+  app.innerHTML = steps(d.status) + status(d) + `
   <section class="cart" aria-label="Booking summary">
     <div class="item">
       <div class="ph"><img src="${photo(d.room)}" alt="${esc(d.room)} room" onerror="this.src='img/ke-ac-room.webp'"><em>${d.ac === "AC" ? "AC" : "NON-AC"}</em></div>
       <div>
         <h2>${esc(d.room)}</h2>
         <div class="sub">${esc(sub)}</div>
-        <div class="dt">${day(d.check_in)} → ${day(d.check_out)}</div>
+        <div class="chips"><span class="chip">${nights} ${nights === 1 ? "night" : "nights"}</span><span class="chip">${esc(guests)}</span></div>
       </div>
     </div>
     <div class="sec">
-      ${paid && d.booking_id ? `<div class="row"><span>Booking ID</span><span>${esc(d.booking_id)}</span></div>` : ""}
-      <div class="row"><span>Guest</span><span>${esc(d.guest_name)}</span></div>
-      <div class="row"><span>Check-in</span><span>${day(d.check_in, true)} · 12 noon</span></div>
-      <div class="row"><span>Check-out</span><span>${day(d.check_out, true)} · 10 am</span></div>
-      <div class="row"><span>Guests</span><span>${esc(guests)}</span></div>
+      ${paid && d.booking_id ? `<div class="row"><span>${I.id}Booking ID</span><span>${esc(d.booking_id)}</span></div>` : ""}
+      <div class="row"><span>${I.user}Guest</span><span>${esc(d.guest_name)}</span></div>
+      <div class="row"><span>${I.in}Check-in</span><span>${day(d.check_in, true)} · 12 noon</span></div>
+      <div class="row"><span>${I.out}Check-out</span><span>${day(d.check_out, true)} · 10 am</span></div>
+      <div class="row"><span>${I.ppl}Guests</span><span>${esc(guests)}</span></div>
     </div>
     <div class="sec">
       <div class="row"><span>${inr(per)} × ${nights} ${nights === 1 ? "night" : "nights"}${nights > 1 ? " (avg)" : ""}</span><span>${inr(d.total)}</span></div>
-      <div class="row"><span>Taxes</span><span>Included</span></div>
+      <div class="row"><span>Taxes &amp; fees</span><span>Included</span></div>
     </div>
     <div class="tot"><b>${paid ? "Amount paid" : "Total payable"}<small>incl. all taxes</small></b><strong>${inr(d.total)}</strong></div>
   </section>
-  ${d.reference ? `<div class="ref">REF ${esc(d.reference)}</div>` : ""}
-  ${canPay ? `<a class="pay" id="pay" href="${esc(d.pay_url)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Pay ${inr(d.total)} securely</a>
-  <div class="trust"><span>🔒 Secured by Razorpay</span><span>UPI · Cards · Netbanking</span></div>
+  ${d.reference ? `<div class="ref">BOOKING REF ${esc(d.reference)}</div>` : ""}
+  ${canPay ? `<div class="trust">${I.lock.replace("<svg", '<svg style="width:12px;height:12px"')}<span>Secured by Razorpay</span><span class="pm"><span>UPI</span><span>Cards</span><span>Net banking</span></span></div>
+  <div class="hl"><div><b>Walk to Main Falls</b>A few minutes on foot</div><div><b>Family friendly</b>Alcohol &amp; smoke free</div>
+    <div><b>Home food</b>Made to order</div><div><b>24/7 power backup</b>Hot water · Wi-Fi</div></div>
   <p class="note">Your booking is confirmed only after payment. The voucher comes to your WhatsApp right after.</p>` : ""}
   ${paid ? `<p class="note ok">Your reservation voucher has been sent to your WhatsApp. Please show it at check-in with an original photo ID for every adult. See you in Courtallam!</p>
-  <a class="ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Kutralam+Ezhilagam+Courtallam">📍 Directions to the hotel</a>` : ""}
-  ${/expired|cancelled/.test(d.status) ? `<a class="ghost" href="tel:+919962222415">📞 Call the booking team</a>` : ""}`;
+  <div class="btns"><a class="ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Kutralam+Ezhilagam+Courtallam">📍 Directions</a><a class="ghost" href="tel:+918248320685">📞 Reception</a></div>` : ""}
+  ${/expired|cancelled/.test(d.status) ? `<div class="btns"><a class="ghost" href="tel:+919962222415">📞 Call us</a><a class="ghost" href="https://wa.me/916374213184">💬 WhatsApp</a></div>` : ""}`;
+  barEl.innerHTML = canPay ? `<div class="paybar"><div class="in"><div class="amt"><small>Total</small><b>${inr(d.total)}</b></div>
+    <button class="pay" id="pay" type="button">${I.lock}Pay securely</button></div></div>` : "";
+  const btn = document.getElementById("pay"); if (btn) btn.onclick = payNow;
   startClock();
 }
 
 function startClock() {
   clearInterval(tick);
-  const el = document.getElementById("clock");
+  const el = document.getElementById("clock"), tb = document.getElementById("tbar");
   if (!el || !data || !data.hold_ms) { if (el) el.textContent = data && data.hold_until || ""; return; }
+  if (!total0) total0 = Math.max(60000, Number(data.hold_ms) - Date.now());
   const f = () => {
     const left = Math.max(0, Number(data.hold_ms) - Date.now());
     const m = Math.floor(left / 60000), s = Math.floor(left / 1000) % 60;
     el.textContent = m + ":" + String(s).padStart(2, "0");
+    if (tb) tb.style.width = Math.max(0, Math.min(100, left / total0 * 100)) + "%";
     if (!left) { clearInterval(tick); load(); }
   };
   f(); tick = setInterval(f, 1000);
 }
 
-function fail(msg) {
-  app.innerHTML = `<div class="st bad"><div class="ic">!</div><div><b>${esc(msg)}</b><span>Please call our booking team on 99622 22415.</span></div></div>
-  <a class="ghost" href="tel:+919962222415">📞 Call the booking team</a>`;
+function toast(t) {
+  const el = document.createElement("div"); el.className = "toast"; el.textContent = t; document.body.appendChild(el);
+  setTimeout(() => el.remove(), 4500);
+}
+function loadCheckout() {
+  if (window.Razorpay) return Promise.resolve();
+  return new Promise((ok, fail) => { const s = document.createElement("script"); s.src = "https://checkout.razorpay.com/v1/checkout.js";
+    s.onload = ok; s.onerror = fail; document.head.appendChild(s); });
+}
+/* pays on this page with Razorpay Checkout; if that cannot start, the guest still gets Razorpay's own payment page */
+async function payNow() {
+  const btn = document.getElementById("pay"); if (!btn || !data) return;
+  btn.disabled = true; btn.innerHTML = I.lock + "Opening payment…";
+  const fallback = () => { if (data.pay_url) location.href = data.pay_url; else { btn.disabled = false; btn.innerHTML = I.lock + "Pay securely"; toast("Could not start the payment. Please try again."); } };
+  try {
+    const [o] = await Promise.all([fetch(PRIME + "?action=voiceCard&op=order&q=" + id, { cache: "no-store" }).then(r => r.json()), loadCheckout()]);
+    if (!o || !o.ok || !o.order_id || !window.Razorpay) { if (o && /expired|cancelled|confirmed/.test(o.status || "")) return load(); return fallback(); }
+    const left = Math.floor((Number(o.hold_ms) - Date.now()) / 1000);
+    const rz = new Razorpay({
+      key: o.key_id, order_id: o.order_id, amount: o.amount, currency: o.currency || "INR",
+      name: "Kutralam Ezhilagam", description: o.description + " · Ref " + (o.reference || ""),
+      image: SITE + "/img/pay-logo.png",
+      prefill: { name: o.name || "", contact: o.contact || "", email: o.email || "" },
+      notes: { quote_id: id }, theme: { color: "#047857" },
+      timeout: left > 60 ? left : undefined, remember_customer: false,
+      modal: { confirm_close: true, ondismiss: () => { btn.disabled = false; btn.innerHTML = I.lock + "Pay securely"; } },
+      handler: () => { paying = true; polls = 0; render(data); setTimeout(() => load(true), 1500); }
+    });
+    rz.on("payment.failed", (r) => toast((r && r.error && r.error.description) || "Payment failed. Please try again."));
+    rz.open();
+  } catch (e) { fallback(); }
 }
 
-async function load() {
-  if (qs.get("demo") === "1") return render({ status: qs.get("s") || "pending_payment", room: qs.get("room") || "Marutham", ac: "AC",
-    guest_name: "Rakesh", check_in: "2026-10-22", check_out: "2026-10-24", nights: 2, adults: 2, children: 0, total: 5198,
-    reference: "V1012", pay_url: "#", hold_until: "6:45 PM", hold_ms: Date.now() + 14 * 60000, booking_id: "EZ-2210" });
+function fail(msg) {
+  barEl.innerHTML = "";
+  app.innerHTML = `<div class="st bad"><div class="ic">!</div><div><b>${esc(msg)}</b><span>Please call our booking team on 99622 22415.</span></div></div>
+  <div class="btns"><a class="ghost" href="tel:+919962222415">📞 Call us</a><a class="ghost" href="https://wa.me/916374213184">💬 WhatsApp</a></div>`;
+}
+
+async function load(afterPay) {
+  if (qs.get("demo") === "1") return render({ status: qs.get("s") || "pending_payment", room: qs.get("room") || "Vaagai", ac: "AC",
+    guest_name: "Rakesh", check_in: "2026-10-21", check_out: "2026-10-22", nights: 1, adults: 2, children: 0, total: 6499,
+    reference: "V1013", pay_url: "#", hold_until: "2:12 PM", hold_ms: Date.now() + 14 * 60000, booking_id: "EZ-2210" });
   if (!/^[a-f0-9]{32}$/i.test(id)) return fail("This link is not complete");
   try {
-    const r = await fetch(PRIME + "?action=voiceCard&q=" + id, { cache: "no-store" });
+    const r = await fetch(PRIME + "?action=voiceCard&q=" + id + (paying ? "&paid=1" : ""), { cache: "no-store" });
     const d = await r.json();
     if (!d || d.ok === false || d.status === "none" || d.status === "bad_request") return fail("This link is not valid");
+    if (d.status !== "pending_payment") paying = false;
     render(d);
-    if (d.status === "pending_payment" && (fromPay || !d.pay_url) && polls++ < 40) setTimeout(load, 4000);
+    if (paying && d.status === "pending_payment" && polls++ < 40) setTimeout(() => load(true), 3500);
   } catch (e) {
     if (polls++ < 5) setTimeout(load, 3000); else fail("Could not load your booking");
   }

@@ -1391,7 +1391,7 @@ function cardMerge(o) {
   const pick = (...k) => { for (const x of k) if (o[x] != null && o[x] !== "") return o[x]; };
   const v = { name: pick("guest_name", "name"), checkIn: pick("check_in", "checkin"), checkOut: pick("check_out", "checkout"),
     nights: pick("nights"), room: pick("room", "room_name", "room_code"), ac: pick("ac"), adults: pick("adults"),
-    children: pick("children"), total: pick("total", "rate_total", "rate"), payUrl: pick("pay_url"),
+    children: pick("children"), total: pick("total", "rate_total", "rate"), payUrl: pick("pay_page", "pay_url"),
     status: pick("status"), holdUntil: pick("hold_until"), bookingId: pick("booking_id"), ref: pick("reference") };
   for (const k in v) if (v[k] != null) card[k] = v[k];
   if (card.checkIn && card.checkOut && !v.nights) card.nights = nightsOf(card.checkIn, card.checkOut) || card.nights;

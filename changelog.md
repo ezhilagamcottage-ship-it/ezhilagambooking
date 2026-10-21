@@ -7,6 +7,14 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v1.9 — 21 Oct 2026
+
+**Pay on our own page.** The /pay checkout page is redesigned in the website's style (progress steps, room photo
+card, countdown, sticky Pay bar) and now takes the payment itself with Razorpay Checkout — Ezhilagam logo and green
+theme — instead of sending the guest to Razorpay's blue page. The Talk with Shenba "Proceed to pay" opens this page too.
+
+---
+
 ## v1.8 — 21 Oct 2026
 
 **No call time limit on Talk with Shenba.** Shenba stays on the call until the booking is held,
