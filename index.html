@@ -339,6 +339,26 @@ dialog.sc{height:100dvh;max-height:100dvh;max-width:480px;margin:0 auto;border-r
   box-shadow:0 6px 18px rgba(4,120,87,.28)}
 .sc-pay[aria-disabled="true"]{background:#d6d3d1;color:#78716c;box-shadow:none;pointer-events:none}
 .sc-pay.done{font-size:14px;text-align:center;background:#ecfdf5;color:var(--brand);border:1.5px solid #a7f3d0;box-shadow:none;pointer-events:none}
+/* Option 1 / Option 2 room cards (Rakesh, 22 Oct 2026 08:11): photo, name, price; the guest taps one */
+.sc-opts{width:100%}
+.sc-opts[hidden]{display:none}
+.sc-opts h3{margin:0 0 6px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.op-row{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;-webkit-overflow-scrolling:touch}
+.op{flex:0 0 78%;max-width:300px;scroll-snap-align:start;border:2px solid var(--line);border-radius:16px;background:var(--card);
+  padding:0;overflow:hidden;text-align:left;font:inherit;color:inherit;cursor:pointer;position:relative;transition:border-color .2s,box-shadow .2s}
+.op img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;background:#e7f5ee}
+.op .tag{position:absolute;left:8px;top:8px;background:rgba(28,25,23,.78);color:#fff;font-size:12px;font-weight:800;border-radius:999px;padding:3px 10px}
+.op .in{padding:8px 12px 10px;display:grid;gap:2px}
+.op .nm{font-weight:800;font-size:15px}
+.op .sub{font-size:12px;color:var(--mute)}
+.op .pr{font-weight:800;font-size:18px;color:var(--brand)}
+.op .pr small{font-size:11.5px;font-weight:600;color:var(--mute)}
+.op .go{margin-top:4px;font-size:12.5px;font-weight:800;color:var(--brand)}
+.op.sel{border-color:var(--brand);box-shadow:0 6px 18px rgba(4,120,87,.22)}
+.op.sel .go{color:#fff;background:var(--brand);border-radius:8px;padding:4px 8px;justify-self:start}
+.sb-opts{align-self:stretch;margin:2px 0}
+.sb-opts .op{flex-basis:72%}
+.sc-pay.busy{opacity:.85;pointer-events:none}
 .sc-end{border:0;border-radius:14px;padding:0 16px;min-height:52px;background:#b91c1c;color:#fff;font:inherit;font-weight:800;cursor:pointer}
 .sc-end[hidden]{display:none}
 /* 22 Oct 2026: the guest types the mobile number (no voice mistakes) and confirms it with a WhatsApp code */
@@ -806,6 +826,7 @@ footer{padding-top:8px}
       <small>Kutralam Ezhilagam's voice assistant (AI)</small>
       <div class="sc-stat" id="scStat" aria-live="polite">Connecting…</div>
     </div>
+    <div class="sc-opts" id="scOpts" hidden><h3>Tap the room you like</h3><div class="op-row" id="scOptRow"></div></div>
     <div class="sc-card" id="scCard">
       <h3>Your booking</h3>
       <div class="sc-row"><span>Name</span><b data-f="name" class="empty">—</b></div>
@@ -1318,9 +1339,11 @@ async function chatSend(t) {
   try { j = await api("/turn", { session: chat, text: t }); }
   catch (e) { if (!e.gone) throw e; chat = null; await startChat(true); j = await api("/turn", { session: chat, text: t }); }
   add("ai", j.reply || "Sorry, could you say that again?");
+  if (j.options) showOptions(j.options, "chat");
   if (j.ask_phone && await askPhone(chat)) {
     const k = await api("/turn", { session: chat, verified: true });
     add("ai", k.reply || "Thank you!");
+    if (k.options) showOptions(k.options, "chat");
   }
 }
 
@@ -1540,18 +1563,24 @@ function cardMerge(o) {
     pay.className = "sc-pay"; pay.href = card.payUrl; pay.setAttribute("aria-disabled", "false");
     pay.textContent = "Proceed to pay " + inr(card.total) + (+card.discount > 0 ? " · " + inr(card.discount) + " off" : "");
     note.className = "sc-note"; note.textContent = "Room held for you until " + (card.holdUntil || "a few minutes") + ". Secure payment by Razorpay.";
-  } else if (card.status === "expired" || card.status === "cancelled") {
-    pay.className = "sc-pay"; pay.removeAttribute("href"); pay.setAttribute("aria-disabled", "true"); pay.textContent = "Proceed to pay";
-    note.className = "sc-note"; note.textContent = "The hold has ended. Ask Shenba to hold the room again.";
-  } else if (card.status === "quoted") {
-    note.className = "sc-note"; note.textContent = "Say yes to Shenba to hold the room, then pay here.";
+    if (payWin) { try { if (!payWin.closed) payWin.location.href = card.payUrl; } catch (e) {} payWin = null; }
+  } else if (card.total && !payBusy) {
+    /* Rakesh, 22 Oct 2026 08:11: "Proceed to pay should happen immediately when rate is populated, with or without discount".
+       A tap tells Shenba to hold the room and make the payment link; the payment page opens by itself when it is ready. */
+    pay.className = "sc-pay"; pay.removeAttribute("href"); pay.setAttribute("aria-disabled", "false"); pay.dataset.hold = "1";
+    pay.textContent = "Proceed to pay " + inr(card.total) + (+card.discount > 0 ? " · " + inr(card.discount) + " off" : "");
+    note.className = "sc-note"; note.textContent = card.status === "expired" || card.status === "cancelled"
+      ? "The earlier hold ended - tap Proceed to pay to hold the room again." : "Tap Proceed to pay to hold this room and pay securely (Razorpay).";
   }
+  if (card.payUrl && card.status === "pending_payment") { delete pay.dataset.hold; payBusy = false; }
 }
+let payWin = null, payBusy = false;
 function cardReset() {
   card = {}; convId = ""; cardFinal = false; clearTimeout(cardTimer); cardTimer = 0;
   document.querySelectorAll("#scCard [data-f]").forEach(el => { el.textContent = "—"; el.className = "empty"; });
   $("scSave").hidden = true;
   const pay = $("scPay"); pay.className = "sc-pay"; pay.removeAttribute("href"); pay.setAttribute("aria-disabled", "true"); pay.textContent = "Proceed to pay";
+  delete pay.dataset.hold; payBusy = false; payWin = null; showOptions([], "call");
   $("scNote").className = "sc-note"; $("scNote").textContent = "Details appear here as you tell Shenba.";
 }
 async function cardPoll() {
@@ -1616,7 +1645,7 @@ function openCall(start) {
   if (start) { cardReset(); startVoice(); }
   else { saState("idle", "Tap Shenba to start talking"); }
 }
-window.__saCard = { cardMerge, cardReset, askPhone, showThanks, confirmLeave, saveResume, pendingResume };   /* used by the preview only */
+window.__saCard = { cardMerge, cardReset, askPhone, showThanks, confirmLeave, saveResume, pendingResume, showOptions };   /* used by the preview only */
 setTimeout(() => { if (SHENBA_WEB && pendingResume()) resumeShenba(); }, 700);   // came back while a WhatsApp code was waiting
 
 /* ── the call (v1.7, our own server) ──
@@ -1682,6 +1711,69 @@ function listen() {
 /* Fillers (Rakesh, 22 Oct 2026 07:50): while Shenba works out her answer (rooms, prices, the guest's history) a short
    natural line plays - "ம்ம்... ஒரு நிமிஷம்." - so the guest is never left in silence. Only if the answer is slower than
    1.3 s; the reply follows straight after it. */
+/* Room options and taps on the screen (Rakesh, 22 Oct 2026 08:11) */
+let tapQ = null;
+const ROOM_PIC = o => o.photo || (/suite|family/i.test(o.type || "") ? "img/ke-suite-living.webp" : o.ac ? "img/ke-ac-room.webp" : "img/ke-double.webp");
+function optEl(o, where) {
+  const b = document.createElement("button"); b.type = "button"; b.className = "op"; b.dataset.n = o.n;
+  b.innerHTML = '<span class="tag">Option ' + o.n + '</span><img alt="" loading="lazy"><span class="in"><span class="nm"></span>' +
+    '<span class="sub"></span><span class="pr"></span><span class="go">Tap to choose</span></span>';
+  const img = b.querySelector("img"); img.src = ROOM_PIC(o); img.alt = o.name; img.onerror = () => { img.onerror = null; img.src = "img/ke-ac-room.webp"; };
+  b.querySelector(".nm").textContent = o.name + " · " + o.ac_label;
+  b.querySelector(".sub").textContent = [o.type, o.max_guests ? "up to " + o.max_guests + " guests" : "", o.floor].filter(Boolean).join(" · ");
+  b.querySelector(".pr").innerHTML = inr(o.total) + ' <small>for ' + o.nights + (o.nights === 1 ? " night" : " nights") + (o.nights > 1 ? " · " + inr(o.per_night) + "/night" : "") + ' · tax incl.</small>';
+  b.addEventListener("click", () => chooseOption(o, where, b));
+  return b;
+}
+function showOptions(opts, where) {
+  if (where === "chat") {
+    if (!opts.length) return;
+    const box = document.createElement("div"); box.className = "sb-opts";
+    const row = document.createElement("div"); row.className = "op-row"; opts.forEach(o => row.appendChild(optEl(o, "chat")));
+    box.appendChild(row); $("sbLog").appendChild(box); $("sbLog").scrollTop = $("sbLog").scrollHeight;
+    return;
+  }
+  const row = $("scOptRow"); row.innerHTML = ""; opts.forEach(o => row.appendChild(optEl(o, "call")));
+  $("scOpts").hidden = !opts.length;
+  if (opts.length) $("scOpts").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+function chooseOption(o, where, el) {
+  el.parentNode.querySelectorAll(".op").forEach(x => { x.classList.toggle("sel", x === el); x.querySelector(".go").textContent = x === el ? "✓ Selected" : "Tap to choose"; });
+  if (where === "chat") { chatTap({ kind: "option", n: o.n }, "Option " + o.n + ": " + o.name + " · " + o.ac_label + " · " + inr(o.total)); return; }
+  cardMerge({ room: o.name, ac: o.ac_label, total: o.total, list_total: o.total, check_in: o.check_in, check_out: o.check_out });
+  sendTap({ kind: "option", n: o.n });
+}
+function sendTap(t) {   // the voice loop picks it up at once: Shenba stops talking / listening and answers the tap
+  tapQ = t;
+  if (src) stopPlay();
+  if (rec) { try { rec.stop(); } catch (e) {} }
+  if (!calling && !starting && session) startVoice(true, true);
+}
+async function chatTap(t, label) {
+  if (!chat) return;
+  add("me", label); typing();
+  try { const j = await api("/turn", { session: chat, tap: t }); add("ai", j.reply || "Sure!"); if (j.options) showOptions(j.options, "chat"); }
+  catch (e) { add("ai", "Sorry, please tell me which option you like."); }
+}
+$("scPay").addEventListener("click", e => {
+  const pay = $("scPay");
+  if (!pay.dataset.hold) return;                 // a ready payment link: the normal link opens it
+  e.preventDefault();
+  if (payBusy) return;
+  if (!calling || !session) { $("scNote").textContent = "The call has ended - tap Shenba to talk again and she will hold this room for you."; return; }
+  payBusy = true;
+  try { payWin = window.open("", "_blank"); if (payWin) payWin.document.write('<title>Kutralam Ezhilagam</title><p style="font:18px system-ui;text-align:center;margin-top:40vh;color:#047857">Holding your room… the payment page opens in a moment.</p>'); } catch (x) { payWin = null; }
+  pay.classList.add("busy"); pay.textContent = "Holding your room…";
+  $("scNote").textContent = "Shenba is holding the room and making your payment link.";
+  sendTap({ kind: "pay" });
+  setTimeout(() => { if (payBusy && !(card.payUrl && card.status === "pending_payment")) { payBusy = false; pay.classList.remove("busy"); cardMerge({}); } }, 60000);
+});
+function takeReply(r) {   // card + room options from any Shenba reply
+  if (!r) return;
+  if (r.card) cardMerge(r.card);
+  if (r.options) showOptions(r.options, "call");
+}
+
 let fillers = [], lastFiller = -1;
 async function loadFillers() {
   if (fillers.length) return;
@@ -1731,7 +1823,7 @@ async function resumeShenba() {
   }
 }
 
-async function startVoice(resume) {
+async function startVoice(resume, viaTap) {
   if (calling || starting) return;
   starting = true; calling = true;
   setMini(false);
@@ -1748,9 +1840,11 @@ async function startVoice(resume) {
     if (resume) {   // the page was reloaded while the guest read the WhatsApp code: same call, same Shenba, carry on
       starting = false; cardPoll();
       saState("connecting", "Shenba is thinking…");
-      const k = await withFiller(api("/turn", { session, verified: true }));
-      if (k.card) cardMerge(k.card);
-      if (k.reply) await play(k.audio_b64);
+      if (!viaTap) {   // a tap after the call ended re-opens the mic and the loop sends the tap
+        const k = await withFiller(api("/turn", { session, verified: true }));
+        takeReply(k);
+        if (k.reply) await play(k.audio_b64);
+      }
     } else {
       const j = await api("/start", { mode: "voice" });
       session = j.session; convId = j.conversation_id || ""; cardPoll();
@@ -1759,18 +1853,22 @@ async function startVoice(resume) {
     }
     let fails = 0;
     while (calling) {
-      const blob = await listen();
-      if (!calling) break;
-      if (!blob) { saState("listening", "Still there? Tap Shenba to talk again"); await endVoice("Call ended · tap Shenba to talk again"); break; }
+      let blob = null;
+      if (!tapQ) {
+        blob = await listen();
+        if (!calling) break;
+        if (!blob && !tapQ) { saState("listening", "Still there? Tap Shenba to talk again"); await endVoice("Call ended · tap Shenba to talk again"); break; }
+      }
       saState("connecting", "Shenba is thinking…");
       let r;
       /* 21 Oct 2026: one failed turn (network blip, server busy) no longer ends the call - retry, then keep listening */
-      const b64 = await blobToB64(blob);
+      const tap = tapQ; tapQ = null;   // a tap on the screen (option card, Proceed to pay) wins over what was being said
+      const body = tap ? { session, tap } : { session, audio_b64: await blobToB64(blob), audio_mime: blob.type };
       let gone = false;
       r = await withFiller((async () => {   // a short filler plays if her answer takes more than a moment
         let rr;
         for (let k = 0; k < 2 && !rr && !gone; k++) {
-          try { rr = await api("/turn", { session, audio_b64: b64, audio_mime: blob.type }); }
+          try { rr = await api("/turn", body); }
           catch (e) { if (e.gone) gone = true; else if (k === 0) await new Promise(z => setTimeout(z, 1500)); }
         }
         return rr;
@@ -1784,7 +1882,7 @@ async function startVoice(resume) {
       }
       fails = 0;
       if (!calling) break;
-      if (r.card) cardMerge(r.card);
+      takeReply(r);
       if (r.silent || !r.reply) continue;
       await play(r.audio_b64);
       if (r.end) { await endVoice("Call ended · thank you!"); if (r.registered || card.phone) showThanks(card.status === "pending_payment"); break; }
@@ -1794,7 +1892,7 @@ async function startVoice(resume) {
         if (!calling) break;
         if (ok) {
           saState("connecting", "Shenba is thinking…");
-          try { const k = await withFiller(api("/turn", { session, verified: true })); if (k.card) cardMerge(k.card); if (k.reply) await play(k.audio_b64); if (k.end) { await endVoice("Call ended · thank you!"); break; } } catch (e) {}
+          try { const k = await withFiller(api("/turn", { session, verified: true })); takeReply(k); if (k.reply) await play(k.audio_b64); if (k.end) { await endVoice("Call ended · thank you!"); break; } } catch (e) {}
         }
       }
     }

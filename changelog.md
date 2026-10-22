@@ -7,6 +7,16 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v2.3 — 22 Oct 2026
+
+**Tap to choose, pay at once, no repeating.** When Shenba offers rooms, the call page (and the chat) shows them as
+Option 1 / Option 2 cards with the room photo, AC or non-AC and the total; the guest taps one and Shenba carries on with
+it. "Proceed to pay" turns green as soon as a rate is on the card (with or without a discount): one tap tells Shenba to
+hold the room, and the payment page opens by itself when the link is ready. Shenba no longer asks the name again or
+reads the details back — she asks the guest to check the card on the screen before checking rooms.
+
+---
+
 ## v2.2 — 22 Oct 2026
 
 **Fillers and nothing lost while reading the code.** When Shenba needs a moment (checking rooms, prices or the guest's
