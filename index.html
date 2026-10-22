@@ -847,7 +847,7 @@ footer{padding-top:8px}
       <button type="button" id="tyClose">Close</button></div>
   </div>
   <div class="sc-actions">
-    <a class="sc-pay" id="scPay" aria-disabled="true" target="_blank" rel="noopener">Proceed to pay</a>
+    <a class="sc-pay" id="scPay" aria-disabled="true">Proceed to pay</a>
     <button type="button" class="sc-end" id="scEnd">End call</button>
   </div>
 </dialog>
@@ -1563,7 +1563,7 @@ function cardMerge(o) {
     pay.className = "sc-pay"; pay.href = card.payUrl; pay.setAttribute("aria-disabled", "false");
     pay.textContent = "Proceed to pay " + inr(card.total) + (+card.discount > 0 ? " · " + inr(card.discount) + " off" : "");
     note.className = "sc-note"; note.textContent = "Room held for you until " + (card.holdUntil || "a few minutes") + ". Secure payment by Razorpay.";
-    if (payWin) { try { if (!payWin.closed) payWin.location.href = card.payUrl; } catch (e) {} payWin = null; }
+    if (payGo) { payGo = false; goPay(card.payUrl); }   // the guest tapped Proceed to pay: open the payment page now
   } else if (card.total && !payBusy) {
     /* Rakesh, 22 Oct 2026 08:11: "Proceed to pay should happen immediately when rate is populated, with or without discount".
        A tap tells Shenba to hold the room and make the payment link; the payment page opens by itself when it is ready. */
@@ -1574,13 +1574,24 @@ function cardMerge(o) {
   }
   if (card.payUrl && card.status === "pending_payment") { delete pay.dataset.hold; payBusy = false; }
 }
-let payWin = null, payBusy = false;
+let payGo = false, payBusy = false, leaving = false;
+/* 22 Oct 2026 22:47: the payment page opens in THIS tab once the link is ready (a new tab left the call page paused on
+   phones and the new tab stayed blank). Shenba finishes her sentence first; the call then ends and the page moves on. */
+async function goPay(url) {
+  if (!url || leaving) return;
+  $("scPay").textContent = "Opening the payment page…";
+  for (let i = 0; i < 6 && !src && calling; i++) await new Promise(z => setTimeout(z, 250));   // her reply is about to play
+  for (let i = 0; i < 40 && src; i++) await new Promise(z => setTimeout(z, 300));   // let her finish (12 s at most)
+  leaving = true; clearResume();
+  try { await endVoice("Opening the payment page…"); } catch (e) {}
+  location.href = url;
+}
 function cardReset() {
   card = {}; convId = ""; cardFinal = false; clearTimeout(cardTimer); cardTimer = 0;
   document.querySelectorAll("#scCard [data-f]").forEach(el => { el.textContent = "—"; el.className = "empty"; });
   $("scSave").hidden = true;
   const pay = $("scPay"); pay.className = "sc-pay"; pay.removeAttribute("href"); pay.setAttribute("aria-disabled", "true"); pay.textContent = "Proceed to pay";
-  delete pay.dataset.hold; payBusy = false; payWin = null; showOptions([], "call");
+  delete pay.dataset.hold; payBusy = false; payGo = false; showOptions([], "call");
   $("scNote").className = "sc-note"; $("scNote").textContent = "Details appear here as you tell Shenba.";
 }
 async function cardPoll() {
@@ -1629,7 +1640,7 @@ function untrap() { if (backTrap) { backTrap = false; try { window.history.back(
 ["sbCall", "sbChat"].forEach(id => $(id).addEventListener("cancel", async e => {   // Escape key
   e.preventDefault(); if (await closeShenba(id === "sbCall" ? "call" : "chat")) untrap();
 }));
-addEventListener("beforeunload", e => { if (collecting()) { e.preventDefault(); e.returnValue = ""; } });
+addEventListener("beforeunload", e => { if (!leaving && collecting()) { e.preventDefault(); e.returnValue = ""; } });
 function showThanks(booked) {
   $("tyHead").textContent = booked ? "Unga room hold pannirukkom!" : "Unga enquiry register aagiduchu!";
   $("tyLine").textContent = booked ? "Payment link WhatsApp-la vandhudum. Pay pannina udane voucher varum 😊"
@@ -1771,16 +1782,18 @@ async function chatTap(t, label) {
 }
 $("scPay").addEventListener("click", e => {
   const pay = $("scPay");
-  if (!pay.dataset.hold) return;                 // a ready payment link: the normal link opens it
+  if (!pay.dataset.hold) {                       // a ready payment link: open it here, in this tab
+    if (pay.getAttribute("href") && pay.getAttribute("aria-disabled") !== "true") { e.preventDefault(); goPay(pay.href); }
+    return;
+  }
   e.preventDefault();
   if (payBusy) return;
   if (!calling || !session) { $("scNote").textContent = "The call has ended - tap Shenba to talk again and she will hold this room for you."; return; }
-  payBusy = true;
-  try { payWin = window.open("", "_blank"); if (payWin) payWin.document.write('<title>Kutralam Ezhilagam</title><p style="font:18px system-ui;text-align:center;margin-top:40vh;color:#047857">Holding your room… the payment page opens in a moment.</p>'); } catch (x) { payWin = null; }
+  payBusy = true; payGo = true;
   pay.classList.add("busy"); pay.textContent = "Holding your room…";
-  $("scNote").textContent = "Shenba is holding the room and making your payment link.";
+  $("scNote").textContent = "Shenba is holding the room - the payment page opens here in a moment.";
   sendTap({ kind: "pay" });
-  setTimeout(() => { if (payBusy && !(card.payUrl && card.status === "pending_payment")) { payBusy = false; pay.classList.remove("busy"); cardMerge({}); } }, 60000);
+  setTimeout(() => { if (payBusy && !(card.payUrl && card.status === "pending_payment")) { payBusy = false; payGo = false; pay.classList.remove("busy"); cardMerge({}); } }, 60000);
 });
 function takeReply(r) {   // card + room options from any Shenba reply
   if (!r) return;

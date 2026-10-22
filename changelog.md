@@ -7,6 +7,15 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v2.6 — 22 Oct 2026
+
+**Payment opens in the same page.** Tapping "Proceed to pay" no longer opens an empty new tab (on phones the call page
+paused behind it and the tab stayed blank). The button shows "Holding your room…" while Shenba holds the room; when the
+payment link is ready and she has finished her sentence, this page goes straight to the payment page. The website also
+accepts calls from ezhilagambooking.netlify.app again.
+
+---
+
 ## v2.5 — 22 Oct 2026
 
 **ElevenLabs first.** Shenba's website calls (and WhatsApp voice notes) speak with the ElevenLabs voice of the phone agent
