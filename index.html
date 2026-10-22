@@ -1713,7 +1713,9 @@ function listen() {
    1.3 s; the reply follows straight after it. */
 /* Room options and taps on the screen (Rakesh, 22 Oct 2026 08:11) */
 let tapQ = null;
-const ROOM_PIC = o => o.photo || (/suite|family/i.test(o.type || "") ? "img/ke-suite-living.webp" : o.ac ? "img/ke-ac-room.webp" : "img/ke-double.webp");
+const drivePic = u => { const m = /drive\.google\.com\/.*[?&]id=([\w-]{20,})/.exec(u || "") || /\/file\/d\/([\w-]{20,})/.exec(u || "");
+  return m ? "https://drive.google.com/thumbnail?id=" + m[1] + "&sz=w800" : u; };   // Drive download links do not show in a page
+const ROOM_PIC = o => drivePic(o.photo) || (/suite|family/i.test(o.type || "") ? "img/ke-suite-living.webp" : o.ac ? "img/ke-ac-room.webp" : "img/ke-double.webp");
 function optEl(o, where) {
   const b = document.createElement("button"); b.type = "button"; b.className = "op"; b.dataset.n = o.n;
   b.innerHTML = '<span class="tag">Option ' + o.n + '</span><img alt="" loading="lazy"><span class="in"><span class="nm"></span>' +
