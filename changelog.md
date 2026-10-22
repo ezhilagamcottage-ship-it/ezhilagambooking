@@ -7,6 +7,15 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v2.4 — 22 Oct 2026
+
+**One voice, one Shenba.** Shenba's voice no longer changes mid-call: if Google's voice is busy she waits a moment and
+tries her own voice again instead of handing over to a different backup voice; if it still cannot be made, her words
+show on the call page. She also keeps the same tone and slang from the first line to the goodbye (language can change,
+the tone does not).
+
+---
+
 ## v2.3 — 22 Oct 2026
 
 **Tap to choose, pay at once, no repeating.** When Shenba offers rooms, the call page (and the chat) shows them as

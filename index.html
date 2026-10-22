@@ -1886,7 +1886,11 @@ async function startVoice(resume, viaTap) {
       if (!calling) break;
       takeReply(r);
       if (r.silent || !r.reply) continue;
-      await play(r.audio_b64);
+      if (r.audio_b64) await play(r.audio_b64);
+      else {   // her voice could not be made this once: show her words rather than let another voice speak (22 Oct 2026)
+        saState("speaking", "Shenba: " + r.reply);
+        await new Promise(z => setTimeout(z, Math.min(9000, 2500 + r.reply.length * 45)));
+      }
       if (r.end) { await endVoice("Call ended · thank you!"); if (r.registered || card.phone) showThanks(card.status === "pending_payment"); break; }
       if (r.ask_phone) {   // the mic waits while the guest types the number and the code
         saState("listening", "Type your mobile number in the box");
