@@ -7,6 +7,14 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v2.5 — 22 Oct 2026
+
+**ElevenLabs first.** Shenba's website calls (and WhatsApp voice notes) speak with the ElevenLabs voice of the phone agent
+(Vennila) whenever ElevenLabs has credits, and with the tuned Google Leda voice when it does not. Each call keeps one voice
+from start to end; the fillers come in the same voice as the call.
+
+---
+
 ## v2.4 — 22 Oct 2026
 
 **One voice, one Shenba.** Shenba's voice no longer changes mid-call: if Google's voice is busy she waits a moment and

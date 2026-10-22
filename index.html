@@ -1788,10 +1788,11 @@ function takeReply(r) {   // card + room options from any Shenba reply
   if (r.options) showOptions(r.options, "call");
 }
 
-let fillers = [], lastFiller = -1;
-async function loadFillers() {
-  if (fillers.length) return;
-  try { const j = await api("/fillers", {}); fillers = (j.fillers || []).filter(f => f.audio_b64); } catch (e) {}
+let fillers = [], lastFiller = -1, fillersFor = "";
+async function loadFillers() {   // per call: the fillers come in the same voice as this call (ElevenLabs or Leda)
+  if (!session || fillersFor === session) return;
+  fillersFor = session; fillers = [];
+  try { const j = await api("/fillers", { session }); fillers = (j.fillers || []).filter(f => f.audio_b64); } catch (e) {}
 }
 async function withFiller(p, ms = 1300) {
   let done = false, fp = null;
@@ -1850,8 +1851,8 @@ async function startVoice(resume, viaTap) {
     outAn = ac.createAnalyser(); outAn.fftSize = 1024; outAn.smoothingTimeConstant = .3; outAn.connect(ac.destination);
     const fq = new Uint8Array(outAn.frequencyBinCount);
     voice = { getOutputVolume: () => level(outAn) * 2.2, getOutputByteFrequencyData: () => { outAn.getByteFrequencyData(fq); return fq; } };
-    loadFillers();
-    if (resume) {   // the page was reloaded while the guest read the WhatsApp code: same call, same Shenba, carry on
+    if (resume) {
+      loadFillers();   // the page was reloaded while the guest read the WhatsApp code: same call, same Shenba, carry on
       starting = false; cardPoll();
       saState("connecting", "Shenba is thinking…");
       if (!viaTap) {   // a tap after the call ended re-opens the mic and the loop sends the tap
@@ -1861,7 +1862,7 @@ async function startVoice(resume, viaTap) {
       }
     } else {
       const j = await api("/start", { mode: "voice" });
-      session = j.session; convId = j.conversation_id || ""; cardPoll();
+      session = j.session; convId = j.conversation_id || ""; cardPoll(); loadFillers();
       starting = false;
       await play(j.audio_b64);
     }
