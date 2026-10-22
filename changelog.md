@@ -7,6 +7,16 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v2.2 — 22 Oct 2026
+
+**Fillers and nothing lost while reading the code.** When Shenba needs a moment (checking rooms, prices or the guest's
+earlier visits), a short natural line plays — "ம்ம்... ஒரு நிமிஷம்.", "Okay, check பண்ணிட்டு சொல்றேன்..." — instead of
+silence; her answer follows straight after. While the guest goes to WhatsApp to read the 4-digit code, the card, the
+conversation and the number are kept on the phone: if the page reloads, it reopens with the code box waiting and the
+same conversation carries on. The typed number also reaches the hotel at once (enquiry report), even if never verified.
+
+---
+
 ## v2.1 — 22 Oct 2026
 
 **Returning guests, safe closing, thank-you.** Shenba asks the mobile number first; once verified she knows if the

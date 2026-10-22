@@ -1326,7 +1326,7 @@ async function chatSend(t) {
 
 /* The guest types the mobile number and confirms it with the 4-digit code Shenba sends on WhatsApp (v2.0, 22 Oct 2026).
    Resolves true once verified, false if the guest chose "Not now" (then they can still say or type it to Shenba). */
-function askPhone(sess) {
+function askPhone(sess, waitingFor) {
   return new Promise(done => {
     const d = $("phDlg"), num = $("phNum"), code = $("phCode");
     const step = n => { $("phStep1").hidden = n !== 1; $("phStep2").hidden = n !== 2; (n === 1 ? num : code).focus(); };
@@ -1340,7 +1340,7 @@ function askPhone(sess) {
       try {
         const j = await fetch(API + "/otp", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ session: sess, phone: p }) }).then(r => r.json());
         if (!j.ok) err(1, j.error || "Could not send the code.");
-        else { $("phTo").textContent = "+91 " + p.slice(0, 5) + " " + p.slice(5); code.value = ""; err(2, ""); step(2); }
+        else { $("phTo").textContent = "+91 " + p.slice(0, 5) + " " + p.slice(5); code.value = ""; err(2, ""); step(2); saveResume({ otpPhone: p }); }
       } catch (e) { err(1, "Could not send the code. Please try again."); }
       busy = false; $("phSend").disabled = false;
     };
@@ -1350,8 +1350,8 @@ function askPhone(sess) {
       busy = true; $("phVerify").disabled = true; err(2, "");
       try {
         const j = await fetch(API + "/verify", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ session: sess, code: c }) }).then(r => r.json());
-        if (j.ok) { cardMerge({ phone: j.phone, phone_verified: true }); $("phErr2").innerHTML = '<span class="ph-ok">✓ Number verified</span>'; setTimeout(() => finish(true), 700); }
-        else err(2, j.error || "That code is not right.");
+        if (j.ok) { saveResume({ otpPhone: null }); cardMerge({ phone: j.phone, phone_verified: true }); $("phErr2").innerHTML = '<span class="ph-ok">✓ Number verified</span>'; setTimeout(() => finish(true), 700); }
+        else { err(2, j.error || "That code is not right."); if (j.error === "session ended") { clearResume(); setTimeout(() => finish(false), 1800); } }
       } catch (e) { err(2, "Could not check the code. Please try again."); }
       busy = false; $("phVerify").disabled = false;
     };
@@ -1362,7 +1362,9 @@ function askPhone(sess) {
     code.oninput = () => { if (code.value.replace(/\D/g, "").length === 4) verify(); };
     code.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); verify(); } };   // the keypad's Enter / Go verifies
     d.onclose = () => done(false);
-    num.value = ""; err(1, ""); err(2, ""); openDlg(d); step(1);
+    num.value = waitingFor || ""; err(1, ""); err(2, ""); openDlg(d);
+    if (waitingFor) { $("phTo").textContent = "+91 " + waitingFor.slice(0, 5) + " " + waitingFor.slice(5); code.value = ""; step(2); }
+    else step(1);
   });
 }
 
@@ -1390,11 +1392,11 @@ $("sbForm").addEventListener("submit", async ev => {
 });
 
 $("sbChatX").addEventListener("click", async () => { if (await closeShenba("chat")) untrap(); });
-addEventListener("pagehide", () => { bye(chat); bye(session); });
+addEventListener("pagehide", () => { if (pendingResume()) return; bye(chat); bye(session); });   // a code is pending: keep the conversation
 $("sbLog").addEventListener("click", e => { if (e.target.dataset.talk) { e.preventDefault(); goVoice(); } });
 $("sbToVoice").addEventListener("click", () => goVoice());
 
-async function endChat() { bye(chat); chat = null; }
+async function endChat() { bye(chat); chat = null; clearResume(); }
 
 async function goVoice() {
   closeDlg($("sbChat"));
@@ -1528,6 +1530,7 @@ function cardMerge(o) {
     if (disc) cardSet("save", inr(card.discount) + " off");
   }
   const pay = $("scPay"), note = $("scNote");
+  if (session) saveResume();
   if (card.status === "confirmed" && card.bookingId) {
     cardFinal = true;
     pay.className = "sc-pay done"; pay.removeAttribute("href"); pay.setAttribute("aria-disabled", "true");
@@ -1580,7 +1583,7 @@ function confirmLeave() {
 async function closeShenba(which) {   // which: "call" | "chat"; returns true if closed
   if (collecting() && !(await confirmLeave())) return false;
   if (which === "call" || $("sbCall").open) { await endVoice(); clearTimeout(cardTimer); closeDlg($("sbCall")); }
-  if (which === "chat" || $("sbChat").open) { closeDlg($("sbChat")); bye(chat); }
+  if (which === "chat" || $("sbChat").open) { closeDlg($("sbChat")); bye(chat); clearResume(); }
   return true;
 }
 let backTrap = false;
@@ -1613,7 +1616,8 @@ function openCall(start) {
   if (start) { cardReset(); startVoice(); }
   else { saState("idle", "Tap Shenba to start talking"); }
 }
-window.__saCard = { cardMerge, cardReset, askPhone, showThanks, confirmLeave };   /* used by the preview only */
+window.__saCard = { cardMerge, cardReset, askPhone, showThanks, confirmLeave, saveResume, pendingResume };   /* used by the preview only */
+setTimeout(() => { if (SHENBA_WEB && pendingResume()) resumeShenba(); }, 700);   // came back while a WhatsApp code was waiting
 
 /* ── the call (v1.7, our own server) ──
    Turn by turn: she speaks (her Leda voice comes back from the server as audio), then she listens. The phone's mic is
@@ -1675,7 +1679,59 @@ function listen() {
   });
 }
 
-async function startVoice() {
+/* Fillers (Rakesh, 22 Oct 2026 07:50): while Shenba works out her answer (rooms, prices, the guest's history) a short
+   natural line plays - "ம்ம்... ஒரு நிமிஷம்." - so the guest is never left in silence. Only if the answer is slower than
+   1.3 s; the reply follows straight after it. */
+let fillers = [], lastFiller = -1;
+async function loadFillers() {
+  if (fillers.length) return;
+  try { const j = await api("/fillers", {}); fillers = (j.fillers || []).filter(f => f.audio_b64); } catch (e) {}
+}
+async function withFiller(p, ms = 1300) {
+  let done = false, fp = null;
+  const t = setTimeout(() => {
+    if (done || !calling || !fillers.length || src) return;
+    let i; do { i = Math.floor(Math.random() * fillers.length); } while (fillers.length > 1 && i === lastFiller);
+    lastFiller = i;
+    fp = play(fillers[i].audio_b64).then(() => { if (!done) saState("connecting", "Shenba is thinking…"); });
+  }, ms);
+  try { return await p; } finally { done = true; clearTimeout(t); if (fp) await fp; }
+}
+/* Kept on this phone while the guest reads the WhatsApp code (Rakesh, 22 Oct 2026: "it should store the data some where when
+   verification number is being entered"): if the page closes or reloads meanwhile, it reopens with the card filled in and
+   the code box waiting, and the same conversation carries on. Cleared when the call or chat ends. */
+const RESUME = "shenbaResume";
+function saveResume(extra) {
+  try {
+    const sid = session || chat; if (!sid) return;
+    const prev = JSON.parse(localStorage.getItem(RESUME) || "{}");
+    localStorage.setItem(RESUME, JSON.stringify(Object.assign(prev, { mode: session ? "voice" : "chat", sid, conv: convId, card,
+      log: session ? [] : history.slice(-20), at: Date.now() }, extra || {})));
+  } catch (e) {}
+}
+function clearResume() { try { localStorage.removeItem(RESUME); } catch (e) {} }
+function pendingResume() {
+  try { const r = JSON.parse(localStorage.getItem(RESUME) || "null"); return r && r.otpPhone && Date.now() - r.at < 25 * 60e3 ? r : null; } catch (e) { return null; }
+}
+async function resumeShenba() {
+  const r = pendingResume(); if (!r) { clearResume(); return; }
+  if (r.mode === "voice") {
+    openDlg($("sbCall")); trapBack(); $("scThanks").hidden = true;
+    session = r.sid; convId = r.conv || ""; cardMerge(r.card || {});
+    saState("idle", "Enter the WhatsApp code to continue");
+    const ok = await askPhone(session, r.otpPhone);
+    if (ok) startVoice(true); else { saState("idle", "Tap Shenba to talk again"); session = ""; clearResume(); }
+  } else {
+    openDlg($("sbChat")); trapBack();
+    chat = r.sid; (r.log || []).forEach(l => add(/^Guest: /.test(l) ? "me" : "ai", l.replace(/^(Guest|Shenba): /, "")));
+    if (await askPhone(chat, r.otpPhone)) {
+      typing();
+      try { const k = await api("/turn", { session: chat, verified: true }); add("ai", k.reply || "Thank you!"); } catch (e) { add("ai", "Thank you! Please continue."); }
+    } else clearResume();
+  }
+}
+
+async function startVoice(resume) {
   if (calling || starting) return;
   starting = true; calling = true;
   setMini(false);
@@ -1683,15 +1739,24 @@ async function startVoice() {
   try {
     mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
     ac = ac || new (window.AudioContext || window.webkitAudioContext)();
-    if (ac.state === "suspended") await ac.resume();
+    if (ac.state === "suspended") await Promise.race([ac.resume(), new Promise(z => setTimeout(z, 1500))]);
     micAn = ac.createAnalyser(); micAn.fftSize = 4096; ac.createMediaStreamSource(mic).connect(micAn);
     outAn = ac.createAnalyser(); outAn.fftSize = 1024; outAn.smoothingTimeConstant = .3; outAn.connect(ac.destination);
     const fq = new Uint8Array(outAn.frequencyBinCount);
     voice = { getOutputVolume: () => level(outAn) * 2.2, getOutputByteFrequencyData: () => { outAn.getByteFrequencyData(fq); return fq; } };
-    const j = await api("/start", { mode: "voice" });
-    session = j.session; convId = j.conversation_id || ""; cardPoll();
-    starting = false;
-    await play(j.audio_b64);
+    loadFillers();
+    if (resume) {   // the page was reloaded while the guest read the WhatsApp code: same call, same Shenba, carry on
+      starting = false; cardPoll();
+      saState("connecting", "Shenba is thinking…");
+      const k = await withFiller(api("/turn", { session, verified: true }));
+      if (k.card) cardMerge(k.card);
+      if (k.reply) await play(k.audio_b64);
+    } else {
+      const j = await api("/start", { mode: "voice" });
+      session = j.session; convId = j.conversation_id || ""; cardPoll();
+      starting = false;
+      await play(j.audio_b64);
+    }
     let fails = 0;
     while (calling) {
       const blob = await listen();
@@ -1702,10 +1767,14 @@ async function startVoice() {
       /* 21 Oct 2026: one failed turn (network blip, server busy) no longer ends the call - retry, then keep listening */
       const b64 = await blobToB64(blob);
       let gone = false;
-      for (let k = 0; k < 2 && !r && !gone; k++) {
-        try { r = await api("/turn", { session, audio_b64: b64, audio_mime: blob.type }); }
-        catch (e) { if (e.gone) gone = true; else if (k === 0) await new Promise(z => setTimeout(z, 1500)); }
-      }
+      r = await withFiller((async () => {   // a short filler plays if her answer takes more than a moment
+        let rr;
+        for (let k = 0; k < 2 && !rr && !gone; k++) {
+          try { rr = await api("/turn", { session, audio_b64: b64, audio_mime: blob.type }); }
+          catch (e) { if (e.gone) gone = true; else if (k === 0) await new Promise(z => setTimeout(z, 1500)); }
+        }
+        return rr;
+      })());
       if (gone) { await endVoice("Call ended · tap Shenba to talk again"); break; }
       if (!r && !calling) break;
       if (!r) {
@@ -1725,7 +1794,7 @@ async function startVoice() {
         if (!calling) break;
         if (ok) {
           saState("connecting", "Shenba is thinking…");
-          try { const k = await api("/turn", { session, verified: true }); if (k.card) cardMerge(k.card); if (k.reply) await play(k.audio_b64); if (k.end) { await endVoice("Call ended · thank you!"); break; } } catch (e) {}
+          try { const k = await withFiller(api("/turn", { session, verified: true })); if (k.card) cardMerge(k.card); if (k.reply) await play(k.audio_b64); if (k.end) { await endVoice("Call ended · thank you!"); break; } } catch (e) {}
         }
       }
     }
@@ -1739,7 +1808,7 @@ async function startVoice() {
 /* tells the server the call or chat is over, so it can note the enquiry if Shenba had the guest's number (v1.7) */
 function bye(id) { if (!id) return; try { navigator.sendBeacon(API + "/end", JSON.stringify({ session: id })); } catch (e) {} }
 async function endVoice(msg) {
-  bye(session);
+  bye(session); clearResume();
   calling = false;
   stopPlay();
   if (rec) { try { rec.stop(); } catch (e) {} }
