@@ -1668,13 +1668,25 @@ function play(b64) {
     try {
       const buf = await ac.decodeAudioData(b64ToBuf(b64));
       if (!calling) return ok();
-      src = ac.createBufferSource(); src.buffer = buf; src.connect(outAn);
+      src = ac.createBufferSource(); src.buffer = buf;
+      /* Same loudness for every clip (Rakesh, 22 Oct 2026 08:22): greeting, fillers and replies are levelled to one volume */
+      const lv = ac.createGain(); lv.gain.value = levelFor(buf); src.connect(lv); lv.connect(outAn);
       src.onended = () => { src = null; playDone = null; ok(); };
       saState("speaking", "Shenba is speaking… tap her to interrupt");
       lipSync();
       src.start();
     } catch (e) { src = null; ok(); }
   });
+}
+function levelFor(buf) {
+  try {
+    const d = buf.getChannelData(0); let sum = 0, n = 0;
+    let peak = 0;
+    for (let i = 0; i < d.length; i += 4) { const v = Math.abs(d[i]); if (v > peak) peak = v; if (v > 0.01) { sum += v * v; n++; } }   // speech only, not pauses
+    if (!n) return 1;
+    const rms = Math.sqrt(sum / n);
+    return Math.min(2.5, 0.98 / Math.max(peak, 0.05), Math.max(0.4, 0.16 / rms));   // never louder than the speaker can take
+  } catch (e) { return 1; }
 }
 function stopPlay() {
   if (src) { try { src.onended = null; src.stop(); } catch (e) {} src = null; }
