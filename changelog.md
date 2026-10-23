@@ -11,6 +11,8 @@ and the one in the Drive filename, and they must always be the same number.
 
 **Natural mouth.** While Shenba talks, her lips open well but glide smoothly from one shape to the next, instead of snapping wide open.
 
+**Natural blinks.** Shenba blinks at uneven gaps, sometimes twice quickly; a warm slow blink when she first greets the guest, a blink when it is the guest's turn to talk, and slow thoughtful blinks with her head tipped a little while she is thinking.
+
 ---
 
 ## v2.6 — 22 Oct 2026

@@ -281,12 +281,15 @@ dialog.sb::backdrop{background:rgba(12,10,9,.55)}
 .sa-body,.sa-head{transform-box:fill-box;transform-origin:center}
 .sa-head{transform-origin:50% 100%}
 /* idle: a natural blink every few seconds (her own closed-eye photo, shown over the eyes) and a small breath */
-.sa-lid{opacity:0;animation:saBlink 4.6s steps(1,end) infinite}
+.sa-lid{opacity:0}   /* blinks are timed in script (Rakesh 23 Oct: natural blinks while welcoming, talking, listening, thinking) */
 .sa-body{animation:saBreath 4.2s ease-in-out infinite}
 @keyframes saBlink{0%,100%{opacity:0}93%{opacity:1}95.8%{opacity:0}}
 @keyframes saBreath{50%{transform:translateY(-.8px) scale(1.008)}}
 /* listening: attentive, a slight nod */
 .sa-anim.listening .sa-head{animation:saNod 2.2s ease-in-out infinite}
+/* thinking: head tipped a little, as if recalling something */
+.sa-anim.thinking .sa-head{animation:saThink 3s ease-in-out infinite}
+@keyframes saThink{0%,100%{transform:rotate(-1.4deg) translateY(-.4px)}50%{transform:rotate(-2.2deg) translateY(-.8px)}}
 .sa-anim.speaking .sa-head{animation:saTalkHead 3.4s ease-in-out infinite}
 .sa-anim.speaking .sa-body{transform:translateY(calc(var(--jaw,0) * -0.6px))}
 @keyframes saTalkHead{0%,100%{transform:rotate(0)}30%{transform:rotate(-1deg) translateY(-.3px)}65%{transform:rotate(.7deg)}}
@@ -1432,13 +1435,48 @@ const dock = $("saDock"), face = $("saFace"), scMain = $("scMain");
 /* the call page shows the same animated Shenba, larger (a copy of the corner picture with its own ids) */
 $("scFace").innerHTML = face.querySelector("svg").outerHTML.replace(/id="sa/g, 'id="sc').replace(/url\(#sa/g, "url(#sc");
 let calling = false, starting = false;
+/* Natural blinks (Rakesh, 23 Oct 2026): uneven gaps, now and then a double blink; a blink when the turn passes,
+   slow thoughtful blinks while she is thinking, and a warm slow double blink when she first greets the guest. */
+const saLids = () => document.querySelectorAll(".sa-lid");
+let blinkTimer = 0, blinkMode = "idle", lastSt = "", greeted = false;
+function saBlinkOnce(slow) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const lids = saLids(), close = slow ? 260 : 110;
+  lids.forEach(l => { l.style.transition = "opacity " + (slow ? 120 : 45) + "ms ease-in"; l.style.opacity = "1"; });
+  setTimeout(() => lids.forEach(l => { l.style.transition = "opacity " + (slow ? 220 : 80) + "ms ease-out"; l.style.opacity = "0"; }), close);
+}
+function saBlink(kind) { saBlinkOnce(kind === "slow" || kind === "warm");
+  if (kind === "double" || kind === "warm") setTimeout(() => saBlinkOnce(kind === "warm"), kind === "warm" ? 520 : 300); }
+function saBlinkLoop() {
+  clearTimeout(blinkTimer);
+  const gap = blinkMode === "thinking" ? 1800 + Math.random() * 1700 : blinkMode === "speaking" ? 2800 + Math.random() * 4200
+    : blinkMode === "listening" ? 2300 + Math.random() * 3200 : 2600 + Math.random() * 3600;
+  blinkTimer = setTimeout(() => {
+    if (!document.hidden) saBlink(blinkMode === "thinking" ? "slow" : Math.random() < .18 ? "double" : "quick");
+    saBlinkLoop();
+  }, gap);
+}
+function saBlinkFor(st, text) {
+  const mode = st === "connecting" && /thinking/i.test(text || "") ? "thinking" : st === "speaking" ? "speaking" : st === "listening" ? "listening" : "idle";
+  if (st !== lastSt) {
+    if (st === "speaking" && !greeted) { greeted = true; setTimeout(() => saBlink("warm"), 450); }     // welcoming
+    else if (mode === "thinking") setTimeout(() => saBlink("slow"), 200);                              // starts to think
+    else if (st === "listening" && Math.random() < .6) setTimeout(() => saBlink("quick"), 250);        // hands the turn over
+    else if (st === "speaking" && Math.random() < .4) setTimeout(() => saBlink("quick"), 600);
+    if (st === "idle" || st === "error" || st === "") greeted = false;
+  }
+  lastSt = st; blinkMode = mode; saBlinkLoop();
+}
+saBlinkLoop();
 function saState(st, text) {
   for (const el of [dock, scMain]) {
     el.classList.toggle("on", st === "listening" || st === "speaking" || st === "connecting");
     el.classList.toggle("listening", st === "listening");
     el.classList.toggle("speaking", st === "speaking");
+    el.classList.toggle("thinking", st === "connecting" && /thinking/i.test(text || ""));
     el.classList.toggle("err", st === "error");
   }
+  saBlinkFor(st, text);
   face.setAttribute("aria-pressed", String(calling));
   face.setAttribute("aria-label", calling ? "Open the call with Shenba" : "Talk with Shenba");
   $("scEnd").hidden = !calling;
