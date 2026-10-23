@@ -7,6 +7,12 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v2.7 — 23 Oct 2026
+
+**Gentler mouth.** While Shenba talks, her lips now open only a little, as in a normal conversation, instead of opening wide.
+
+---
+
 ## v2.6 — 22 Oct 2026
 
 **Payment opens in the same page.** Tapping "Proceed to pay" no longer opens an empty new tab (on phones the call page
