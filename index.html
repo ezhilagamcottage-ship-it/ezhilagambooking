@@ -295,7 +295,7 @@ dialog.sb::backdrop{background:rgba(12,10,9,.55)}
    read from her voice many times a second; the plain cycle below is only the fallback */
 .sa-v{opacity:0}
 .sa-anim.speaking .sa-mopen{animation:saMouth .48s ease-in-out infinite}
-@keyframes saMouth{0%,100%{opacity:.1}30%{opacity:.55}55%{opacity:.3}78%{opacity:.5}}
+@keyframes saMouth{0%,100%{opacity:.15}30%{opacity:.8}55%{opacity:.4}78%{opacity:.7}}
 @media (min-width:560px){.sa-bar{left:50%;right:auto;transform:translateX(-50%);width:min(560px,calc(100vw - 40px));bottom:20px}}
 @media (max-width:360px){.sa-txt small{display:none}}
 
@@ -1471,11 +1471,11 @@ function saViseme(b, vol) {          // b: band levels {low, mid, high, fric} on
 }
 function saMouthFrame(target, vol) {   // ease every shape toward its target weight
   for (const v of VIS) {
-    const goal = v === target ? Math.min(v === "aa" ? .45 : .55, .12 + vol * .55) : 0;   // Rakesh 23 Oct: a gentle mouth, never wide open
-    visW[v] += (goal - visW[v]) * .55;
+    const goal = v === target ? Math.min(v === "aa" ? .8 : .72, .2 + vol * .9) : 0;   // Rakesh 23 Oct: opens well, with a smooth glide
+    visW[v] += (goal - visW[v]) * .28;
     const o = visW[v] < .02 ? "0" : visW[v].toFixed(3); visEl[v].forEach(e => { e.style.opacity = o; });
   }
-  setJaw((target ? vol * .5 : 0).toFixed(3));
+  setJaw((target ? vol * .75 : 0).toFixed(3));
   volHist = [vol, volHist[0], volHist[1]];
 }
 let freq = null;

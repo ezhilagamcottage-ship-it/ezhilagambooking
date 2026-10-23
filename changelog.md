@@ -9,7 +9,7 @@ and the one in the Drive filename, and they must always be the same number.
 
 ## v2.7 — 23 Oct 2026
 
-**Gentler mouth.** While Shenba talks, her lips now open only a little, as in a normal conversation, instead of opening wide.
+**Natural mouth.** While Shenba talks, her lips open well but glide smoothly from one shape to the next, instead of snapping wide open.
 
 ---
 
