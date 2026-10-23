@@ -391,6 +391,18 @@ dialog.lv::backdrop{background:rgba(28,25,23,.5)}
 .lv h4{margin:0 0 6px;font-size:16.5px}.lv p{margin:0 0 14px;font-size:13.5px;color:var(--mute);line-height:1.45}
 .lv-b{display:flex;gap:8px}.lv-b button{flex:1;min-height:46px;border-radius:12px;border:0;font:inherit;font-weight:800;cursor:pointer}
 .lv-ok{background:#f5f5f4;color:#b91c1c}.lv-stay{background:var(--brand);color:#fff}
+/* v2.7 (Rakesh, 23 Oct 2026): a call opens with Shenba full size saying vanakkam, then she shrinks into her circle;
+   at the end she steps out of the circle, walks towards the guest and says nandri, then the thank-you card shows. */
+.sw{position:absolute;inset:0;z-index:31;overflow:hidden;pointer-events:none;visibility:hidden}
+.sw-veil{position:absolute;inset:0;background:rgba(250,249,247,.94);opacity:0}
+.sw-pic{position:absolute;inset:0;overflow:hidden;transform-origin:var(--fx) var(--fy)}
+.sw-pic img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.sw-glow{position:absolute;inset:0;background:radial-gradient(circle at var(--fx) var(--fy),rgba(255,236,190,.55),transparent 45%);opacity:0}
+.sw-shade{position:absolute;inset:auto 0 0 0;height:55%;background:linear-gradient(transparent,rgba(6,40,30,.78))}
+.sw-say{position:absolute;left:0;right:0;bottom:13%;text-align:center;color:#fff;padding:0 18px}
+.sw-say .t{font-family:"Noto Sans Tamil","Latha","Vijaya",sans-serif;font-weight:700;font-size:44px;line-height:1.15;text-shadow:0 2px 14px rgba(0,0,0,.35)}
+.sw-say .t span{display:inline-block;opacity:0}
+.sw-say .s{margin-top:8px;font-size:16px;font-weight:700;color:#fde68a;opacity:0}
 /* the thank-you at the end of a call: Shenba in her silk saree, hands joined */
 .ty{position:absolute;inset:0;z-index:30;background:#fffdf8;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;overflow:hidden}
 .ty[hidden]{display:none}
@@ -844,6 +856,9 @@ footer{padding-top:8px}
       <p class="sc-note" id="scNote">Details appear here as you tell Shenba.</p>
     </div>
   </div>
+  <div class="sw" id="sw" aria-hidden="true"><div class="sw-veil" id="swVeil"></div>
+    <div class="sw-pic" id="swPic"><img src="img/shenba-namaste.webp" alt=""><div class="sw-glow" id="swGlow"></div><div class="sw-shade" id="swShade"></div></div>
+    <div class="sw-say" id="swSay"><div class="t" id="swT"></div><div class="s" id="swS"></div></div></div>
   <div class="ty" id="scThanks" hidden>
     <img src="img/shenba-namaste.webp" alt="Shenba, hands joined, in a white silk saree with a green border">
     <div class="cap"><b id="tyHead">Unga enquiry register aagiduchu!</b><span id="tyLine">Room details WhatsApp-la vandhudum. Booking team seekiram call pannuvanga 😊</span><em>Nandri! 🙏</em>
@@ -1544,6 +1559,7 @@ function lipSync() {
   lipRaf = requestAnimationFrame(step);
 }
 window.__saLip = { saViseme, saMouthFrame };   /* used by the preview recorder only */
+window.__sw = { welcome: () => swWelcome(), goodbye: b => showThanks(b) };   /* preview / test hook only */
 
 /* ── the booking card on the call page ──
    Two sources: Shenba's display tool (show_booking_details, sent the moment she learns a detail) and Prime's
@@ -1683,7 +1699,101 @@ function showThanks(booked) {
   $("tyHead").textContent = booked ? "Unga room hold pannirukkom!" : "Unga enquiry register aagiduchu!";
   $("tyLine").textContent = booked ? "Payment link WhatsApp-la vandhudum. Pay pannina udane voucher varum 😊"
                                    : "Room details WhatsApp-la vandhudum. Booking team seekiram call pannuvanga 😊";
-  $("scThanks").hidden = false;
+  swGoodbye(booked).then(() => {
+    $("scThanks").hidden = false;
+    const cap = document.querySelector("#scThanks .cap"); if (cap && cap.animate) cap.animate([{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "none" }], { duration: 600, easing: "ease-out" });
+    $("sw").style.visibility = "hidden";
+  });
+}
+
+/* ── v2.7: vanakkam / nandri animation (see the CSS note at .sw) ── */
+const SW_FACE = { x: 355 / 720, y: 228 / 1260, r: 96 / 720 };    // where her face sits in img/shenba-namaste.webp (720 x 1260)
+const swWait = ms => new Promise(r => setTimeout(r, ms));
+const swCalm = () => matchMedia("(prefers-reduced-motion: reduce)").matches || !Element.prototype.animate;
+function swGeo() {
+  const D = $("sbCall").getBoundingClientRect(), F = $("scFace").getBoundingClientRect(), W = D.width, H = D.height;
+  const k0 = Math.max(W / 720, H / 1260), iw = 720 * k0, ox = (W - iw) / 2;
+  const fx = ox + SW_FACE.x * iw, fy = SW_FACE.y * 1260 * k0, fr = SW_FACE.r * iw;
+  const cx = F.left - D.left + F.width / 2, cy = F.top - D.top + F.height / 2, cr = F.width / 2;
+  return { W, H, fx, fy, fr, cx, cy, cr, k: cr / fr, ok: F.width > 0 && W > 0 };
+}
+function swWords(t) {
+  const parts = window.Intl && Intl.Segmenter ? [...new Intl.Segmenter("ta", { granularity: "grapheme" }).segment(t)].map(x => x.segment) : [t];
+  $("swT").innerHTML = parts.map(ch => "<span>" + (ch === " " ? "&nbsp;" : ch) + "</span>").join("");
+  [...$("swT").children].forEach((sp, i) => sp.animate([{ opacity: 0, transform: "translateY(14px)" }, { opacity: 1, transform: "none" }],
+    { duration: 520, delay: i * 55, easing: "cubic-bezier(.2,.7,.2,1)", fill: "forwards" }));
+}
+function swClear() { for (const id of ["sw", "swPic", "swSay", "swS", "swShade", "swVeil", "swGlow", "scFace"]) $(id).getAnimations().forEach(a => a.cancel());
+  $("swPic").style.transformOrigin = ""; $("swPic").style.borderRadius = ""; $("swT").innerHTML = ""; $("swS").style.opacity = 0; $("swSay").style.opacity = ""; }
+let swBusy = false;
+async function swWelcome() {
+  if (swCalm() || swBusy) return; const g = swGeo(); if (!g.ok) return;
+  swBusy = true; swClear();
+  const sw = $("sw"), pic = $("swPic"), face = $("scFace");
+  pic.style.setProperty("--fx", g.fx + "px"); pic.style.setProperty("--fy", g.fy + "px");
+  sw.style.visibility = "visible"; face.style.opacity = 0;
+  sw.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, fill: "forwards" });
+  pic.animate([{ transform: "scale(1.07)" }, { transform: "scale(1)" }], { duration: 1600, easing: "cubic-bezier(.2,.7,.2,1)", fill: "forwards" });
+  $("swGlow").animate([{ opacity: 0 }, { opacity: 1, offset: .5 }, { opacity: 0 }], { duration: 2000, delay: 300 });
+  $("swS").textContent = "நான் Shenba 🙏";
+  await swWait(350); swWords("வணக்கம்!");
+  await swWait(650); $("swS").animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 500, fill: "forwards" });
+  pic.animate([{ transform: "none" }, { transform: "translateY(5px) rotate(.6deg) scale(1.01)" }, { transform: "none" }], { duration: 1100, easing: "ease-in-out", composite: "add" });
+  // stay while she greets: until her first words have played a little (at most about 5 s in all)
+  const t0 = Date.now(); let spoke = 0;
+  while (calling && Date.now() - t0 < 4200) { if (scMain.classList.contains("speaking")) { spoke = spoke || Date.now(); if (Date.now() - spoke > 1500) break; } await swWait(120); }
+  const h = swGeo(), tx = h.cx - h.fx, ty = h.cy - h.fy;
+  $("swSay").animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" });
+  $("swShade").animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500, fill: "forwards" });
+  pic.animate([{ clipPath: `circle(${Math.hypot(h.W, h.H)}px at ${h.fx}px ${h.fy}px)`, transform: "none" },
+               { clipPath: `circle(${h.fr}px at ${h.fx}px ${h.fy}px)`, transform: `translate(${tx}px,${ty}px) scale(${h.k})` }],
+    { duration: 1100, easing: "cubic-bezier(.65,0,.25,1)", fill: "forwards" });
+  await swWait(920);
+  face.style.opacity = ""; face.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260 });
+  sw.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: "forwards" });
+  await swWait(280); sw.style.visibility = "hidden"; swClear(); swBusy = false;
+  setTimeout(() => saBlink("warm"), 300);
+}
+function swVoice(booked) {   // her nandri, in the call's own audio (same loudness as the call)
+  if (!ac) return;
+  fetch(booked ? "audio/shenba-nandri-hold.mp3" : "audio/shenba-nandri.mp3").then(r => r.arrayBuffer()).then(b => ac.decodeAudioData(b)).then(buf => {
+    const s = ac.createBufferSource(), lv = ac.createGain(); s.buffer = buf; lv.gain.value = levelFor(buf); s.connect(lv); lv.connect(ac.destination); s.start();
+  }).catch(() => {});
+}
+async function swGoodbye(booked) {
+  const g = swGeo();
+  if (swCalm() || !g.ok || swBusy) { swVoice(booked); return; }
+  swBusy = true; swClear();
+  const sw = $("sw"), pic = $("swPic"), face = $("scFace"), f = { x: g.fx, y: g.fy }, c = { x: g.cx, y: g.cy }, k = g.k, s0 = .34;
+  const T = (s, t) => `translate(${t.x}px,${t.y}px) scale(${s})`, at = s => ({ x: c.x - s * f.x, y: c.y - s * f.y });
+  pic.style.transformOrigin = "0 0"; pic.style.borderRadius = "46px"; $("swShade").style.opacity = 0; $("swSay").style.opacity = 0;
+  sw.style.visibility = "visible"; sw.style.opacity = 1;
+  // 1. the circle opens: she steps back and you see all of her where the circle was
+  face.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: "forwards" });
+  $("swVeil").animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, fill: "forwards" });
+  pic.animate([{ transform: T(k, at(k)), clipPath: `circle(${g.fr}px at ${f.x}px ${f.y}px)` },
+               { transform: T(s0, at(s0)), clipPath: `circle(${Math.hypot(g.W, g.H)}px at ${f.x}px ${f.y}px)` }],
+    { duration: 900, easing: "cubic-bezier(.3,0,.2,1)", fill: "forwards" });
+  await swWait(1020);
+  // 2. she walks towards the guest (soft step-bob and sway) and says nandri
+  swVoice(booked);
+  const frames = [], a0 = at(s0);
+  for (let i = 0; i <= 48; i++) {
+    const t = i / 48, e = t * t * (3 - 2 * t) * .35 + Math.pow(t, 1.8) * .65, s = s0 + (1 - s0) * e;
+    const ph = Math.PI * 5 * t, damp = 1 - t * .6;
+    frames.push({ transform: `translate(${a0.x * (1 - e)}px,${a0.y * (1 - e) - Math.abs(Math.sin(ph)) * 7 * damp}px) rotate(${Math.sin(ph) * 1.1 * damp}deg) scale(${s})`,
+                  borderRadius: (46 * (1 - t)) + "px", offset: t });
+  }
+  pic.animate(frames, { duration: 2600, easing: "linear", fill: "forwards" });
+  await swWait(1430); $("swVeil").animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600, fill: "forwards" });
+  await swWait(1170);
+  // 3. a small bow with "நன்றி!"; then the thank-you card (the same picture) takes over
+  $("swShade").animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, fill: "forwards" });
+  $("swSay").style.opacity = 1; $("swS").textContent = "";
+  pic.animate([{ transform: "none" }, { transform: "translateY(5px) rotate(.6deg) scale(1.01)" }, { transform: "none" }], { duration: 1100, easing: "ease-in-out", composite: "add" });
+  swWords("நன்றி!"); await swWait(1500);
+  $("swSay").animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" });
+  await swWait(250); swBusy = false; face.getAnimations().forEach(a => a.cancel());
 }
 $("tyClose").addEventListener("click", () => { $("scThanks").hidden = true; closeDlg($("sbCall")); untrap(); });
 
@@ -1894,6 +2004,7 @@ async function startVoice(resume, viaTap) {
   starting = true; calling = true;
   setMini(false);
   saState("connecting", "Connecting…");
+  if (!resume && $("sbCall").open) swWelcome();
   try {
     mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
     ac = ac || new (window.AudioContext || window.webkitAudioContext)();

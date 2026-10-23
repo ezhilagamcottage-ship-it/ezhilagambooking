@@ -9,6 +9,8 @@ and the one in the Drive filename, and they must always be the same number.
 
 ## v2.7 — 23 Oct 2026
 
+**Vanakkam and nandri animation.** When a call starts, Shenba appears full size with joined hands and "வணக்கம்!", stays while she greets, then shrinks into her circle. When the call ends she steps out of the circle, walks towards the guest saying "நன்றி!" in her own voice (a room-held version and an enquiry version, `audio/shenba-nandri*.mp3`), and the thank-you card follows. Phones set to reduce motion skip the movement.
+
 **Natural mouth.** While Shenba talks, her lips open well but glide smoothly from one shape to the next, instead of snapping wide open.
 
 **Natural blinks.** Shenba blinks at uneven gaps, sometimes twice quickly; a warm slow blink when she first greets the guest, a blink when it is the guest's turn to talk, and slow thoughtful blinks with her head tipped a little while she is thinking.
