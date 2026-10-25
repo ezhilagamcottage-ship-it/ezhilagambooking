@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v5.1 — 25 Oct 2026
+
+**Guest details: ID questions removed.** The booking form no longer asks "ID you will bring" or "Last 4 digits of that ID" (Rakesh). It now says to bring an original photo ID for every adult, checked at the desk. The booking still sends empty ID fields, so the sheet's columns are unchanged.
+
 ## v5.0 — 25 Oct 2026
 
 **"Live with Nature" redesign, phone and computer** (Rakesh approved the preview, 14:35). Modelled on tandjungsarihotel.com: sand paper, a taupe rail, Caslon type, small red capitals for labels.

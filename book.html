@@ -1178,7 +1178,7 @@ const S = {
      flight while the guest is still tapping the guest counts. By the time
      they press Find Available Rooms it has almost always landed. */
   prefetch: null,
-  guest: { name:"", phone:"", address:"", city:"", pin:"", idType:"Aadhaar", idLast4:"" },
+  guest: { name:"", phone:"", address:"", city:"", pin:"", idType:"", idLast4:"" },   /* v5.1: ID type and last 4 are no longer asked (Rakesh, 25 Oct); the ID is checked at the desk */
   payRef: "", booking: null, error: "",
   /* Rakesh, 1 Sep 2026: "should always ask for full payment or 60 percent as
      advance if the select checkbox advance else it should always keep full
@@ -1699,16 +1699,7 @@ function stepGuest(app) {
         <label><span class="lbl">${l}</span>
           <input data-f="${k}" type="${t}" value="${f[k]}" placeholder="${ph}"></label>`).join("")}
 
-      <label><span class="lbl">ID you will bring</span>
-        <select data-f="idType">${ID_TYPES.map((x) =>
-          `<option${x === f.idType ? " selected" : ""}>${x}</option>`).join("")}</select></label>
-
-      <label><span class="lbl">Last 4 digits of that ID</span>
-        <input data-f="idLast4" type="tel" inputmode="numeric" maxlength="4"
-          value="${f.idLast4}" placeholder="4821"></label>
-      <p class="fine">Four digits only — enough for the desk to match you to your
-        booking. Your full ID is checked in person at check-in and is never typed
-        into this page.</p>
+      <p class="fine">Bring an original photo ID for every adult — it is checked in person at check-in.</p>
     </div></section>`);
   box.querySelectorAll("select[data-f]").forEach((i) => i.onchange = (e) => {
     S.guest[e.target.dataset.f] = e.target.value;
@@ -3407,7 +3398,6 @@ async function advanceStep() {
     if (g.name.trim().length < 3) return fail("Please give the name the room should be under.");
     if (g.phone.length !== 10) return fail("A 10-digit WhatsApp number, please — the voucher goes there.");
     if (g.pin && g.pin.length !== 6) return fail("A PIN code is 6 digits.");
-    if (g.idLast4.length !== 4) return fail("The last 4 digits of the ID you will bring, please — the desk uses them to find your booking.");
     S.step = 3; return render();
   }
   if (S.step === 3) {
