@@ -1716,7 +1716,7 @@ const SW_FACE = { x: 355 / 720, y: 228 / 1260, r: 96 / 720 };    // where her fa
 const swWait = ms => new Promise(r => setTimeout(r, ms));
 const swCalm = () => matchMedia("(prefers-reduced-motion: reduce)").matches || !Element.prototype.animate;
 /* the intro video (v2.8): 1080 x 1920; where her face sits in it, and what she says (kept in step with the server) */
-const INTRO = { src: "img/shenba-intro.mp4", face: { x: 0.5, y: 0.3, r: 0.14 }, w: 1080, h: 1920,
+const INTRO = { src: "img/shenba-intro.mp4", face: { x: 0.5, y: 0.43, r: 0.14 }, w: 720, h: 1280,
   line: "வாங்க! எழிலகம் room booking-க்கு help பண்ண நான் இருக்கேன், ஷென்பா. உங்க check-in date சொல்லுங்க?" };
 let swMedia = { face: SW_FACE, w: 720, h: 1260 };
 function swGeo() {
