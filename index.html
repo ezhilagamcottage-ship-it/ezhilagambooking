@@ -235,6 +235,20 @@ dialog.sb::backdrop{background:rgba(12,10,9,.55)}
 .sb-send:disabled{opacity:.45}
 .sb-alt{display:block;width:100%;border:0;border-top:1px solid var(--line);background:#fff7ed;
   color:var(--gold);font:inherit;font-weight:800;font-size:14px;padding:11px;cursor:pointer}
+/* ── Album skin: the chat window in the photo-album's colours, only when opened from /album (?s=album) ── */
+html.sb-album #sbChat{--bg:#f8f2e4;--ink:#3a2f22;--brand:#6b4326;--card:#fffaf0;--line:rgba(58,47,34,.16);--mute:#6e604c;--gold:#6b4326;box-shadow:0 24px 70px rgba(20,11,5,.5)}
+html.sb-album #sbChat .sb-head{background:linear-gradient(180deg,#7a4e2c 0%,#5c3a20 100%)}
+html.sb-album #sbChat .sb-who b{font-family:"Gloock",Georgia,serif;font-weight:400;font-size:17px;letter-spacing:.01em}
+html.sb-album #sbChat .sb-av{background:#f8f2e4;color:#2f5b46;font-family:"Gloock",Georgia,serif}
+html.sb-album #sbChat .sb-x{color:#f3ead3}
+html.sb-album #sbChat .sb-m.ai{background:#fffaf0;border-color:rgba(58,47,34,.16);color:#3a2f22}
+html.sb-album #sbChat .sb-m.me{background:#dfe9e0;border:1px solid rgba(47,91,70,.22);color:#1f3f30}
+html.sb-album #sbChat .sb-m a{color:#2f5b46}
+html.sb-album #sbChat .sb-bar{background:#efe5cf;border-top-color:rgba(58,47,34,.16)}
+html.sb-album #sbChat .sb-bar input{background:#fffaf0;border-color:rgba(58,47,34,.22);color:#3a2f22}
+html.sb-album #sbChat .sb-bar input:focus{outline-color:#2f5b46}
+html.sb-album #sbChat .sb-send{background:#2f5b46}
+html.sb-album #sbChat .sb-alt{background:#f3ead3;color:#6b4326;border-top-color:rgba(58,47,34,.16);font-family:"Caveat",cursive;font-weight:700;font-size:18px}
 /* ── Shenba avatar dock (v1.4) ────────────────────────────────────────────
    The one voice launcher on the page. Tap her face to start the call, tap
    again to end it. Same Shenba brain and tools as before (v1.7: our own server, no ElevenLabs); the old orb
@@ -3101,6 +3115,16 @@ function dodge() {
 addEventListener("scroll", dodge, { passive: true });
 addEventListener("resize", dodge);
 dodge();
+
+/* Album skin + fonts, when Chat is opened from the photo-album (/?s=album#chat). */
+try {
+  if (new URLSearchParams(location.search).get("s") === "album") {
+    document.documentElement.classList.add("sb-album");
+    var _af = document.createElement("link"); _af.rel = "stylesheet";
+    _af.href = "https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Gloock&display=swap";
+    document.head.appendChild(_af);
+  }
+} catch (e) {}
 
 /* Deep link: kutralamezhilagam.com/#talk opens voice, #chat opens chat. */
 if (location.hash === "#chat") $("chatBtn").click();
