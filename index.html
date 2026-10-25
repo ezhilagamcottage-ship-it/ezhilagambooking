@@ -417,6 +417,11 @@ dialog.lv::backdrop{background:rgba(28,25,23,.5)}
 .ty .cap b{display:block;font-size:21px;line-height:1.25;text-shadow:0 1px 6px rgba(0,0,0,.35)}
 .ty .cap span{display:block;margin-top:6px;font-size:14px;opacity:.95}
 .ty .cap em{display:block;margin-top:10px;font-family:var(--serif);font-style:normal;font-size:28px;font-weight:700;color:#fde68a}
+/* v2.9 (Rakesh, 25 Oct 2026): the call ends with Shenba's own nandri video (her avatar, lip-synced, on the balcony, the
+   Kutralam Ezhilagam logo building at the top), the thank-you card over her last frame, then the logo outro video and
+   the window closes back to the home page. */
+.oz{position:absolute;inset:0;z-index:32;background:#fff;display:flex;align-items:center;justify-content:center}
+.oz[hidden]{display:none}.oz video{width:100%;height:100%;object-fit:contain;background:#fff}
 .ty button{position:relative;margin-top:14px;border:0;border-radius:12px;padding:12px 22px;font:inherit;font-weight:800;background:#fff;color:var(--brand-dk);cursor:pointer}
 
 .callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 20px}
@@ -865,10 +870,11 @@ footer{padding-top:8px}
     <div class="sw-pic" id="swPic"><img src="img/shenba-namaste.webp" alt=""><video class="sw-vid" id="swVid" playsinline preload="none" poster="img/shenba-intro.jpg"></video><div class="sw-glow" id="swGlow"></div><div class="sw-shade" id="swShade"></div></div>
     <div class="sw-say" id="swSay"><div class="t" id="swT"></div><div class="s" id="swS"></div></div></div>
   <div class="ty" id="scThanks" hidden>
-    <img src="img/shenba-namaste.webp" alt="Shenba, hands joined, in a white silk saree with a green border">
+    <img id="tyPic" src="img/shenba-namaste.webp" alt="Shenba, hands joined, in a white silk saree with a green border">
     <div class="cap"><b id="tyHead">Unga enquiry register aagiduchu!</b><span id="tyLine">Room details WhatsApp-la vandhudum. Booking team seekiram call pannuvanga 😊</span><em>Nandri! 🙏</em>
       <button type="button" id="tyClose">Close</button></div>
   </div>
+  <div class="oz" id="scOutro" hidden><video id="ozVid" muted playsinline preload="none"></video></div>
   <div class="sc-actions">
     <a class="sc-pay" id="scPay" aria-disabled="true">Proceed to pay</a>
     <button type="button" class="sc-end" id="scEnd">End call</button>
@@ -1704,8 +1710,10 @@ function showThanks(booked) {
   $("tyHead").textContent = booked ? "Unga room hold pannirukkom!" : "Unga enquiry register aagiduchu!";
   $("tyLine").textContent = booked ? "Payment link WhatsApp-la vandhudum. Pay pannina udane voucher varum 😊"
                                    : "Room details WhatsApp-la vandhudum. Booking team seekiram call pannuvanga 😊";
-  swGoodbye(booked).then(() => {
+  swGoodbye(booked).then(viaVideo => {
+    $("tyPic").src = viaVideo ? NANDRI[booked ? "hold" : "enq"].end : "img/shenba-namaste.webp";
     $("scThanks").hidden = false;
+    clearTimeout(ozTimer); ozTimer = setTimeout(playOutro, 6000);   // the card stays a few seconds, then the logo outro
     const cap = document.querySelector("#scThanks .cap"); if (cap && cap.animate) cap.animate([{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "none" }], { duration: 600, easing: "ease-out" });
     $("sw").style.visibility = "hidden";
   });
@@ -1810,9 +1818,62 @@ function swVoice(booked) {   // her nandri, in the call's own audio (same loudne
     const s = ac.createBufferSource(), lv = ac.createGain(); s.buffer = buf; lv.gain.value = levelFor(buf); s.connect(lv); lv.connect(ac.destination); s.start();
   }).catch(() => {});
 }
+/* v2.9: her nandri as a video (muted, with her voice from swVoice so it matches the call's loudness). Resolves true if it
+   played; false means the photo walk below takes over. */
+const NANDRI = { hold: { src: "img/shenba-nandri-hold.mp4", end: "img/shenba-nandri-hold-end.jpg" },
+                 enq: { src: "img/shenba-nandri.mp4", end: "img/shenba-nandri-end.jpg" },
+                 face: { x: 0.5, y: 0.40, r: 0.15 }, w: 540, h: 960 };
+const OUTRO = "img/ezhilagam-outro.mp4";
+function swWarmEnd() {   // fetch the ending videos into the cache while the call is on (about 0.8 MB in all)
+  for (const u of [NANDRI.hold.src, NANDRI.enq.src, OUTRO]) fetch(u, { priority: "low" }).catch(() => {});
+}
+async function swNandri(booked) {
+  const v = $("swVid"), sw = $("sw"), pic = $("swPic"), face = $("scFace");
+  if (swBusy || !v || !v.canPlayType("video/mp4")) return false;
+  try { v.pause(); } catch (e) {}
+  v.muted = true; v.removeAttribute("poster"); v.preload = "auto"; v.src = NANDRI[booked ? "hold" : "enq"].src;
+  const ready = await new Promise(ok => {
+    const fin = r => { v.removeEventListener("loadeddata", y); v.removeEventListener("error", n); ok(r); };
+    const y = () => fin(true), n = () => fin(false);
+    v.addEventListener("loadeddata", y); v.addEventListener("error", n); setTimeout(() => fin(v.readyState >= 2), 3500);
+    try { v.load(); } catch (e) { fin(false); }
+  });
+  if (!ready) { v.removeAttribute("src"); return false; }
+  swBusy = true; swClear();
+  swMedia = { face: NANDRI.face, w: NANDRI.w, h: NANDRI.h };
+  const g = swGeo(), tx = g.cx - g.fx, ty = g.cy - g.fy;
+  pic.style.setProperty("--fx", g.fx + "px"); pic.style.setProperty("--fy", g.fy + "px");
+  sw.classList.add("vid"); $("swSay").style.opacity = 0; $("swShade").style.opacity = 0;
+  sw.style.visibility = "visible"; sw.style.opacity = 1;
+  // 1. her circle opens into the full picture
+  face.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: "forwards" });
+  if (!swCalm()) {
+    pic.animate([{ clipPath: `circle(${g.fr}px at ${g.fx}px ${g.fy}px)`, transform: `translate(${tx}px,${ty}px) scale(${g.k})` },
+                 { clipPath: `circle(${Math.hypot(g.W, g.H)}px at ${g.fx}px ${g.fy}px)`, transform: "none" }],
+      { duration: 900, easing: "cubic-bezier(.3,0,.2,1)", fill: "forwards" });
+    await swWait(900);
+  }
+  // 2. she says nandri
+  const played = await new Promise(ok => {
+    let started = false;
+    const fin = () => { v.removeEventListener("ended", fin); ok(started); };
+    v.addEventListener("playing", () => { if (!started) { started = true; swVoice(booked); } }, { once: true });
+    v.addEventListener("ended", fin);
+    setTimeout(fin, Math.max(5000, (v.duration || 7) * 1000 + 1500));
+    try { v.currentTime = 0; } catch (e) {}
+    const p = v.play(); if (p && p.catch) p.catch(() => fin());
+  });
+  // 3. the thank-you card (her last frame) takes over; the caller shows it
+  setTimeout(() => { sw.classList.remove("vid"); sw.style.visibility = "hidden"; swClear(); face.getAnimations().forEach(a => a.cancel());
+    swMedia = { face: SW_FACE, w: 720, h: 1260 }; v.removeAttribute("src"); v.setAttribute("poster", "img/shenba-intro.jpg"); try { v.load(); } catch (e) {} }, 400);
+  swBusy = false;
+  if (!played) { swVoice(booked); }
+  return true;
+}
 async function swGoodbye(booked) {
+  if (await swNandri(booked)) return true;
   const g = swGeo();
-  if (swCalm() || !g.ok || swBusy) { swVoice(booked); return; }
+  if (swCalm() || !g.ok || swBusy) { swVoice(booked); return false; }
   swBusy = true; swClear();
   const sw = $("sw"), pic = $("swPic"), face = $("scFace"), f = { x: g.fx, y: g.fy }, c = { x: g.cx, y: g.cy }, k = g.k, s0 = .34;
   const T = (s, t) => `translate(${t.x}px,${t.y}px) scale(${s})`, at = s => ({ x: c.x - s * f.x, y: c.y - s * f.y });
@@ -1844,8 +1905,28 @@ async function swGoodbye(booked) {
   swWords("நன்றி!"); await swWait(1500);
   $("swSay").animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" });
   await swWait(250); swBusy = false; face.getAnimations().forEach(a => a.cancel());
+  return false;
 }
-$("tyClose").addEventListener("click", () => { $("scThanks").hidden = true; closeDlg($("sbCall")); untrap(); });
+$("tyClose").addEventListener("click", () => playOutro());
+/* v2.9: the logo outro after the thank-you card, then the call window closes and the guest is back on the home page */
+let ozTimer = 0, ozOn = false;
+function ozDone() {
+  clearTimeout(ozTimer); ozOn = false;
+  const v = $("ozVid"); try { v.pause(); } catch (e) {}
+  $("scOutro").hidden = true; $("scThanks").hidden = true; closeDlg($("sbCall")); untrap();
+  try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { window.scrollTo(0, 0); }
+}
+function playOutro() {
+  clearTimeout(ozTimer); if (ozOn || $("scThanks").hidden) return; ozOn = true;
+  const v = $("ozVid"), box = $("scOutro");
+  if (!v.getAttribute("src")) v.src = OUTRO;
+  try { v.currentTime = 0; } catch (e) {}
+  box.hidden = false; if (box.animate) box.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 350 });
+  const p = v.play();
+  const stop = setTimeout(ozDone, 11000);
+  v.onended = () => { clearTimeout(stop); setTimeout(ozDone, 500); };
+  if (p && p.catch) p.catch(() => { clearTimeout(stop); ozDone(); });
+}
 
 function openCall(start) {
   if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
@@ -2077,7 +2158,7 @@ async function startVoice(resume, viaTap) {
     } else {
       // with the intro, the server is told what she has already said, so she carries on from the check-in date
       const j = await api("/start", intro ? { mode: "voice", opening: INTRO.line } : { mode: "voice" });
-      session = j.session; convId = j.conversation_id || ""; cardPoll(); loadFillers();
+      session = j.session; convId = j.conversation_id || ""; cardPoll(); loadFillers(); setTimeout(swWarmEnd, 15000);
       starting = false;
       if (intro && await intro) saState("listening", "Listening… tell Shenba your check-in date");
       else { if (intro) swWelcome(); await play(j.audio_b64); }

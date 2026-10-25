@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v2.9 — 25 Oct 2026
+
+**Shenba's nandri video and the logo outro.** At the end of a call, Shenba's circle opens into her own avatar video on the balcony, saying nandri in her Vennila voice (a room-held version and an enquiry version, `img/shenba-nandri*.mp4`, about 320 KB each, played muted with her voice from `audio/shenba-nandri*.mp3`). The Kutralam Ezhilagam logo builds behind her with a see-through background, and her sides fade softly. The thank-you card then shows over her last frame. After about 6 seconds, or when the guest taps Close, the logo outro (`img/ezhilagam-outro.mp4`) plays, the call window closes and the guest is back on the home page. The ending videos are fetched 15 seconds into a call. If a video can't play, the old photo walk is used.
+
 ## v2.8 — 25 Oct 2026
 
 **Shenba's talking intro.** Tapping "Talk with Shenba" now opens with Shenba herself on video: her ElevenLabs avatar, lip-synced in her own Vennila voice, standing in front of the full Ezhilagam building with the logo on top, saying "வாங்க! எழிலகம் room booking-க்கு help பண்ண நான் இருக்கேன், ஷென்பா. உங்க check-in date சொல்லுங்க?". The call connects while she speaks, the server is told what she has already said, then she shrinks into her circle and listens for the check-in date. The video (`img/shenba-intro.mp4`) is 715 KB with a 96 KB still frame, and only starts loading 4 seconds after the page opens. If a phone cannot play it, the v2.7 photo welcome and greeting run as before.
