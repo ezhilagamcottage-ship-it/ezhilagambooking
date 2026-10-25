@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v3.4 — 25 Oct 2026
+
+**ElevenLabs credits kept low.** The live call has a hard stop at 15 minutes (was 60). At 7 minutes, if the booking card is still empty (no dates and guests, room, price or number), Shenba wraps up warmly — "இதுக்கு மேல WhatsApp-ல பேசலாமா?…" — and ends the call; a sheet then offers **WhatsApp-ல continue பண்ணுங்க** (WhatsApp Shenba, with the dates already known) or **இங்கேயே chat பண்ணுங்க** (Chat with Shenba), both free of voice credits. A booking on its way stays live; a minute before the 15-minute stop she finishes the hold / payment link or moves to WhatsApp. A call that reaches the stop without a booking also gets the WhatsApp/chat sheet.
+
 ## v3.3 — 25 Oct 2026
 
 **Outro ends on the numbers.** After the logo outro the screen stays on its last frame: tap the Booking (99622 22415) or Reception (82483 20685) box to call that number; a small Home button at the bottom right goes back to the home page.

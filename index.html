@@ -435,6 +435,13 @@ dialog.lv::backdrop{background:rgba(28,25,23,.5)}
   border:0;border-radius:14px;padding:8px 10px 6px;background:#0f5132;color:#fff;font:700 11px/1 inherit;box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer}
 .oz-home svg{width:20px;height:20px}
 .oz.done .oz-home{display:flex}
+/* v3.4: hand-over to WhatsApp / chat (off-topic after 7 min, or the 15-min stop) */
+.ho{position:absolute;inset:0;z-index:33;display:flex;align-items:flex-end;justify-content:center;background:rgba(15,23,20,.45)}
+.ho[hidden]{display:none}
+.ho-card{width:100%;max-width:440px;background:#fff;border-radius:22px 22px 0 0;padding:20px 18px max(18px,env(safe-area-inset-bottom));text-align:center}
+.ho-card h4{margin:0 0 6px;font-size:18px}.ho-card p{margin:0 0 14px;color:var(--mute);font-size:14px;line-height:1.45}
+.ho-card a,.ho-card button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;border-radius:14px;border:0;font:inherit;font-weight:800;font-size:16px;text-decoration:none;cursor:pointer;margin-top:8px}
+.ho-wa{background:#25d366;color:#fff}.ho-chat{background:#f1f5f3;color:var(--brand-dk)}.ho-x{background:none!important;color:var(--mute)!important;min-height:40px!important;font-weight:600!important}
 .ty button{position:relative;margin-top:14px;border:0;border-radius:12px;padding:12px 22px;font:inherit;font-weight:800;background:#fff;color:var(--brand-dk);cursor:pointer}
 
 .callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 20px}
@@ -891,6 +898,12 @@ footer{padding-top:8px}
     <a class="oz-tel b" href="tel:+919962222415" aria-label="Call booking, 99622 22415"></a>
     <a class="oz-tel r" href="tel:+918248320685" aria-label="Call reception, 82483 20685"></a></div>
     <button type="button" class="oz-home" id="ozHome" aria-label="Back to the home page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>Home</button></div>
+  <div class="ho" id="scHand" hidden><div class="ho-card">
+    <h4>Shenba-வோட WhatsApp-ல தொடரலாம் 🙏</h4>
+    <p>உங்க கேள்விகளுக்கு அங்கேயே பதில் சொல்லுவாங்க, room details-உம் அனுப்புவாங்க.</p>
+    <a class="ho-wa" id="hoWa" href="#" target="_blank" rel="noopener">WhatsApp-ல continue பண்ணுங்க</a>
+    <button type="button" class="ho-chat" id="hoChat">இங்கேயே chat பண்ணுங்க</button>
+    <button type="button" class="ho-x" id="hoX">Close</button></div></div>
   <div class="sc-actions">
     <a class="sc-pay" id="scPay" aria-disabled="true">Proceed to pay</a>
     <button type="button" class="sc-end" id="scEnd">End call</button>
@@ -2258,6 +2271,34 @@ async function resumeShenba() {
    credits, network), the call carries on on our own server exactly as before (Google + Leda backup). The client library
    is kept here (js/eleven-client-1.28.0.js, @elevenlabs/client 1.28.0, MIT, with the max-duration override added). */
 const AGENT = "agent_2101m57dd7z8fvnva0erjk0h0va2", ELEVEN_SDK = "js/eleven-client-1.28.0.js", LIVE_AGENT = true;
+/* v3.4 (Rakesh, 25 Oct 2026: keep ElevenLabs credits low): the live call has a hard stop at 15 minutes. At 7 minutes, if the
+   booking card is still empty (no dates and guests, room, price or number) the guest is chatting about other things: Shenba
+   wraps up warmly and the guest carries on, free, with WhatsApp Shenba or Chat with Shenba. A booking on its way stays live
+   until it is done or the 15 minutes are up. */
+const AGENT_MAX_S = 900, AGENT_CHECK_S = 420;
+let agentClock = 0, agentHand = false;
+const bookingOnWay = () => !!((card.checkIn && (card.adults != null || card.nights)) || card.room || card.total || card.phone || card.status);
+function agentWatch(conv) {
+  clearTimeout(agentClock); agentHand = false;
+  agentClock = setTimeout(() => {
+    if (agentConv !== conv || !calling) return;
+    if (bookingOnWay()) {   // a booking on its way: carry on; near the end she wraps up herself
+      agentClock = setTimeout(() => { if (agentConv === conv) try { conv.sendContextualUpdate("Only one minute is left on this call. Finish what you are doing now: if the guest wants the room, hold it and send the payment link; otherwise tell them warmly that you will continue on WhatsApp, say nandri and end the call."); } catch (e) {} }, (AGENT_MAX_S - AGENT_CHECK_S - 70) * 1000);
+      return;
+    }
+    agentHand = true;
+    try { conv.sendContextualUpdate("TIME: this website call has gone on for 7 minutes without booking details. In your very next reply, answer briefly, then warmly say: 'இதுக்கு மேல WhatsApp-ல பேசலாமா? அங்கேயே எல்லா details-உம் அனுப்புறேன், உங்க கேள்விக்கும் பதில் சொல்றேன்' and say nandri and end the call."); } catch (e) {}
+    agentClock = setTimeout(() => { if (agentConv === conv) endVoice("Call ended · continue on WhatsApp").then(handOver); }, 45000);   // she did not end it herself
+  }, AGENT_CHECK_S * 1000);
+}
+function handOver() {   // WhatsApp Shenba (remembers the guest by number) or Chat with Shenba, both free of voice credits
+  const bits = [card.checkIn ? "check-in " + card.checkIn : "", card.nights ? card.nights + " night(s)" : "", card.adults != null ? card.adults + " adults" : ""].filter(Boolean).join(", ");
+  $("hoWa").href = "https://wa.me/916374213184?text=" + encodeURIComponent("Hi Shenba, I was talking to you on the website" + (bits ? " (" + bits + ")" : "") + ". I'd like to continue here.");
+  $("scHand").hidden = false;
+}
+$("hoX").addEventListener("click", () => { $("scHand").hidden = true; });
+$("hoWa").addEventListener("click", () => { setTimeout(() => { $("scHand").hidden = true; }, 400); });
+$("hoChat").addEventListener("click", () => { $("scHand").hidden = true; closeDlg($("sbCall")); untrap(); setTimeout(() => $("chatBtn").click(), 250); });
 let agentConv = null, agentBye = false, agentT0 = 0, agentHeard = false, agentNoDur = false, agentTries = 0, agentIntro = null;
 function loadEleven() {
   if (window.ElevenLabsClient) return Promise.resolve(window.ElevenLabsClient);
@@ -2304,10 +2345,10 @@ async function startAgent(intro) {
     onError: () => {}
   };
   const ov = { agent: intro ? { firstMessage: "" } : {} };
-  if (!agentNoDur) ov.conversation = { maxDurationSeconds: 3600 };
+  if (!agentNoDur) ov.conversation = { maxDurationSeconds: AGENT_MAX_S };
   conv = await EL.Conversation.startSession({ agentId: AGENT, connectionType: "webrtc", overrides: ov, ...handlers });
   if (!calling) { try { await conv.endSession(); } catch (e) {} throw new Error("ended"); }
-  agentConv = conv; agentBye = false; voice = conv; starting = false; agentT0 = Date.now(); agentHeard = false;
+  agentConv = conv; agentBye = false; voice = conv; starting = false; agentT0 = Date.now(); agentHeard = false; agentWatch(conv);
   try { convId = conv.getId() || ""; } catch (e) { convId = ""; }
   try { conv.sendContextualUpdate(webContext()); } catch (e) {}
   cardPoll(); setTimeout(swWarmEnd, 15000);
@@ -2329,15 +2370,16 @@ async function agentGone(d) {   // the live call ended by itself (she said nandr
     calling = false; starting = false; startVoice(false, false, true); return;
   }
   calling = false; clearResume();
-  const byHer = d && d.reason === "agent";
+  const byHer = (d && d.reason === "agent") || Date.now() - agentT0 > (AGENT_MAX_S - 30) * 1000;
   saState("idle", byHer ? "Call ended · thank you!" : "Call ended · tap Shenba to talk again");
   if (!byHer) { if (convId && !cardFinal) cardPoll(); return; }
   try {   // the latest from Prime (hold, payment link) before the thank-you
     const r = await Promise.race([fetch(PRIME + "?action=voiceCard&conv=" + encodeURIComponent(convId), { cache: "no-store" }), new Promise((_, n) => setTimeout(n, 2500))]);
     const j = await r.json(); if (j && j.ok && j.status && j.status !== "none") cardMerge(j);
   } catch (e) {}
-  if ($("sbCall").open && (card.status === "pending_payment" || card.phone || card.name || card.checkIn)) showThanks(card.status === "pending_payment");
-  else if (convId && !cardFinal) cardPoll();
+  clearTimeout(agentClock);
+  if ($("sbCall").open && !agentHand && (card.status === "pending_payment" || card.phone || card.name || card.checkIn)) showThanks(card.status === "pending_payment");
+  else { if (convId && !cardFinal) cardPoll(); if ($("sbCall").open && (agentHand || Date.now() - agentT0 > (AGENT_MAX_S - 30) * 1000)) handOver(); }
 }
 
 async function startVoice(resume, viaTap, serverOnly) {
@@ -2446,6 +2488,7 @@ async function startVoice(resume, viaTap, serverOnly) {
 function bye(id) { if (!id) return; try { navigator.sendBeacon(API + "/end", JSON.stringify({ session: id })); } catch (e) {} }
 async function endVoice(msg) {
   bargeBlob = null;
+  clearTimeout(agentClock);
   if (agentConv) { const c = agentConv; agentConv = null; agentBye = true; try { await c.endSession(); } catch (e) {} }
   bye(session); clearResume();
   calling = false;
