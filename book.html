@@ -719,6 +719,13 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-red)}
 #bar .paynote span b{color:#544f45;letter-spacing:.03em}
 @media (min-width:1024px){#bar .paynote{max-width:708px} section.step:has(#part){max-width:620px}}
 .wrap{padding-bottom:190px}
+
+/* v5.4 floor / no-lift tags */
+.paroom{margin:4px 0 0;font-size:17px;font-weight:400;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 8px}
+.pafl{font:400 11.5px/1.3 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#7b7466}
+.nolift{font:400 11px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:#a62a23;padding:4px 8px;border-radius:2px}
+#vcard .v-room{white-space:normal;line-height:1.35}
+.roomrow p b.nl{font-weight:400;color:#a62a23;letter-spacing:.04em}
 </style>
 </head>
 <body>
@@ -850,6 +857,18 @@ const ROOMS = [
     amen:["Largest room in the house","Ground floor — no stairs"], bed:"Double cots · extra beds on request",
     desc:"The largest room in the house \u2014 ground-floor suite, sleeps up to fifteen." },
 ];
+
+/* v5.4 (Rakesh, 25 Oct): wherever a booked room is named — the Pay step, the
+   voucher card, the voucher picture, the note to the desk — say its floor, and
+   "No lift" for the first and second floors, so nobody with elderly parents
+   or heavy bags is surprised on arrival. */
+function roomFloor(n) { const r = ROOMS.find((x) => x.name === n); return r ? r.floor : ""; }
+function roomLabel(n) {
+  const f = roomFloor(n);
+  return f ? n + " · " + f + " floor" + (f !== "Ground" ? " · No lift" : "") : n;
+}
+const roomsLabel = (list) => (list || S.pick).map(roomLabel).join(" + ");
+
 const AC_ADDON = { Studio: 500, Suite: 1000 };
 /* Same four the staff app offers, so the register reads identically whether
    the booking came from the desk or from this page. */
@@ -1395,7 +1414,7 @@ function drawRooms(list) {
             ? `<img class="rthumb" alt="" loading="lazy" src="${r.thumbs[0]}">` : ""}
           <div class="meta">
             <h3>${r.name}${rec ? ` <span class="rec">Best fit</span>` : ""}</h3>
-            <p>${r.type} · ${r.floor} Floor · sleeps ${r.pax}${!r.ac ? " · no AC" : ""}</p>
+            <p>${r.type} · ${r.floor} Floor${r.floor !== "Ground" ? ' · <b class="nl">No lift</b>' : ""} · sleeps ${r.pax}${!r.ac ? " · no AC" : ""}</p>
             <span class="more" data-detail="${r.name}">Photos &amp; walkthrough →</span></div>
           <div class="price">${inr(roomCost(r))}<small>/night</small></div>
         </button>`));
@@ -1999,7 +2018,7 @@ function stepPay(app) {
   app.appendChild($(`<section class="step">
     <div class="card">
       <p class="sechead" style="margin-top:0">Your stay</p>
-      <h3 style="margin:2px 0 0;font-size:16px;font-weight:800">${S.pick.join(" + ")}</h3>
+      ${S.pick.map((n) => `<h3 class="paroom">${esc(n)} <span class="pafl">${esc(roomFloor(n))} floor</span>${roomFloor(n) && roomFloor(n) !== "Ground" ? ` <span class="nolift">No lift</span>` : ""}</h3>`).join("")}
       <p class="note" style="font-size:12.5px;color:#78716c">${fmt(S.checkIn)} → ${fmt(S.checkOut)} · ${nights} night${nights>1?"s":""} · ${paxTotal()} guest${paxTotal()>1?"s":""}</p>
       <dl>
         <div><dt>Tariff</dt><dd>${inr(tariff())}</dd></div>
@@ -2131,7 +2150,7 @@ function stepDone(app) {
    * Yellowish brown, as asked — and it is issued only here, on the far side
    * of the desk phone actually seeing the money. */
   const wa = `https://wa.me/${CFG.DESK_WA}?text=` + encodeURIComponent(
-    `Booking ${id} · ${S.guest.name} · ${S.pick.join(" + ")} · ` +
+    `Booking ${id} · ${S.guest.name} · ${roomsLabel()} · ` +
     `${fmt(S.checkIn)} to ${fmt(S.checkOut)} · ${paxTotal()} guests · ${
       paidInFull() ? `PAID IN FULL ${inr(tariff())}` : `advance ${inr(payNow())} paid, ${inr(dueLater())} at check-in`
     }, ref ${S.payRef}`);
@@ -2201,7 +2220,7 @@ function stepDone(app) {
               </div>
             </div>
             <div class="v-tail">
-              <span class="v-room">Room: ${esc(S.pick.join(" + "))}</span>
+              <span class="v-room">Room: ${esc(roomsLabel())}</span>
               <span class="v-sm" style="margin:0">${paxTotal()} guest${paxTotal()===1?"":"s"} · ${nightsN} Night${nightsN===1?"":"s"} Stay</span>
             </div>
             <p class="v-addr">
@@ -2973,7 +2992,8 @@ function drawPremiumVoucher(ctx, d) {
   ctx.save();
   ctx.strokeStyle = "rgba(166,129,46,.4)"; ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(IX + colW + 15, iy - 16); ctx.lineTo(IX + colW + 15, iy + 118);
+  const RL = String(d.rooms || "").split(" + "), RX = (RL.length - 1) * 24;   /* v5.4: one line per room */
+  ctx.moveTo(IX + colW + 15, iy - 16); ctx.lineTo(IX + colW + 15, iy + 118 + RX);
   ctx.stroke(); ctx.restore();
 
   ctx.save();
@@ -2983,11 +3003,18 @@ function drawPremiumVoucher(ctx, d) {
   ctx.fillText(d.checkIn,  IX + colW + 34, iy + 32);
   ctx.fillText(d.checkOut, IX + colW + 34, iy + 60);
   ctx.fillStyle = INK_2; ctx.font = "400 18px " + SANS;
-  ctx.fillText(d.rooms,  IX + colW + 34, iy + 88);
-  ctx.fillText(d.guests + " · " + d.nights, IX + colW + 34, iy + 114);
+  { /* each room on its own line, with its floor and "No lift"; shrink a long one to fit */
+    const maxW = IX + IW - (IX + colW + 34);
+    RL.forEach((line, k) => {
+      let fs = 18; ctx.font = "400 " + fs + "px " + SANS;
+      while (fs > 13 && ctx.measureText(line).width > maxW) { fs -= 1; ctx.font = "400 " + fs + "px " + SANS; }
+      ctx.fillText(line, IX + colW + 34, iy + 88 + k * 24);
+    });
+    ctx.font = "400 18px " + SANS; }
+  ctx.fillText(d.guests + " · " + d.nights, IX + colW + 34, iy + 114 + RX);
   ctx.restore();
 
-  iy += 152;
+  iy += 152 + RX;
   ctx.save();
   ctx.strokeStyle = "rgba(166,129,46,.35)"; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(IX, iy); ctx.lineTo(IX + IW, iy); ctx.stroke();
@@ -3303,7 +3330,7 @@ async function drawVoucherOnce() {
     guestPhone:  digits.length === 10
                    ? "+91 " + digits.slice(0, 5) + " " + digits.slice(5)
                    : (digits ? "+91 " + digits : ""),
-    rooms:       S.pick.join(" + "),
+    rooms:       roomsLabel(),
     checkIn:     fmt(S.checkIn) + " · 12:00 PM",
     checkOut:    fmt(S.checkOut) + " · 10:00 AM",
     guests:      S.adults + " Adult" + (S.adults == 1 ? "" : "s") +

@@ -830,7 +830,11 @@ function stayParts(el, text) {
 }
 stayParts($("ci"), b.checkIn);
 stayParts($("co"), b.checkOut);
-$("room").textContent = "Room: " + b.room;
+/* v5.4: floor and "No lift" for first/second-floor rooms, always */
+const FLOOR = { Aambal:"Ground", Thillai:"Ground", Vaagai:"Ground", Paalai:"First", Shenbagam:"First", Mavval:"First",
+                Marutham:"Second", Mullai:"Second", Kurinji:"Second" };
+const roomLabel = (n) => { n = String(n).trim(); const f = FLOOR[n]; return f ? n + " · " + f + " floor" + (f !== "Ground" ? " · No lift" : "") : n; };
+$("room").textContent = "Room: " + String(b.room).split(/\s*[+,]\s*/).map(roomLabel).join(" + ");
 $("occ").textContent  = b.occupancy;
 $("refBig").textContent = b.bookingRef;
 
