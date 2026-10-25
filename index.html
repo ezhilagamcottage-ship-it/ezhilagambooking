@@ -3116,20 +3116,20 @@ addEventListener("scroll", dodge, { passive: true });
 addEventListener("resize", dodge);
 dodge();
 
-/* Album skin + fonts, when Chat is opened from the photo-album (/?s=album#chat). */
-try {
-  if (new URLSearchParams(location.search).get("s") === "album") {
-    document.documentElement.classList.add("sb-album");
-    var _af = document.createElement("link"); _af.rel = "stylesheet";
-    _af.href = "https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Gloock&display=swap";
-    document.head.appendChild(_af);
-  }
-} catch (e) {}
+/* Album entry (/?s=album): Chat wears the album colours; Talk starts the call straight away, like the home page. */
+var _fromAlbum = false;
+try { _fromAlbum = new URLSearchParams(location.search).get("s") === "album"; } catch (e) {}
+if (_fromAlbum) {
+  document.documentElement.classList.add("sb-album");
+  var _af = document.createElement("link"); _af.rel = "stylesheet";
+  _af.href = "https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Gloock&display=swap";
+  document.head.appendChild(_af);
+}
 
 /* Deep link: kutralamezhilagam.com/#talk opens voice, #chat opens chat. */
 if (location.hash === "#chat") $("chatBtn").click();
-/* #talk only shows her; the call (and the mic question) waits for a tap */
-if (location.hash === "#talk") openCall(false);
+/* #talk shows her; from the album it plays her intro and begins listening at once (openCall(true)), otherwise it waits for a tap */
+if (location.hash === "#talk") openCall(_fromAlbum);
 </script>
 <script>
 /* Lens over the logo (v1.6). One loop every 7 s: left to right and back on a
