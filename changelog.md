@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v3.0 — 25 Oct 2026
+
+**Shenba answers sooner and says what she is doing.** No filler on quick turns (name, date, head count) unless her answer takes more than 2.4 seconds. When she is about to look up rooms (dates and guests known, no price yet) she says so at once ("check பண்ணிட்டு சொல்றேன்…", and once the new clips are added: "Availability check பண்றேன்…", "நீங்க கேட்ட dates-ல room available-ஆ-ன்னு பாக்குறேன்…", "ஒரு second, rooms check பண்றேன்…"), only once for the same dates and guests. Proceed to pay: "Room hold பண்றேன், ஒரு second…". The "ம்ம்…" and "சரி…" lines are no longer used and no line repeats twice in a row. When her answer is ready, a filler that is still playing fades out at once instead of finishing. The screen says "Checking availability…" / "One moment…" instead of "Shenba is thinking…". The new clips go in `audio/filler-*.mp3` (Vennila voice only; with the Leda voice the server's own lines are used).
+
 ## v2.9 — 25 Oct 2026
 
 **Shenba's nandri video and the logo outro.** At the end of a call, Shenba's circle opens into her own avatar video on the balcony, saying nandri in her Vennila voice (a room-held version and an enquiry version, `img/shenba-nandri*.mp4`, about 320 KB each, played muted with her voice from `audio/shenba-nandri*.mp3`). The Kutralam Ezhilagam logo builds behind her with a see-through background, and her sides fade softly. The thank-you card then shows over her last frame. After about 6 seconds, or when the guest taps Close, the logo outro (`img/ezhilagam-outro.mp4`) plays, the call window closes and the guest is back on the home page. The ending videos are fetched 15 seconds into a call. If a video can't play, the old photo walk is used.

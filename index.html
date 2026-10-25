@@ -1483,7 +1483,7 @@ function saBlinkLoop() {
   }, gap);
 }
 function saBlinkFor(st, text) {
-  const mode = st === "connecting" && /thinking/i.test(text || "") ? "thinking" : st === "speaking" ? "speaking" : st === "listening" ? "listening" : "idle";
+  const mode = st === "connecting" && /thinking|checking|holding|moment/i.test(text || "") ? "thinking" : st === "speaking" ? "speaking" : st === "listening" ? "listening" : "idle";
   if (st !== lastSt) {
     if (st === "speaking" && !greeted) { greeted = true; setTimeout(() => saBlink("warm"), 450); }     // welcoming
     else if (mode === "thinking") setTimeout(() => saBlink("slow"), 200);                              // starts to think
@@ -1499,7 +1499,7 @@ function saState(st, text) {
     el.classList.toggle("on", st === "listening" || st === "speaking" || st === "connecting");
     el.classList.toggle("listening", st === "listening");
     el.classList.toggle("speaking", st === "speaking");
-    el.classList.toggle("thinking", st === "connecting" && /thinking/i.test(text || ""));
+    el.classList.toggle("thinking", st === "connecting" && /thinking|checking|holding|moment/i.test(text || ""));
     el.classList.toggle("err", st === "error");
   }
   saBlinkFor(st, text);
@@ -1944,7 +1944,7 @@ setTimeout(() => { if (SHENBA_WEB && pendingResume()) resumeShenba(); }, 700);  
    to the server, which turns it into text, asks her brain, and sends back her words and her voice. Tapping her face
    while she speaks stops her and lets the guest talk. `voice` is a small stand-in object with the two readings the lip
    sync above already uses (volume and frequency bands of her voice). The mic question is asked only after the tap. */
-let ac = null, mic = null, micAn = null, outAn = null, src = null, rec = null, session = "", playDone = null;
+let ac = null, mic = null, micAn = null, outAn = null, src = null, rec = null, session = "", playDone = null, srcGain = null, srcEnd = 0;
 const MAX_TURN_MS = 20000, SILENCE_MS = 700, NOBODY_MS = 30000;   // 21 Oct: 0.7 s of quiet ends the guest's turn (was 1.1 s)
 function b64ToBuf(b64) { const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u.buffer; }
 function blobToB64(blob) { return new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1] || ""); r.onerror = no; r.readAsDataURL(blob); }); }
@@ -1960,7 +1960,7 @@ function play(b64) {
       if (!calling) return ok();
       src = ac.createBufferSource(); src.buffer = buf;
       /* Same loudness for every clip (Rakesh, 22 Oct 2026 08:22): greeting, fillers and replies are levelled to one volume */
-      const lv = ac.createGain(); lv.gain.value = levelFor(buf); src.connect(lv); lv.connect(outAn);
+      const lv = ac.createGain(); lv.gain.value = levelFor(buf); src.connect(lv); lv.connect(outAn); srcGain = lv; srcEnd = ac.currentTime + buf.duration;
       src.onended = () => { src = null; playDone = null; ok(); };
       saState("speaking", "Shenba is speaking… tap her to interrupt");
       lipSync();
@@ -2080,21 +2080,69 @@ function takeReply(r) {   // card + room options from any Shenba reply
   if (r.options) showOptions(r.options, "call");
 }
 
-let fillers = [], lastFiller = -1, fillersFor = "";
+/* Fillers v3.0 (Rakesh, 25 Oct 2026: "Shenba seems to be thinking too much even for filling dates and names … should not
+   repeat the same words … instead it can say availability check panren … make Shenba faster"):
+   - quick turns (name, date, head count) get NO filler unless her answer is really slow (2.4 s);
+   - when she is about to look up rooms (dates and guests known, no price yet) she says what she is doing, at once:
+     "Availability check பண்றேன்…", "நீங்க கேட்ட dates-ல room available-ஆ-ன்னு பாக்குறேன்…", "ஒரு second, rooms check பண்றேன்…"
+     - but only once for the same dates and guests;
+   - a tap on a room or Proceed to pay: "Room hold பண்றேன், ஒரு second…";
+   - the "ம்ம்…" and "சரி…" lines are never used, and no line is used twice in a row;
+   - when her answer is ready the filler fades out at once instead of finishing, so the answer comes sooner. */
+let fillers = { avail: [], hold: [], gen: [] }, lastFiller = "", fillersFor = "", availSaid = "";
+const FILL_OWN = { avail: ["audio/filler-availability.mp3", "audio/filler-dates.mp3", "audio/filler-rooms.mp3"], hold: ["audio/filler-hold.mp3"] };
+const abToB64 = ab => { const u = new Uint8Array(ab); let t = ""; for (let i = 0; i < u.length; i += 8192) t += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); return btoa(t); };
 async function loadFillers() {   // per call: the fillers come in the same voice as this call (ElevenLabs or Leda)
   if (!session || fillersFor === session) return;
-  fillersFor = session; fillers = [];
-  try { const j = await api("/fillers", { session }); fillers = (j.fillers || []).filter(f => f.audio_b64); } catch (e) {}
+  fillersFor = session; fillers = { avail: [], hold: [], gen: [] }; availSaid = ""; lastFiller = "";
+  let eng = "";
+  try {
+    const j = await api("/fillers", { session }); eng = j.engine || "";
+    for (const f of (j.fillers || []).filter(f => f.audio_b64)) {
+      const t = f.text || "";
+      if (/^\s*(ம்ம்|சரி)/.test(t)) continue;                                   // no "hmm" / "sari"
+      if (/check|பாத்துட்டு/i.test(t)) fillers.avail.push({ t, b: f.audio_b64 });   // "check பண்ணிட்டு சொல்றேன்", "பாத்துட்டு சொல்றேன்"
+      else fillers.gen.push({ t, b: f.audio_b64 });                               // "ஒரு second…"
+    }
+  } catch (e) {}
+  if (eng !== "eleven") return;   // our own lines are in her ElevenLabs voice (Vennila) only: the voice never changes mid-call
+  for (const k of ["avail", "hold"]) for (const u of FILL_OWN[k]) {
+    fetch(u).then(r => r.ok ? r.arrayBuffer() : null).then(ab => {
+      if (!ab || fillersFor !== session) return;
+      if (k === "avail" && fillers.avail.length && !fillers.avail.some(x => x.own)) fillers.avail = [];   // ours replace the old ones
+      fillers[k].push({ t: u, b: abToB64(ab), own: true });
+    }).catch(() => {});
+  }
 }
-async function withFiller(p, ms = 1300) {
+function fillerKind(tap) {
+  if (tap) return tap.kind === "option" ? "gen" : "hold";   // Proceed to pay: she holds the room and makes the link
+  const key = [card.checkIn, card.checkOut, card.nights, card.adults, card.children].join("|");
+  if (card.checkIn && (card.adults != null || card.nights) && !card.total && availSaid !== key) return "avail";
+  return "gen";
+}
+async function withFiller(p, kind = "gen") {
   let done = false, fp = null;
+  const list = () => (fillers[kind] && fillers[kind].length ? fillers[kind] : kind === "hold" ? fillers.gen : []);
+  const ms = kind === "avail" ? 700 : kind === "hold" ? 600 : 2400;
   const t = setTimeout(() => {
-    if (done || !calling || !fillers.length || src) return;
-    let i; do { i = Math.floor(Math.random() * fillers.length); } while (fillers.length > 1 && i === lastFiller);
-    lastFiller = i;
-    fp = play(fillers[i].audio_b64).then(() => { if (!done) saState("connecting", "Shenba is thinking…"); });
+    const L = list();
+    if (done || !calling || !L.length || src) return;
+    let i; do { i = Math.floor(Math.random() * L.length); } while (L.length > 1 && L[i].t === lastFiller);
+    lastFiller = L[i].t;
+    if (kind === "avail") availSaid = [card.checkIn, card.checkOut, card.nights, card.adults, card.children].join("|");
+    fp = play(L[i].b).then(() => { if (!done) saState("connecting", kind === "gen" ? "One moment…" : "Checking rooms…"); });
   }, ms);
-  try { return await p; } finally { done = true; clearTimeout(t); if (fp) await fp; }
+  try { return await p; }
+  finally {
+    done = true; clearTimeout(t);
+    if (fp) {   // her answer is ready: let the filler end if it is nearly over, otherwise fade it out quickly
+      if (src && srcGain && ac && srcEnd - ac.currentTime > 0.45) {
+        try { srcGain.gain.setTargetAtTime(0, ac.currentTime, 0.05); } catch (e) {}
+        await new Promise(z => setTimeout(z, 180)); stopPlay();
+      }
+      await fp;
+    }
+  }
 }
 /* Kept on this phone while the guest reads the WhatsApp code (Rakesh, 22 Oct 2026: "it should store the data some where when
    verification number is being entered"): if the page closes or reloads meanwhile, it reopens with the card filled in and
@@ -2171,12 +2219,13 @@ async function startVoice(resume, viaTap) {
         if (!calling) break;
         if (!blob && !tapQ) { saState("listening", "Still there? Tap Shenba to talk again"); await endVoice("Call ended · tap Shenba to talk again"); break; }
       }
-      saState("connecting", "Shenba is thinking…");
       let r;
       /* 21 Oct 2026: one failed turn (network blip, server busy) no longer ends the call - retry, then keep listening */
       const tap = tapQ; tapQ = null;   // a tap on the screen (option card, Proceed to pay) wins over what was being said
       const body = tap ? { session, tap } : { session, audio_b64: await blobToB64(blob), audio_mime: blob.type };
       let gone = false;
+      const fk = fillerKind(tap);
+      saState("connecting", fk === "avail" ? "Checking availability…" : fk === "hold" ? "Holding your room…" : "One moment…");
       r = await withFiller((async () => {   // a short filler plays if her answer takes more than a moment
         let rr;
         for (let k = 0; k < 2 && !rr && !gone; k++) {
@@ -2184,7 +2233,7 @@ async function startVoice(resume, viaTap) {
           catch (e) { if (e.gone) gone = true; else if (k === 0) await new Promise(z => setTimeout(z, 1500)); }
         }
         return rr;
-      })());
+      })(), fk);
       if (gone) { await endVoice("Call ended · tap Shenba to talk again"); break; }
       if (!r && !calling) break;
       if (!r) {
