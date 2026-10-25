@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v5.3 — 25 Oct 2026
+
+**One pay button.** The big "Pay ₹… · UPI, Card or Net Banking" button in the page is removed; only the bottom "Pay ₹… securely" button stays (Rakesh). Just above it: "Pay securely with Razorpay", the ways to pay (UPI, card, net banking) and the booking reference.
+
 ## v5.2 — 25 Oct 2026
 
 **Razorpay is the only way to pay on the booking page** (Rakesh). The "Pay with any UPI app" button, the UPI QR code and the "type the last 4 digits of the UPI reference" box are gone. One button, "Pay ₹… · UPI, Card or Net Banking", opens Razorpay checkout; the footer button does the same. UPI is now switched ON inside Razorpay (it was off since 2 Sep, when UPI went to the hotel's own handle), so guests can still pay by GPay/PhonePe/any UPI app through Razorpay. Razorpay charges its usual fee on UPI payments. The booking is written only after Razorpay confirms the payment, as before.
