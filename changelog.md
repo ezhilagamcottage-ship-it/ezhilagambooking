@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v5.6 — 25 Oct 2026
+
+**Opening ends with a glide** (Rakesh). When the logo animation finishes, the Kutralam Ezhilagam logo glides from the centre to its place at the top-left corner and the Powered by CloudNest pill glides to the top-right corner, while the white screen fades away behind them. On a computer the logo glides to its top-left plate and the pill fades out (the computer header has no pill). Skip does the same glide.
+
 ## v5.5 — 25 Oct 2026
 
 **Phone header** (Rakesh). The Kutralam Ezhilagam logo moves to the left end and does what the bar icon did — tap it to go back to the top. The bar icon is gone on phones. The **Powered by CloudNest Technologies** pill sits at the top right on the same line; the menu button sits just before it. Computer layout unchanged.

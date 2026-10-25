@@ -3278,9 +3278,51 @@ if (location.hash === "#talk") openCall(false);
   try { sessionStorage.setItem("tsIntro", "1"); } catch (e) {}
   document.body.style.overflow = "hidden";
   var v = $("tsIntroV"), ended = false;
+  /* v5.6 (Rakesh, 25 Oct 16:26): when the opening ends the logo glides to its
+     place at the top-left and the CloudNest pill to the top-right, while the
+     white screen fades away behind them. On a computer, where the header has no
+     pill, the pill fades out instead. Falls back to the old lift if anything is
+     missing. */
   var finish = function () {
-    if (ended) return; ended = true; intro.classList.add("done"); document.body.style.overflow = "";
-    setTimeout(function () { intro.remove(); }, 1100);
+    if (ended) return; ended = true; document.body.style.overflow = "";
+    var EASE = "cubic-bezier(.65,0,.25,1)", D = 1100;
+    var tLogo = document.querySelector("#tsLogo .logo"), hCn = document.querySelector(".ts-rail .ts-cn"), iCn = intro.querySelector(".cn");
+    if (!tLogo || !Element.prototype.animate) { intro.classList.add("done"); setTimeout(function () { intro.remove(); }, 1100); return; }
+    try {
+      /* the logo inside the video frame (measured from the clip: 4.6–98.3% across, 12–88% down) */
+      var vr = v.getBoundingClientRect();
+      var from = { x: vr.left + vr.width * 0.046, y: vr.top + vr.height * 0.12, w: vr.width * 0.937, h: vr.height * 0.76 };
+      var to = tLogo.getBoundingClientRect();
+      var fly = document.createElement("img");
+      fly.src = "img/logo-hd.webp"; fly.alt = "";
+      fly.style.cssText = "position:fixed;left:" + from.x + "px;top:" + from.y + "px;width:" + from.w + "px;height:" + from.h + "px;z-index:310;pointer-events:none;transform-origin:0 0;object-fit:contain";
+      document.body.appendChild(fly);
+      v.style.visibility = "hidden";
+      var logoBox = document.getElementById("tsLogo"); logoBox.style.visibility = "hidden";
+      var sx = to.width / from.w, sy = to.height / from.h;
+      fly.animate([{ transform: "none" }, { transform: "translate(" + (to.left - from.x) + "px," + (to.top - from.y) + "px) scale(" + sx + "," + sy + ")" }],
+                  { duration: D, easing: EASE, fill: "forwards" });
+      var pillOnHeader = hCn && hCn.offsetParent !== null && iCn;
+      if (pillOnHeader) {
+        var a = iCn.getBoundingClientRect(), b = hCn.getBoundingClientRect();
+        hCn.style.visibility = "hidden";
+        iCn.style.transition = "none"; iCn.style.transformOrigin = "0 0";
+        iCn.animate([{ transform: "none" }, { transform: "translate(" + (b.left - a.left) + "px," + (b.top - a.top) + "px) scale(" + (b.width / a.width) + "," + (b.height / a.height) + ")" }],
+                    { duration: D, easing: EASE, fill: "forwards" });
+      } else if (iCn) {
+        iCn.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500, fill: "forwards" });
+      }
+      intro.querySelectorAll(".tl,.tc,button").forEach(function (el) { el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 350, fill: "forwards" }); });
+      intro.style.pointerEvents = "none";
+      intro.animate([{ backgroundColor: "rgba(255,255,255,1)" }, { backgroundColor: "rgba(255,255,255,0)" }],
+                    { duration: D * 0.8, delay: D * 0.15, easing: "ease-out", fill: "forwards" });
+      setTimeout(function () {
+        logoBox.style.visibility = ""; if (hCn) hCn.style.visibility = "";
+        fly.remove(); intro.remove();
+      }, D + 40);
+    } catch (e) {
+      intro.classList.add("done"); setTimeout(function () { intro.remove(); }, 1100);
+    }
   };
   var go = function () { intro.classList.add("go"); setTimeout(finish, 2300); };
   v.addEventListener("ended", go);
