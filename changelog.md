@@ -7,6 +7,12 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v2.8 — 25 Oct 2026
+
+**Shenba's talking intro.** Tapping "Talk with Shenba" now opens with Shenba herself on video: her ElevenLabs avatar, lip-synced in her own Vennila voice, standing in front of the full Ezhilagam building with the logo on top, saying "வாங்க! எழிலகம் room booking-க்கு help பண்ண நான் இருக்கேன், ஷென்பா. உங்க check-in date சொல்லுங்க?". The call connects while she speaks, the server is told what she has already said, then she shrinks into her circle and listens for the check-in date. The video (`img/shenba-intro.mp4`) is 715 KB with a 96 KB still frame, and only starts loading 4 seconds after the page opens. If a phone cannot play it, the v2.7 photo welcome and greeting run as before.
+
+---
+
 ## v2.7 — 23 Oct 2026
 
 **Vanakkam and nandri animation.** When a call starts, Shenba appears full size with joined hands and "வணக்கம்!", stays while she greets, then shrinks into her circle. When the call ends she steps out of the circle, walks towards the guest saying "நன்றி!" in her own voice (a room-held version and an enquiry version, `audio/shenba-nandri*.mp3`), and the thank-you card follows. Phones set to reduce motion skip the movement.
