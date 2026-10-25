@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v5.5 — 25 Oct 2026
+
+**Phone header** (Rakesh). The Kutralam Ezhilagam logo moves to the left end and does what the bar icon did — tap it to go back to the top. The bar icon is gone on phones. The **Powered by CloudNest Technologies** pill sits at the top right on the same line; the menu button sits just before it. Computer layout unchanged.
+
 ## v5.4 — 25 Oct 2026
 
 **Floor and "No lift" on every booked room** (Rakesh). First- and second-floor rooms say "No lift" next to the room name: on the room list, on the Pay step (room name, floor, red NO LIFT tag), on the voucher card ("Room: Marutham · Second floor · No lift"), on the voucher picture (one line per room), in the note to the front desk, and on voucher.html. Room names sent to the sheet are unchanged.

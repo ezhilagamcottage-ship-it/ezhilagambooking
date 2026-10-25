@@ -1131,6 +1131,25 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
 }
 @media (max-width:420px){ .ts-fg{grid-template-columns:1fr} }
 @media (prefers-reduced-motion:reduce){ #tsIntro{display:none} }
+
+/* v5.5 (Rakesh, 25 Oct 15:10) phone header: hotel logo at the left end (tap = back to top,
+   as the bar icon did), Powered by CloudNest pill at the top right on the same line. */
+.ts-cn{display:none}
+.ts-logo{cursor:pointer}
+@media (max-width:899px){
+  .ts-rail .ts-emb{display:none}
+  .ts-logo{left:max(14px,env(safe-area-inset-left));transform:none;top:9px}
+  .ts-logo .logo-wrap{width:118px}
+  .ts-rail{justify-content:flex-end;gap:8px}
+  .ts-rail .ts-burger{order:1;width:34px}
+  .ts-rail .ts-cn{order:2;display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:999px;background:#fff;border:1px solid #d6dce7;box-shadow:0 4px 12px rgba(31,111,235,.12)}
+  .ts-cn img{width:22px;height:22px;display:block}
+  .ts-cn>span{display:flex;flex-direction:column;line-height:1.05}
+  .ts-cn small{font:400 7.5px/1.2 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6b7690}
+  .ts-cn b{font:600 10.5px/1.15 "Sora",ui-sans-serif,system-ui,sans-serif;letter-spacing:-.01em;color:#0b1220;white-space:nowrap}
+  .ts-cn b i{font-style:normal;color:#1f6feb}
+}
+@media (max-width:360px){ .ts-logo .logo-wrap{width:100px} .ts-cn small{display:none} .ts-cn b{font-size:9.5px} }
 </style>
 </head>
 <body>
@@ -1147,6 +1166,7 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   <a class="ts-emb" href="#top" aria-label="Kutralam Ezhilagam, back to top"><i></i><i></i><i></i><i></i></a>
   <button type="button" class="ts-burger" id="tsBurger" aria-label="Open menu" aria-expanded="false"><i></i><i></i></button>
   <a class="ts-wa" href="https://wa.me/916374213184" target="_blank" rel="noopener">WhatsApp</a>
+  <span class="ts-cn" aria-label="Powered by CloudNest Technologies"><img src="img/cloudnest.webp" alt="" width="22" height="22"><span><small>Powered by</small><b><i>CloudNest</i> Technologies</b></span></span>
 </nav>
 
 <div class="ts-act" id="tsAct">
@@ -3231,6 +3251,10 @@ if (location.hash === "#talk") openCall(false);
     location.href = (page || "book.html") + "?ci=" + B.ci + "&co=" + B.co + "&ad=" + B.ad + "&ch=" + B.ch;
   };
   $("tsReserve").onclick = openBook;
+  /* the hotel logo takes the job of the old bar icon: back to the top of the page */
+  $("tsLogo").addEventListener("click", function () { menu(false); window.scrollTo({ top: 0, behavior: "smooth" }); });
+  $("tsLogo").setAttribute("role", "link"); $("tsLogo").setAttribute("aria-label", "Kutralam Ezhilagam, back to top"); $("tsLogo").tabIndex = 0;
+  $("tsLogo").addEventListener("keydown", function (e) { if (e.key === "Enter") $("tsLogo").click(); });
 
   /* menu */
   function menu(on) { $("tsMenu").classList.toggle("on", on); $("tsMenu").setAttribute("aria-hidden", String(!on)); $("tsBurger").setAttribute("aria-expanded", String(on)); }
