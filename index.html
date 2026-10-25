@@ -249,6 +249,11 @@ html.sb-album #sbChat .sb-bar input{background:#fffaf0;border-color:rgba(58,47,3
 html.sb-album #sbChat .sb-bar input:focus{outline-color:#2f5b46}
 html.sb-album #sbChat .sb-send{background:#2f5b46}
 html.sb-album #sbChat .sb-alt{background:#f3ead3;color:#6b4326;border-top-color:rgba(58,47,34,.16);font-family:"Caveat",cursive;font-weight:700;font-size:18px}
+/* Lite / Desk switch — flips between this home page and the photo-album (/album) */
+.mode{position:fixed;top:max(10px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:120;display:inline-flex;align-items:center;padding:4px;border-radius:999px;background:rgba(255,255,255,.92);border:1px solid rgba(20,30,20,.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(20,40,30,.16)}
+.mode a{text-decoration:none;padding:7px 17px;border-radius:999px;font:600 12.5px/1 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.04em;color:#2f3a34;transition:color .2s}
+.mode a.on{background:var(--brand,#0f7a6e);color:#fff;box-shadow:0 2px 7px rgba(4,120,87,.3)}
+@media (max-width:899px){ .mode{top:calc(env(safe-area-inset-top,0px) + 62px)} }
 /* ── Shenba avatar dock (v1.4) ────────────────────────────────────────────
    The one voice launcher on the page. Tap her face to start the call, tap
    again to end it. Same Shenba brain and tools as before (v1.7: our own server, no ElevenLabs); the old orb
@@ -1167,6 +1172,7 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
 </style>
 </head>
 <body>
+<nav class="mode" aria-label="Browsing mode"><a class="on" href="https://www.kutralamezhilagam.com/" aria-current="page">Lite</a><a href="https://www.kutralamezhilagam.com/album">Desk</a></nav>
 
 <!-- ══ v5.0 layout. The working parts of the old page are moved in here by the script at the end. ══ -->
 <div id="tsIntro" aria-hidden="true">
