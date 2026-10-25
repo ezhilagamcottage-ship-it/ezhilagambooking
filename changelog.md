@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v3.1 — 25 Oct 2026
+
+**Talk over Shenba again.** While she speaks, the mic keeps listening (the phone's echo cancelling removes her own voice). If the guest speaks over her for about a third of a second, she stops at once and the guest's words, recorded from the moment they began, go to her as the next turn — no need to wait for her to finish or to tap her face. Fillers are not interrupted.
+
 ## v3.0 — 25 Oct 2026
 
 **Shenba answers sooner and says what she is doing.** No filler on quick turns (name, date, head count) unless her answer takes more than 2.4 seconds. When she is about to look up rooms (dates and guests known, no price yet) she says so at once ("check பண்ணிட்டு சொல்றேன்…", and once the new clips are added: "Availability check பண்றேன்…", "நீங்க கேட்ட dates-ல room available-ஆ-ன்னு பாக்குறேன்…", "ஒரு second, rooms check பண்றேன்…"), only once for the same dates and guests. Proceed to pay: "Room hold பண்றேன், ஒரு second…". The "ம்ம்…" and "சரி…" lines are no longer used and no line repeats twice in a row. When her answer is ready, a filler that is still playing fades out at once instead of finishing. The screen says "Checking availability…" / "One moment…" instead of "Shenba is thinking…". The new clips go in `audio/filler-*.mp3` (Vennila voice only; with the Leda voice the server's own lines are used).

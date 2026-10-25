@@ -2010,6 +2010,51 @@ function listen() {
   });
 }
 
+/* v3.1 (Rakesh, 25 Oct 2026: "it was able to listen even while it's talking earlier, now it completes the statement and
+   then listens"): while Shenba speaks, the mic keeps listening (the phone's echo cancelling removes her own voice). When the
+   guest speaks over her for about 0.3 s - louder than what is left of her voice in the mic - she stops at once and the
+   guest's words are recorded from the moment they began, then sent as the next turn. Fillers are not interrupted. */
+let bargeBlob = null;
+function recType() { return ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"].find(t => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || ""; }
+async function playBarge(b64) {
+  if (!mic || !micAn || !outAn || !window.MediaRecorder) { await play(b64); return null; }
+  const type = recType();
+  let br = null, chunks = [], loud = 0, calm = 0, barged = false, watching = true;
+  const startRec = () => {
+    try { chunks = []; br = new MediaRecorder(mic, type ? { mimeType: type } : undefined);
+      br.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); }; br.start(200); } catch (e) { br = null; }
+  };
+  const dropRec = () => { if (br) { const b = br; br = null; b.ondataavailable = null; b.onstop = null; try { b.stop(); } catch (e) {} } chunks = []; };
+  const watch = () => {
+    if (!watching || !calling) return;
+    if (src) {
+      const v = level(micAn), o = level(outAn);
+      if (v > Math.max(0.035, o * 0.55 + 0.012)) {           // someone is talking over her
+        calm = 0; if (!br) startRec();
+        loud += 50; if (loud >= 300) { barged = true; watching = false; stopPlay(); return; }
+      } else { loud = Math.max(0, loud - 25); if (br && ++calm > 8) { dropRec(); loud = 0; } }   // a cough or a bump, not speech
+    }
+    setTimeout(watch, 50);
+  };
+  setTimeout(watch, 350);   // not in her first moment, while the echo cancelling settles
+  await play(b64); watching = false;
+  if (!barged || !br || !calling) { dropRec(); return null; }
+  saState("listening", "Listening… go ahead");
+  const b = br; rec = b;   // a tap on a room can stop it, as with any turn
+  return await new Promise(ok => {
+    let quiet = 0; const t0 = performance.now();
+    b.onstop = () => { rec = null; ok(chunks.length ? new Blob(chunks, { type: chunks[0].type || type || "audio/webm" }) : null); };
+    const tick = () => {
+      if (b.state === "inactive") return;
+      if (!calling) { b.stop(); return; }
+      if (level(micAn) > 0.02) quiet = 0; else quiet += 50;
+      if (quiet >= SILENCE_MS || performance.now() - t0 > MAX_TURN_MS) { b.stop(); return; }
+      setTimeout(tick, 50);
+    };
+    tick();
+  });
+}
+
 /* Fillers (Rakesh, 22 Oct 2026 07:50): while Shenba works out her answer (rooms, prices, the guest's history) a short
    natural line plays - "ம்ம்... ஒரு நிமிஷம்." - so the guest is never left in silence. Only if the answer is slower than
    1.3 s; the reply follows straight after it. */
@@ -2213,9 +2258,9 @@ async function startVoice(resume, viaTap) {
     }
     let fails = 0;
     while (calling) {
-      let blob = null;
+      let blob = bargeBlob; bargeBlob = null;   // the guest already spoke over her last answer
       if (!tapQ) {
-        blob = await listen();
+        if (!blob) blob = await listen();
         if (!calling) break;
         if (!blob && !tapQ) { saState("listening", "Still there? Tap Shenba to talk again"); await endVoice("Call ended · tap Shenba to talk again"); break; }
       }
@@ -2245,7 +2290,7 @@ async function startVoice(resume, viaTap) {
       if (!calling) break;
       takeReply(r);
       if (r.silent || !r.reply) continue;
-      if (r.audio_b64) await play(r.audio_b64);
+      if (r.audio_b64) bargeBlob = await playBarge(r.audio_b64);
       else {   // her voice could not be made this once: show her words rather than let another voice speak (22 Oct 2026)
         saState("speaking", "Shenba: " + r.reply);
         await new Promise(z => setTimeout(z, Math.min(9000, 2500 + r.reply.length * 45)));
@@ -2271,6 +2316,7 @@ async function startVoice(resume, viaTap) {
 /* tells the server the call or chat is over, so it can note the enquiry if Shenba had the guest's number (v1.7) */
 function bye(id) { if (!id) return; try { navigator.sendBeacon(API + "/end", JSON.stringify({ session: id })); } catch (e) {} }
 async function endVoice(msg) {
+  bargeBlob = null;
   bye(session); clearResume();
   calling = false;
   stopPlay();
