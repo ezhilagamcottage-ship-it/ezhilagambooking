@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v3.2 — 25 Oct 2026
+
+**Talk with Shenba is back on the ElevenLabs live agent.** The call runs on the same Shenba agent as the phone line (voice Vennila, live room, price and booking tools), so she answers in a moment and the guest can talk over her naturally. Her talking intro still opens the call (the mic is muted until it ends) and the agent carries on from the check-in date, without greeting again. The booking card fills in from her show_booking_details tool and from Prime (voiceCard, with the payment link); Proceed to pay asks her to hold the room; when she ends the call the nandri video, thank-you card and logo outro follow. The website asks the agent for a 60-minute limit (the phone line keeps 4 minutes) once the agent allows it. If the live agent cannot start (no ElevenLabs credits, network), the call carries on on our own server exactly as before (Google + Leda backup). Client library kept in `js/eleven-client-1.28.0.js` (@elevenlabs/client 1.28.0, MIT; the max-duration override added). Chat with Shenba stays on our server.
+
 ## v3.1 — 25 Oct 2026
 
 **Talk over Shenba again.** While she speaks, the mic keeps listening (the phone's echo cancelling removes her own voice). If the guest speaks over her for about a third of a second, she stops at once and the guest's words, recorded from the moment they began, go to her as the next turn — no need to wait for her to finish or to tap her face. Fillers are not interrupted.

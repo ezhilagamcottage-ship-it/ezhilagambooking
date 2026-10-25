@@ -2093,6 +2093,12 @@ function chooseOption(o, where, el) {
   sendTap({ kind: "option", n: o.n });
 }
 function sendTap(t) {   // the voice loop picks it up at once: Shenba stops talking / listening and answers the tap
+  if (agentConv) {   // live agent: the tap reaches her as the guest's words
+    const say = t.kind === "pay" ? "(On the screen I tapped Proceed to pay.) Please hold this room for me now and send the payment link."
+      : t.kind === "option" ? "(On the screen I tapped Option " + t.n + ".) I would like this one." : "";
+    if (say) { try { agentConv.sendUserMessage(say); } catch (e) {} }
+    return;
+  }
   tapQ = t;
   if (src) stopPlay();
   if (rec) { try { rec.stop(); } catch (e) {} }
@@ -2112,7 +2118,7 @@ $("scPay").addEventListener("click", e => {
   }
   e.preventDefault();
   if (payBusy) return;
-  if (!calling || !session) { $("scNote").textContent = "The call has ended - tap Shenba to talk again and she will hold this room for you."; return; }
+  if (!calling || (!session && !agentConv)) { $("scNote").textContent = "The call has ended - tap Shenba to talk again and she will hold this room for you."; return; }
   payBusy = true; payGo = true;
   pay.classList.add("busy"); pay.textContent = "Holding your room…";
   $("scNote").textContent = "Shenba is holding the room - the payment page opens here in a moment.";
@@ -2223,15 +2229,109 @@ async function resumeShenba() {
   }
 }
 
-async function startVoice(resume, viaTap) {
+/* v3.2 (Rakesh, 25 Oct 2026: "Switch Talk with Shenba back to the ElevenLabs live agent"): the call runs on the
+   ElevenLabs live agent again - the same Shenba agent as the phone line (voice Vennila, live room / price / booking tools) -
+   so she answers at once and the guest can talk over her. Her talking intro still opens the call (the mic stays muted
+   until it ends) and the agent carries on from the check-in date. The booking card fills in from her show_booking_details
+   tool and from Prime (voiceCard, by conversation id, with the payment link); Proceed to pay asks her to hold the room;
+   when she ends the call the nandri video, thank-you card and logo outro follow. No time limit on the website (the agent
+   allows the website to set its own; the phone line keeps 4 minutes). If the live agent cannot start (no ElevenLabs
+   credits, network), the call carries on on our own server exactly as before (Google + Leda backup). The client library
+   is kept here (js/eleven-client-1.28.0.js, @elevenlabs/client 1.28.0, MIT, with the max-duration override added). */
+const AGENT = "agent_2101m57dd7z8fvnva0erjk0h0va2", ELEVEN_SDK = "js/eleven-client-1.28.0.js", LIVE_AGENT = true;
+let agentConv = null, agentBye = false, agentT0 = 0, agentHeard = false, agentNoDur = false, agentTries = 0, agentIntro = null;
+function loadEleven() {
+  if (window.ElevenLabsClient) return Promise.resolve(window.ElevenLabsClient);
+  return loadEleven.p || (loadEleven.p = new Promise((ok, no) => {
+    const sc = document.createElement("script"); sc.src = ELEVEN_SDK; sc.async = true;
+    sc.onload = () => window.ElevenLabsClient ? ok(window.ElevenLabsClient) : no(new Error("sdk"));
+    sc.onerror = () => { loadEleven.p = null; no(new Error("sdk")); };
+    document.head.appendChild(sc);
+  }));
+}
+const webContext = () => "WEBSITE CALL: the guest is talking to you on the Kutralam Ezhilagam website (the Talk with Shenba page), " +
+  "not on a phone line, so you do NOT know their mobile number: ask for their 10-digit mobile number when you need it for an " +
+  "enquiry or a booking, and say it back digit by digit. You have ALREADY greeted them and asked: \"" + INTRO.line + "\" - do not " +
+  "greet again, carry on from their answer. Keep every reply short and lively. Before checking rooms say one short natural line " +
+  "such as 'Availability check பண்றேன்' or 'நீங்க கேட்ட dates-ல room available-ஆ-ன்னு பாக்குறேன்' - never the same line twice, " +
+  "and do not keep saying ம்ம் or சரி. Call show_booking_details silently every time you learn or change a detail. The guest " +
+  "sees the details and a Proceed to pay button on the screen, so you need not read details back. There is no time limit on " +
+  "this call. Today is " + new Date().toDateString() + ".";
+async function startAgent(intro) {
+  const EL = await loadEleven();
+  if (!calling) throw new Error("ended");
+  let conv = null;
+  agentIntro = intro; agentTries++;
+  const handlers = {
+    clientTools: { show_booking_details: async p => { agentHeard = true; cardMerge(p); return "shown"; } },
+    onModeChange: m => {
+      if (m.mode === "speaking") agentHeard = true;
+      if (!calling || agentConv !== conv || swBusy) return;
+      const sp = m.mode === "speaking";
+      saState(sp ? "speaking" : "listening", sp ? "Shenba is speaking…" : "Listening… go ahead");
+      if (sp) lipSync();
+    },
+    onMessage: () => { agentHeard = true; },
+    onDisconnect: d => { if (agentConv === conv) agentGone(d); },
+    onError: () => {}
+  };
+  const ov = { agent: intro ? { firstMessage: "" } : {} };
+  if (!agentNoDur) ov.conversation = { maxDurationSeconds: 3600 };
+  conv = await EL.Conversation.startSession({ agentId: AGENT, connectionType: "webrtc", overrides: ov, ...handlers });
+  if (!calling) { try { await conv.endSession(); } catch (e) {} throw new Error("ended"); }
+  agentConv = conv; agentBye = false; voice = conv; starting = false; agentT0 = Date.now(); agentHeard = false;
+  try { convId = conv.getId() || ""; } catch (e) { convId = ""; }
+  try { conv.sendContextualUpdate(webContext()); } catch (e) {}
+  cardPoll(); setTimeout(swWarmEnd, 15000);
+  if (intro) {   // she is still saying her intro: the agent must not hear it
+    try { conv.setMicMuted(true); } catch (e) {}
+    await intro;
+    if (agentConv !== conv) return;
+    try { conv.setMicMuted(false); } catch (e) {}
+  }
+  if (calling && agentConv === conv) saState("listening", intro ? "Listening… tell Shenba your check-in date" : "Listening… go ahead");
+}
+async function agentGone(d) {   // the live call ended by itself (she said nandri and hung up, or the line dropped)
+  agentConv = null; voice = null;
+  if (agentBye || !calling) return;
+  if (!agentHeard && Date.now() - agentT0 < 9000) {   // refused at the start (e.g. the duration setting is not allowed yet)
+    console.warn("Shenba live: the call was refused at the start", d && d.reason);
+    if (!agentNoDur) { agentNoDur = true; try { await startAgent(agentIntro); return; } catch (e) {} }
+    // the live agent is not available: carry on on our own server
+    calling = false; starting = false; startVoice(false, false, true); return;
+  }
+  calling = false; clearResume();
+  const byHer = d && d.reason === "agent";
+  saState("idle", byHer ? "Call ended · thank you!" : "Call ended · tap Shenba to talk again");
+  if (!byHer) { if (convId && !cardFinal) cardPoll(); return; }
+  try {   // the latest from Prime (hold, payment link) before the thank-you
+    const r = await Promise.race([fetch(PRIME + "?action=voiceCard&conv=" + encodeURIComponent(convId), { cache: "no-store" }), new Promise((_, n) => setTimeout(n, 2500))]);
+    const j = await r.json(); if (j && j.ok && j.status && j.status !== "none") cardMerge(j);
+  } catch (e) {}
+  if ($("sbCall").open && (card.status === "pending_payment" || card.phone || card.name || card.checkIn)) showThanks(card.status === "pending_payment");
+  else if (convId && !cardFinal) cardPoll();
+}
+
+async function startVoice(resume, viaTap, serverOnly) {
   if (calling || starting) return;
   starting = true; calling = true;
   setMini(false);
   saState("connecting", "Connecting…");
   // v2.8: her talking intro first (started inside the tap); the photo welcome only if the video cannot play
-  const intro = !resume && $("sbCall").open ? swIntro() : null;
-  if (!resume && $("sbCall").open && !intro) swWelcome();
+  const intro = !resume && !serverOnly && $("sbCall").open ? swIntro() : null;
+  if (!resume && !serverOnly && $("sbCall").open && !intro) swWelcome();
   try {
+    if (!resume && !serverOnly && LIVE_AGENT) {
+      agentNoDur = false; agentTries = 0;
+      try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === "suspended") ac.resume(); } catch (e) {}   // for her nandri voice later
+      try { await startAgent(intro); return; }
+      catch (e) {
+        if (e && e.name === "NotAllowedError") throw e;
+        console.warn("Shenba live agent unavailable, using our server", e && (e.message || e));
+        if (!calling) return;
+        agentConv = null;   // the live agent could not start: carry on on our own server
+      }
+    }
     mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
     ac = ac || new (window.AudioContext || window.webkitAudioContext)();
     if (ac.state === "suspended") await Promise.race([ac.resume(), new Promise(z => setTimeout(z, 1500))]);
@@ -2250,10 +2350,11 @@ async function startVoice(resume, viaTap) {
       }
     } else {
       // with the intro, the server is told what she has already said, so she carries on from the check-in date
-      const j = await api("/start", intro ? { mode: "voice", opening: INTRO.line } : { mode: "voice" });
+      const j = await api("/start", intro || serverOnly ? { mode: "voice", opening: INTRO.line } : { mode: "voice" });
       session = j.session; convId = j.conversation_id || ""; cardPoll(); loadFillers(); setTimeout(swWarmEnd, 15000);
       starting = false;
-      if (intro && await intro) saState("listening", "Listening… tell Shenba your check-in date");
+      if (serverOnly) saState("listening", "Listening… go ahead");   // the live agent dropped out after her intro: the server carries on
+      else if (intro && await intro) saState("listening", "Listening… tell Shenba your check-in date");
       else { if (intro) swWelcome(); await play(j.audio_b64); }
     }
     let fails = 0;
@@ -2317,6 +2418,7 @@ async function startVoice(resume, viaTap) {
 function bye(id) { if (!id) return; try { navigator.sendBeacon(API + "/end", JSON.stringify({ session: id })); } catch (e) {} }
 async function endVoice(msg) {
   bargeBlob = null;
+  if (agentConv) { const c = agentConv; agentConv = null; agentBye = true; try { await c.endSession(); } catch (e) {} }
   bye(session); clearResume();
   calling = false;
   stopPlay();
