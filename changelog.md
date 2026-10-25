@@ -7,6 +7,12 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v3.3 — 25 Oct 2026
+
+**Outro ends on the numbers.** After the logo outro the screen stays on its last frame: tap the Booking (99622 22415) or Reception (82483 20685) box to call that number; a small Home button at the bottom right goes back to the home page.
+
+**Shenba's order on the website call.** Check-in date → how many people → rooms and prices at once → then she offers to send them on WhatsApp and asks for the number → name → hold and payment link. She asks for the number earlier only if the guest is just checking, goes quiet or is leaving. The moment the guest gives a number she notes the enquiry (create_enquiry), so the room photos and details go to the guest's WhatsApp while she keeps talking.
+
 ## v3.2 — 25 Oct 2026
 
 **Talk with Shenba is back on the ElevenLabs live agent.** The call runs on the same Shenba agent as the phone line (voice Vennila, live room, price and booking tools), so she answers in a moment and the guest can talk over her naturally. Her talking intro still opens the call (the mic is muted until it ends) and the agent carries on from the check-in date, without greeting again. The booking card fills in from her show_booking_details tool and from Prime (voiceCard, with the payment link); Proceed to pay asks her to hold the room; when she ends the call the nandri video, thank-you card and logo outro follow. The website asks the agent for a 60-minute limit (the phone line keeps 4 minutes) once the agent allows it. If the live agent cannot start (no ElevenLabs credits, network), the call carries on on our own server exactly as before (Google + Leda backup). Client library kept in `js/eleven-client-1.28.0.js` (@elevenlabs/client 1.28.0, MIT; the max-duration override added). Chat with Shenba stays on our server.

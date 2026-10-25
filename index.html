@@ -421,7 +421,20 @@ dialog.lv::backdrop{background:rgba(28,25,23,.5)}
    Kutralam Ezhilagam logo building at the top), the thank-you card over her last frame, then the logo outro video and
    the window closes back to the home page. */
 .oz{position:absolute;inset:0;z-index:32;background:#fff;display:flex;align-items:center;justify-content:center}
-.oz[hidden]{display:none}.oz video{width:100%;height:100%;object-fit:contain;background:#fff}
+.oz[hidden]{display:none}
+/* v3.3 (Rakesh, 25 Oct 2026): the outro stays on its last frame; both numbers on it can be tapped to call, and a small
+   Home button (bottom right) goes back to the home page */
+.oz-box{position:relative;width:min(100%,calc(100dvh * 9 / 16));aspect-ratio:9/16;max-height:100%}
+.oz video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.oz-tel{position:absolute;left:7%;right:7%;border-radius:14px;display:none;-webkit-tap-highlight-color:transparent}
+.oz-tel.b{top:67%;height:12.8%}.oz-tel.r{top:81.6%;height:12.4%}
+.oz.done .oz-tel{display:block;animation:ozRing 1.8s ease-out 2}
+.oz-tel:active{background:rgba(255,255,255,.18)}
+@keyframes ozRing{0%{box-shadow:0 0 0 0 rgba(16,185,129,.55)}100%{box-shadow:0 0 0 14px rgba(16,185,129,0)}}
+.oz-home{position:absolute;right:14px;bottom:max(14px,env(safe-area-inset-bottom));display:none;flex-direction:column;align-items:center;gap:2px;
+  border:0;border-radius:14px;padding:8px 10px 6px;background:#0f5132;color:#fff;font:700 11px/1 inherit;box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer}
+.oz-home svg{width:20px;height:20px}
+.oz.done .oz-home{display:flex}
 .ty button{position:relative;margin-top:14px;border:0;border-radius:12px;padding:12px 22px;font:inherit;font-weight:800;background:#fff;color:var(--brand-dk);cursor:pointer}
 
 .callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 20px}
@@ -874,7 +887,10 @@ footer{padding-top:8px}
     <div class="cap"><b id="tyHead">Unga enquiry register aagiduchu!</b><span id="tyLine">Room details WhatsApp-la vandhudum. Booking team seekiram call pannuvanga 😊</span><em>Nandri! 🙏</em>
       <button type="button" id="tyClose">Close</button></div>
   </div>
-  <div class="oz" id="scOutro" hidden><video id="ozVid" muted playsinline preload="none"></video></div>
+  <div class="oz" id="scOutro" hidden><div class="oz-box"><video id="ozVid" muted playsinline preload="none" poster="img/ezhilagam-outro-end.jpg"></video>
+    <a class="oz-tel b" href="tel:+919962222415" aria-label="Call booking, 99622 22415"></a>
+    <a class="oz-tel r" href="tel:+918248320685" aria-label="Call reception, 82483 20685"></a></div>
+    <button type="button" class="oz-home" id="ozHome" aria-label="Back to the home page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>Home</button></div>
   <div class="sc-actions">
     <a class="sc-pay" id="scPay" aria-disabled="true">Proceed to pay</a>
     <button type="button" class="sc-end" id="scEnd">End call</button>
@@ -1911,7 +1927,7 @@ $("tyClose").addEventListener("click", () => playOutro());
 /* v2.9: the logo outro after the thank-you card, then the call window closes and the guest is back on the home page */
 let ozTimer = 0, ozOn = false;
 function ozDone() {
-  clearTimeout(ozTimer); ozOn = false;
+  clearTimeout(ozTimer); ozOn = false; $("scOutro").classList.remove("done");
   const v = $("ozVid"); try { v.pause(); } catch (e) {}
   $("scOutro").hidden = true; $("scThanks").hidden = true; closeDlg($("sbCall")); untrap();
   try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { window.scrollTo(0, 0); }
@@ -1922,11 +1938,14 @@ function playOutro() {
   if (!v.getAttribute("src")) v.src = OUTRO;
   try { v.currentTime = 0; } catch (e) {}
   box.hidden = false; if (box.animate) box.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 350 });
+  box.classList.remove("done");
+  const end = () => { clearTimeout(stop); box.classList.add("done"); };   // stays on the numbers until Home is tapped
   const p = v.play();
-  const stop = setTimeout(ozDone, 11000);
-  v.onended = () => { clearTimeout(stop); setTimeout(ozDone, 500); };
-  if (p && p.catch) p.catch(() => { clearTimeout(stop); ozDone(); });
+  const stop = setTimeout(end, 11000);
+  v.onended = end;
+  if (p && p.catch) p.catch(end);
 }
+$("ozHome").addEventListener("click", ozDone);
 
 function openCall(start) {
   if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
@@ -2250,9 +2269,18 @@ function loadEleven() {
   }));
 }
 const webContext = () => "WEBSITE CALL: the guest is talking to you on the Kutralam Ezhilagam website (the Talk with Shenba page), " +
-  "not on a phone line, so you do NOT know their mobile number: ask for their 10-digit mobile number when you need it for an " +
-  "enquiry or a booking, and say it back digit by digit. You have ALREADY greeted them and asked: \"" + INTRO.line + "\" - do not " +
-  "greet again, carry on from their answer. Keep every reply short and lively. Before checking rooms say one short natural line " +
+  "not on a phone line, so you do NOT know their mobile number. You have ALREADY greeted them and asked: \"" + INTRO.line + "\" - do not " +
+  "greet again, carry on from their answer. ORDER (Rakesh, 25 Oct 2026): 1) check-in date and nights, 2) how many people - " +
+  "one quick question, 3) check rooms at once and give the rooms with prices, 4) THEN offer to send them on WhatsApp and ask for " +
+  "the number, e.g. 'இந்த room photos-உம் price-உம் உங்க WhatsApp-க்கு அனுப்பட்டுமா? Number சொல்லுங்க', 5) their name, then hold the " +
+  "room and send the payment link. Do not ask the number before you have shown rooms and prices - EXCEPT ask for it at once " +
+  "('உங்க WhatsApp number சொல்லுங்க, details அனுப்பிடுறேன்') if the guest says they are only checking or will decide later, goes " +
+  "quiet, or is about to leave. Take the 10-digit number and say it back digit by digit. THE MOMENT the guest gives a number " +
+  "(and you know the dates), silently call create_enquiry straight away - guest_name: their name if known, otherwise 'Website " +
+  "guest'; phone; check_in; check_out; adults; children; room_code and ac if they picked one; language; notes: 'Website Talk " +
+  "with Shenba call - please send room photos, tariff and the Talk with Shenba link https://kutralamezhilagam.com' - so the " +
+  "room photos and details reach their WhatsApp while you keep talking; then tell them briefly they are on WhatsApp. Also call " +
+  "show_booking_details with the phone. Keep every reply short and lively. Before checking rooms say one short natural line " +
   "such as 'Availability check பண்றேன்' or 'நீங்க கேட்ட dates-ல room available-ஆ-ன்னு பாக்குறேன்' - never the same line twice, " +
   "and do not keep saying ம்ம் or சரி. Call show_booking_details silently every time you learn or change a detail. The guest " +
   "sees the details and a Proceed to pay button on the screen, so you need not read details back. There is no time limit on " +
