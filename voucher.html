@@ -311,9 +311,79 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold-dk);outline-of
 }
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ══ v4.1 desktop: the hotel on the left, the page on the right ═══════════
+   Rakesh, 25 Oct 2026: every guest page gets a computer layout. On screens
+   1024px and wider a photo panel holds the left of the screen (logo, what the
+   hotel is, the numbers, Shenba) and the page itself works in the space to
+   its right. Under 1024px none of this exists and the phone page is exactly
+   as it was. */
+.dk-side{display:none}
+@media (min-width:1024px){
+  :root{--side:clamp(360px,38vw,600px)}
+  body{padding-left:var(--side)}
+  .dk-side{display:flex;position:fixed;inset:0 auto 0 0;width:var(--side);z-index:5;overflow:hidden;
+    flex-direction:column;justify-content:space-between;padding:34px clamp(28px,3vw,48px);color:#fff;background:#0c1512}
+  .dk-side .dk-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;animation:dkZoom 24s ease-in-out infinite alternate}
+  @keyframes dkZoom{from{transform:scale(1.02)}to{transform:scale(1.1)}}
+  .dk-side::before{content:"";position:absolute;inset:0;z-index:-1;background:
+    linear-gradient(180deg,rgba(9,18,15,.55) 0%,rgba(9,18,15,.15) 30%,rgba(9,18,15,.55) 62%,rgba(9,18,15,.9) 100%)}
+  .dk-logo{align-self:flex-start;position:relative;display:block;padding:10px 16px;border-radius:16px;background:#fff;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);line-height:0}
+  .dk-logo img{height:52px;width:auto}
+  .dk-over{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:11.5px;font-weight:800;letter-spacing:.2em;
+    text-transform:uppercase;color:#d9a441}
+  .dk-over::before{content:"";width:30px;height:1px;background:#d9a441}
+  .dk-h{margin:0;font-family:"Cormorant Garamond","Times New Roman",Georgia,serif;font-weight:600;
+    font-size:clamp(34px,2.9vw,48px);line-height:1.05;text-shadow:0 2px 20px rgba(0,0,0,.35)}
+  .dk-h em{font-style:italic;color:#fde7c1}
+  .dk-pts{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:9px}
+  .dk-pts li{display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.9)}
+  .dk-pts li::before{content:"";flex:none;width:18px;height:18px;border-radius:50%;background:#047857 url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/11px no-repeat}
+  .dk-help{display:grid;gap:10px}
+  .dk-help p{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+  .dk-calls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .dk-calls a,.dk-shenba{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;text-decoration:none;color:#fff;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.24);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .dk-calls a:hover,.dk-shenba:hover{background:rgba(255,255,255,.22)}
+  .dk-calls small{display:block;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+  .dk-calls b{display:block;font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .dk-calls svg{flex:none;width:30px;height:30px;padding:7px;border-radius:50%;background:#fff;color:#047857}
+  .dk-shenba img{flex:none;width:40px;height:40px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px #fff,0 0 0 4px #d9a441}
+  .dk-shenba b{display:block;font-size:15px}
+  .dk-shenba small{display:block;font-size:12px;color:rgba(255,255,255,.75)}
+  .dk-help p.dk-rules{margin:4px 0 0;font-size:11.5px;font-weight:400;letter-spacing:0;text-transform:none;line-height:1.55;color:rgba(255,255,255,.62)}
+  .dk-rules b{color:#fdba74}
+}
+@media (min-width:1024px) and (max-height:760px){.dk-pts{display:none}.dk-h{font-size:34px}}
+@media print{.dk-side{display:none!important}body{padding-left:0!important}}
+
+@media (min-width:1024px){
+  .shell{max-width:470px;padding:40px 20px 48px}
+}
 </style>
 </head>
 <body>
+<!-- v4.1 desktop side panel: shown only on screens 1024px and wider -->
+<aside class="dk-side" aria-label="About Kutralam Ezhilagam">
+  <img class="dk-bg" src="img/hero.webp" alt="" aria-hidden="true">
+  <a class="dk-logo" href="/"><img src="img/logo-hd.webp" alt="Kutralam Ezhilagam home" width="484" height="163"></a>
+  <div>
+    <p class="dk-over">Booking confirmed &middot; Courtallam</p>
+    <h2 class="dk-h">See you soon at<br><em>Kutralam Ezhilagam</em></h2>
+    <ul class="dk-pts"><li>Show this voucher at the front desk</li><li>Bring an original photo ID for every adult</li><li>Check-in 12:00 PM &middot; Check-out 10:00 AM</li><li>A short walk to the Main Falls</li></ul>
+  </div>
+  <div class="dk-help">
+    <p>Need a hand?</p>
+    <div class="dk-calls">
+      <a href="tel:+919962222415"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span><small>Booking</small><b>99622 22415</b></span></a>
+      <a href="tel:+918248320685"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span><small>Reception</small><b>82483 20685</b></span></a>
+    </div>
+    <a class="dk-shenba" href="/#chat"><img src="img/shenba.webp" alt=""><span><b>Chat with Shenba</b><small>Our assistant (AI) · Tamil &amp; English</small></span></a>
+    <p class="dk-rules"><b>Wedding proof is mandatory for couples.</b> Strictly no smoking or alcohol on the premises. Check-in 12:00 PM · Check-out 10:00 AM</p>
+  </div>
+</aside>
+
 
 <div class="shell">
   <div class="card" id="card">

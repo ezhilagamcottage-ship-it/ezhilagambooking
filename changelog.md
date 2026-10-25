@@ -7,6 +7,15 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v4.1 — 25 Oct 2026
+
+**Every guest page now has a computer layout; phones are unchanged.** On screens 1024px and wider:
+- **Booking page (Reserve now):** a hotel photo panel holds the left of the screen (logo, "Nine rooms, a short walk from the Main Falls", what the rooms are, both phone numbers, Chat with Shenba, the house rules). The booking works on the right: the four steps as big tabs; your stay and the AC choice side by side; rooms in two columns that lift on hover (photo preview still shows); the details form in two columns; on Pay, what you are paying for on the left and the UPI / card buttons on the right; the voucher at its own width. The Continue bar sits under the right-hand column, and "Photos & walkthrough" opens as a drawer from the right.
+- **Checkout page (Shenba's payment link):** the same photo panel, with a bigger room picture and the four highlights in one row.
+- **Voucher page:** the same photo panel, with the voucher beside it. Printing still prints only the voucher.
+- **Chat with Shenba:** opens as a full-height panel down the right side instead of a box in the middle.
+Same steps, same buttons, same payment and booking code — the change is layout only. The A4 check-in slip is for printing and is unchanged.
+
 ## v4.0 — 25 Oct 2026
 
 **A computer gets its own home page; the phone page is unchanged.** On screens 1024px wide and up, the room photos fill the whole screen and wipe from one to the next, with the room thumbnails and arrows along the foot. On the left, where the eye lands first: "Comfortable stay near Courtallam Main Falls", the nine rooms in one line, the A/C, family and power-backup chips, then **Reserve now** (green) and **Chat with Shenba** (white) side by side. On the right, Talk with Shenba is a concierge card: her face much larger with gold rings pulsing out, a "Voice assistant · Tamil & English" tag, rotating "Try saying…" examples (one in Tamil), and a **Tap to talk** button that turns green with a moving sound wave while she listens. Logo on a white plate (lens still gliding), the two numbers as glass buttons, rating badges cycling on the right; date, daily quote, house rules and address kept. Still one screen, no scrolling. Everything is in one `@media (min-width:1024px)` block plus four desktop-only elements hidden on phones.
