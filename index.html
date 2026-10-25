@@ -943,30 +943,32 @@ html.ts .ts-hero .quote q{font-family:var(--ts-serif);font-size:18px!important;f
 html.ts .ts-hero .quote cite{color:var(--ts-cream);opacity:.8;font-family:var(--ts-sans);font-weight:400}
 html.ts .ts-hero .arw{display:flex;top:auto;bottom:30px;transform:none;width:44px;height:44px;z-index:5;background:rgba(251,246,236,.14);color:var(--ts-cream);
   border:1px solid rgba(251,246,236,.45);box-shadow:none;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-html.ts .ts-hero .arw.prev{left:auto;right:420px} html.ts .ts-hero .arw.next{left:auto;right:366px}
+html.ts .ts-hero .arw.prev{left:auto;right:458px} html.ts .ts-hero .arw.next{left:auto;right:404px}
 .ts-title{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--ts-cream);pointer-events:none;padding:0 20px}
 .ts-title h1{position:static!important;width:auto!important;height:auto!important;clip:auto!important;overflow:visible!important;
   margin:0;font:400 clamp(44px,6vw,84px)/1.05 var(--ts-serif);letter-spacing:-.01em;text-transform:none;text-shadow:0 2px 24px rgba(0,0,0,.35);animation:tsRise 1.4s cubic-bezier(.2,.7,.2,1) both .2s}
 .ts-title p{margin:16px 0 0;color:rgba(251,246,236,.85);animation:tsRise 1.4s cubic-bezier(.2,.7,.2,1) both .45s}
 @keyframes tsRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
 
-/* ── Shenba, always on screen ── */
-#tsDock{position:fixed;z-index:65;right:max(22px,env(safe-area-inset-right));bottom:max(22px,env(safe-area-inset-bottom));width:330px}
-html.ts #tsDock .sa-dock,html.ts #tsDock .sa-dock.mini{display:flex;align-items:center;gap:14px;padding:12px 14px 12px 12px;border-radius:2px;cursor:pointer;
-  background:var(--ts-cream);border:1px solid rgba(147,131,108,.35);box-shadow:0 20px 50px rgba(40,32,22,.28);animation:none}
-html.ts #tsDock .sa-face,html.ts #tsDock .sa-dock.mini .sa-face{width:66px;height:66px;flex:none;box-shadow:0 0 0 3px #fff,0 0 0 5px var(--ts-taupe)}
-html.ts #tsDock .sa-face::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--ts-taupe);animation:tsRing 2.6s ease-out infinite;pointer-events:none}
-@keyframes tsRing{from{transform:scale(1);opacity:.8}to{transform:scale(1.35);opacity:0}}
-html.ts #tsDock .sa-dock.on .sa-face{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--ts-red)}
+/* ── Shenba, always on screen: her own card, floating (Rakesh, 25 Oct 14:27) ── */
+#tsDock{position:fixed;z-index:65;right:max(22px,env(safe-area-inset-right));bottom:max(22px,env(safe-area-inset-bottom));width:360px}
+html.ts #tsDock .sa-dock,html.ts #tsDock .sa-dock.mini{display:flex;flex-direction:row;align-items:center;gap:14px;padding:12px 14px 12px 12px;border-radius:22px;cursor:pointer;text-align:left;transform:none;
+  background:linear-gradient(135deg,#fffaf3,#fff1dd);border:1.5px solid #f1d3a6;box-shadow:0 18px 44px rgba(120,72,10,.22);animation:tsFloat 4s ease-in-out infinite}
+@keyframes tsFloat{50%{transform:translateY(-4px)}}
+html.ts #tsDock .sa-dock:hover{animation-play-state:paused;box-shadow:0 22px 50px rgba(120,72,10,.3)}
+html.ts #tsDock .sa-face,html.ts #tsDock .sa-dock.mini .sa-face{width:74px;height:74px;flex:none;box-shadow:0 0 0 4px #fff,0 0 0 7px #f3d7b0}
+html.ts #tsDock .sa-face::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(217,164,65,.55);animation:tsRing 2.6s ease-out infinite;pointer-events:none}
+@keyframes tsRing{from{transform:scale(1);opacity:.85}to{transform:scale(1.3);opacity:0}}
+html.ts #tsDock .sa-dock.on .sa-face{box-shadow:0 0 0 4px #fff,0 0 0 7px #047857}
+html.ts #tsDock .sa-dock.speaking .sa-face{box-shadow:0 0 0 4px #fff,0 0 0 7px #d9a441}
 html.ts #tsDock .sa-txt,html.ts #tsDock .sa-dock.mini .sa-txt{display:block;flex:1;min-width:0}
-html.ts #tsDock .sa-txt b{font:400 21px/1.15 var(--ts-serif);color:var(--ts-ink);white-space:normal}
-html.ts #tsDock .sa-txt small{display:block;margin-top:3px;font:400 11px/1.35 var(--ts-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ts-red);white-space:normal}
-html.ts #tsDock .sa-stat{font-size:12px;color:var(--ts-ink2)}
+html.ts #tsDock .sa-txt b{display:block;font:800 21px/1.15 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;color:#9a4a07;white-space:normal}
+html.ts #tsDock .sa-txt small{display:block;margin-top:3px;font:400 13px/1.35 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;color:#78716c;white-space:normal;letter-spacing:0;text-transform:none}
+html.ts #tsDock .sa-stat{font-size:12.5px;color:#047857}
 html.ts #tsDock .sa-stat:empty{display:none}
-html.ts #tsDock .sa-go{display:grid;flex:none;width:42px;height:42px;border-radius:50%;background:var(--ts-taupe);color:#fff;box-shadow:none}
-html.ts #tsDock .sa-go svg{width:20px;height:20px}
+html.ts #tsDock .sa-go{display:grid;place-items:center;flex:none;width:50px;height:50px;border-radius:50%;background:#b45309;color:#fff;box-shadow:0 6px 16px rgba(180,83,9,.32)}
+html.ts #tsDock .sa-go svg{width:23px;height:23px}
 html.ts #tsDock .sa-min,html.ts .sa-live,html.ts .sa-try,html.ts .sa-wave{display:none!important}
-html.ts #tsDock .sa-dock{flex-direction:row;text-align:left;transform:none}
 
 /* ── sections ── */
 .ts-main{margin-left:var(--ts-rail)}
@@ -1092,24 +1094,23 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   html.ts .ts-hero .quote q{font-size:16px!important}
   html.ts .ts-hero .today{left:20px;bottom:24px}
   .ts-title{justify-content:flex-start;padding-top:22%}
-  .ts-act{top:auto;bottom:0;left:0;right:0;gap:0;display:grid;grid-template-columns:1.25fr 1fr 1fr;background:var(--ts-cream);box-shadow:0 -10px 30px rgba(40,32,22,.14);
-    padding:8px max(8px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
-  .ts-act .ts-btn,html.ts .ts-act #chatBtn{min-height:52px;padding:0 8px;font-size:11.5px;letter-spacing:.08em;box-shadow:none}
-  .ts-act .ts-btn.c{background:var(--ts-red);color:#fff;grid-column:3;grid-row:1}
-  html.ts .ts-act #chatBtn{grid-column:2;grid-row:1}
-  html.ts .ts-act #chatBtn{margin:0 6px;font-size:10.5px;letter-spacing:.05em;line-height:1.2;padding:0 6px}
-  html.ts .ts-act #chatBtn svg{display:none}
-  #tsDock{right:auto;left:max(8px,env(safe-area-inset-left));bottom:calc(8px + env(safe-area-inset-bottom));width:calc((100vw - 16px) * 1.25 / 3.25 - 4px);z-index:71}
-  html.ts #tsDock .sa-dock,html.ts #tsDock .sa-dock.mini{padding:4px 6px 4px 4px;gap:8px;min-height:52px;box-shadow:none;border:1px solid var(--ts-line)}
-  html.ts #tsDock .sa-face,html.ts #tsDock .sa-dock.mini .sa-face{width:42px;height:42px}
-  html.ts #tsDock .sa-txt b{font-size:14.5px;line-height:1.1}
-  html.ts #tsDock .sa-txt small,html.ts #tsDock .sa-go,html.ts #tsDock .sa-stat{display:none}
+  .ts-act{top:auto;bottom:0;left:0;right:0;gap:8px;display:grid;grid-template-columns:1fr 1fr;background:rgba(251,246,236,.97);box-shadow:0 -10px 30px rgba(40,32,22,.14);
+    padding:8px max(10px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  .ts-act .ts-btn,html.ts .ts-act #chatBtn{min-height:50px;padding:0 10px;font-size:12px;letter-spacing:.1em;box-shadow:none;border-radius:2px}
+  .ts-act .ts-btn.c{background:var(--ts-red);color:#fff;grid-column:2;grid-row:1}
+  html.ts .ts-act #chatBtn{grid-column:1;grid-row:1;margin:0}
+  #tsDock{left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));width:auto;bottom:calc(76px + env(safe-area-inset-bottom));z-index:71}
+  html.ts #tsDock .sa-dock,html.ts #tsDock .sa-dock.mini{padding:9px 10px 9px 9px;gap:12px;border-radius:20px}
+  html.ts #tsDock .sa-face,html.ts #tsDock .sa-dock.mini .sa-face{width:56px;height:56px}
+  html.ts #tsDock .sa-txt b{font-size:19px}
+  html.ts #tsDock .sa-txt small{font-size:12px}
+  html.ts #tsDock .sa-go{width:46px;height:46px}
   .ts-spaces{grid-template-columns:1fr;gap:44px}
   .ts-sp:nth-child(2){margin-top:0}
   .ts-room{flex-basis:78vw}
   .ts-room:nth-child(even){margin-top:0}
   .ts-fg{grid-template-columns:1fr 1fr}
-  .ts-foot{padding-bottom:110px}
+  .ts-foot{padding-bottom:190px}
   #tsBook .pan{top:0;max-height:100svh;overflow:auto;padding-top:22px}
   .ts-fields{grid-template-columns:1fr 1fr;gap:26px 22px;margin-top:26px}
   .ts-close{margin-left:0}
