@@ -7,6 +7,16 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v5.0 — 25 Oct 2026
+
+**"Live with Nature" redesign, phone and computer** (Rakesh approved the preview, 14:35). Modelled on tandjungsarihotel.com: sand paper, a taupe rail, Caslon type, small red capitals for labels.
+- **Logo opening:** the site starts with the Kutralam Ezhilagam logo animation (`img/logo-intro.mp4`, cut from the logo outro), a red line, "Courtallam · Live with Nature" and a **Powered by CloudNest Technologies** pill (`img/cloudnest.webp`), then lifts away. Once per visit, Skip button, never on a #talk / #chat link, off for reduced motion.
+- **Home:** the photo slider fills the screen with "Live with Nature" over it; welcome text and the rating badges; four spaces (hill view, rooftop pool, suites, A/C); **rooms carousel** of all nine rooms with their own photos (`img/rooms/`), arrows, drag/swipe and a red progress line; dark footer. A menu slides in from the rail. The page scrolls again.
+- **Always on screen:** Talk with Shenba floats in her own card (face, title, mic); Reserve now and Chat with Shenba stay at the top right on a computer and in a bar at the bottom on a phone.
+- **Reservation panel:** Reserve now drops a sand panel with Arrival, Departure, Adults, Children; each opens with an unfolding dropdown (calendar for dates). Check rates opens `book.html?ci=&co=&ad=&ch=`.
+- **Booking page:** reads those values and skips the dates/guests questions; restyled in the same colours and type. Every step, payment and booking is unchanged.
+All the old page's working parts (slider, Shenba talk and chat, call window) are moved into the new layout, not rebuilt.
+
 ## v4.1 — 25 Oct 2026
 
 **Every guest page now has a computer layout; phones are unchanged.** On screens 1024px and wider:
