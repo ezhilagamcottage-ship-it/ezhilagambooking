@@ -18,7 +18,7 @@
 <link rel="preload" as="image" href="img/ke-facade.webp">
 
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Sora:wght@600&display=swap">
 <style>
 /* Hand-written and inlined, for the same reason the booking page is: this
    page is opened on a phone signal at the falls, and a stylesheet that has to
@@ -901,6 +901,15 @@ html.ts .wrap{display:none!important}
 #tsIntro .tc{opacity:0;transform:translateY(8px);transition:opacity .8s .3s,transform .8s .3s;color:var(--ts-ink)}
 #tsIntro.go .tl{width:min(220px,50vw)} #tsIntro.go .tc{opacity:1;transform:none}
 #tsIntro.done{transform:translateY(-100%)}
+/* Powered by CloudNest Technologies — the builder's pill, under the hotel's logo */
+#tsIntro .cn{display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:7px 18px 7px 8px;border-radius:999px;background:#fff;border:1px solid #d6dce7;
+  box-shadow:0 8px 24px rgba(31,111,235,.14);opacity:0;transform:translateY(12px) scale(.96);transition:opacity .7s .55s,transform .7s cubic-bezier(.2,.8,.2,1) .55s}
+#tsIntro.go .cn{opacity:1;transform:none}
+#tsIntro .cn img{width:30px;height:30px;display:block}
+#tsIntro .cn span{display:flex;flex-direction:column;line-height:1.1;text-align:left}
+#tsIntro .cn small{font:400 10px/1.2 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6b7690}
+#tsIntro .cn b{font:600 15px/1.2 "Sora",ui-sans-serif,system-ui,sans-serif;letter-spacing:-.01em;color:#0b1220}
+#tsIntro .cn b i{font-style:normal;color:#1f6feb}
 #tsIntro button{position:absolute;right:max(20px,env(safe-area-inset-right));bottom:max(20px,env(safe-area-inset-bottom));background:none;border:0;color:var(--ts-ink2);cursor:pointer}
 
 /* ── rail (left on a computer, top bar on a phone) ── */
@@ -1130,6 +1139,7 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
 <div id="tsIntro" aria-hidden="true">
   <video id="tsIntroV" muted playsinline preload="auto" poster="img/logo-intro.jpg"><source src="img/logo-intro.mp4" type="video/mp4"></video>
   <span class="tl"></span><span class="tc ts-cap">Courtallam &middot; Live with Nature</span>
+  <span class="cn"><img src="img/cloudnest.webp" alt="" width="30" height="30"><span><small>Powered by</small><b><i>CloudNest</i> Technologies</b></span></span>
   <button type="button" class="ts-cap" id="tsSkip">Skip</button>
 </div>
 
@@ -3248,7 +3258,7 @@ if (location.hash === "#talk") openCall(false);
     if (ended) return; ended = true; intro.classList.add("done"); document.body.style.overflow = "";
     setTimeout(function () { intro.remove(); }, 1100);
   };
-  var go = function () { intro.classList.add("go"); setTimeout(finish, 1500); };
+  var go = function () { intro.classList.add("go"); setTimeout(finish, 2300); };
   v.addEventListener("ended", go);
   var p = v.play(); if (p && p.catch) p.catch(function () { go(); });
   setTimeout(function () { if (!intro.classList.contains("go")) go(); }, 4200);
