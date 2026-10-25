@@ -7,6 +7,8 @@
 <link rel="preload" as="image" href="img/hero.webp">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://drive.google.com">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 /* Hand-written, inlined on purpose. The Tailwind play CDN compiles in the
    browser: it is explicitly not for production, it costs a round trip before
@@ -651,6 +653,65 @@ header{margin-bottom:10px;text-align:center}
   .sheetfoot .in{max-width:none;padding:0 12px}
   #modal .mpanel{max-width:460px;padding:28px 26px}
 }
+
+/* ══ v5.0 booking theme — the same sand, taupe, red and Caslon as the home page.
+   Layout and every step are unchanged; only colour, type and edges move. ══ */
+:root{--ink:#544f45;--mute:#7b7466;--line:rgba(84,79,69,.2);--bg:#f1ecde;--card:#fbf6ec;--brand:#93836c;--brand-dk:#7a6b56;--gold:#a62a23;--r:2px;
+  --ts-serif:"Libre Caslon Text","Adobe Caslon Pro",Georgia,"Times New Roman",serif;--ts-red:#a62a23;--ts-sand2:#e8dfd1}
+body{background:var(--bg);color:var(--ink);font-family:"Helvetica Neue",Helvetica,Arial,ui-sans-serif,sans-serif}
+.eyebrow,.stepof,.sechead,.lbl,.railhead,.qrhead,.tag{color:var(--ts-red)!important;font-weight:400!important;letter-spacing:.12em!important;text-transform:uppercase}
+.sechead.picked{color:var(--ts-red)}
+.tag.gold{color:#7a6b56!important}
+h1,.mtitle,.sheetbar h2,.waitcard h2,.opt h3,.pass h2,.vname,.empty b{font-family:var(--ts-serif)!important;font-weight:400!important;letter-spacing:0!important}
+.mtitle{font-size:26px}
+.opt h3{font-size:19px}
+.steps li{border-radius:0;background:transparent;color:var(--mute);border-bottom:1px solid var(--line);font-weight:400;letter-spacing:.12em;text-transform:uppercase}
+.steps li.on{background:transparent;color:var(--ink);border-bottom:2px solid var(--ts-red)}
+.steps li.done{background:transparent;color:var(--brand);border-bottom:2px solid var(--brand)}
+.card,.opt,.qrbox,.waitcard{background:var(--card);border-color:var(--line);border-radius:2px}
+.opt.on{background:#544f45;border-color:#544f45}
+.opt.on .tag{color:#e8c9a8!important}
+.roomrow.on{background:#efe5d3;border-color:var(--brand)}
+.roomrow .price,.price{font-family:var(--ts-serif);font-weight:400}
+.rec{background:var(--ts-sand2);color:var(--ts-red);border-radius:0}
+.more,.roomrow.on .more{color:var(--ts-red);font-weight:400;letter-spacing:.06em;text-transform:uppercase;font-size:10.5px}
+dd.big{color:var(--ts-red)}
+input[type=date],input[type=text],input[type=tel],input[type=number],select{border:0;border-bottom:1px solid var(--ink);border-radius:0;background:transparent;padding:10px 2px;font-family:var(--ts-serif);font-weight:400;font-size:18px}
+input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-red)}
+.x{border-radius:2px;background:var(--ts-sand2);color:var(--ink)}
+#next,.mgo,.pay,.sheetfoot button,.btn-dark{border-radius:2px;background:var(--brand);font-weight:400;letter-spacing:.12em;text-transform:uppercase;font-size:13.5px}
+#next:hover,.mgo:hover,.pay:hover{background:var(--brand-dk)}
+#next:disabled,.pay.off{background:#d6cdbd}
+.paycard{border-radius:2px;letter-spacing:.12em;text-transform:uppercase;font-weight:400;font-size:13.5px}
+.btn-plain{border-radius:2px;background:var(--card)}
+#bar,.sheetfoot{background:rgba(251,246,236,.97);border-top-color:var(--line)}
+#back{color:var(--mute);letter-spacing:.1em;text-transform:uppercase;font-weight:400;font-size:12px}
+.pm button{border-radius:0;border-color:var(--ink);background:transparent}
+.pm b{font-family:var(--ts-serif);font-weight:400}
+.cnt{border-bottom-color:var(--line)}
+#modal{background:rgba(40,32,22,.45);align-items:flex-start;padding:0}
+#modal .mpanel{max-width:none;border-radius:0;background:var(--ts-sand2);padding:28px 24px 40px;animation:tsDrop .7s cubic-bezier(.77,0,.18,1) both;box-shadow:0 30px 60px rgba(40,32,22,.25)}
+#modal .mpanel>*{max-width:560px;margin-left:auto;margin-right:auto}
+#modal .mgo{max-width:560px;display:block}
+@keyframes tsDrop{from{transform:translateY(-100%)}to{transform:none}}
+#sheet .panel{background:var(--bg)}
+.facts span,.amen span{border-radius:0;background:var(--card);border-color:var(--line)}
+.warn,.err{border-radius:2px}
+.fine,.note{color:var(--mute)}
+/* the desktop photo panel in the warm palette */
+@media (min-width:1024px){
+  body{background:var(--bg)}
+  .dk-side{background:#3d362e}
+  .dk-side::before{background:linear-gradient(180deg,rgba(61,54,46,.55) 0%,rgba(61,54,46,.1) 30%,rgba(61,54,46,.55) 62%,rgba(45,39,32,.92) 100%)}
+  .dk-logo{border-radius:2px;background:#fbf6ec}
+  .dk-over{color:#e8c9a8} .dk-over::before{background:#e8c9a8}
+  .dk-h{font-family:var(--ts-serif)!important;font-weight:400}
+  .dk-pts li::before{background-color:#93836c}
+  .dk-calls a,.dk-shenba{border-radius:2px}
+  .dk-calls svg{color:#93836c}
+  .steps li{padding:10px 6px}
+  #modal{padding-left:var(--side)}
+}
 </style>
 </head>
 <body>
@@ -1137,6 +1198,23 @@ const S = {
   /* Index into CFG.UPI. 0 is HDFC, which is the one Rakesh wants used. */
   payee: 0
 };
+
+/* v5.0: the home page's reservation panel passes ?ci=&co=&ad=&ch= so the guest
+   is not asked for dates and guests twice. Anything missing or out of range
+   falls back to the usual first question. */
+(function () {
+  try {
+    var q = new URLSearchParams(location.search), ok = function (x) { return /^\d{4}-\d{2}-\d{2}$/.test(x || ""); };
+    var ci = q.get("ci"), co = q.get("co");
+    if (ok(ci) && ok(co) && ci >= S.checkIn && co > ci) {
+      S.checkIn = ci; S.checkOut = co;
+      var ad = parseInt(q.get("ad"), 10), ch = parseInt(q.get("ch"), 10);
+      if (ad >= 1 && ad <= 40) S.adults = ad;
+      if (ch >= 0 && ch <= 20) S.children = ch;
+      S.modal = 0;
+    }
+  } catch (e) {}
+})();
 
 /* ── availability ─────────────────────────────────────────────────────── */
 function nightsOf() {

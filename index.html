@@ -17,6 +17,8 @@
 <link rel="preload" as="image" href="img/logo.webp">
 <link rel="preload" as="image" href="img/ke-facade.webp">
 
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 /* Hand-written and inlined, for the same reason the booking page is: this
    page is opened on a phone signal at the falls, and a stylesheet that has to
@@ -867,9 +869,374 @@ footer{padding-top:8px}
   dialog#sbChat .sb-head{padding:18px 18px}
   dialog#sbChat .sb-log{padding:18px}
 }
+
+/* ══ v5.0 "Live with Nature" theme (Rakesh, 25 Oct 2026) ══════════════════
+   Modelled on tandjungsarihotel.com: sand paper, a taupe rail on the left,
+   Caslon for the voice of the hotel, small red capitals for labels, and a
+   reservation panel that drops from the top with animated dropdowns.
+   The photo slider, Shenba (talk + chat) and Reserve stay, and Talk / Chat /
+   Reserve are on screen at all times. The page scrolls again so the rooms
+   can sit in a carousel under the photographs. */
+:root{
+  --ts-sand:#f1ecde; --ts-sand2:#e8dfd1; --ts-cream:#fbf6ec; --ts-ink:#544f45; --ts-ink2:#7b7466;
+  --ts-red:#a62a23; --ts-taupe:#93836c; --ts-taupe-dk:#7a6b56; --ts-earth:#3d362e; --ts-line:rgba(84,79,69,.22);
+  --ts-serif:"Libre Caslon Text","Adobe Caslon Pro","Noto Serif Tamil",Georgia,"Times New Roman",serif;
+  --ts-sans:"Helvetica Neue",Helvetica,Arial,ui-sans-serif,sans-serif;
+  --ts-rail:72px;
+}
+html.ts,html.ts body{height:auto!important;overflow:visible!important}
+html.ts body{background:var(--ts-sand);color:var(--ts-ink);font-family:var(--ts-sans)}
+html.ts .wrap{display:none!important}
+.ts-cap{font:400 12.5px/1.4 var(--ts-sans);letter-spacing:.1em;text-transform:uppercase}
+.ts-red{color:var(--ts-red)}
+.ts-link{display:inline-block;padding:0 0 5px;border:0;border-bottom:1px solid currentColor;background:none;cursor:pointer;
+  color:var(--ts-ink);text-decoration:none;font:400 12.5px/1.4 var(--ts-sans);letter-spacing:.1em;text-transform:uppercase;transition:color .3s,border-color .3s}
+.ts-link:hover{color:var(--ts-red)}
+
+/* ── logo intro ── */
+#tsIntro{position:fixed;inset:0;z-index:300;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  transition:transform 1s cubic-bezier(.77,0,.18,1)}
+#tsIntro video,#tsIntro img{width:min(620px,84vw);height:auto;display:block}
+#tsIntro .tl{width:0;height:1px;background:var(--ts-red);transition:width 1.2s cubic-bezier(.65,0,.35,1)}
+#tsIntro .tc{opacity:0;transform:translateY(8px);transition:opacity .8s .3s,transform .8s .3s;color:var(--ts-ink)}
+#tsIntro.go .tl{width:min(220px,50vw)} #tsIntro.go .tc{opacity:1;transform:none}
+#tsIntro.done{transform:translateY(-100%)}
+#tsIntro button{position:absolute;right:max(20px,env(safe-area-inset-right));bottom:max(20px,env(safe-area-inset-bottom));background:none;border:0;color:var(--ts-ink2);cursor:pointer}
+
+/* ── rail (left on a computer, top bar on a phone) ── */
+.ts-rail{position:fixed;z-index:60;left:0;top:0;bottom:0;width:var(--ts-rail);background:var(--ts-taupe);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:22px 0}
+.ts-emb{display:grid;gap:4px;width:34px;text-decoration:none}
+.ts-emb i{display:block;height:6px;border-radius:2px}
+.ts-emb i:nth-child(1){width:58%;background:#15a03a}.ts-emb i:nth-child(2){width:80%;background:#1e6f86}
+.ts-emb i:nth-child(3){width:86%;background:#2e8fd6}.ts-emb i:nth-child(4){width:100%;background:#2bb6c9}
+.ts-burger{width:40px;height:40px;border:0;background:none;cursor:pointer;display:flex;gap:6px;justify-content:center;align-items:center}
+.ts-burger i{width:1.5px;height:30px;background:var(--ts-cream);transition:transform .4s}
+.ts-burger:hover i:first-child{transform:translateX(-3px)} .ts-burger:hover i:last-child{transform:translateX(3px)}
+.ts-wa{writing-mode:vertical-rl;transform:rotate(180deg);color:#fff;text-decoration:none;font:400 13px/1 var(--ts-sans);letter-spacing:.14em;text-transform:uppercase;padding:6px 0}
+.ts-wa:hover{color:var(--ts-cream);opacity:.8}
+
+/* ── top: logo + actions (always on screen) ── */
+.ts-logo{position:absolute;z-index:40;top:22px;left:calc(var(--ts-rail) + 28px);background:var(--ts-cream);padding:10px 16px;border-radius:2px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.ts-logo .logo-wrap{width:210px}
+.ts-logo .logo{display:block;width:100%;height:auto}
+.ts-act{position:fixed;z-index:70;top:22px;right:max(22px,env(safe-area-inset-right));display:flex;gap:10px}
+.ts-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:0 20px;border:0;border-radius:2px;cursor:pointer;text-decoration:none;
+  font:400 12.5px/1 var(--ts-sans);letter-spacing:.12em;text-transform:uppercase;transition:background .3s,color .3s,transform .2s}
+.ts-btn:hover{transform:translateY(-1px)}
+.ts-btn.c{background:var(--ts-cream);color:var(--ts-red);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.ts-btn.c:hover{background:#fff}
+html.ts #chatBtn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:0 20px;border:0;border-radius:2px;cursor:pointer;
+  background:var(--ts-taupe);color:#fff;font:400 12.5px/1 var(--ts-sans);letter-spacing:.12em;text-transform:uppercase;box-shadow:0 6px 18px rgba(0,0,0,.12);animation:none}
+html.ts #chatBtn:hover{background:var(--ts-taupe-dk)}
+html.ts #chatBtn svg{width:17px;height:17px}
+html.ts #chatBtn b{display:inline;font:inherit}
+
+/* ── hero: the photo slider, full screen ── */
+.ts-hero{position:relative;height:100vh;height:100svh;min-height:560px;margin-left:var(--ts-rail);overflow:hidden;background:var(--ts-earth)}
+html.ts .ts-hero .gal{position:absolute;inset:0;margin:0;border:0;border-radius:0;aspect-ratio:auto;height:auto;background:var(--ts-earth)}
+html.ts .ts-hero .gal::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(30,25,20,.35),rgba(30,25,20,.1) 35%,rgba(30,25,20,.25) 65%,rgba(30,25,20,.7))}
+html.ts .ts-hero .track{z-index:0}
+html.ts .ts-hero .slide button{cursor:default}
+html.ts .ts-hero .today{top:auto;bottom:34px;left:28px;z-index:4;background:rgba(61,54,46,.55);border-color:rgba(251,246,236,.35)}
+html.ts .ts-hero .quote{left:28px;right:auto;bottom:78px;max-width:min(520px,60%);padding:0;background:none;z-index:4}
+html.ts .ts-hero .quote q{font-family:var(--ts-serif);font-size:18px!important;font-weight:400;font-style:italic}
+html.ts .ts-hero .quote cite{color:var(--ts-cream);opacity:.8;font-family:var(--ts-sans);font-weight:400}
+html.ts .ts-hero .arw{display:flex;top:auto;bottom:30px;transform:none;width:44px;height:44px;z-index:5;background:rgba(251,246,236,.14);color:var(--ts-cream);
+  border:1px solid rgba(251,246,236,.45);box-shadow:none;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+html.ts .ts-hero .arw.prev{left:auto;right:420px} html.ts .ts-hero .arw.next{left:auto;right:366px}
+.ts-title{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--ts-cream);pointer-events:none;padding:0 20px}
+.ts-title h1{position:static!important;width:auto!important;height:auto!important;clip:auto!important;overflow:visible!important;
+  margin:0;font:400 clamp(44px,6vw,84px)/1.05 var(--ts-serif);letter-spacing:-.01em;text-transform:none;text-shadow:0 2px 24px rgba(0,0,0,.35);animation:tsRise 1.4s cubic-bezier(.2,.7,.2,1) both .2s}
+.ts-title p{margin:16px 0 0;color:rgba(251,246,236,.85);animation:tsRise 1.4s cubic-bezier(.2,.7,.2,1) both .45s}
+@keyframes tsRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+
+/* ── Shenba, always on screen ── */
+#tsDock{position:fixed;z-index:65;right:max(22px,env(safe-area-inset-right));bottom:max(22px,env(safe-area-inset-bottom));width:330px}
+html.ts #tsDock .sa-dock,html.ts #tsDock .sa-dock.mini{display:flex;align-items:center;gap:14px;padding:12px 14px 12px 12px;border-radius:2px;cursor:pointer;
+  background:var(--ts-cream);border:1px solid rgba(147,131,108,.35);box-shadow:0 20px 50px rgba(40,32,22,.28);animation:none}
+html.ts #tsDock .sa-face,html.ts #tsDock .sa-dock.mini .sa-face{width:66px;height:66px;flex:none;box-shadow:0 0 0 3px #fff,0 0 0 5px var(--ts-taupe)}
+html.ts #tsDock .sa-face::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--ts-taupe);animation:tsRing 2.6s ease-out infinite;pointer-events:none}
+@keyframes tsRing{from{transform:scale(1);opacity:.8}to{transform:scale(1.35);opacity:0}}
+html.ts #tsDock .sa-dock.on .sa-face{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--ts-red)}
+html.ts #tsDock .sa-txt,html.ts #tsDock .sa-dock.mini .sa-txt{display:block;flex:1;min-width:0}
+html.ts #tsDock .sa-txt b{font:400 21px/1.15 var(--ts-serif);color:var(--ts-ink);white-space:normal}
+html.ts #tsDock .sa-txt small{display:block;margin-top:3px;font:400 11px/1.35 var(--ts-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ts-red);white-space:normal}
+html.ts #tsDock .sa-stat{font-size:12px;color:var(--ts-ink2)}
+html.ts #tsDock .sa-stat:empty{display:none}
+html.ts #tsDock .sa-go{display:grid;flex:none;width:42px;height:42px;border-radius:50%;background:var(--ts-taupe);color:#fff;box-shadow:none}
+html.ts #tsDock .sa-go svg{width:20px;height:20px}
+html.ts #tsDock .sa-min,html.ts .sa-live,html.ts .sa-try,html.ts .sa-wave{display:none!important}
+html.ts #tsDock .sa-dock{flex-direction:row;text-align:left;transform:none}
+
+/* ── sections ── */
+.ts-main{margin-left:var(--ts-rail)}
+.ts-sec{padding:clamp(70px,9vw,120px) max(20px,env(safe-area-inset-right)) clamp(70px,9vw,120px) max(20px,env(safe-area-inset-left))}
+.ts-in{max-width:1180px;margin:0 auto}
+.ts-intro{text-align:center}
+.ts-intro h2{margin:14px auto 0;max-width:22ch;font:400 clamp(32px,3.4vw,46px)/1.15 var(--ts-serif);color:var(--ts-ink);text-wrap:balance}
+.ts-intro p.lead{max-width:60ch;margin:22px auto 0;font-size:15.5px;line-height:1.75;color:var(--ts-ink)}
+.ts-links{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.ts-badges{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:46px;flex-wrap:wrap}
+html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;border-radius:2px;box-shadow:0 10px 26px rgba(40,32,22,.12)}
+.ts-amen{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;list-style:none;margin:0;padding:0}
+.ts-amen li{display:flex;align-items:center;gap:10px}
+.ts-amen li::before{content:"";width:22px;height:1px;background:var(--ts-red)}
+.ts-rule{width:min(1180px,100%);height:1px;background:var(--ts-line);margin:0 auto}
+
+.ts-spaces{display:grid;grid-template-columns:1fr 1fr;gap:56px 64px;max-width:900px;margin:0 auto}
+.ts-sp img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.ts-sp .ph{overflow:hidden}
+.ts-sp:hover img{transform:scale(1.04)}
+.ts-sp .row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-top:18px}
+.ts-sp h3{margin:0;font:400 26px/1.2 var(--ts-serif);color:var(--ts-ink)}
+.ts-sp p{margin:12px 0 0;max-width:42ch;font-size:14.5px;line-height:1.7;color:var(--ts-ink2)}
+.ts-sp:nth-child(2){margin-top:90px}
+
+/* rooms carousel */
+.ts-rhead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:34px}
+.ts-rhead h2{margin:12px 0 0;font:400 clamp(30px,3vw,42px)/1.15 var(--ts-serif);color:var(--ts-ink)}
+.ts-car{display:flex;gap:34px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:8px;cursor:grab}
+.ts-car::-webkit-scrollbar{display:none}
+.ts-car.drag{cursor:grabbing;scroll-snap-type:none}
+.ts-room{flex:0 0 clamp(250px,24vw,300px);scroll-snap-align:start}
+.ts-room:nth-child(even){margin-top:48px}
+.ts-room .ph{overflow:hidden;background:var(--ts-sand2)}
+.ts-room img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;pointer-events:none;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.ts-room:hover img{transform:scale(1.05)}
+.ts-room h3{margin:18px 0 6px;font:400 28px/1.15 var(--ts-serif);color:var(--ts-ink)}
+.ts-room .m{margin:0 0 10px}
+.ts-room p{margin:0 0 16px;font-size:14.5px;line-height:1.65;color:var(--ts-ink2)}
+.ts-prog{display:flex;align-items:center;gap:22px;margin-top:40px}
+.ts-bar{position:relative;flex:1;height:1px;background:var(--ts-line);max-width:340px;margin:0 auto}
+.ts-bar i{position:absolute;left:0;top:-1px;height:3px;width:20%;background:var(--ts-red);transition:left .2s,width .2s}
+.ts-nav{display:flex;gap:10px}
+.ts-nav button{width:42px;height:42px;border-radius:50%;border:1px solid var(--ts-line);background:none;color:var(--ts-ink);cursor:pointer;transition:background .3s,color .3s}
+.ts-nav button:hover{background:var(--ts-taupe);color:#fff;border-color:var(--ts-taupe)}
+
+.ts-foot{background:var(--ts-earth);color:var(--ts-cream);margin-left:var(--ts-rail);padding:70px max(20px,env(safe-area-inset-right)) 120px max(20px,env(safe-area-inset-left))}
+.ts-fg{text-align:left;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.3fr 1fr 1fr 1.3fr;gap:36px}
+.ts-fg h4{margin:0 0 14px;color:#d9b9a0}
+.ts-fg p,.ts-fg a{margin:0;font-size:14px;line-height:1.85;color:rgba(251,246,236,.82);text-decoration:none}
+.ts-fg a:hover{color:#fff}
+.ts-fg .big{font:400 30px/1.15 var(--ts-serif);color:var(--ts-cream);margin-bottom:14px}
+.ts-copy{max-width:1180px;margin:46px auto 0;padding-top:18px;border-top:1px solid rgba(251,246,236,.15);font-size:12.5px;color:rgba(251,246,236,.55)}
+
+/* ── reservation panel ── */
+#tsBook{position:fixed;inset:0;z-index:120;visibility:hidden;pointer-events:none}
+#tsBook .veil{position:absolute;inset:0;background:rgba(40,32,22,.45);opacity:0;transition:opacity .6s}
+#tsBook .pan{position:absolute;left:var(--ts-rail);right:0;top:0;background:var(--ts-sand2);padding:36px max(24px,env(safe-area-inset-right)) 54px max(24px,env(safe-area-inset-left));
+  transform:translateY(-102%);transition:transform .8s cubic-bezier(.77,0,.18,1);box-shadow:0 30px 60px rgba(40,32,22,.25)}
+#tsBook.on{visibility:visible;pointer-events:auto}
+#tsBook.on .veil{opacity:1}
+#tsBook.on .pan{transform:none}
+.ts-close{border:0;background:none;padding:6px 0;cursor:pointer;color:var(--ts-ink);margin-left:clamp(0px,6vw,100px)}
+.ts-close:hover{color:var(--ts-red)}
+.ts-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(20px,4vw,72px);max-width:1250px;margin:clamp(30px,6vh,70px) auto 0}
+.ts-f{position:relative;opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
+#tsBook.on .ts-f{opacity:1;transform:none}
+#tsBook.on .ts-f:nth-child(1){transition-delay:.35s}#tsBook.on .ts-f:nth-child(2){transition-delay:.45s}
+#tsBook.on .ts-f:nth-child(3){transition-delay:.55s}#tsBook.on .ts-f:nth-child(4){transition-delay:.65s}
+.ts-f .lb{display:block;color:var(--ts-red);font-size:15px;letter-spacing:.12em}
+.ts-f .age{display:block;min-height:16px;margin-top:4px;font:400 11px/1.4 var(--ts-sans);color:var(--ts-ink)}
+.ts-dd{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin-top:10px;padding:8px 0 14px;border:0;border-bottom:1px solid var(--ts-ink);
+  background:none;cursor:pointer;color:var(--ts-ink);font:400 clamp(24px,2.2vw,32px)/1.2 var(--ts-serif);text-align:left}
+.ts-dd svg{flex:none;width:16px;height:16px;transition:transform .45s cubic-bezier(.65,0,.35,1)}
+.ts-f.open .ts-dd svg{transform:rotate(180deg)}
+.ts-pop{position:absolute;z-index:5;left:0;right:0;top:calc(100% + 6px);background:var(--ts-cream);box-shadow:0 24px 50px rgba(40,32,22,.2);
+  clip-path:inset(0 0 100% 0);opacity:0;transition:clip-path .5s cubic-bezier(.77,0,.18,1),opacity .3s;pointer-events:none;max-height:330px;overflow:auto}
+.ts-f.open .ts-pop{clip-path:inset(0 0 0 0);opacity:1;pointer-events:auto}
+.ts-pop .opt{display:block;width:100%;padding:12px 18px;border:0;background:none;text-align:left;cursor:pointer;color:var(--ts-ink);font:400 19px/1.2 var(--ts-serif);
+  opacity:0;transform:translateY(-6px);transition:opacity .35s,transform .35s,background .2s}
+.ts-f.open .ts-pop .opt{opacity:1;transform:none}
+.ts-pop .opt:hover,.ts-pop .opt.sel{background:var(--ts-sand2)} .ts-pop .opt.sel{color:var(--ts-red)}
+.ts-cal{padding:14px 14px 16px;min-width:280px}
+.ts-cal .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font:400 18px/1 var(--ts-serif)}
+.ts-cal .hd button{width:32px;height:32px;border:0;border-radius:50%;background:none;cursor:pointer;color:var(--ts-ink);font-size:16px}
+.ts-cal .hd button:hover{background:var(--ts-sand2)}
+.ts-cal .hd button:disabled{opacity:.25;cursor:default;background:none}
+.ts-cal .g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.ts-cal .g span{font:400 10.5px/2 var(--ts-sans);letter-spacing:.08em;color:var(--ts-ink2)}
+.ts-cal .g button{aspect-ratio:1;border:0;border-radius:50%;background:none;cursor:pointer;color:var(--ts-ink);font:400 14px/1 var(--ts-sans)}
+.ts-cal .g button:hover:not(:disabled){background:var(--ts-sand2)}
+.ts-cal .g button.sel{background:var(--ts-taupe);color:#fff}
+.ts-cal .g button.rng{background:rgba(147,131,108,.18)}
+.ts-cal .g button:disabled{color:rgba(84,79,69,.28);cursor:default}
+.ts-go{display:flex;justify-content:center;margin-top:clamp(36px,7vh,80px);opacity:0;transition:opacity .6s .75s}
+#tsBook.on .ts-go{opacity:1}
+.ts-go .ts-btn{background:var(--ts-taupe);color:#fff;min-height:58px;padding:0 34px;font-size:14px}
+.ts-go .ts-btn:hover{background:var(--ts-taupe-dk)}
+.ts-note{text-align:center;margin:16px 0 0;font-size:12.5px;color:var(--ts-ink2)}
+
+/* menu */
+#tsMenu{position:fixed;inset:0;z-index:110;background:var(--ts-earth);color:var(--ts-cream);display:flex;align-items:center;padding-left:calc(var(--ts-rail) + clamp(30px,8vw,140px));
+  clip-path:inset(0 100% 0 0);transition:clip-path .9s cubic-bezier(.77,0,.18,1);visibility:hidden}
+#tsMenu.on{clip-path:inset(0 0 0 0);visibility:visible}
+#tsMenu ul{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+#tsMenu a,#tsMenu button.mi{font:400 clamp(30px,4vw,48px)/1.2 var(--ts-serif);color:var(--ts-cream);text-decoration:none;background:none;border:0;padding:0;cursor:pointer;opacity:.85;transition:opacity .3s,padding .3s}
+#tsMenu a:hover,#tsMenu button.mi:hover{opacity:1;padding-left:10px}
+#tsMenu .x{position:absolute;top:28px;right:max(28px,env(safe-area-inset-right));background:none;border:0;color:var(--ts-cream);cursor:pointer}
+#tsMenu small{display:block;margin-top:34px;color:rgba(251,246,236,.6)}
+
+/* ── phones and small tablets ── */
+@media (max-width:899px){
+  :root{--ts-rail:0px}
+  .ts-rail{bottom:auto;right:0;width:auto;height:58px;flex-direction:row;padding:0 max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));background:var(--ts-sand);box-shadow:0 1px 0 var(--ts-line)}
+  .ts-rail .ts-wa{display:none}
+  .ts-burger i{background:var(--ts-ink);height:22px}
+  .ts-emb{width:28px;gap:3px} .ts-emb i{height:5px}
+  .ts-logo{position:fixed;z-index:61;top:8px;left:50%;transform:translateX(-50%);padding:0;background:none;box-shadow:none}
+  .ts-logo .logo-wrap{width:128px}
+  .ts-hero{height:74vh;height:74svh;min-height:440px;margin-top:58px}
+  html.ts .ts-hero .arw{bottom:20px} html.ts .ts-hero .arw.prev{right:72px} html.ts .ts-hero .arw.next{right:20px}
+  html.ts .ts-hero .quote{bottom:70px;max-width:none;right:20px;left:20px}
+  html.ts .ts-hero .quote q{font-size:16px!important}
+  html.ts .ts-hero .today{left:20px;bottom:24px}
+  .ts-title{justify-content:flex-start;padding-top:22%}
+  .ts-act{top:auto;bottom:0;left:0;right:0;gap:0;display:grid;grid-template-columns:1.25fr 1fr 1fr;background:var(--ts-cream);box-shadow:0 -10px 30px rgba(40,32,22,.14);
+    padding:8px max(8px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+  .ts-act .ts-btn,html.ts .ts-act #chatBtn{min-height:52px;padding:0 8px;font-size:11.5px;letter-spacing:.08em;box-shadow:none}
+  .ts-act .ts-btn.c{background:var(--ts-red);color:#fff;grid-column:3;grid-row:1}
+  html.ts .ts-act #chatBtn{grid-column:2;grid-row:1}
+  html.ts .ts-act #chatBtn{margin:0 6px;font-size:10.5px;letter-spacing:.05em;line-height:1.2;padding:0 6px}
+  html.ts .ts-act #chatBtn svg{display:none}
+  #tsDock{right:auto;left:max(8px,env(safe-area-inset-left));bottom:calc(8px + env(safe-area-inset-bottom));width:calc((100vw - 16px) * 1.25 / 3.25 - 4px);z-index:71}
+  html.ts #tsDock .sa-dock,html.ts #tsDock .sa-dock.mini{padding:4px 6px 4px 4px;gap:8px;min-height:52px;box-shadow:none;border:1px solid var(--ts-line)}
+  html.ts #tsDock .sa-face,html.ts #tsDock .sa-dock.mini .sa-face{width:42px;height:42px}
+  html.ts #tsDock .sa-txt b{font-size:14.5px;line-height:1.1}
+  html.ts #tsDock .sa-txt small,html.ts #tsDock .sa-go,html.ts #tsDock .sa-stat{display:none}
+  .ts-spaces{grid-template-columns:1fr;gap:44px}
+  .ts-sp:nth-child(2){margin-top:0}
+  .ts-room{flex-basis:78vw}
+  .ts-room:nth-child(even){margin-top:0}
+  .ts-fg{grid-template-columns:1fr 1fr}
+  .ts-foot{padding-bottom:110px}
+  #tsBook .pan{top:0;max-height:100svh;overflow:auto;padding-top:22px}
+  .ts-fields{grid-template-columns:1fr 1fr;gap:26px 22px;margin-top:26px}
+  .ts-close{margin-left:0}
+  .ts-dd{font-size:22px}
+  .ts-cal{min-width:0}
+  .ts-f:nth-child(2) .ts-pop,.ts-f:nth-child(4) .ts-pop{left:auto;right:0}
+  .ts-f .ts-pop{width:min(320px,calc(100vw - 40px))}
+  #tsMenu{padding-left:32px}
+}
+@media (max-width:420px){ .ts-fg{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){ #tsIntro{display:none} }
 </style>
 </head>
 <body>
+
+<!-- ══ v5.0 layout. The working parts of the old page are moved in here by the script at the end. ══ -->
+<div id="tsIntro" aria-hidden="true">
+  <video id="tsIntroV" muted playsinline preload="auto" poster="img/logo-intro.jpg"><source src="img/logo-intro.mp4" type="video/mp4"></video>
+  <span class="tl"></span><span class="tc ts-cap">Courtallam &middot; Live with Nature</span>
+  <button type="button" class="ts-cap" id="tsSkip">Skip</button>
+</div>
+
+<nav class="ts-rail" aria-label="Site">
+  <a class="ts-emb" href="#top" aria-label="Kutralam Ezhilagam, back to top"><i></i><i></i><i></i><i></i></a>
+  <button type="button" class="ts-burger" id="tsBurger" aria-label="Open menu" aria-expanded="false"><i></i><i></i></button>
+  <a class="ts-wa" href="https://wa.me/916374213184" target="_blank" rel="noopener">WhatsApp</a>
+</nav>
+
+<div class="ts-act" id="tsAct">
+  <button type="button" class="ts-btn c" id="tsReserve">Reserve now</button>
+</div>
+<div id="tsDock"></div>
+
+<section class="ts-hero" id="top" aria-label="Photographs of Kutralam Ezhilagam">
+  <div class="ts-logo" id="tsLogo"></div>
+  <div class="ts-title" id="tsTitle"><p class="ts-cap" style="margin:0 0 16px;animation-delay:.1s">Kutralam Ezhilagam &middot; Courtallam</p></div>
+</section>
+
+<main class="ts-main">
+  <section class="ts-sec ts-intro" id="stay">
+    <div class="ts-in">
+      <p class="ts-cap ts-red">Welcome</p>
+      <h2>A comfortable stay, a short walk from Courtallam Main Falls</h2>
+      <p class="lead">Nine rooms &mdash; studios and suites sleeping two to fifteen &mdash; in Vairams Nagar on Five Falls Road. Wake up to the hills, swim in the rooftop plunge pool, and walk to the falls.</p>
+      <div class="ts-links">
+        <button type="button" class="ts-link" data-ts="reserve">Reserve now</button>
+        <button type="button" class="ts-link" data-ts="talk">Talk with Shenba</button>
+        <button type="button" class="ts-link" data-ts="chat">Chat with Shenba</button>
+      </div>
+      <div class="ts-badges" id="tsBadges">
+        <ul class="ts-amen ts-cap"><li>A/C &amp; Non A/C</li><li>Family friendly</li><li>24/7 power backup</li></ul>
+      </div>
+    </div>
+  </section>
+  <div class="ts-rule"></div>
+
+  <section class="ts-sec" id="spaces">
+    <div class="ts-spaces">
+      <article class="ts-sp"><div class="ph"><img src="img/ke-hills-window.webp" alt="Twin beds beside a wide window looking on to the Courtallam hills" loading="lazy"></div>
+        <div class="row"><h3>Hill-view rooms</h3><button type="button" class="ts-link" data-ts="rooms">View rooms</button></div>
+        <p>Wide picture windows on to the Courtallam hills and forest. Ground, first and second floors, with balconies over the grounds.</p></article>
+      <article class="ts-sp"><div class="ph"><img src="img/ke-pool.webp" alt="The rooftop plunge pool lit blue at night under a pergola" loading="lazy"></div>
+        <div class="row"><h3>Rooftop plunge pool</h3><button type="button" class="ts-link" data-ts="reserve">Reserve</button></div>
+        <p>A small pool on the terrace under a pergola, lit blue after dark, with the hills all around.</p></article>
+      <article class="ts-sp"><div class="ph"><img src="img/ke-suite-living.webp" alt="The suite living room with a sofa and television" loading="lazy"></div>
+        <div class="row"><h3>Suites for families</h3><button type="button" class="ts-link" data-ts="rooms">View rooms</button></div>
+        <p>A sitting room with sofa and television and the bedroom beyond. One suite has its own kitchen; the largest sleeps fifteen.</p></article>
+      <article class="ts-sp"><div class="ph"><img src="img/ke-ac-room.webp" alt="An air-conditioned room with a teak bed and fresh linen" loading="lazy"></div>
+        <div class="row"><h3>A/C &amp; Non A/C</h3><button type="button" class="ts-link" data-ts="reserve">Reserve</button></div>
+        <p>Teak beds and fresh linen, air conditioning where you want it, and 24/7 power backup.</p></article>
+    </div>
+  </section>
+  <div class="ts-rule"></div>
+
+  <section class="ts-sec" id="rooms">
+    <div class="ts-in">
+      <div class="ts-rhead">
+        <div><p class="ts-cap ts-red">Our rooms</p><h2>Nine rooms, each with its own name</h2></div>
+        <div class="ts-nav"><button type="button" id="tsPrev" aria-label="Previous rooms">&larr;</button><button type="button" id="tsNext" aria-label="Next rooms">&rarr;</button></div>
+      </div>
+      <div class="ts-car" id="tsCar"></div>
+      <div class="ts-prog"><div class="ts-bar"><i id="tsBar"></i></div></div>
+    </div>
+  </section>
+</main>
+
+<footer class="ts-foot">
+  <div class="ts-fg">
+    <div><p class="big">Kutralam Ezhilagam</p><p>No 46, Vairams Nagar, Five Falls Road, Courtallam</p></div>
+    <div><h4 class="ts-cap">Booking</h4><a href="tel:+919962222415">99622 22415</a><h4 class="ts-cap" style="margin-top:18px">Reception</h4><a href="tel:+918248320685">82483 20685</a></div>
+    <div><h4 class="ts-cap">Stay</h4><p>Check-in 12:00 PM</p><p>Check-out 10:00 AM</p></div>
+    <div><h4 class="ts-cap">House rules</h4><p>Wedding proof is mandatory for couples. Strictly no smoking or alcohol on the premises.</p></div>
+  </div>
+  <p class="ts-copy">&copy; 2026 Kutralam Ezhilagam &middot; Courtallam</p>
+</footer>
+
+<div id="tsBook" role="dialog" aria-modal="true" aria-label="Reserve a room">
+  <div class="veil" data-close></div>
+  <div class="pan">
+    <button type="button" class="ts-close ts-cap" data-close>Close</button>
+    <div class="ts-fields">
+      <div class="ts-f" data-f="ci"><span class="lb ts-cap">Arrival</span><span class="age"></span><button type="button" class="ts-dd"><span></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 5.5l6 6 6-6"/></svg></button><div class="ts-pop"></div></div>
+      <div class="ts-f" data-f="co"><span class="lb ts-cap">Departure</span><span class="age"></span><button type="button" class="ts-dd"><span></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 5.5l6 6 6-6"/></svg></button><div class="ts-pop"></div></div>
+      <div class="ts-f" data-f="ad"><span class="lb ts-cap">Adults</span><span class="age">( Ages 13 or more )</span><button type="button" class="ts-dd"><span></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 5.5l6 6 6-6"/></svg></button><div class="ts-pop"></div></div>
+      <div class="ts-f" data-f="ch"><span class="lb ts-cap">Children</span><span class="age">( Ages 2 - 12 )</span><button type="button" class="ts-dd"><span></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 5.5l6 6 6-6"/></svg></button><div class="ts-pop"></div></div>
+    </div>
+    <div class="ts-go"><button type="button" class="ts-btn" id="tsCheck">Check rates</button></div>
+    <p class="ts-note">You'll see the rooms free for your dates next, then pay a small advance by UPI or card.</p>
+  </div>
+</div>
+
+<div id="tsMenu" aria-hidden="true">
+  <button type="button" class="x ts-cap" id="tsMenuX">Close</button>
+  <div>
+    <ul>
+      <li><a href="#top" data-m>Home</a></li>
+      <li><a href="#stay" data-m>Stay</a></li>
+      <li><a href="#spaces" data-m>Spaces</a></li>
+      <li><a href="#rooms" data-m>Rooms</a></li>
+      <li><button type="button" class="mi" data-ts="talk">Talk with Shenba</button></li>
+      <li><button type="button" class="mi" data-ts="chat">Chat with Shenba</button></li>
+      <li><button type="button" class="mi" data-ts="reserve">Reserve now</button></li>
+    </ul>
+    <small class="ts-cap">Booking 99622 22415 &middot; Reception 82483 20685</small>
+  </div>
+</div>
+
 
 <div class="wrap">
 
@@ -2731,6 +3098,160 @@ if (location.hash === "#talk") openCall(false);
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+/* v5.0 layout wiring. Moves the page's working parts into the new layout, then
+   adds the logo intro, the reservation panel, the room carousel and the menu. */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  document.documentElement.classList.add("ts");
+
+  /* move, never rebuild: every listener on these stays attached */
+  $("tsLogo").appendChild(document.querySelector(".logo-wrap"));
+  var hero = document.querySelector(".ts-hero");
+  hero.insertBefore($("gal"), hero.firstChild);
+  var h1 = document.querySelector(".mast h1"); if (h1) { h1.textContent = "Live with Nature"; $("tsTitle").appendChild(h1); }
+  $("tsDock").appendChild($("saDock"));
+  $("tsAct").appendChild($("chatBtn"));
+  var badge = document.querySelector(".gbadge"); if (badge) $("tsBadges").insertBefore(badge, $("tsBadges").firstChild);
+
+  /* rooms — from the booking page's own list */
+  var ROOMS = [
+    ["Aambal","Studio","Ground","2","Compact studio for one or two, opening on to the garden."],
+    ["Thillai","Studio","Ground","4","Ground-floor studio with room for a family of four."],
+    ["Marutham","Studio","Second","4","Second-floor studio with a balcony over the grounds."],
+    ["Mullai","Studio","Second","4","Quiet second-floor studio, the furthest from the road."],
+    ["Paalai","Studio","First","5","First-floor studio with double cots, comfortable for five."],
+    ["Kurinji","Studio","Second","5","Second-floor double-cot room with the mountain view."],
+    ["Shenbagam","Suite","First","10","Premium suite with its own kitchen."],
+    ["Mavval","Suite","First","10","Premium first-floor suite for a large family."],
+    ["Vaagai","Suite","Ground","15","The largest room in the house, sleeping up to fifteen."]
+  ];
+  var car = $("tsCar");
+  car.innerHTML = ROOMS.map(function (r) {
+    return '<article class="ts-room"><div class="ph"><img src="img/rooms/' + r[0].toLowerCase() + '.webp" alt="' + r[0] + ' room" loading="lazy" draggable="false"></div>' +
+      '<h3>' + r[0] + '</h3><p class="m ts-cap ts-red">' + r[1] + ' &middot; ' + r[2] + ' floor &middot; sleeps ' + r[3] + '</p>' +
+      '<p>' + r[4] + '</p><button type="button" class="ts-link" data-ts="reserve">Reserve now</button></article>';
+  }).join("");
+  function prog() {
+    var max = car.scrollWidth - car.clientWidth, f = car.clientWidth / car.scrollWidth;
+    $("tsBar").style.width = (f * 100) + "%";
+    $("tsBar").style.left = (max > 0 ? car.scrollLeft / max * (1 - f) * 100 : 0) + "%";
+  }
+  car.addEventListener("scroll", prog, { passive: true }); addEventListener("resize", prog); prog();
+  var step = function (d) { var c = car.querySelector(".ts-room"); car.scrollBy({ left: d * (c ? c.offsetWidth + 34 : 300), behavior: "smooth" }); };
+  $("tsPrev").onclick = function () { step(-1); }; $("tsNext").onclick = function () { step(1); };
+  /* drag to scroll with a mouse */
+  var dx = null, sl = 0, moved = false;
+  car.addEventListener("pointerdown", function (e) { if (e.pointerType !== "mouse") return; dx = e.clientX; sl = car.scrollLeft; moved = false; car.classList.add("drag"); });
+  addEventListener("pointermove", function (e) { if (dx === null) return; var d = e.clientX - dx; if (Math.abs(d) > 4) moved = true; car.scrollLeft = sl - d; });
+  addEventListener("pointerup", function () { if (dx === null) return; dx = null; car.classList.remove("drag"); });
+  car.addEventListener("click", function (e) { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+
+  /* the reservation panel */
+  var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+  var isoOf = function (d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
+  var parse = function (s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); };
+  var add = function (s, n) { var d = parse(s); d.setDate(d.getDate() + n); return isoOf(d); };
+  var today = isoOf(new Date()), last = add(today, 365);
+  var B = { ci: today, co: add(today, 1), ad: 2, ch: 0, mci: today.slice(0, 7), mco: today.slice(0, 7) };
+  var nice = function (s) { var d = parse(s); return d.getDate() + " " + MON[d.getMonth()] + " " + d.getFullYear(); };
+  var F = {}; document.querySelectorAll(".ts-f").forEach(function (f) { F[f.dataset.f] = f; });
+  function label() {
+    F.ci.querySelector(".ts-dd span").textContent = nice(B.ci);
+    F.co.querySelector(".ts-dd span").textContent = nice(B.co);
+    F.ad.querySelector(".ts-dd span").textContent = B.ad + " Adult" + (B.ad > 1 ? "s" : "");
+    F.ch.querySelector(".ts-dd span").textContent = B.ch + " Child" + (B.ch === 1 ? "" : "ren");
+  }
+  function cal(key) {
+    var ym = key === "ci" ? B.mci : B.mco, y = +ym.slice(0, 4), m = +ym.slice(5, 7) - 1;
+    var first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate(), lead = (first.getDay() + 6) % 7;
+    var min = key === "ci" ? today : add(B.ci, 1);
+    var h = '<div class="ts-cal"><div class="hd"><button type="button" data-mv="-1" aria-label="Previous month"' + (ym <= today.slice(0, 7) ? " disabled" : "") + '>&larr;</button><span>' +
+      ["January","February","March","April","May","June","July","August","September","October","November","December"][m] + " " + y +
+      '</span><button type="button" data-mv="1" aria-label="Next month"' + (ym >= last.slice(0, 7) ? " disabled" : "") + '>&rarr;</button></div><div class="g">' +
+      ["Mo","Tu","We","Th","Fr","Sa","Su"].map(function (d) { return "<span>" + d + "</span>"; }).join("");
+    for (var i = 0; i < lead; i++) h += "<i></i>";
+    for (var d = 1; d <= days; d++) {
+      var s = y + "-" + pad(m + 1) + "-" + pad(d), cls = (s === B[key] ? "sel" : (s > B.ci && s < B.co ? "rng" : ""));
+      h += '<button type="button" data-d="' + s + '" class="' + cls + '"' + (s < min || s > last ? " disabled" : "") + ">" + d + "</button>";
+    }
+    return h + "</div></div>";
+  }
+  function list(key) {
+    var lo = key === "ad" ? 1 : 0, hi = key === "ad" ? 15 : 10, h = "";
+    for (var n = lo; n <= hi; n++) h += '<button type="button" class="opt' + (n === B[key] ? " sel" : "") + '" data-n="' + n + '" style="transition-delay:' + ((n - lo) * 0.03) + 's">' +
+      n + (key === "ad" ? " Adult" + (n > 1 ? "s" : "") : " Child" + (n === 1 ? "" : "ren")) + "</button>";
+    return h;
+  }
+  function fill(key) { F[key].querySelector(".ts-pop").innerHTML = key === "ci" || key === "co" ? cal(key) : list(key); }
+  function closeAll(except) { Object.keys(F).forEach(function (k) { if (k !== except) F[k].classList.remove("open"); }); }
+  Object.keys(F).forEach(function (k) {
+    var f = F[k];
+    f.querySelector(".ts-dd").onclick = function (e) {
+      e.stopPropagation(); var was = f.classList.contains("open"); closeAll(k);
+      if (!was) { if (k === "co") B.mco = B.co.slice(0, 7); if (k === "ci") B.mci = B.ci.slice(0, 7); fill(k); }
+      f.classList.toggle("open", !was);
+    };
+    f.querySelector(".ts-pop").addEventListener("click", function (e) {
+      e.stopPropagation();
+      var t = e.target.closest("button"); if (!t || t.disabled) return;
+      if (t.dataset.mv) { var mk = k === "ci" ? "mci" : "mco", d = parse(B[mk] + "-01"); d.setMonth(d.getMonth() + +t.dataset.mv); B[mk] = isoOf(d).slice(0, 7); fill(k); return; }
+      if (t.dataset.d) {
+        B[k] = t.dataset.d;
+        if (k === "ci" && B.co <= B.ci) B.co = add(B.ci, 1);
+        label(); f.classList.remove("open");
+        if (k === "ci") setTimeout(function () { B.mco = B.co.slice(0, 7); fill("co"); F.co.classList.add("open"); }, 260);
+        return;
+      }
+      if (t.dataset.n) { B[k] = +t.dataset.n; label(); f.classList.remove("open"); }
+    });
+  });
+  $("tsBook").addEventListener("click", function () { closeAll(); });
+  function openBook() { closeAll(); label(); $("tsBook").classList.add("on"); document.body.style.overflow = "hidden"; }
+  function closeBook() { closeAll(); $("tsBook").classList.remove("on"); document.body.style.overflow = ""; }
+  document.querySelectorAll("#tsBook [data-close]").forEach(function (b) { b.onclick = closeBook; });
+  addEventListener("keydown", function (e) { if (e.key === "Escape") { closeBook(); menu(false); } });
+  $("tsCheck").onclick = function () {
+    var page = (document.getElementById("bookBtn") || {}).getAttribute ? document.getElementById("bookBtn").getAttribute("href") : "book.html";
+    location.href = (page || "book.html") + "?ci=" + B.ci + "&co=" + B.co + "&ad=" + B.ad + "&ch=" + B.ch;
+  };
+  $("tsReserve").onclick = openBook;
+
+  /* menu */
+  function menu(on) { $("tsMenu").classList.toggle("on", on); $("tsMenu").setAttribute("aria-hidden", String(!on)); $("tsBurger").setAttribute("aria-expanded", String(on)); }
+  $("tsBurger").onclick = function () { menu(true); }; $("tsMenuX").onclick = function () { menu(false); };
+  document.querySelectorAll("#tsMenu [data-m]").forEach(function (a) { a.addEventListener("click", function () { menu(false); }); });
+
+  /* every Talk / Chat / Reserve / Rooms link on the page */
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-ts]"); if (!t) return;
+    var w = t.dataset.ts; menu(false);
+    if (w === "reserve") openBook();
+    else if (w === "talk") $("saFace").click();
+    else if (w === "chat") $("chatBtn").click();
+    else if (w === "rooms") $("rooms").scrollIntoView({ behavior: "smooth" });
+  });
+
+  /* logo intro: once per visit, never on a deep link to Talk or Chat */
+  var intro = $("tsIntro"), seen = false;
+  try { seen = sessionStorage.getItem("tsIntro") === "1"; } catch (e) {}
+  if (seen || /#(talk|chat)/.test(location.hash) || matchMedia("(prefers-reduced-motion: reduce)").matches) { intro.remove(); return; }
+  try { sessionStorage.setItem("tsIntro", "1"); } catch (e) {}
+  document.body.style.overflow = "hidden";
+  var v = $("tsIntroV"), ended = false;
+  var finish = function () {
+    if (ended) return; ended = true; intro.classList.add("done"); document.body.style.overflow = "";
+    setTimeout(function () { intro.remove(); }, 1100);
+  };
+  var go = function () { intro.classList.add("go"); setTimeout(finish, 1500); };
+  v.addEventListener("ended", go);
+  var p = v.play(); if (p && p.catch) p.catch(function () { go(); });
+  setTimeout(function () { if (!intro.classList.contains("go")) go(); }, 4200);
+  $("tsSkip").onclick = finish;
 })();
 </script>
 </body></html>
