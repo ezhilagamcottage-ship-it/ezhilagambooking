@@ -634,9 +634,9 @@ header{margin-bottom:10px;text-align:center}
   section.step>.card.stack:has(input[data-f="name"])>label:has([data-f="address"]),
   section.step>.card.stack:has(input[data-f="name"])>.fine{grid-column:1/-1}
   /* step 3: what you are paying for on the left, how to pay on the right */
-  section.step:has(#qrbox){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:22px;align-items:start}
-  section.step:has(#qrbox)>.card:first-child{grid-column:1;grid-row:1/span 40;position:sticky;top:24px}
-  section.step:has(#qrbox)>*:not(:first-child){grid-column:2}
+  section.step:has(#paycard){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:22px;align-items:start}
+  section.step:has(#paycard)>.card:first-child{grid-column:1;grid-row:1/span 40;position:sticky;top:24px}
+  section.step:has(#paycard)>*:not(:first-child){grid-column:2}
   /* step 4: the voucher at the width it was drawn for */
   section.step:has(.v-card),section.step:has(.waitcard){max-width:480px;margin:0 auto}
   /* the action bar belongs to the right-hand column */
@@ -722,7 +722,7 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-red)}
   <div>
     <p class="dk-over">Book direct &middot; Courtallam</p>
     <h2 class="dk-h">Nine rooms,<br>a short walk from the <em>Main Falls</em></h2>
-    <ul class="dk-pts"><li>Studios and suites for two to fifteen guests</li><li>A/C &amp; Non A/C &middot; family friendly</li><li>24/7 power backup</li><li>Pay by UPI straight to the hotel, or by card</li></ul>
+    <ul class="dk-pts"><li>Studios and suites for two to fifteen guests</li><li>A/C &amp; Non A/C &middot; family friendly</li><li>24/7 power backup</li><li>Pay securely by UPI, card or net banking</li></ul>
   </div>
   <div class="dk-help">
     <p>Need a hand?</p>
@@ -1861,8 +1861,9 @@ async function copyVpa(btn) {
 
 /* ── Cards and net banking, through Razorpay ──────────────────────────────
  *
- * Rakesh, 2 Sep 2026: only cards, credit cards and net banking go through
- * Razorpay; UPI, GPay, Paytm and PhonePe keep paying the hotel's own handle.
+ * Rakesh, 25 Oct 2026: Razorpay is now the ONLY way to pay on this page, UPI
+ * included (the hotel-handle UPI button was removed). Was 2 Sep: cards and net
+ * banking only, UPI to the hotel's own handle.
  *
  * That instruction is enforced in the `method` block below. Razorpay's
  * checkout offers UPI by default, and a guest who took it would cost about
@@ -1910,7 +1911,7 @@ async function payByCard(btn) {
   if (!d || !d.ok) return done((d && d.message) || "Could not start the card payment.");
 
   if (!(await loadRzp())) {
-    return done("The card checkout could not load. Please use the UPI button above, " +
+    return done("The secure checkout could not load. Please check your connection and try again, " +
                 "or message us and we will send a payment link.");
   }
 
@@ -1925,7 +1926,7 @@ async function payByCard(btn) {
     notes: { ref: S.ref },
     /* Cards and net banking only. See the note above — this is the line that
        keeps UPI off the gateway. */
-    method: { card: true, netbanking: true, upi: false, wallet: false,
+    method: { card: true, netbanking: true, upi: true, wallet: false,
               emi: false, paylater: false, cardless_emi: false },
     theme: { color: "#0f766e" },
     modal: { ondismiss: () => done("") },
@@ -1934,7 +1935,7 @@ async function payByCard(btn) {
   try {
     rz.on("payment.failed", (ev) => {
       const m = (ev && ev.error && ev.error.description) || "The card was declined.";
-      done(m + " Nothing has been charged. You can try another card or pay by UPI.");
+      done(m + " Nothing has been charged. You can try again with another card, UPI app or bank.");
     });
   } catch (e) {}
   rz.open();
@@ -1964,7 +1965,7 @@ async function finishCard(r, btn, was) {
   }
   if (!v.paid) {
     return fail("The payment has not completed yet. Give it a moment and try again, " +
-                "or pay by UPI instead.");
+                "or message us and we will check it for you.");
   }
   /* Paid and proved. Hold the room, then straight to the voucher — there is
      nothing to wait for, because the gateway has already answered. */
@@ -2007,49 +2008,19 @@ function stepPay(app) {
       </label>
     </div>
 
-    ${!upi ? `<p class="warn">UPI address not set. Fill <code>CFG.UPI</code> before this page goes live — otherwise Pay does nothing.</p>` : ""}
-
-    <p class="railhead">Pay by UPI — straight to the hotel, no fee</p>
-    <button id="pay" class="pay ${upi ? "" : "off"}" ${upi ? "" : "disabled"}>${payLabel}</button>
-
-    <div id="qrbox" class="qrbox" ${S.qrOpen ? "" : "hidden"}>
-      <p class="qrhead">Scan with any UPI app</p>
-      <canvas id="qr" width="256" height="256" role="img"
-        aria-label="UPI payment code for ${inr(amt)}"></canvas>
-      <p class="qramt">${inr(amt)} to <b>${pay.name}</b></p>
-      <p class="qrvpa">${pay.vpa}<span>${CFG.UPI_PHONE}</span></p>
-      ${pay.mcc ? "" : `<p class="qrwho">Your UPI app will show
-        <b>${pay.name}</b> — that is ${CFG.BRAND}'s own account.</p>`}
-      <button id="copyvpa" class="btn-plain">Copy UPI ID</button>
-      ${CFG.UPI.length > 1 ? `
-      <div class="payee" role="group" aria-label="Choose where to pay">
-        ${CFG.UPI.map((h, i) => `<button type="button" class="payee-b${i === S.payee ? " on" : ""}"
-            data-payee="${i}" ${i === S.payee ? 'aria-pressed="true"' : 'aria-pressed="false"'}>${h.bank}</button>`).join("")}
-      </div>` : ""}
-      <p class="fine" style="margin-top:10px">Works with GPay, PhonePe, Paytm, BHIM
-        and any bank app. Quote <b>${S.ref}</b> if you are asked for a note.</p>
-    </div>
-
-    ${CFG.RZP_ENABLED ? `
-    <div class="railsplit"><span>or</span></div>
-    <button id="paycard" class="paycard">Pay by Card / Net Banking</button>
-` : ""}
-
-    <div class="card">
-      <p class="note">Paying by UPI? Your app will open. After paying, come back here and type the
-        <b>last 4 digits of the UPI reference</b> — that is what lets us find your payment
-        and hold the room.</p>
-      <input id="ref" class="ref" inputmode="numeric" maxlength="4" placeholder="4321" value="${S.payRef}">
-      <p class="fine">Reference <b>${S.ref}</b> — quote it if you message us.</p>
-    </div></section>`));
+    <p class="railhead">Pay securely with Razorpay</p>
+    <button id="paycard" class="pay">Pay ${inr(amt)} · UPI, Card or Net Banking</button>
+    <p class="fine" style="text-align:center;margin:0 0 12px">GPay, PhonePe, Paytm, any UPI app, debit and credit cards or net banking.
+      The room is held for you the moment the payment is confirmed. Reference <b>${S.ref}</b>.</p>
+    </section>`));
 
   /* The footer button is drawn by foot(), not by this section, so changing
      the reference has to tell it. Without this the guest types all four
      digits and Continue stays grey — they have paid and the page will not
      let them finish, which is the worst state this screen can be in. */
   const payBtn = app.querySelector("#pay");
-  if (upi) payBtn.onclick = () => startPay(payBtn);
-  app.querySelector("#copyvpa").onclick = (e) => copyVpa(e.currentTarget);
+  if (payBtn && upi) payBtn.onclick = () => startPay(payBtn);   /* v5.2: UPI button removed; Razorpay only */
+  const cv = app.querySelector("#copyvpa"); if (cv) cv.onclick = (e) => copyVpa(e.currentTarget);
   /* Switching where the money goes rebuilds the code and the button. It does
      NOT re-render the whole step: that would collapse the open QR panel the
      guest is looking at, which is the one thing they must not lose hold of
@@ -2069,7 +2040,7 @@ function stepPay(app) {
   if (card) card.onclick = () => payByCard(card);
   /* Re-drawn on every render while it is open. A code showing the previous
      amount is the worst kind of wrong, because it scans. */
-  if (S.qrOpen) drawQr();
+  if (S.qrOpen && app.querySelector("#qr")) drawQr();
 
   app.querySelector("#part").onchange = (e) => {
     S.partPay = e.target.checked;
@@ -2079,7 +2050,7 @@ function stepPay(app) {
     render();
   };
 
-  app.querySelector("#ref").oninput = (e) => {
+  const refIn = app.querySelector("#ref"); if (refIn) refIn.oninput = (e) => {
     S.payRef = e.target.value.replace(/\D/g, "").slice(0, 4);
     e.target.value = S.payRef;
     foot();
@@ -3377,10 +3348,10 @@ function foot() {
   const label = {
     1: S.pick.length ? `Continue · ${inr(tariff())}` : "Choose a room",
     2: "Continue to payment",
-    3: `I have paid ${inr(payNow())}`,
+    3: `Pay ${inr(payNow())} securely`,
     4: "Book another stay"
   }[S.step];
-  const ready = { 1: S.pick.length > 0, 2: true, 3: S.payRef.length === 4, 4: true }[S.step];
+  const ready = { 1: S.pick.length > 0, 2: true, 3: !S.paying, 4: true }[S.step];
   bar.innerHTML = `<div class="in">
     ${S.step > 1 && S.step < 4 ? `<button id="back">Back</button>` : ""}
     <button id="next" ${ready ? "" : "disabled"}>${label}</button></div>`;
@@ -3401,11 +3372,9 @@ async function advanceStep() {
     S.step = 3; return render();
   }
   if (S.step === 3) {
-    const btn = document.querySelector("#next");
-    btn.disabled = true; btn.textContent = "Holding your room…";
-    await holdRoom({}, "waiting");
-    btn.disabled = false;
-    return;
+    /* v5.2 (Rakesh, 25 Oct): Razorpay is the only way to pay, so the footer
+       button opens the same checkout as the button in the page. */
+    return payByCard(document.querySelector("#next"));
   }
   location.reload();
 }

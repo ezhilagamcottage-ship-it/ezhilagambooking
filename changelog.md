@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v5.2 — 25 Oct 2026
+
+**Razorpay is the only way to pay on the booking page** (Rakesh). The "Pay with any UPI app" button, the UPI QR code and the "type the last 4 digits of the UPI reference" box are gone. One button, "Pay ₹… · UPI, Card or Net Banking", opens Razorpay checkout; the footer button does the same. UPI is now switched ON inside Razorpay (it was off since 2 Sep, when UPI went to the hotel's own handle), so guests can still pay by GPay/PhonePe/any UPI app through Razorpay. Razorpay charges its usual fee on UPI payments. The booking is written only after Razorpay confirms the payment, as before.
+
 ## v5.1 — 25 Oct 2026
 
 **Guest details: ID questions removed.** The booking form no longer asks "ID you will bring" or "Last 4 digits of that ID" (Rakesh). It now says to bring an original photo ID for every adult, checked at the desk. The booking still sends empty ID fields, so the sheet's columns are unchanged.
