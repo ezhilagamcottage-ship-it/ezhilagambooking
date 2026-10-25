@@ -17,3 +17,6 @@
 
 # Checkout page for a room Shenba has held (WhatsApp link + Razorpay return). 21 Oct 2026.
 /pay          /pay.html     200
+
+# Photo-album page: the rooms as a flip-through book. Shared as a direct link.
+/album        /album.html   200
