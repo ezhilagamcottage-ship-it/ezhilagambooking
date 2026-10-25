@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v4.0 — 25 Oct 2026
+
+**A computer gets its own home page; the phone page is unchanged.** On screens 1024px wide and up, the room photos fill the whole screen and wipe from one to the next, with the room thumbnails and arrows along the foot. On the left, where the eye lands first: "Comfortable stay near Courtallam Main Falls", the nine rooms in one line, the A/C, family and power-backup chips, then **Reserve now** (green) and **Chat with Shenba** (white) side by side. On the right, Talk with Shenba is a concierge card: her face much larger with gold rings pulsing out, a "Voice assistant · Tamil & English" tag, rotating "Try saying…" examples (one in Tamil), and a **Tap to talk** button that turns green with a moving sound wave while she listens. Logo on a white plate (lens still gliding), the two numbers as glass buttons, rating badges cycling on the right; date, daily quote, house rules and address kept. Still one screen, no scrolling. Everything is in one `@media (min-width:1024px)` block plus four desktop-only elements hidden on phones.
+
 ## v3.4 — 25 Oct 2026
 
 **ElevenLabs credits kept low.** The live call has a hard stop at 15 minutes (was 60). At 7 minutes, if the booking card is still empty (no dates and guests, room, price or number), Shenba wraps up warmly — "இதுக்கு மேல WhatsApp-ல பேசலாமா?…" — and ends the call; a sheet then offers **WhatsApp-ல continue பண்ணுங்க** (WhatsApp Shenba, with the dates already known) or **இங்கேயே chat பண்ணுங்க** (Chat with Shenba), both free of voice credits. A booking on its way stays live; a minute before the 15-minute stop she finishes the hold / payment link or moves to WhatsApp. A call that reaches the stop without a booking also gets the WhatsApp/chat sheet.
