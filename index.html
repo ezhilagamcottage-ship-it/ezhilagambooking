@@ -2973,14 +2973,28 @@ async function startVoice(resume, viaTap, serverOnly) {
   starting = true; calling = true;
   setMini(false);
   saState("connecting", "Connecting…");
-  // v2.8: her talking intro first (started inside the tap); the photo welcome only if the video cannot play
+  /* v6.8 (Rakesh, 26 Oct): on phones, opening the microphone switches the speaker into "call" mode, which swallowed the
+     first seconds of her intro (it started playing first, then the live call opened the mic). Now the mic opens first, the
+     audio route settles, and only then does she start speaking - so her very first word is heard. The intro still plays if
+     the mic is refused (the call itself then explains). The stream is closed once the live call holds its own. */
+  let preMic = null;
+  if (!resume && !serverOnly && $("sbCall").open && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    try {
+      preMic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+      try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === "suspended") await ac.resume(); } catch (e) {}
+      await new Promise(z => setTimeout(z, 450));   // let the phone finish switching the audio route
+    } catch (e) { preMic = null; }
+    if (!calling) { if (preMic) preMic.getTracks().forEach(t => t.stop()); starting = false; return; }
+  }
+  const dropPreMic = () => { if (preMic) { const m = preMic; preMic = null; setTimeout(() => m.getTracks().forEach(t => t.stop()), 1500); } };
+  // v2.8: her talking intro first; the photo welcome only if the video cannot play
   const intro = !resume && !serverOnly && $("sbCall").open ? swIntro() : null;
   if (!resume && !serverOnly && $("sbCall").open && !intro) swWelcome();
   try {
     if (!resume && !serverOnly && LIVE_AGENT) {
       agentNoDur = false; agentTries = 0;
       try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === "suspended") ac.resume(); } catch (e) {}   // for her nandri voice later
-      try { await startAgent(intro); return; }
+      try { await startAgent(intro); dropPreMic(); return; }
       catch (e) {
         if (e && e.name === "NotAllowedError") throw e;
         console.warn("Shenba live agent unavailable, using our server", e && (e.message || e));
@@ -2988,7 +3002,8 @@ async function startVoice(resume, viaTap, serverOnly) {
         agentConv = null;   // the live agent could not start: carry on on our own server
       }
     }
-    mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+    mic = preMic || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+    preMic = null;
     ac = ac || new (window.AudioContext || window.webkitAudioContext)();
     if (ac.state === "suspended") await Promise.race([ac.resume(), new Promise(z => setTimeout(z, 1500))]);
     micAn = ac.createAnalyser(); micAn.fftSize = 4096; ac.createMediaStreamSource(mic).connect(micAn);
@@ -3064,6 +3079,7 @@ async function startVoice(resume, viaTap, serverOnly) {
       }
     }
   } catch (e) {
+    if (preMic) { try { preMic.getTracks().forEach(t => t.stop()); } catch (x) {} preMic = null; }
     calling = false; stopPlay(); if (rec) { try { rec.stop(); } catch (x) {} }
     saState("error");
     if (e && e.name === "NotAllowedError") { $("saStat").textContent = "Mic blocked · call 99622 22415"; $("scStat").textContent = "Microphone is blocked. Allow it in your browser, or call 99622 22415."; }

@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v6.8 — 26 Oct 2026
+
+**Shenba's first words are heard** (Rakesh). On phones, tapping Talk started her intro and opened the microphone at the same moment; opening the mic switches the phone's speaker into call mode, which swallowed the first few seconds of her voice. Now the microphone opens first (the "allow microphone" question comes first on a first visit), the phone gets half a second to settle, and only then does she start speaking — so her greeting is heard from the first word. If the microphone is refused she still greets and the call explains how to allow it.
+
 ## v6.7 — 26 Oct 2026
 
 **A smile while rooms are checked** (Rakesh). Instead of "Checking what is free…" the guest sees one of 24 polite, warm lines picked at random and changing every few seconds — e.g. "Peeking into our nine rooms for you…", "Fluffing the pillows while we check your dates…", "Brewing a fresh filter coffee while we look… ☕", "Placing jasmine at the door while we look… 🌼", "One moment — saving you the best stay in Courtallam…". The same lines show on the "Find available rooms" button while it waits.
