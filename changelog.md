@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v6.6 — 26 Oct 2026
+
+**PIN code before City** (Rakesh). The PIN code box now comes above City, so the city fills itself as soon as the 6th digit is typed ("City filled from the PIN code — change it if needed"; 641001 → Coimbatore, 600088 → Chennai). Changing the PIN updates a city it filled; a city the guest typed is never replaced. Typing the city first still offers the suggestions list and fills the PIN.
+
 ## v6.5 — 26 Oct 2026
 
 **City suggestions and PIN filled for you** (Rakesh). As the guest types the city, a list drops down under the box — Tamil Nadu and nearby-state towns first, then the rest of India, each group A to Z ("c" shows Chengalpattu, Chennai, Chidambaram, Coimbatore …; "co" shows Coimbatore, Colachel, Coonoor, Courtallam). Tapping a city fills the PIN code with that city's head post office PIN from India Post ("PIN of Coimbatore head post office — change it if yours is different"). A PIN the guest typed is never overwritten, and typing a PIN with the city empty fills the city (627811 → Tenkasi). If India Post is slow or offline nothing is blocked — the guest just types it. City list: js/cities.js (1,264 Indian cities and towns).

@@ -1738,6 +1738,7 @@ async function pinForCity(city) {
   return { pin: list[0].Pincode, office: String(list[0].Name || "").trim() };
 }
 async function cityForPin(pin) {
+  if (/^600/.test(pin)) return "Chennai";   /* India Post still files many Chennai PINs under Kanchipuram / Tiruvallur */
   try { const r = await fetch("https://api.postalpincode.in/pincode/" + pin, { signal: AbortSignal.timeout(6000) });
     const j = await r.json(); const po = (j && j[0] && j[0].PostOffice) || []; if (!po.length) return null;
     await loadCities();
@@ -1768,6 +1769,7 @@ function cityAssist(box) {
   };
   const choose = (name) => { ci.value = name; S.guest.city = name; hide(); fillPin(name); };
   ci.addEventListener("input", async () => {
+    S.guest.cityAuto = false;
     const t = ci.value.trim().toLowerCase();
     if (!t) { hide(); return; }
     await loadCities(); if (!ezCities) return;
@@ -1790,9 +1792,14 @@ function cityAssist(box) {
   }, 150));
   pi.addEventListener("input", async () => {
     S.guest.pinAuto = false; note.textContent = "";
-    if (/^[1-9][0-9]{5}$/.test(S.guest.pin || "") && !ci.value.trim()) {
-      const c = await cityForPin(S.guest.pin);
-      if (c && !ci.value.trim()) { ci.value = c; S.guest.city = c; note.textContent = "City filled from the PIN code."; }
+    /* v6.6: PIN comes first, so a full PIN fills the city (and updates a city it filled itself) */
+    if (/^[1-9][0-9]{5}$/.test(S.guest.pin || "") && (!ci.value.trim() || S.guest.cityAuto)) {
+      const want = S.guest.pin; note.textContent = "Finding your city…";
+      const c = await cityForPin(want);
+      if (S.guest.pin !== want) return;
+      if (c && (!ci.value.trim() || S.guest.cityAuto)) { ci.value = c; S.guest.city = c; S.guest.cityAuto = true; hide();
+        note.textContent = "City filled from the PIN code — change it if needed."; }
+      else note.textContent = "";
     }
   });
 }
@@ -1813,8 +1820,8 @@ function stepGuest(app) {
     <div class="card stack">
       ${[["name","Full name","text","As on your ID"],
          ["phone","WhatsApp number","tel","10 digits"],
-         ["city","City","text","e.g. Chennai"],
-         ["pin","PIN code","tel","6 digits"]].map(([k,l,t,ph]) => `
+         ["pin","PIN code","tel","6 digits"],
+         ["city","City","text","e.g. Chennai"]].map(([k,l,t,ph]) => `
         <label><span class="lbl">${l}</span>
           <input data-f="${k}" type="${t}" value="${f[k]}" placeholder="${ph}"${k === "phone" ? ' inputmode="numeric" pattern="[0-9]*" maxlength="14" autocomplete="tel-national"' : k === "pin" ? ' inputmode="numeric" pattern="[0-9]*" maxlength="6"' : ""}>${k === "phone" ? '<small class="phhint" style="display:block;margin-top:6px;font-size:13px;color:#78716c"></small>' : ""}</label>`).join("")}
 
