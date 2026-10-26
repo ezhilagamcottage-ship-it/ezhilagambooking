@@ -1712,6 +1712,91 @@ async function loadAvail() {
 }
 
 /* ── step 2 ───────────────────────────────────────────────────────────── */
+/* v6.5 (Rakesh, 26 Oct): City suggestions as you type ("c" -> Chennai, Coimbatore ... A-Z) from js/cities.js, and the PIN
+   filled from India Post (api.postalpincode.in: the city's head post office). A typed PIN with no city fills the city.
+   The guest can always change either; nothing blocks booking if the lookup is slow or offline. */
+const CITY_ALIAS = { bengaluru: "Bangalore", trichy: "Tiruchirappalli", kanyakumari: "Kanniyakumari", mysuru: "Mysore",
+  puducherry: "Pondicherry", gurugram: "Gurgaon", kochi: "Ernakulam", thoothukudi: "Tuticorin", courtallam: "Tenkasi", kutralam: "Tenkasi" };
+let ezCities = null;
+function loadCities() {
+  if (ezCities || window.EZ_CITIES) { ezCities = ezCities || window.EZ_CITIES.split(";").map((x) => x.split("|")); return Promise.resolve(); }
+  return new Promise((ok) => { const sc = document.createElement("script"); sc.src = "js/cities.js?v=6.5";
+    sc.onload = () => { ezCities = (window.EZ_CITIES || "").split(";").map((x) => x.split("|")); ok(); }; sc.onerror = () => ok();
+    document.head.appendChild(sc); });
+}
+async function pinForCity(city) {
+  const q = async (name) => { try { const r = await fetch("https://api.postalpincode.in/postoffice/" + encodeURIComponent(name), { signal: AbortSignal.timeout(6000) });
+    const j = await r.json(); return (j && j[0] && j[0].PostOffice) || []; } catch (e) { return []; } };
+  let list = await q(city);
+  if (!list.length && CITY_ALIAS[city.toLowerCase()]) list = await q(CITY_ALIAS[city.toLowerCase()]);
+  if (!list.length) return null;
+  const c = (CITY_ALIAS[city.toLowerCase()] || city).toLowerCase();
+  const score = (p) => { const n = String(p.Name || "").trim().toLowerCase(); let s = 0;
+    if (p.BranchType === "Head Post Office") s += 4; if (n === c) s += 3; else if (n.startsWith(c)) s += 2;
+    if (String(p.District || "").toLowerCase() === c) s += 1; return s; };
+  list.sort((a, b) => score(b) - score(a));
+  return { pin: list[0].Pincode, office: String(list[0].Name || "").trim() };
+}
+async function cityForPin(pin) {
+  try { const r = await fetch("https://api.postalpincode.in/pincode/" + pin, { signal: AbortSignal.timeout(6000) });
+    const j = await r.json(); const po = (j && j[0] && j[0].PostOffice) || []; if (!po.length) return null;
+    await loadCities();
+    const known = po.map((x) => String(x.Name || "").trim()).find((n) => ezCities && ezCities.some((c) => c[0].toLowerCase() === n.toLowerCase()));
+    return known || String(po[0].District || "").trim() || null; }
+  catch (e) { return null; }
+}
+function cityAssist(box) {
+  const ci = box.querySelector('input[data-f="city"]'), pi = box.querySelector('input[data-f="pin"]');
+  if (!ci || !pi) return;
+  ci.setAttribute("autocomplete", "off");
+  const lab = ci.closest("label"); lab.style.position = "relative";
+  const dd = document.createElement("div");
+  dd.style.cssText = "position:absolute;left:0;right:0;top:100%;z-index:30;background:#fff;border:1px solid #d6d3d1;border-radius:10px;" +
+    "box-shadow:0 10px 24px rgba(28,25,23,.15);max-height:260px;overflow:auto;display:none";
+  lab.appendChild(dd);
+  const note = document.createElement("small");
+  note.style.cssText = "display:block;margin-top:6px;font-size:13px;color:#78716c";
+  pi.closest("label").appendChild(note);
+  const hide = () => { dd.style.display = "none"; };
+  const fillPin = async (city) => {
+    if (S.guest.pin && !S.guest.pinAuto) return;          // never overwrite a PIN the guest typed
+    note.textContent = "Finding the PIN code…";
+    const r = await pinForCity(city);
+    if (!r || S.guest.city !== city) { note.textContent = ""; return; }
+    S.guest.pin = r.pin; S.guest.pinAuto = true; pi.value = r.pin;
+    note.textContent = "PIN of " + r.office + " head post office — change it if yours is different.";
+  };
+  const choose = (name) => { ci.value = name; S.guest.city = name; hide(); fillPin(name); };
+  ci.addEventListener("input", async () => {
+    const t = ci.value.trim().toLowerCase();
+    if (!t) { hide(); return; }
+    await loadCities(); if (!ezCities) return;
+    /* nearby states first (most guests), then A-Z: "c" -> Chennai, Chidambaram, Coimbatore, Courtallam ... */
+    const rank = (x) => x[1] === "Tamil Nadu" ? 0 : /^(Kerala|Karnataka|Puducherry|Andhra Pradesh|Telangana)$/.test(x[1] || "") ? 1 : 2;
+    const byRank = (a, b) => rank(a) - rank(b) || a[0].localeCompare(b[0]);
+    const starts = ezCities.filter((x) => x[0].toLowerCase().startsWith(t)).sort(byRank);
+    const more = starts.length < 8 ? ezCities.filter((x) => !x[0].toLowerCase().startsWith(t) && x[0].toLowerCase().includes(t)).sort(byRank) : [];
+    const hits = starts.concat(more).slice(0, 8);
+    if (!hits.length) { hide(); return; }
+    dd.innerHTML = hits.map((x) => `<div data-c="${x[0].replace(/"/g, "")}" style="padding:11px 14px;border-bottom:1px solid #f5f5f4;cursor:pointer;font-size:16px">` +
+      `${x[0]} <span style="color:#a8a29e;font-size:13px">${x[1] || ""}</span></div>`).join("");
+    dd.style.display = "block";
+    dd.querySelectorAll("[data-c]").forEach((el) => { el.onmousedown = (e) => e.preventDefault(); el.onclick = () => choose(el.dataset.c); });
+  });
+  ci.addEventListener("blur", () => setTimeout(() => {
+    hide();
+    const v = ci.value.trim();
+    if (v && ezCities && ezCities.some((x) => x[0].toLowerCase() === v.toLowerCase()) && (!S.guest.pin || S.guest.pinAuto)) fillPin(S.guest.city = v);
+  }, 150));
+  pi.addEventListener("input", async () => {
+    S.guest.pinAuto = false; note.textContent = "";
+    if (/^[1-9][0-9]{5}$/.test(S.guest.pin || "") && !ci.value.trim()) {
+      const c = await cityForPin(S.guest.pin);
+      if (c && !ci.value.trim()) { ci.value = c; S.guest.city = c; note.textContent = "City filled from the PIN code."; }
+    }
+  });
+}
+
 /* v6.4: an Indian mobile is 10 digits starting 6, 7, 8 or 9 */
 function phoneOk(p) { return /^[6-9][0-9]{9}$/.test(p || ""); }
 function phoneHint(box) {
@@ -1756,6 +1841,7 @@ function stepGuest(app) {
   });
   app.appendChild(box);
   phoneHint(box);
+  cityAssist(box);
 }
 
 

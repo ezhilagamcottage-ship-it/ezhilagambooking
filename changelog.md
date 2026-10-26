@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v6.5 — 26 Oct 2026
+
+**City suggestions and PIN filled for you** (Rakesh). As the guest types the city, a list drops down under the box — Tamil Nadu and nearby-state towns first, then the rest of India, each group A to Z ("c" shows Chengalpattu, Chennai, Chidambaram, Coimbatore …; "co" shows Coimbatore, Colachel, Coonoor, Courtallam). Tapping a city fills the PIN code with that city's head post office PIN from India Post ("PIN of Coimbatore head post office — change it if yours is different"). A PIN the guest typed is never overwritten, and typing a PIN with the city empty fills the city (627811 → Tenkasi). If India Post is slow or offline nothing is blocked — the guest just types it. City list: js/cities.js (1,264 Indian cities and towns).
+
 ## v6.4 — 26 Oct 2026
 
 **WhatsApp number checked as you type** (Rakesh). The box takes numbers only (letters and spaces are dropped, the phone shows the number pad), a pasted +91 or leading 0 is removed, and it stops at 10 digits. A line under the box shows "5 of 10 digits", "✓ 10 digits", or "A mobile number starts with 6, 7, 8 or 9". Continue to payment only goes ahead with a real 10-digit mobile number. PIN code also takes numbers only.
