@@ -7,6 +7,14 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v7.1 — 26 Oct 2026
+
+**Pay on the same page, no second payment screen** (Rakesh). On the lite site, "Review & pay" now opens Razorpay right on the page. The old booking page no longer appears in between asking to pay again. Prime prices the stay, Razorpay takes the money, Prime writes the booking, and the guest lands on "You're booked!" with a receipt (booking ID, room, stay, guests, amount, Razorpay reference).
+- Review & pay screen: progress pills (Room ✓ · Details · Pay), stay summary with "Change dates or guests", "Who's checking in?", price details and one button "Pay ₹X · Confirm room". The button tells the guest what is still missing ("Add your 10-digit WhatsApp number").
+- WhatsApp number: +91 shown, pasted +91 or 0 removed, "✓ We'll send your voucher here" when it is right.
+- Sign in with Google before paying (ready, switched on once the Google sign-in key is added): name and email filled in, "Welcome back, <name>" on the home page and on My Bookings, receipts of every stay listed.
+- The payment choice is asked once. Prime collects the stay in full today, so the page says "Pay once, nothing at the desk"; the 60% advance option appears only when Prime takes advances.
+
 ## v7.0 — 26 Oct 2026
 
 **New lite site for phones** (Rakesh). Phones opening kutralamezhilagam.com now go to `/lite`, which plays the same logo intro and then opens a new maroon-and-beige page:

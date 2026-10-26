@@ -11,6 +11,7 @@
 <link rel="icon" href="img/logo.webp">
 <link rel="canonical" href="https://www.kutralamezhilagam.com/lite">
 <link rel="preload" as="image" href="img/ke-facade.webp">
+<link rel="preconnect" href="https://checkout.razorpay.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Poppins:wght@400;500;600;700&display=swap">
 <style>
@@ -486,6 +487,65 @@ svg.i{width:22px;height:22px;flex:none}
 .ab:active{transform:scale(.97)}
 .sheet.fromBar{bottom:calc(var(--dockh) + 8px)}
 
+/* ===== v7.1: sign-in, review & pay, receipts ===== */
+.psteps{display:flex;gap:6px;list-style:none;margin:0;padding:0;font-size:12px;font-weight:600;color:var(--muted)}
+.psteps li{display:flex;white-space:nowrap;justify-content:center;align-items:center;gap:6px;flex:1;padding:8px 10px;border-radius:999px;background:var(--white);box-shadow:var(--shadow-sm)}
+.psteps li i{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line);font-size:11px}
+.psteps li.done{color:var(--ok)}.psteps li.on{color:var(--maroon);background:var(--maroon-soft)}.psteps li.on i{background:var(--maroon);border-color:var(--maroon);color:#fff}
+.chg{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:13px;font-weight:600;color:var(--maroon)}
+.acct{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.acct b{display:block;font-size:14px}.acct span{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct>div{min-width:0}
+.ava{border-radius:50%;object-fit:cover;flex:none;display:block}
+.ava.ini{display:grid;place-items:center;background:var(--maroon);color:#fff;font-weight:600}
+.link{color:var(--maroon);font-weight:600;font-size:13px;padding:6px 4px}
+.gwrap{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.gwrap p{margin:0;font-size:12px;color:var(--muted)}
+.gbtn{width:100%;max-width:360px;min-height:44px;display:flex;justify-content:center}
+.phonein{display:flex;align-items:center;border:1px solid var(--line);background:var(--bg);border-radius:var(--r-sm);overflow:hidden}
+.phonein span{padding:0 4px 0 14px;font-weight:600;color:var(--muted)}
+.phonein input{flex:1;min-width:0;border:0;background:none;padding:12px 14px 12px 6px;font:inherit;color:var(--ink);letter-spacing:.04em}
+.field small{font-size:12px;color:var(--muted)}.field small.good{color:var(--ok)}.field small.bad{color:#B42318}
+.lines{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.lines>div{display:flex;justify-content:space-between;gap:10px}.lines span{color:#5A4A47}.lines b{font-weight:500;white-space:nowrap}
+.lines .disc b{color:var(--ok)}
+.lines .tot{border-top:1px solid var(--line);padding-top:10px;margin-top:2px}.lines .tot span{font-weight:600;color:var(--ink);font-size:16px}.lines .tot b{font:400 28px var(--serif);color:var(--maroon)}
+.opts2{display:flex;flex-direction:column;gap:10px}
+.paynote{display:flex;gap:10px;align-items:flex-start;background:#EAF6EE;border:1px solid #CDE8D6;border-radius:var(--r-md);padding:12px;color:#1F5E39;font-size:12px}
+.paynote b{display:block;font-size:14px}
+.trust{list-style:none;margin:0;padding:0 4px;display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}
+.trust li{display:flex;gap:8px;align-items:center}.trust svg{color:var(--maroon)}
+.paycta{width:100%;height:58px;border-radius:999px;font-size:16px}
+.paycta.soft{opacity:.55;box-shadow:none}
+.under{text-align:center;font-size:11px;color:var(--muted);margin:6px 0 0}
+.probl{background:#FBEAEA;border:1px solid #F3C6C6;color:#8A1C1C;border-radius:var(--r-md);padding:10px 12px;font-size:12px;margin:0 0 8px}
+.spin.light{border-color:rgba(255,255,255,.35);border-top-color:#fff;width:16px;height:16px;display:inline-block;vertical-align:-3px}
+.rcpt{width:100%;background:var(--card);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:14px 16px;text-align:left;border-top:5px solid var(--maroon)}
+.rcpt header{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:10px;margin-bottom:4px}
+.rcpt header span{display:block;font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.rcpt header b{font:400 22px var(--serif);color:var(--maroon)}
+.rcpt .pill{font-size:11px;font-weight:600;border-radius:999px;padding:4px 10px;text-transform:none;letter-spacing:0}
+.rcpt .pill.green{background:#EAF6EE;color:var(--ok)}.rcpt .pill.amber{background:#FFF6E8;color:#9A6B12}
+.rcpt footer{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px;margin-top:4px}
+.tick.pop{animation:tickpop .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes tickpop{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.12)}100%{transform:none;opacity:1}}
+.wb{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:999px;padding:4px 12px 4px 4px;box-shadow:var(--shadow-sm);font-size:11px;color:var(--muted);text-align:left;line-height:1.2}
+.wb b{display:block;font-size:13px;color:var(--ink)}
+.homehead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sisheet{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.sibg{position:absolute;inset:0;background:rgba(35,23,24,.45);animation:fadein .25s ease both}
+.sibox{position:relative;width:100%;max-width:480px;background:var(--white);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:22px max(20px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;animation:sheetup .35s cubic-bezier(.2,.8,.2,1) both}
+.sibox .sx{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.silogo{height:40px;width:auto}
+.sibox h2{font:400 26px var(--serif);color:var(--maroon)}
+.sibox p{margin:0;color:#5A4A47;font-size:14px}
+.sibox ul{list-style:none;margin:4px 0 6px;padding:0;display:flex;flex-direction:column;gap:6px;text-align:left;font-size:13px}
+.sibox li{display:flex;gap:8px;align-items:center}.sibox li svg{color:var(--ok)}
+.sibox small{font-size:11px;color:var(--muted)}
+@keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.rcpt .pill.grey{background:#EEE8E4;color:var(--muted)}
+
 /* ===== logo intro (same clip and rhythm as the main site), then the lite page ===== */
 #intro{position:fixed;inset:0;z-index:300;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:transform 1s cubic-bezier(.77,0,.18,1),opacity .6s ease .5s}
 #intro video{width:min(620px,84vw);height:auto;display:block}
@@ -530,6 +590,8 @@ body.intro-on .app,body.intro-on .dock{opacity:0}
 const CFG={SCRIPT_URL:"https://script.google.com/macros/s/AKfycbwUVyNn9AIKvCpF2SQRsTqyepZgqwhOIeWCJt25YT5wyC3pp0fWayuTSDTvlwmD24Ww/exec",
   ADVANCE_PC:60,      /* same as book.html CFG.ADVANCE_PC: what Prime takes when the guest pays part */
   FULL_DISCOUNT:0,    /* % off for paying in full. Set to 5 once Prime's rzpOrder gives the same discount */
+  ADVANCE_LIVE:false, /* Prime's rzpOrder collects the full stay today; true once it honours part=1 */
+  GOOGLE_CLIENT_ID:"",/* OAuth web client for kutralamezhilagam.com (Sign in with Google) */
   AVAIL_DAYS:120};
 const SHENBA_WA="916374213184", DESK="+91 82483 20685", SHENBA_IMG="img/shenba.webp", HERO="img/ke-facade.webp";
 const BOOK=[{"name": "Aambal", "rate": 1199, "pax": 2, "type": "Studio", "floor": "Ground", "ac": false, "amen": ["Garden facing", "Ground floor — no stairs"], "bed": "One double bed", "desc": "Compact studio for one or two, opening on to the garden. No air conditioning.", "video": "_oAx9wZhcNs", "photos": ["https://drive.google.com/thumbnail?id=1Q0XMZxhI0p9kvVHtaPquFPk4cdkuUdL6&sz=w800", "https://drive.google.com/thumbnail?id=1qmtx7iUM-g24D-8r7POF6ErVCZExLxFH&sz=w800"]}, {"name": "Thillai", "rate": 1899, "pax": 4, "type": "Studio", "floor": "Ground", "ac": true, "amen": ["Ground floor — no stairs", "Family sized"], "bed": "Double cots · extra beds on request", "desc": "Ground-floor studio with room for a family of four.", "video": "JI6k7zTDtNI", "photos": ["https://drive.google.com/thumbnail?id=19sS4VUH5c9rmW_Q2x9QC8WkU5A8ADOhu&sz=w800"]}, {"name": "Marutham", "rate": 2099, "pax": 4, "type": "Studio", "floor": "Second", "ac": true, "amen": ["Balcony over the grounds"], "bed": "Double cots · extra beds on request", "desc": "Second-floor studio with a balcony over the grounds.", "video": "2zSyiaMIdO4", "photos": ["https://drive.google.com/thumbnail?id=1rVz-A0WTs4YtjLGUn8CYuHuAQ3pGKKlg&sz=w800", "https://drive.google.com/thumbnail?id=1xfArTBzFiroMyi3LMQOaPgewEEER0rZl&sz=w800", "https://drive.google.com/thumbnail?id=1sYXPV5p2RQjIVLQ1UXREpe35BITabfrp&sz=w800"]}, {"name": "Mullai", "rate": 2199, "pax": 4, "type": "Studio", "floor": "Second", "ac": true, "amen": ["Quietest room · furthest from the road"], "bed": "Double cots · extra beds on request", "desc": "Quiet second-floor studio, the furthest from the road.", "video": "LaAJmEnBzKU", "photos": ["https://drive.google.com/thumbnail?id=1BYNx533kDTUQ3hvmVKwZPdCAU4IuW8tA&sz=w800", "https://drive.google.com/thumbnail?id=162pwp5YpVnuljyziHDVNtyqsFFJR3z0h&sz=w800"]}, {"name": "Paalai", "rate": 2699, "pax": 5, "type": "Studio", "floor": "First", "ac": true, "amen": ["First floor"], "bed": "Double cots · extra beds on request", "desc": "First-floor studio with double cots — comfortable for five.", "video": "koIl5BPC6YA", "photos": ["https://drive.google.com/thumbnail?id=1w0pfUMNecnKvaQSMN4pzXs66nrxZa_Vn&sz=w800", "https://drive.google.com/thumbnail?id=1PwgfKiT2R5ZxwYYjT179Kgoj-CvhUoDe&sz=w800"]}, {"name": "Kurinji", "rate": 2899, "pax": 5, "type": "Studio", "floor": "Second", "ac": true, "amen": ["Mountain view"], "bed": "Double cots · extra beds on request", "desc": "Second-floor double-cot room with the mountain view.", "video": "17MDHAKBoG4", "photos": ["https://drive.google.com/thumbnail?id=1BQUwK1qb5HTYFXqflPSXprEFF20MMNhV&sz=w800", "https://drive.google.com/thumbnail?id=1Q-tS9PQOKOsEp4D3wC1s_zl8Wb9WONIf&sz=w800", "https://drive.google.com/thumbnail?id=1RPxqylGCFSJea3Jg8lDG_Tukvf1SLltx&sz=w800", "https://drive.google.com/thumbnail?id=1uLCLAzMnzAykCofgVNcNip5CYemSEBHc&sz=w800"]}, {"name": "Shenbagam", "rate": 4599, "pax": 10, "type": "Suite", "floor": "First", "ac": false, "amen": ["Own kitchen", "Suite"], "bed": "Double cots · extra beds on request", "desc": "Premium suite with its own kitchen. No air conditioning.", "video": "-13te1AytlM", "photos": ["https://drive.google.com/thumbnail?id=1D45yMWOpOViryCRSuiYRbIH9921v3Ek-&sz=w800", "https://drive.google.com/thumbnail?id=120Uz9w0P54s6ja-1aJ1WOWykgPZgVPIz&sz=w800", "https://drive.google.com/thumbnail?id=1axzG_LYz8uZT4VfUk-JTnSqsJshqFIHh&sz=w800", "https://drive.google.com/thumbnail?id=1J5PuzP3obYejKr-TG3YtLryPnYYN0l8m&sz=w800", "https://drive.google.com/thumbnail?id=15TMCieRDAyZat18RsWhEQrxiqXdDZkLl&sz=w800", "https://drive.google.com/thumbnail?id=1iJA-QMD8H4SghehuZzgeeoR19gg7N6aL&sz=w800"]}, {"name": "Mavval", "rate": 4899, "pax": 10, "type": "Suite", "floor": "First", "ac": true, "amen": ["Suite", "Family sized"], "bed": "Double cots · extra beds on request", "desc": "Premium first-floor suite for a large family.", "video": "3e-ED3Gyz4c", "photos": ["https://drive.google.com/thumbnail?id=1BeUaSgD6X35Hs1MiGZLDhZL1wcKtVeBD&sz=w800", "https://drive.google.com/thumbnail?id=1JJOkMPlDh0qbPcGoD_2Jq2jnFO8vuQTp&sz=w800", "https://drive.google.com/thumbnail?id=1S5N6Q_Qt4YZNR6tnZ6zIw6UVsfccz76B&sz=w800", "https://drive.google.com/thumbnail?id=1HmqDf9bsgWhL4A70VsNBNXruNN0ERhPF&sz=w800"]}, {"name": "Vaagai", "rate": 5499, "pax": 15, "type": "Suite", "floor": "Ground", "ac": true, "amen": ["Largest room in the house", "Ground floor — no stairs"], "bed": "Double cots · extra beds on request", "desc": "The largest room in the house — ground-floor suite, sleeps up to fifteen.", "video": "YaJNIivvbhQ", "photos": ["https://drive.google.com/thumbnail?id=1nkvq8Ft_f-LtukBmDOTeSijV1Eq2XbEL&sz=w800", "https://drive.google.com/thumbnail?id=1elrqhi5avV7zGIAgfXTK4Y5sBPiu4FwK&sz=w800", "https://drive.google.com/thumbnail?id=1zF59wijXaM36atAmP28pdp6d2_6nr_s3&sz=w800", "https://drive.google.com/thumbnail?id=17fG-coc4cfDGs0syomz-LItA81vPBNVJ&sz=w800"]}];
@@ -698,7 +760,7 @@ function planHTML(){const st=S.plan,ready=nights()>0,free=ready?freeRooms():[];
     <p class="hint" style="text-align:center">${beyond()?"Shenba confirms rooms for dates this far ahead.":!BUSY?(AVAIL_ERR?"Could not check rooms just now":"Checking which rooms are free…"):`${free.length} of 9 rooms free on your dates`}</p></div></div>`}
 V.home=()=>{const prop=[HERO],order=slideOrder();return `
   ${topTabs()}
-  <header class="homehead gut"><div><p class="lead2">${sm(ic.pin)} Vairams Nagar, Courtallam</p><h1>Kutralam Ezhilagam</h1></div></header>
+  <header class="homehead gut"><div><p class="lead2">${sm(ic.pin)} Vairams Nagar, Courtallam</p><h1>Kutralam Ezhilagam</h1></div>${ACCOUNT?`<button class="wb" data-tab="bookings">${avatar(ACCOUNT,34)}<span>Welcome back,<b>${esc(ACCOUNT.given||firstName(ACCOUNT.name))}</b></span></button>`:""}</header>
   <div class="gut stack">
     <section class="hero2"><img src="${prop[0]}" alt="Kutralam Ezhilagam building, Courtallam"><div class="hshade"></div>
       <div class="htext"><p>Live with Nature</p><h2>A comfortable stay, a short walk from Main Falls</h2></div></section>
@@ -773,12 +835,6 @@ V.search=()=>`${topTabs()}
   <div class="stack" id="results">${filtered().map(resultCard).join("")||'<div class="empty"><b>No rooms match</b>Try another word or category.</div>'}</div></div>`;
 V.favs=()=>{const f=ROOMS.filter(r=>S.favs.includes(r.id));return `${topTabs()}
   <div class="gut stack" style="padding-top:8px">${pageTitle("Favorites")}${f.length?f.map(resultCard).join(""):`<div class="empty"><div class="tick">${ic.heart}</div><b>No saved rooms yet</b>Tap the heart on a room to keep it here.</div>`}</div>`};
-V.bookings=()=>`${topTabs()}
-  <div class="gut stack" style="padding-top:8px">${pageTitle("My Bookings")}${S.bookings.length?S.bookings.map(b=>{const r=ROOMS.find(x=>x.id===b.rid)||ROOMS[0];return `<div class="card bk">${img(r)}<div>
-    <span class="status">${esc(b.status)}</span><div style="font:400 19px var(--serif);margin-top:4px">${esc(b.room)}</div>
-    <div class="muted num" style="font-size:12px">${esc(b.dates)} · ${esc(b.guests)}</div><div class="num" style="font-size:13px"><b>${esc(b.total)}</b> <span class="muted">· ${esc(b.ref)}</span></div></div></div>`}).join("")+'<p class="note">Your booking ID and voucher reach you on WhatsApp from Shenba as soon as the payment goes through.</p>'
-    :`<div class="empty"><div class="tick">${ic.cal}</div><b>No bookings yet</b>Your booking requests will appear here.</div>`}</div>`;
-
 V.room=()=>{const r=room(),busy=nights()>0&&busyOn(r);return `
   <div class="dhero"><div class="ph"><img src="${r.photos[S.pi??r.cover]}" alt="${esc(r.name)} room"></div>
     <button class="fbtn l" data-back aria-label="Back">${ic.back}</button><button class="fbtn r" data-view aria-label="View room photos">${ic.expand}</button>
@@ -800,47 +856,183 @@ V.room=()=>{const r=room(),busy=nights()>0&&busyOn(r);return `
     <div class="card"><h3>Good to know</h3><p class="muted" style="margin:0;font-size:13px">Check-in 12:00 PM · Check-out 10:00 AM. Alcohol-free, smoke-free family property. Photo ID for every adult. 50% advance reserves the room.</p></div>
   </div>`};
 
-/* Payment terms: full payment is the default and earns FULL_DISCOUNT; advance is ADVANCE_PC of the list total */
+/* ---------- Guest account (Sign in with Google) ----------
+   Google's button gives us a signed ID token. We read the name, email and photo from it to fill the form,
+   and the token travels to Prime with the order so Prime can tie receipts to the guest's email.
+   Receipts are also kept on this phone under the guest's Google account, so "Welcome back" works offline. */
+const ACC={get(){return store.get("acct",null)},set(a){store.set("acct",a)},clear(){try{localStorage.removeItem("ezl_acct")}catch(e){}}};
+let ACCOUNT=ACC.get(), GSI_READY=false, GSI_FAILED=false;
+const firstName=n=>String(n||"").trim().split(/\s+/)[0]||"";
+function jwtBody(t){try{const b=t.split(".")[1].replace(/-/g,"+").replace(/_/g,"/");
+  return JSON.parse(decodeURIComponent(atob(b).split("").map(c=>"%"+("00"+c.charCodeAt(0).toString(16)).slice(-2)).join("")))}catch(e){return null}}
+function onGoogle(resp){const p=jwtBody(resp&&resp.credential);if(!p||!p.email){toast("Google sign-in did not finish. Please try again.");return}
+  const was=ACCOUNT&&ACCOUNT.sub===p.sub;
+  ACCOUNT={sub:p.sub,email:p.email,name:p.name||p.given_name||"",given:p.given_name||firstName(p.name),picture:p.picture||"",token:resp.credential,at:Date.now()};
+  ACC.set(ACCOUNT);if(!S.name)S.name=ACCOUNT.name;
+  const r=receipts();toast(r.length?`Welcome back, ${ACCOUNT.given}!`:`Signed in as ${ACCOUNT.email}`);
+  syncReceipts();S.signin=false;if(S.afterSignin){const n=S.afterSignin;S.afterSignin=null;go(n);return}render()}
+function refreshSignin(){if(!ACCOUNT)return;loadGsi().then(ok=>{if(!ok)return;
+  /* tokens last an hour; a returning guest is signed in again silently (one tap) so receipts can be fetched */
+  if(Date.now()-(ACCOUNT.at||0)<50*60*1000){syncReceipts();return}try{google.accounts.id.prompt()}catch(e){}})}
+function loadGsi(){if(!CFG.GOOGLE_CLIENT_ID){GSI_FAILED=true;return Promise.resolve(false)}
+  if(loadGsi._p)return loadGsi._p;
+  loadGsi._p=new Promise(res=>{const t=setTimeout(()=>{GSI_FAILED=true;res(false)},9000);
+    const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;
+    s.onload=()=>{clearTimeout(t);try{google.accounts.id.initialize({client_id:CFG.GOOGLE_CLIENT_ID,callback:onGoogle,auto_select:true,itp_support:true,context:"signin",ux_mode:"popup"});GSI_READY=true;res(true)}catch(e){GSI_FAILED=true;res(false)}};
+    s.onerror=()=>{clearTimeout(t);GSI_FAILED=true;res(false)};document.head.appendChild(s)});
+  return loadGsi._p}
+function drawGoogleButtons(){if(!GSI_READY)return;document.querySelectorAll(".gbtn:not([data-drawn])").forEach(el=>{el.dataset.drawn="1";
+  try{google.accounts.id.renderButton(el,{type:"standard",theme:"outline",size:"large",shape:"pill",text:el.dataset.text||"continue_with",logo_alignment:"left",width:Math.min(360,el.offsetWidth||320)})}catch(e){}})}
+/* Receipts from Prime for the signed-in email (every stay, any device). Prime checks the Google token first. */
+async function syncReceipts(){if(!ACCOUNT||!ACCOUNT.token)return;let d=null;
+  try{d=await primePost({action:"guestReceipts",googleToken:ACCOUNT.token})}catch(e){}
+  if(!d||!d.ok||!Array.isArray(d.bookings))return;
+  const local=receipts(),byId={};local.forEach(x=>byId[x.bookingId]=x);
+  const nd=s=>s?new Date(s+"T12:00:00"):null;
+  const server=d.bookings.map(b=>{const ci=nd(b.checkIn),co=nd(b.checkOut),n=ci&&co?Math.max(1,Math.round((co-ci)/864e5)):1,old=byId[b.bookingId]||{};
+    return Object.assign({},old,{bookingId:b.bookingId,room:b.room+(b.ac?" · "+(/^ac$/i.test(b.ac)?"A/C":b.ac):""),dates:ci&&co?`${fmt(ci)} – ${fmt(co)} · ${n} night${n>1?"s":""}`:old.dates||"",
+      guests:old.guests||`${b.adults} adult${b.adults===1?"":"s"}${b.children?`, ${b.children} child${b.children===1?"":"ren"}`:""}`,paid:b.paid,total:b.total,balance:b.balance,status:b.status,email:d.email})});
+  const ids=new Set(server.map(x=>x.bookingId));
+  store.set(receiptKey(),server.concat(local.filter(x=>!ids.has(x.bookingId))).slice(0,30));
+  if(["bookings","home","done"].includes(S.screen))render()}
+function signOut(){try{google.accounts.id.disableAutoSelect()}catch(e){}ACCOUNT=null;ACC.clear();toast("Signed out");render()}
+const receiptKey=()=>"rcpt_"+(ACCOUNT?ACCOUNT.sub:"guest");
+const receipts=()=>store.get(receiptKey(),[]);
+function saveReceipt(r){const k=receiptKey(),list=store.get(k,[]).filter(x=>x.bookingId!==r.bookingId);list.unshift(r);store.set(k,list.slice(0,30))}
+const avatar=(a,size=36)=>a&&a.picture?`<img class="ava" src="${esc(a.picture)}" alt="" width="${size}" height="${size}" referrerpolicy="no-referrer">`:`<span class="ava ini" style="width:${size}px;height:${size}px">${esc((a&&a.given||"G")[0])}</span>`;
+
+/* ---------- Payment terms ----------
+   Prime prices the stay again and charges what it prices, so the page shows Prime's figure once the order exists.
+   An advance is offered only when Prime takes one (CFG.ADVANCE_LIVE); until then the stay is paid in full. */
 const FULL_DISCOUNT=CFG.FULL_DISCOUNT, ADVANCE_PC=CFG.ADVANCE_PC;
 const terms=q=>{const save=Math.round(q.total*FULL_DISCOUNT/100),full=q.total-save,adv=Math.round(q.total*ADVANCE_PC/100);
-  return{save,full,adv,balance:q.total-adv,now:S.payMode==="full"?full:adv}};
-V.pay=()=>{const set=picked(),q=quote(set),t=terms(q),gs=`${S.adults} Adult${S.adults>1?"s":""}${S.teens?`, ${S.teens} Teen`:""}${S.kids?`, ${S.kids} Child`:""}`;const r=set[0],full=S.payMode==="full";
-  return `<div class="bar gut"><button data-back aria-label="Back">${ic.back}</button><h1>Payment</h1><span></span></div>
-  <div class="gut stack" style="padding-top:16px">
-  <div class="sumcard rise"><div class="sumtop"><span class="roomno num">${set.length>1?set.length:r.no}</span><div><b>Kutralam Ezhilagam ${set.map(x=>x.name).join(" + ")}</b><small class="num">${set.length>1?set.length+" rooms · sleeps "+capOf(set):catName(r)} · ${S.wantAc&&set.some(x=>!x.noAc)?"A/C":"Non-A/C"}</small></div>${img(r)}</div>
-    <div class="prow">${ic.cal}<span>Check-in</span><b class="num">${fmtL(S.checkIn)} (12:00 PM)</b></div>
-    <div class="prow">${ic.calclock}<span>Check-Out</span><b class="num">${fmtL(S.checkOut)} (10:00 AM)</b></div>
-    <div class="prow">${ic.users}<span>Guests</span><b>${gs}</b></div>
-    ${q.rows.map(x=>`<div class="prow">${ic.bed}<span>${x.r.name} · ${x.r.floor} floor</span><b class="num">${inr(x.avg)} x ${q.n} night${q.n>1?"s":""}</b></div>`).join("")}
-    ${q.ac?`<div class="prow">${ic.snow}<span>A/C</span><b class="num">${inr(q.ac)}</b></div>`:""}
-    <div class="prow">${ic.shield}<span>Taxes</span><b>Included</b></div>
-    ${full&&t.save?`<div class="prow disc">${ic.tag}<span>Full payment discount (${FULL_DISCOUNT}%)</span><b class="num">− ${inr(t.save)}</b></div>`:""}
-    <div class="ptotal">${ic.wallet}<span>Total Price</span><b class="num">${full&&t.save?`<s class="was">${inr(q.total)}</s>`:""}${inr(full?t.full:q.total)}</b></div></div>
-  <div class="card stack" style="gap:12px"><h3 style="margin:0">Guest details</h3>
-    <div class="field"><label for="gname">Full name</label><input id="gname" autocomplete="name" placeholder="As on photo ID" value="${esc(S.name)}"></div>
-    <div class="field"><label for="gphone">WhatsApp number</label><input id="gphone" inputmode="tel" autocomplete="tel" placeholder="10-digit mobile" value="${esc(S.phone)}"></div></div>
-  <div class="card stack" style="gap:12px"><h3 style="margin:0">How would you like to pay?</h3>
-    <button class="payopt${full?" on":""}" role="radio" data-pay="full" aria-checked="${full}"><span class="dot2"></span><div><b>Pay in full ${t.save?`<span class="save">Save ${FULL_DISCOUNT}%</span>`:`<span class="save">Recommended</span>`}</b><small>Nothing to pay at check-in</small></div><strong class="num">${inr(t.full)}${t.save?`<s>${inr(q.total)}</s>`:""}</strong></button>
-    <button class="payopt${full?"":" on"}" role="radio" data-pay="advance" aria-checked="${!full}"><span class="dot2"></span><div><b>Pay ${ADVANCE_PC}% advance</b><small>Balance ${inr(t.balance)} before check-in</small></div><strong class="num">${inr(t.adv)}</strong></button>
-    ${full?"":`<div class="balnote">${ic.clock}<div><b>Balance ${inr(t.balance)} to be paid before check-in</b><span>Clearing it before you arrive makes check-in quick and smooth.</span></div></div>
-    <button class="upsell" data-pay="full">${ic.tag}<div><b>${t.save?`Pay in full and save ${inr(t.save)}`:"We recommend paying in full"}</b><span>${t.save?`Get ${FULL_DISCOUNT}% off and walk`:"Nothing to settle at the desk, walk"} straight to your room</span></div>${sm(ic.right)}</button>`}
-  </div>
-  <p class="secure">${ic.lock} Secure payment by Razorpay: UPI, card or net banking</p>
-  <a class="shenlink" href="https://wa.me/${SHENBA_WA}?text=${encodeURIComponent(shenbaMsg())}" target="_blank" rel="noopener">${sm(ic.chat)} Prefer to talk first? Share these details with Shenba</a></div>`};
-V.done=()=>{const b=S.bookings[0];
-  return `<div class="bar gut"><span></span><h1>Booking Reserved</h1><span></span></div>
-  <div class="gut stack done" style="padding-top:24px"><div class="tick">${ic.check}</div><h2>${b.mode==="full"?"Paid in full":"Advance received"}</h2>
-    <p class="preview-note">Preview only. No money was taken and nothing was booked in Prime.</p>
-    <div class="sumcard" style="width:100%;text-align:left">
-      <div class="prow">${ic.bed}<span>Room</span><b>${esc(b.room)}</b></div>
-      <div class="prow">${ic.cal}<span>Dates</span><b class="num">${esc(b.dates)}</b></div>
-      <div class="prow">${ic.users}<span>Guests</span><b>${esc(b.guests)}</b></div>
-      <div class="prow">${ic.wallet}<span>Paid now</span><b class="num">${esc(b.due)}</b></div>
-      ${b.balance?`<div class="prow">${ic.clock}<span>Balance before check-in</span><b class="num">${esc(b.balance)}</b></div>`:`<div class="prow disc">${ic.tag}<span>You saved</span><b class="num">${esc(b.saved)}</b></div>`}
-      <div class="ptotal">${ic.wallet}<span>Stay total</span><b class="num">${esc(b.total)}</b></div></div>
-    <p class="muted" style="margin:0;max-width:34ch;font-size:13px">On the live site the booking ID and voucher arrive on WhatsApp from Shenba as soon as payment succeeds.</p>
+  const part=CFG.ADVANCE_LIVE&&S.payMode==="advance";return{save,full,adv,balance:q.total-adv,part,now:part?adv:full}};
+const guestLine=()=>`${S.adults} adult${S.adults>1?"s":""}${S.teens?`, ${S.teens} teen${S.teens>1?"s":""}`:""}${S.kids?`, ${S.kids} child${S.kids>1?"ren":""}`:""}`;
+const cleanPhone=v=>{v=String(v||"").replace(/\D/g,"");return v.length>10?v.slice(-10):v};
+const phoneDigits=()=>cleanPhone(S.phone);
+const phoneOk=()=>/^[6-9]\d{9}$/.test(phoneDigits());
+function readyToPay(){if(!picked().length||!nights())return"Pick your dates and room";
+  if(!ACCOUNT&&!GSI_FAILED)return"Sign in with Google to continue";
+  if(String(S.name||"").trim().length<3)return"Add the name the room is under";
+  if(!phoneOk())return"Add your 10-digit WhatsApp number";return""}
+
+V.pay=()=>{if(ACCOUNT&&!S.name)S.name=ACCOUNT.name||"";const set=picked(),q=quote(set),t=terms(q),r=set[0],n=q.n,ac=S.wantAc&&set.some(x=>!x.noAc);
+  const pd=phoneDigits(),pmsg=!pd?"Your booking voucher comes here":pd.length<10?`${pd.length} of 10 digits`:phoneOk()?"✓ We'll send your voucher here":"A mobile number starts with 6, 7, 8 or 9";
+  return `<div class="bar gut"><button data-back aria-label="Back to rooms">${ic.back}</button><h1>Review &amp; pay</h1><span></span></div>
+  <div class="gut stack" style="padding-top:14px">
+  <ol class="psteps" aria-label="Progress"><li class="done">${sm(ic.check)} Room</li><li class="on"><i>2</i> Details</li><li><i>3</i> Pay</li></ol>
+  <section class="sumcard rise"><div class="sumtop"><span class="roomno num">${set.length>1?set.length:r.no}</span><div><b>${set.map(x=>x.name).join(" + ")}</b><small class="num">${set.length>1?`${set.length} rooms · sleeps ${capOf(set)}`:catName(r)} · ${ac?"A/C":"Non-A/C"}</small></div>${img(r)}</div>
+    <div class="prow">${ic.cal}<span>Check-in</span><b class="num">${fmtD(S.checkIn)} · 12 PM</b></div>
+    <div class="prow">${ic.calclock}<span>Check-out</span><b class="num">${fmtD(S.checkOut)} · 10 AM</b></div>
+    <div class="prow">${ic.users}<span>Guests</span><b>${guestLine()}</b></div>
+    <button class="chg" data-tab="home">${sm(ic.edit)} Change dates or guests</button></section>
+
+  <section class="card stack rise" style="--i:1;gap:12px"><h3 style="margin:0">Who's checking in?</h3>
+    ${ACCOUNT?`<div class="acct">${avatar(ACCOUNT,40)}<div><b>${esc(ACCOUNT.name||ACCOUNT.given)}</b><span>${esc(ACCOUNT.email)}</span></div><button class="link" data-signout>Not you?</button></div>`
+      :GSI_FAILED?`<p class="hint" style="margin:0">Google sign-in is not available right now. Fill in your name and WhatsApp number to continue.</p>`
+      :`<div class="gwrap"><div class="gbtn" data-text="continue_with"></div><p>We'll email your receipt and keep your bookings in one place.</p></div>`}
+    <div class="field"><label for="gname">Name on the booking</label><input id="gname" autocomplete="name" placeholder="As on your photo ID" value="${esc(S.name||"")}"></div>
+    <div class="field"><label for="gphone">WhatsApp number</label><div class="phonein"><span>+91</span><input id="gphone" inputmode="numeric" autocomplete="tel-national" maxlength="18" placeholder="10-digit mobile" value="${esc(pd)}"></div>
+      <small id="phint" class="${pd&&!phoneOk()&&pd.length===10?"bad":phoneOk()?"good":""}">${pmsg}</small></div></section>
+
+  <section class="card stack rise" style="--i:2;gap:12px"><h3 style="margin:0">Price details</h3>
+    <div class="lines num">${q.rows.map(x=>`<div><span>${x.r.name} · ${inr(x.avg)} × ${n} night${n>1?"s":""}</span><b>${inr(x.base)}</b></div>`).join("")}
+      ${q.ac?`<div><span>A/C</span><b>${inr(q.ac)}</b></div>`:""}<div><span>Taxes</span><b>Included</b></div>
+      ${t.save&&!t.part?`<div class="disc"><span>Pay-in-full saving (${FULL_DISCOUNT}%)</span><b>− ${inr(t.save)}</b></div>`:""}
+      <div class="tot"><span>Total</span><b>${inr(t.part?q.total:t.full)}</b></div></div>
+    ${CFG.ADVANCE_LIVE?`<div class="opts2" role="radiogroup" aria-label="How much to pay now">
+      <button class="payopt${t.part?"":" on"}" role="radio" data-pay="full" aria-checked="${!t.part}"><span class="dot2"></span><div><b>Pay in full <span class="save">${t.save?`Save ${FULL_DISCOUNT}%`:"Recommended"}</span></b><small>Nothing to pay at the desk</small></div><strong class="num">${inr(t.full)}</strong></button>
+      <button class="payopt${t.part?" on":""}" role="radio" data-pay="advance" aria-checked="${t.part}"><span class="dot2"></span><div><b>Pay ${ADVANCE_PC}% now</b><small>${inr(t.balance)} before check-in</small></div><strong class="num">${inr(t.adv)}</strong></button></div>
+      ${t.part?`<div class="balnote">${ic.clock}<div><b>${inr(t.balance)} to pay before check-in</b><span>Clearing it before you arrive makes check-in quick.${t.save?` Paying in full now saves ${inr(t.save)}.`:""}</span></div></div>`:""}`
+      :`<div class="paynote">${ic.shieldok}<div><b>Pay once, nothing at the desk</b><span>Your full stay is paid now, so check-in takes a minute.</span></div></div>`}
+  </section>
+  <ul class="trust rise" style="--i:3"><li>${sm(ic.lock)} Secure payment by Razorpay · UPI, cards, net banking</li><li>${sm(ic.chat)} Booking voucher on WhatsApp right after payment</li><li>${sm(ic.shield)} Photo ID for every adult at check-in · alcohol &amp; smoke free</li><li>${sm(ic.mic)} Questions first? <button class="link" data-shenba style="padding:0">Talk with Shenba</button></li></ul>
+  </div>`};
+
+V.done=()=>{const b=S.lastReceipt;if(!b)return V.bookings();
+  return `<div class="bar gut"><span></span><h1>Booking confirmed</h1><span></span></div>
+  <div class="gut stack done" style="padding-top:22px"><div class="tick pop">${ic.check}</div>
+    <h2>You're booked${b.given?`, ${esc(b.given)}`:""}!</h2>
+    <p class="muted" style="margin:0;max-width:34ch">${esc(b.room)} is yours for ${esc(b.dates)}. See you in Courtallam.</p>
+    ${receiptCard(b,true)}
+    <p class="muted" style="margin:0;font-size:13px;max-width:36ch">Your voucher is on its way on WhatsApp to +91 ${esc(b.phone)}.${b.emailed?` A copy of this receipt was emailed to ${esc(b.email)}.`:b.email?` This receipt is saved to ${esc(b.email)}'s bookings.`:""}</p>
     <div class="copyrow muted">Booking desk <code>${DESK}</code><button class="small-btn" data-copy="${DESK}">Copy</button></div>
-    <button class="btn out pill" data-tab="bookings">View my bookings</button></div>`};
+    <button class="btn out pill" data-tab="bookings">See all my bookings</button></div>`};
+function receiptCard(b,open){return `<article class="rcpt${open?" open":""}"><header><div><span>Booking ID</span><b class="num">${esc(b.bookingId||"Confirming…")}</b></div><span class="pill ${/cancel/i.test(b.status||"")?"grey":b.balance>0?"amber":"green"}">${/cancel/i.test(b.status||"")?"Cancelled":b.balance>0?"Advance paid":"Paid in full"}</span></header>
+  <div class="prow">${ic.bed}<span>Room</span><b>${esc(b.room)}</b></div>
+  <div class="prow">${ic.cal}<span>Stay</span><b class="num">${esc(b.dates)}</b></div>
+  <div class="prow">${ic.users}<span>Guests</span><b>${esc(b.guests)}</b></div>
+  <div class="prow">${ic.wallet}<span>Paid</span><b class="num">${inr(b.paid)}</b></div>
+  ${b.balance>0?`<div class="prow">${ic.clock}<span>Balance before check-in</span><b class="num">${inr(b.balance)}</b></div>`:""}
+  <footer class="num"><span>Razorpay ${esc(b.payRef||"")}</span><span>${esc(b.paidOn||"")}</span></footer></article>`}
+
+V.bookings=()=>{const list=receipts();return `${topTabs()}
+  <div class="gut stack" style="padding-top:8px">${pageTitle(ACCOUNT?`Welcome back, ${esc(ACCOUNT.given||firstName(ACCOUNT.name))}`:"My Bookings")}
+  ${ACCOUNT?`<div class="acct card">${avatar(ACCOUNT,40)}<div><b>${esc(ACCOUNT.name||ACCOUNT.given)}</b><span>${esc(ACCOUNT.email)}</span></div><button class="link" data-signout>Sign out</button></div>`
+    :`<div class="card gwrap">${GSI_FAILED?`<p style="margin:0">Your receipts from this phone appear here.</p>`:`<div class="gbtn" data-text="signin_with"></div><p>Sign in to see the receipts of every stay you booked with us.</p>`}</div>`}
+  ${list.length?list.map((b,i)=>`<div class="rise" style="--i:${i}">${receiptCard(b,i===0)}</div>`).join("")
+    :`<div class="empty"><div class="tick">${ic.cal}</div><b>No bookings yet</b>Your receipts appear here as soon as you book.</div>`}
+  </div>`};
+
+/* ---------- Pay: Prime prices the stay, Razorpay takes the money on this page, Prime writes the booking ---------- */
+async function primePost(payload){const r=await fetch(CFG.SCRIPT_URL,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});return r.json()}
+function loadRzp(){if(window.Razorpay)return Promise.resolve(true);if(loadRzp._p)return loadRzp._p;
+  loadRzp._p=new Promise(res=>{const t=setTimeout(()=>res(false),9000),el=document.createElement("script");el.src="https://checkout.razorpay.com/v1/checkout.js";el.async=true;
+    el.onload=()=>{clearTimeout(t);res(!!window.Razorpay)};el.onerror=()=>{clearTimeout(t);loadRzp._p=null;res(false)};document.head.appendChild(el)});return loadRzp._p}
+function setBusy(label){S.paying=label||"";const b=$("#payBtn");if(b){b.disabled=!!label;b.innerHTML=label?`<span class="spin light"></span> ${label}`:payLabel()}}
+function payLabel(){const set=picked(),t=terms(quote(set));return `${ic.lock} Pay ${inr(S.orderAmt||t.now)} · Confirm room`}
+async function startPayment(){const why=readyToPay();
+  if(why){toast(why);if(!ACCOUNT&&!GSI_FAILED){openSignin("pay")}else if(/name/.test(why))$("#gname")?.focus();else $("#gphone")?.focus();return}
+  if(S.paying)return;
+  const set=picked(),q=quote(set),t=terms(q),digits=phoneDigits(),ref=S.ref||(S.ref="EZ"+Date.now().toString(36).toUpperCase().slice(-6));
+  setBusy("Opening secure payment…");
+  const [rz,order]=await Promise.all([loadRzp(),primePost({action:"rzpOrder",room:set.map(r=>r.name).join(","),checkIn:iso(S.checkIn),checkOut:iso(S.checkOut),
+      wantAc:S.wantAc&&set.some(r=>!r.noAc),part:t.part,name:S.name.trim(),phone:digits,email:ACCOUNT?ACCOUNT.email:"",googleToken:ACCOUNT?ACCOUNT.token:"",
+      adults:S.adults+S.teens,children:S.kids,ref,source:"Website lite"}).catch(()=>null)]);
+  if(!order||!order.ok||!order.orderId){setBusy("");toast((order&&order.message)||"We couldn't reach our booking desk. Nothing was charged. Please try again.");return}
+  if(!rz){setBusy("");toast("The payment window could not open. Check your connection and try again.");return}
+  S.orderAmt=Math.round((Number(order.amount)||0)/100);
+  const checkout=new window.Razorpay({key:order.keyId,order_id:order.orderId,amount:order.amount,currency:order.currency||"INR",
+    name:"Kutralam Ezhilagam",description:`${set.map(r=>r.name).join(" + ")} · ${fmt(S.checkIn)} to ${fmt(S.checkOut)}`,image:"/img/pay-logo.png",
+    prefill:{name:S.name.trim(),email:ACCOUNT?ACCOUNT.email:"",contact:"91"+digits},notes:{ref},theme:{color:"#7A1F2B"},
+    method:{card:true,netbanking:true,upi:true,wallet:false,emi:false,paylater:false,cardless_emi:false},
+    modal:{confirm_close:true,ondismiss:()=>{setBusy("");toast("Payment not completed. Your room is still free to book.")}},
+    handler:resp=>finishPayment(resp,{set,q,t,digits,ref})});
+  try{checkout.on("payment.failed",ev=>{toast(((ev&&ev.error&&ev.error.description)||"The payment did not go through.")+" Nothing was charged.")})}catch(e){}
+  checkout.open();setBusy("Waiting for payment…")}
+async function finishPayment(resp,ctx){setBusy("Confirming your booking…");
+  let v=null;try{v=await primePost({action:"rzpVerify",razorpay_order_id:resp.razorpay_order_id,razorpay_payment_id:resp.razorpay_payment_id,razorpay_signature:resp.razorpay_signature})}catch(e){}
+  if(!v||!v.ok||!v.verified){setBusy("");payProblem("We couldn't confirm that payment yet. Please don't pay again. Shenba or the desk will confirm it for you.",resp);return}
+  if(!v.paid){setBusy("");payProblem("Your payment is still processing. Please don't pay again. We'll confirm it on WhatsApp shortly.",resp);return}
+  const {set,q,t,digits,ref}=ctx,paid=Number(v.amount)||S.orderAmt||t.now,total=Number(v.total)||(t.part?q.total:t.full);
+  let bookingId=v.bookingId||"";
+  /* The same write the booking page makes. Prime de-duplicates it by the Razorpay payment id. */
+  try{const w=await primePost({action:"webBooking",name:S.name.trim(),phone:digits,email:ACCOUNT?ACCOUNT.email:"",room:set.map(r=>r.name).join(","),
+      checkIn:iso(S.checkIn),checkOut:iso(S.checkOut),adults:S.adults+S.teens,children:S.kids,total,reservationPaid:paid,balance:Math.max(0,total-paid),
+      payment:"Card / Net banking",paymentStatus:total-paid>0?"Partial Advance":"Fully Paid",paymentRef:resp.razorpay_payment_id,rzpOrderId:resp.razorpay_order_id,
+      acPreference:S.wantAc&&set.some(r=>!r.noAc)?"AC":"Non-AC",enquirySource:"Website",checkInTime:"12:00 PM",checkOutTime:"10:00 AM",booking_ref:ref});
+    if(w&&w.bookingId)bookingId=w.bookingId}catch(e){}
+  const rec={bookingId:bookingId||ref,ref,room:set.map(r=>r.name).join(" + ")+(S.wantAc&&set.some(r=>!r.noAc)?" · A/C":" · Non-A/C"),rid:set[0].id,
+    dates:`${fmt(S.checkIn)} – ${fmt(S.checkOut)} · ${q.n} night${q.n>1?"s":""}`,guests:guestLine(),paid,total,balance:Math.max(0,total-paid),
+    payRef:"…"+String(resp.razorpay_payment_id||"").slice(-6),paidOn:new Date().toLocaleString("en-IN",{day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"}),
+    name:S.name.trim(),given:ACCOUNT?ACCOUNT.given:firstName(S.name),email:ACCOUNT?ACCOUNT.email:"",phone:digits,emailed:!!v.emailed};
+  saveReceipt(rec);S.lastReceipt=rec;S.paying="";S.orderAmt=0;S.ref=null;S.pick=[];go("done")}
+function payProblem(msg,resp){S.problem={msg,pay:resp&&resp.razorpay_payment_id};render();window.scrollTo({top:0,behavior:"smooth"})}
+
+/* ---------- Sign-in sheet (between "Review & pay" on the rooms list and the pay page) ---------- */
+function openSignin(next){if(ACCOUNT||GSI_FAILED){if(next)go(next);return}S.signin=true;S.afterSignin=next||null;renderSignin();
+  loadGsi().then(ok=>{if(!ok){S.signin=false;renderSignin();if(next)go(next)}else drawGoogleButtons()})}
+function renderSignin(){let el=$("#signin");if(!S.signin){if(el)el.remove();return}
+  if(!el){el=document.createElement("div");el.id="signin";el.className="sisheet";document.body.appendChild(el)}
+  el.innerHTML=`<div class="sibg" data-siclose></div><div class="sibox" role="dialog" aria-modal="true" aria-labelledby="siT">
+    <button class="sx" data-siclose aria-label="Close">${ic.close}</button>
+    <img src="img/logo-hd.webp" alt="Kutralam Ezhilagam" class="silogo">
+    <h2 id="siT">One step to your room</h2><p>Sign in with Google to reserve. It takes a second.</p>
+    <ul><li>${sm(ic.check)} Your name and email filled in for you</li><li>${sm(ic.check)} Receipt sent to your inbox</li><li>${sm(ic.check)} All your stays in one place next time</li></ul>
+    <div class="gbtn" data-text="continue_with"></div>
+    <small>We only see your name, email and photo. No posts, no contacts.</small></div>`;
+  drawGoogleButtons()}
+
 const waText=b=>`Vanakkam Shenba! I'd like to book at Kutralam Ezhilagam.\nRef: ${b.ref}\nRoom: ${b.room}\nDates: ${b.dates}\nGuests: ${b.guests}\nTotal: ${b.total} (${b.mode==="advance"?"50% advance "+b.due:"pay in full"})\nName: ${b.name}\nPhone: ${b.phone}`;
 
 /* ---------- Top tabs (moved up from the bottom) ---------- */
@@ -856,8 +1048,8 @@ function dock(){const s=S.screen;
   if(s==="room")return `<div class="twobtn"><button class="btn" data-reserve>Reserve Now ${ic.arrow}</button><button class="btn out" data-view>View Room</button></div>`;
   if(s==="rooms"){const set=picked(),cap=capOf(set),p=pax(),ok=set.length&&cap>=p,q=quote(set),w=Math.min(100,Math.round(cap/p*100));
     return `<div class="paybar"><div class="n num"><b class="small">${set.length?set.length+" room"+(set.length>1?"s":""):"No room yet"}</b><small>Sleeps ${cap} of ${p}</small><div class="capbar"><i class="${ok?"ok":""}" style="width:${w}%"></i></div></div>
-      <button class="btn" data-goto-pay ${ok?"":"disabled"}>${ok?"Continue":set.length?"Add a room":"Select a room"}<small class="num">${ok?inr(q.total):set.length?`for ${p-cap} more`:"to continue"}</small></button></div>`}
-  if(s==="pay"){const t=terms(quote(picked()));return `<button class="btn pill" data-confirm>${ic.shieldok} Reserve Now · Pay ${inr(t.now)}</button>`}
+      <button class="btn" data-goto-pay ${ok?"":"disabled"}>${ok?"Review & pay":set.length?"Add a room":"Select a room"}<small class="num">${ok?inr(q.total):set.length?`for ${p-cap} more`:"to continue"}</small></button></div>`}
+  if(s==="pay"){const why=readyToPay();return `${S.problem?`<p class="probl">${esc(S.problem.msg)}</p>`:""}<button class="btn pill paycta${why?" soft":""}" id="payBtn" data-confirm>${S.paying?`<span class="spin light"></span> ${S.paying}`:payLabel()}</button><p class="under">${why?esc(why):"You'll see the amount again on Razorpay before you pay"}</p>`}
   return ""}
 
 function render(){
@@ -867,14 +1059,18 @@ function render(){
   renderShenba();
   const q=$("#q");if(q){q.oninput=e=>{S.q=e.target.value;const box=$("#results");if(box)box.innerHTML=filtered().map(resultCard).join("")||'<div class="empty"><b>No rooms match</b>Try another word or category.</div>'};
     if(S.screen==="search"){q.focus();q.setSelectionRange(q.value.length,q.value.length)}}
-  ["gname","gphone"].forEach(id=>{const el=$("#"+id);if(el)el.oninput=e=>{S[id==="gname"?"name":"phone"]=e.target.value}});
+  const nm=$("#gname");if(nm)nm.oninput=e=>{S.name=e.target.value;refreshPayCta()};
+  const ph=$("#gphone");if(ph)ph.oninput=e=>{const v=cleanPhone(e.target.value);if(e.target.value!==v)e.target.value=v;S.phone=v;
+    const h=$("#phint"),ok=phoneOk();if(h){h.className=ok?"good":v.length===10?"bad":"";h.textContent=!v?"Your booking voucher comes here":v.length<10?`${v.length} of 10 digits`:ok?"✓ We'll send your voucher here":"A mobile number starts with 6, 7, 8 or 9"}refreshPayCta()};
+  if(GSI_READY)drawGoogleButtons();else if(document.querySelector(".gbtn"))loadGsi().then(ok=>ok?drawGoogleButtons():render());
 }
+function refreshPayCta(){const b=$("#payBtn"),u=document.querySelector(".under");if(!b||S.paying)return;const why=readyToPay();b.classList.toggle("soft",!!why);if(u)u.textContent=why||"You'll see the amount again on Razorpay before you pay"}
 function shenbaMsg(){const bits=[];
   if(S.pick.length&&["rooms","pay"].includes(S.screen))bits.push(`Rooms: ${S.pick.join(" + ")}`);else if(S.screen==="room")bits.push(`Room: ${room().name}`);
   if(S.checkIn&&S.checkOut)bits.push(`Dates: ${fmt(S.checkIn)} – ${fmt(S.checkOut)}`);
   bits.push(`Guests: ${S.adults} adult${S.adults>1?"s":""}${S.teens?", "+S.teens+" teen":""}${S.kids?", "+S.kids+" child":""}`);
   return `Vanakkam Shenba! I'm looking at Kutralam Ezhilagam.\n${bits.join("\n")}`}
-function renderShenba(){const onBar=TABS.includes(S.screen)||S.screen==="done";$("#fab").hidden=onBar;document.querySelectorAll("[data-shenba].ab").forEach(b=>b.setAttribute("aria-expanded",S.shenba));$("#sheet").classList.toggle("fromBar",onBar);$("#fab").setAttribute("aria-expanded",S.shenba);$("#sheet").hidden=!S.shenba;
+function renderShenba(){const onBar=TABS.includes(S.screen)||S.screen==="done";$("#fab").hidden=onBar||S.screen==="pay";document.querySelectorAll("[data-shenba].ab").forEach(b=>b.setAttribute("aria-expanded",S.shenba));$("#sheet").classList.toggle("fromBar",onBar);$("#fab").setAttribute("aria-expanded",S.shenba);$("#sheet").hidden=!S.shenba;
   $("#waShenba").href=`https://wa.me/${SHENBA_WA}?text=${encodeURIComponent(shenbaMsg())}`}
 function go(screen,push=true){if(push&&S.screen!==screen)HIST.push(S.screen);S.screen=screen;if(TABS.includes(screen)){S.tab=screen;HIST.length=0}render();window.scrollTo(0,0)}
 function toast(t){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2000)}
@@ -900,7 +1096,9 @@ document.addEventListener("click",e=>{
   if(d.retry!==undefined){AVAIL_ERR=false;render();loadAvail();return}
   if(d.small!==undefined){S.showSmall=true;render();return}
   if(d.wantac){S.wantAc=d.wantac==="1";render();return}
-  if(d.gotoPay!==undefined){go("pay");return}
+  if(d.gotoPay!==undefined){S.problem=null;openSignin("pay");return}
+  if(d.signout!==undefined){signOut();return}
+  if(d.siclose!==undefined){S.signin=false;S.afterSignin=null;renderSignin();return}
   if(d.reserve!==undefined){const r=room();
     if(!nights()){S.plan=1;S.anim="enter";S.want=r.name;toast("Pick your dates first");go("home");requestAnimationFrame(()=>$("#plan")?.scrollIntoView({block:"start"}));return}
     if(busyOn(r)){toast(`${r.name} is booked on your dates`);go("rooms");return}
@@ -915,25 +1113,14 @@ document.addEventListener("click",e=>{
   if(d.zoom){S.pi=+d.zoom;render();window.scrollTo({top:0,behavior:"smooth"});return}
   if(d.shenba!==undefined){S.shenba=!S.shenba;renderShenba();return}
   if(d.copy){navigator.clipboard?.writeText(d.copy).then(()=>toast("Number copied"),()=>toast(d.copy));return}
-  if(d.confirm!==undefined){const digits=S.phone.replace(/\D/g,"").slice(-10);
-    if(S.name.trim().length<3){toast("Enter the name the room should be under");$("#gname").focus();return}
-    if(!/^[6-9][0-9]{9}$/.test(digits)){toast("Enter a 10-digit WhatsApp number");$("#gphone").focus();return}
-    const set=picked(),q=quote(set),t=terms(q),full=S.payMode==="full";
-    /* The real payment runs on the booking page: Prime prices the stay again, Razorpay takes the money,
-       Prime writes the booking and Shenba sends the voucher. The guest lands straight in the checkout. */
-    const u=new URLSearchParams({ci:iso(S.checkIn),co:iso(S.checkOut),ad:String(S.adults+S.teens),ch:String(S.kids),
-      rooms:set.map(r=>r.name).join(","),ac:S.wantAc&&set.some(r=>!r.noAc)?"1":"0",part:full?"0":"1",name:S.name.trim(),phone:digits,go:"pay"});
-    S.bookings.unshift({rid:set[0].id,ref:"",room:`${set.map(r=>r.name).join(" + ")} · ${S.wantAc&&set.some(r=>!r.noAc)?"A/C":"Non-A/C"}`,dates:`${fmt(S.checkIn)} – ${fmt(S.checkOut)} (${q.n}N)`,
-      guests:`${S.adults}A${S.teens?" + "+S.teens+"T":""}${S.kids?" + "+S.kids+"C":""}`,total:inr(full?t.full:q.total),mode:S.payMode,status:"Sent to secure checkout"});
-    store.set("bookings",S.bookings.slice(0,10));
-    location.href="/book?"+u.toString();return}
+  if(d.confirm!==undefined){startPayment();return}
 });
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-room][role=button]")){e.preventDefault();e.target.click()}});
 $("#sheet").querySelector("[aria-label=Close]").innerHTML=ic.close;
 $("#sheet a.p").insertAdjacentHTML("afterbegin",ic.mic);$("#waShenba").insertAdjacentHTML("afterbegin",ic.chat);
 $("#shenImg").src=SHENBA_IMG;$("#shenImg2").src=SHENBA_IMG;
-render();startCarousel();loadAvail();
-
+render();startCarousel();loadAvail();if(CFG.GOOGLE_CLIENT_ID){loadGsi();refreshSignin()}else GSI_FAILED=true;
+if(location.hash==="#bookings")go("bookings");
 /* Logo intro: once per visit, never on a deep link, skipped for reduced motion. Same rhythm as index.html:
    clip plays (3.3 s), line + caption + CloudNest pill rise, then the white screen lifts away. */
 (function(){const el=$("#intro");let seen=false;try{seen=sessionStorage.getItem("liteIntro")==="1"}catch(e){}
