@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v7.2 — 26 Oct 2026
+
+**60% advance on the lite site** (Rakesh). On "Review & pay" the guest chooses once: "Pay in full" (Recommended, nothing to pay at the desk) or "Pay 60% now" (shows the balance to pay before check-in). Prime takes exactly 60% for the advance and records the booking as Partial Advance with the balance, so the check-in screen asks for the balance and the 4:15 PM pending-balance reminder lists it. The receipt shows "Advance paid" and the balance before check-in.
+
 ## v7.1 — 26 Oct 2026
 
 **Pay on the same page, no second payment screen** (Rakesh). On the lite site, "Review & pay" now opens Razorpay right on the page. The old booking page no longer appears in between asking to pay again. Prime prices the stay, Razorpay takes the money, Prime writes the booking, and the guest lands on "You're booked!" with a receipt (booking ID, room, stay, guests, amount, Razorpay reference).
