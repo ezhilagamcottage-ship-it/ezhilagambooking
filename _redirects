@@ -23,3 +23,6 @@
 
 # Lite mobile site (v7.0, 26 Oct 2026). Phones are sent here from the home page after which it plays the logo intro.
 /lite         /lite.html    200
+
+# Privacy page (needed for Google sign-in), 26 Oct 2026
+/privacy      /privacy.html 200
