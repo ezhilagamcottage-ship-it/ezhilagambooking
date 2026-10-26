@@ -1356,8 +1356,26 @@ function stepDates(app) {
   if (!S.busy && !S.modal) startPrefetch().then(render);
 }
 
+/* v6.7 (Rakesh, 26 Oct): a smile while rooms are checked - a different polite line each time, changing every ~2.4 s */
+const WAIT_LINES = ["Peeking into our nine rooms for you…", "Fluffing the pillows while we check your dates…", "Asking the falls which rooms are free… 🌊", "Counting the cosy corners for your stay…", "Checking the room keys at the front desk…", "Brewing a fresh filter coffee while we look… ☕", "Making sure the best room is waiting just for you…", "Our front desk is checking the calendar for you…", "Opening the guest register for your dates…", "Finding you a room with a view of the hills… ⛰️", "Just a moment — rolling out the welcome mat…", "Looking for the perfect room for your family…", "Tidying up the availability chart for you…", "Checking which doors are ready to welcome you…", "Lining up the best rooms for your dates…", "A quick look at the bookings — almost there…", "Gathering fresh towels and free rooms…", "Smiling at the calendar and checking your dates… 😊", "Polishing the door handles while we check…", "Listening to the falls and checking our rooms…", "Our rooms are lining up to meet you…", "Checking the cosiest rooms in Courtallam…", "Placing jasmine at the door while we look… 🌼", "One moment — saving you the best stay in Courtallam…"];
+let waitLast = -1;
+function waitLine() {
+  let i = Math.floor(Math.random() * WAIT_LINES.length);
+  if (i === waitLast) i = (i + 1 + Math.floor(Math.random() * (WAIT_LINES.length - 1))) % WAIT_LINES.length;
+  waitLast = i; return WAIT_LINES[i];
+}
+/* keep an element's text rotating while it is on the page */
+function waitRotate(el) {
+  el.textContent = waitLine();
+  const t = setInterval(() => {
+    if (!el.isConnected) return clearInterval(t);
+    el.style.opacity = "0";
+    setTimeout(() => { el.textContent = waitLine(); el.style.opacity = "1"; }, 250);
+  }, 2400);
+}
+
 function drawRooms(list) {
-  if (S.loading) { list.appendChild($(`<p class="loading">Checking what is free…</p>`)); return; }
+  if (S.loading) { const p = $(`<p class="loading" style="transition:opacity .25s;font-size:15px"></p>`); list.appendChild(p); waitRotate(p); return; }
   if (!S.busy) return;
   const nights = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
   const free = freeRooms();
@@ -1607,7 +1625,7 @@ function openModal() {
       /* If the prefetch has already landed this resolves instantly and the
          list is simply there. If the signal was slow we say so rather than
          showing an empty page that looks like "nothing is free". */
-      if (!S.busy) { btn.textContent = "Checking availability…"; await startPrefetch(); }
+      if (!S.busy) { btn.style.transition = "opacity .25s"; waitRotate(btn); await startPrefetch(); }
       S.modal = 0; render();
     };
     panel.appendChild($(`<button class="mback">Back to dates</button>`));

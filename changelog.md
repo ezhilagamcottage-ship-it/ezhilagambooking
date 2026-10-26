@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v6.7 — 26 Oct 2026
+
+**A smile while rooms are checked** (Rakesh). Instead of "Checking what is free…" the guest sees one of 24 polite, warm lines picked at random and changing every few seconds — e.g. "Peeking into our nine rooms for you…", "Fluffing the pillows while we check your dates…", "Brewing a fresh filter coffee while we look… ☕", "Placing jasmine at the door while we look… 🌼", "One moment — saving you the best stay in Courtallam…". The same lines show on the "Find available rooms" button while it waits.
+
 ## v6.6 — 26 Oct 2026
 
 **PIN code before City** (Rakesh). The PIN code box now comes above City, so the city fills itself as soon as the 6th digit is typed ("City filled from the PIN code — change it if needed"; 641001 → Coimbatore, 600088 → Chennai). Changing the PIN updates a city it filled; a city the guest typed is never replaced. Typing the city first still offers the suggestions list and fills the PIN.
