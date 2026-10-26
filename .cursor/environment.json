@@ -1,0 +1,16 @@
+{
+  "name": "Ezhilagam Booking Site",
+  "install": "bash .cursor/scripts/install.sh",
+  "terminals": [
+    {
+      "name": "static-server",
+      "command": "python3 -m http.server 8080 --bind 0.0.0.0"
+    }
+  ],
+  "ports": [
+    {
+      "name": "site",
+      "port": 8080
+    }
+  ]
+}
