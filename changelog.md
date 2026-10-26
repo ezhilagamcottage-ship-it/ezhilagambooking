@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v6.3 — 26 Oct 2026
+
+**No street address on the booking form** (Rakesh). Step 2 now asks only for name, WhatsApp number, city and PIN code. The full address is on the original photo ID every adult shows at check-in, so the guest is not asked for it twice; city and PIN still go to the booking sheet as before.
+
 ## v5.8 — 25 Oct 2026
 
 **Rooftop wording** (Rakesh). "Blue-lit rooftop terrace" is now **"Spacious rooftop terrace"**; the description now reads "A spacious open terrace under a pergola for the whole family to relax together, with soft ambient lights in the evening and the hills all around." The welcome line says "relax with your family on the spacious rooftop terrace in the evening", and the photo description matches.

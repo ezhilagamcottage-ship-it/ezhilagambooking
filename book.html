@@ -628,10 +628,9 @@ header{margin-bottom:10px;text-align:center}
   .roomrow:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(28,25,23,.1);border-color:#d6d3d1}
   .roomrow .rthumb{width:72px;height:72px;border-radius:12px;object-fit:cover;flex:none;background:#e7e5e4}
   #rooms>.award{max-width:420px;justify-self:center;margin-top:14px!important}
-  /* step 2: the form in two columns, address across both */
+  /* step 2: the form in two columns (v6.3: no street address - it is on the photo ID checked at the desk) */
   section.step>.card.stack:has(input[data-f="name"]){display:grid;grid-template-columns:1fr 1fr;gap:16px 18px}
   section.step>.card.stack:has(input[data-f="name"])>*{margin:0}
-  section.step>.card.stack:has(input[data-f="name"])>label:has([data-f="address"]),
   section.step>.card.stack:has(input[data-f="name"])>.fine{grid-column:1/-1}
   /* step 3: what you are paying for on the left, how to pay on the right */
   section.step:has(#paycard){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:22px;align-items:start}
@@ -1719,7 +1718,6 @@ function stepGuest(app) {
     <div class="card stack">
       ${[["name","Full name","text","As on your ID"],
          ["phone","WhatsApp number","tel","10 digits"],
-         ["address","Address","text","House / street"],
          ["city","City","text","e.g. Chennai"],
          ["pin","PIN code","tel","6 digits"]].map(([k,l,t,ph]) => `
         <label><span class="lbl">${l}</span>
@@ -2320,7 +2318,7 @@ function n8nPayload(extra) {
     guest: S.guest.name.trim(),
     phone: S.guest.phone,
     waNumber: "91" + S.guest.phone,
-    address: [S.guest.address, S.guest.city].filter(Boolean).join(", "),
+    address: S.guest.city,
     pin: S.guest.pin,
     idType: S.guest.idType,
     idLast4: S.guest.idLast4,
@@ -3423,7 +3421,7 @@ async function holdRoom(extra, settleState) {
         action: "webBooking",
         name: S.guest.name.trim(),
         phone: S.guest.phone,
-        city: [S.guest.address, S.guest.city].filter(Boolean).join(", "),
+        city: S.guest.city,
         pin: S.guest.pin,
         room: S.pick.join(","),
         checkIn: S.checkIn, checkOut: S.checkOut,
