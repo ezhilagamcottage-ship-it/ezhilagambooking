@@ -1237,6 +1237,18 @@ const S = {
       if (ad >= 1 && ad <= 40) S.adults = ad;
       if (ch >= 0 && ch <= 20) S.children = ch;
       S.modal = 0;
+      /* v7.0: the lite site hands over the rooms, A/C, payment choice and the guest, so the guest
+         lands straight on payment instead of answering everything twice. Each value is checked
+         here; anything that does not fit is simply not used. */
+      var picks = (q.get("rooms") || "").split(",").filter(function (n) { return ROOMS.some(function (r) { return r.name === n; }); });
+      if (picks.length) {
+        S.pick = picks; S.wantAc = q.get("ac") === "1"; S.partPay = q.get("part") === "1";
+        var nm = (q.get("name") || "").trim().slice(0, 60), ph = (q.get("phone") || "").replace(/\D/g, "").slice(-10);
+        if (nm.length >= 3) S.guest.name = nm;
+        if (/^[6-9][0-9]{9}$/.test(ph)) S.guest.phone = ph;
+        S.step = S.guest.name && S.guest.phone ? 3 : 2;
+        S.fromLite = q.get("go") === "pay" && S.step === 3;
+      }
     }
   } catch (e) {}
 })();
@@ -2156,7 +2168,7 @@ function stepPay(app) {
       </dl>
       <label class="row" style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px">
         <input id="part" type="checkbox" ${S.partPay ? "checked" : ""}>
-        <span style="font-size:13px;font-weight:600">Pay ${CFG.ADVANCE_PC}% now, the rest at check-in</span>
+        <span style="font-size:13px;font-weight:600">Pay ${CFG.ADVANCE_PC}% now, balance before check-in</span>
       </label>
     </div>
 
@@ -3605,5 +3617,7 @@ function fail(msg) {
 const _render = render;
 render = function () { _render(); foot(); };
 render();
+/* v7.0: coming from the lite site with everything filled in, open the secure checkout at once */
+if (S.fromLite) { S.fromLite = false; setTimeout(function () { var b = document.querySelector("#next"); if (b && S.step === 3) payByCard(b); }, 600); }
 </script>
 </body></html>

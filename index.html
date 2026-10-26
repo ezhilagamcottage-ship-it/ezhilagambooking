@@ -2,6 +2,12 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>
+/* v7.0: phones get the lite site (/lite), which opens with the same logo intro. ?full=1 or the
+   "Full website" link keeps the full site for the rest of the visit; deep links (#talk, #chat, …) stay here. */
+(function(){try{var q=location.search;if(/[?&]full=1/.test(q))sessionStorage.setItem("fullSite","1");
+  if(sessionStorage.getItem("fullSite")!=="1"&&!location.hash&&window.matchMedia("(max-width: 820px)").matches)location.replace("/lite"+q);}catch(e){}})();
+</script>
 <title>Kutralam Ezhilagam · Courtallam</title>
 <meta name="description" content="Comfortable stay near Courtallam Main Falls. A/C and Non A/C rooms, family friendly, 24/7 power backup. Book direct.">
 <meta name="theme-color" content="#faf9f7">

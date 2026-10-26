@@ -7,6 +7,20 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v7.0 — 26 Oct 2026
+
+**New lite site for phones** (Rakesh). Phones opening kutralamezhilagam.com now go to `/lite`, which plays the same logo intro and then opens a new maroon-and-beige page:
+- A short introduction to the hotel with the full building photo, four highlights, and a room carousel that crossfades through all nine rooms with the nightly rate, a one-line description and the features of each.
+- Tabs at the top (Home, Rooms, Favorites, Bookings) and two big buttons at the bottom that stay on screen: Talk with Shenba and Reserve Now.
+- Reserve Now opens the dates on the home page (calendar with a sweep animation), then the guests (Adult / Teenager / Children), then shows only the rooms that are free on those dates and sleep the group, in Budget (studios) and Luxury (suites), with a Budget pick and a Luxury pick worked out the same way as the booking page.
+- Payment: Pay in full is chosen by default and marked Recommended; the 60% advance shows the balance to be paid before check-in. Reserve Now · Pay opens the same secure Razorpay checkout as the booking page, with the rooms, dates and guest already filled in, so Prime writes the booking and the voucher goes out as before.
+- Aambal and Shenbagam never offer A/C. Free rooms come live from Prime (publicAvail); rates are the booking page's own.
+- "Full website" at the foot of the lite page (or `?full=1`) keeps the full site for the rest of the visit; links with #talk, #chat and the rest still open the full site.
+
+**Payment page in the website colours.** `/pay` (the page Shenba's links open) is now maroon instead of green, with the same fonts as the lite site, and Razorpay's checkout window uses the maroon too.
+
+**Booking page.** Accepts the rooms, A/C, payment choice, name and number from the lite site and opens the checkout straight away. The advance line now reads "balance before check-in".
+
 ## v6.8 — 26 Oct 2026
 
 **Shenba's first words are heard** (Rakesh). On phones, tapping Talk started her intro and opened the microphone at the same moment; opening the mic switches the phone's speaker into call mode, which swallowed the first few seconds of her voice. Now the microphone opens first (the "allow microphone" question comes first on a first visit), the phone gets half a second to settle, and only then does she start speaking — so her greeting is heard from the first word. If the microphone is refused she still greets and the call explains how to allow it.
