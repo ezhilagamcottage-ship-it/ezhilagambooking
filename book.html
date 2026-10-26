@@ -1712,6 +1712,16 @@ async function loadAvail() {
 }
 
 /* ── step 2 ───────────────────────────────────────────────────────────── */
+/* v6.4: an Indian mobile is 10 digits starting 6, 7, 8 or 9 */
+function phoneOk(p) { return /^[6-9][0-9]{9}$/.test(p || ""); }
+function phoneHint(box) {
+  const h = box.querySelector(".phhint"); if (!h) return;
+  const p = S.guest.phone || "";
+  if (!p) { h.textContent = "10-digit mobile number, numbers only"; h.style.color = "#78716c"; }
+  else if (!/^[6-9]/.test(p)) { h.textContent = "A mobile number starts with 6, 7, 8 or 9"; h.style.color = "#b91c1c"; }
+  else if (p.length < 10) { h.textContent = p.length + " of 10 digits"; h.style.color = "#b45309"; }
+  else { h.textContent = "✓ 10 digits"; h.style.color = "#15803d"; }
+}
 function stepGuest(app) {
   const f = S.guest;
   const box = $(`<section class="step">
@@ -1721,7 +1731,7 @@ function stepGuest(app) {
          ["city","City","text","e.g. Chennai"],
          ["pin","PIN code","tel","6 digits"]].map(([k,l,t,ph]) => `
         <label><span class="lbl">${l}</span>
-          <input data-f="${k}" type="${t}" value="${f[k]}" placeholder="${ph}"></label>`).join("")}
+          <input data-f="${k}" type="${t}" value="${f[k]}" placeholder="${ph}"${k === "phone" ? ' inputmode="numeric" pattern="[0-9]*" maxlength="14" autocomplete="tel-national"' : k === "pin" ? ' inputmode="numeric" pattern="[0-9]*" maxlength="6"' : ""}>${k === "phone" ? '<small class="phhint" style="display:block;margin-top:6px;font-size:13px;color:#78716c"></small>' : ""}</label>`).join("")}
 
       <p class="fine">Bring an original photo ID for every adult — it is checked in person at check-in.</p>
     </div></section>`);
@@ -1734,11 +1744,18 @@ function stepGuest(app) {
       e.target.value = S.guest.idLast4; return;
     }
     const k = i.dataset.f; let v = e.target.value;
-    if (k === "phone") v = v.replace(/\D/g, "").slice(-10);
-    if (k === "pin") v = v.replace(/\D/g, "").slice(0, 6);
+    /* v6.4 (Rakesh, 26 Oct): digits only, a pasted +91 / 0 is dropped, never more than 10, live count */
+    if (k === "phone") {
+      v = v.replace(/\D/g, "");
+      if (v.length > 10 && v.startsWith("91")) v = v.slice(2);
+      if (v.length > 10 && v.startsWith("0")) v = v.slice(1);
+      v = v.slice(0, 10); e.target.value = v; S.guest.phone = v; phoneHint(box);
+    }
+    if (k === "pin") { v = v.replace(/\D/g, "").slice(0, 6); e.target.value = v; }
     S.guest[k] = v;
   });
   app.appendChild(box);
+  phoneHint(box);
 }
 
 
@@ -3400,7 +3417,8 @@ async function advanceStep() {
   if (S.step === 2) {
     const g = S.guest;
     if (g.name.trim().length < 3) return fail("Please give the name the room should be under.");
-    if (g.phone.length !== 10) return fail("A 10-digit WhatsApp number, please — the voucher goes there.");
+    if (!phoneOk(g.phone)) return fail(g.phone.length !== 10 ? "A 10-digit WhatsApp number, please — the voucher goes there."
+                                                         : "That is not a mobile number — it should start with 6, 7, 8 or 9.");
     if (g.pin && g.pin.length !== 6) return fail("A PIN code is 6 digits.");
     S.step = 3; return render();
   }

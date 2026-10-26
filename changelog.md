@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v6.4 — 26 Oct 2026
+
+**WhatsApp number checked as you type** (Rakesh). The box takes numbers only (letters and spaces are dropped, the phone shows the number pad), a pasted +91 or leading 0 is removed, and it stops at 10 digits. A line under the box shows "5 of 10 digits", "✓ 10 digits", or "A mobile number starts with 6, 7, 8 or 9". Continue to payment only goes ahead with a real 10-digit mobile number. PIN code also takes numbers only.
+
 ## v6.3 — 26 Oct 2026
 
 **No street address on the booking form** (Rakesh). Step 2 now asks only for name, WhatsApp number, city and PIN code. The full address is on the original photo ID every adult shows at check-in, so the guest is not asked for it twice; city and PIN still go to the booking sheet as before.
