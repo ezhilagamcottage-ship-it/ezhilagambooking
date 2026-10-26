@@ -912,7 +912,7 @@ const cleanPhone=v=>{v=String(v||"").replace(/\D/g,"");return v.length>10?v.slic
 const phoneDigits=()=>cleanPhone(S.phone);
 const phoneOk=()=>/^[6-9]\d{9}$/.test(phoneDigits());
 function readyToPay(){if(!picked().length||!nights())return"Pick your dates and room";
-  if(!ACCOUNT&&!GSI_FAILED)return"Sign in with Google to continue";
+  if(!ACCOUNT&&!GSI_FAILED&&!S.noGoogle)return"Sign in with Google to continue";
   if(String(S.name||"").trim().length<3)return"Add the name the room is under";
   if(!phoneOk())return"Add your 10-digit WhatsApp number";return""}
 
@@ -930,7 +930,7 @@ V.pay=()=>{if(ACCOUNT&&!S.name)S.name=ACCOUNT.name||"";const set=picked(),q=quot
   <section class="card stack rise" style="--i:1;gap:12px"><h3 style="margin:0">Who's checking in?</h3>
     ${ACCOUNT?`<div class="acct">${avatar(ACCOUNT,40)}<div><b>${esc(ACCOUNT.name||ACCOUNT.given)}</b><span>${esc(ACCOUNT.email)}</span></div><button class="link" data-signout>Not you?</button></div>`
       :GSI_FAILED?`<p class="hint" style="margin:0">Google sign-in is not available right now. Fill in your name and WhatsApp number to continue.</p>`
-      :`<div class="gwrap"><div class="gbtn" data-text="continue_with"></div><p>We'll email your receipt and keep your bookings in one place.</p></div>`}
+      :S.noGoogle?`<p class="hint" style="margin:0">Booking without Google: your voucher comes on WhatsApp. <button class="link" data-usegoogle style="padding:0">Sign in with Google</button></p>`:`<div class="gwrap"><div class="gbtn" data-text="continue_with"></div><p>We'll email your receipt and keep your bookings in one place.</p><button class="link" data-nogoogle>Continue without Google</button></div>`}
     <div class="field"><label for="gname">Name on the booking</label><input id="gname" autocomplete="name" placeholder="As on your photo ID" value="${esc(S.name||"")}"></div>
     <div class="field"><label for="gphone">WhatsApp number</label><div class="phonein"><span>+91</span><input id="gphone" inputmode="numeric" autocomplete="tel-national" maxlength="18" placeholder="10-digit mobile" value="${esc(pd)}"></div>
       <small id="phint" class="${pd&&!phoneOk()&&pd.length===10?"bad":phoneOk()?"good":""}">${pmsg}</small></div></section>
@@ -1020,7 +1020,7 @@ async function finishPayment(resp,ctx){setBusy("Confirming your booking…");
 function payProblem(msg,resp){S.problem={msg,pay:resp&&resp.razorpay_payment_id};render();window.scrollTo({top:0,behavior:"smooth"})}
 
 /* ---------- Sign-in sheet (between "Review & pay" on the rooms list and the pay page) ---------- */
-function openSignin(next){if(ACCOUNT||GSI_FAILED){if(next)go(next);return}S.signin=true;S.afterSignin=next||null;renderSignin();
+function openSignin(next){if(ACCOUNT||GSI_FAILED||S.noGoogle){if(next)go(next);return}S.signin=true;S.afterSignin=next||null;renderSignin();
   loadGsi().then(ok=>{if(!ok){S.signin=false;renderSignin();if(next)go(next)}else drawGoogleButtons()})}
 function renderSignin(){let el=$("#signin");if(!S.signin){if(el)el.remove();return}
   if(!el){el=document.createElement("div");el.id="signin";el.className="sisheet";document.body.appendChild(el)}
@@ -1030,7 +1030,7 @@ function renderSignin(){let el=$("#signin");if(!S.signin){if(el)el.remove();retu
     <h2 id="siT">One step to your room</h2><p>Sign in with Google to reserve. It takes a second.</p>
     <ul><li>${sm(ic.check)} Your name and email filled in for you</li><li>${sm(ic.check)} Receipt sent to your inbox</li><li>${sm(ic.check)} All your stays in one place next time</li></ul>
     <div class="gbtn" data-text="continue_with"></div>
-    <small>We only see your name, email and photo. <a href="/privacy">Privacy</a></small></div>`;
+    <small>We only see your name, email and photo. <a href="/privacy">Privacy</a></small><button class="link" data-nogoogle>Continue without Google</button></div>`;
   drawGoogleButtons()}
 
 const waText=b=>`Vanakkam Shenba! I'd like to book at Kutralam Ezhilagam.\nRef: ${b.ref}\nRoom: ${b.room}\nDates: ${b.dates}\nGuests: ${b.guests}\nTotal: ${b.total} (${b.mode==="advance"?"50% advance "+b.due:"pay in full"})\nName: ${b.name}\nPhone: ${b.phone}`;
@@ -1098,6 +1098,8 @@ document.addEventListener("click",e=>{
   if(d.wantac){S.wantAc=d.wantac==="1";render();return}
   if(d.gotoPay!==undefined){S.problem=null;openSignin("pay");return}
   if(d.signout!==undefined){signOut();return}
+  if(d.nogoogle!==undefined){S.noGoogle=true;const n=S.afterSignin;S.signin=false;S.afterSignin=null;renderSignin();if(n&&S.screen!==n)go(n);else render();return}
+  if(d.usegoogle!==undefined){S.noGoogle=false;render();return}
   if(d.siclose!==undefined){S.signin=false;S.afterSignin=null;renderSignin();return}
   if(d.reserve!==undefined){const r=room();
     if(!nights()){S.plan=1;S.anim="enter";S.want=r.name;toast("Pick your dates first");go("home");requestAnimationFrame(()=>$("#plan")?.scrollIntoView({block:"start"}));return}
