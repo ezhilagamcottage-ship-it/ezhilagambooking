@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v8.2 — 27 Oct 2026
+
+**Gold logo on the computer home page** (Rakesh). The Kutralam Ezhilagam logo keeps its shape and size (four bars, two-line lettering) but now uses the site's gold: bars in four gold shades, "Kutralam" light gold, "Ezhilagam" rich gold, straight on the navy page with no white box (`img/logo-gold.webp`). The opening starts in the logo's own colours and turns gold as it glides into place. Phones, the opening video and the payment page keep the original colours.
+
 ## v8.1 — 27 Oct 2026
 
 **Right-side window on the computer home page** (Rakesh). Shenba stands on the left, the welcome sits in the middle, and the frame on the right is a window: Rooms, Gallery, Location, Contact, Chat with Shenba and Reserve open inside it with a small right-to-left page turn and the paper sound, while the rest of the page stays still. Home or the × on a window page goes back to the photos. Below about 1180 px wide Shenba's figure is hidden and the floating Talk card shows instead.
