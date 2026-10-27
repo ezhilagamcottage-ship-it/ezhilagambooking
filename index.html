@@ -1385,6 +1385,7 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   @media (prefers-reduced-motion:reduce){ .kh-shenba,.kh-sh-bub,#khFab,#khFab::after{animation:none} }
 }
 
+.sa-retry{border:0;border-radius:999px;padding:6px 14px;margin:0 2px;cursor:pointer;background:#0f7a6e;color:#fff;font:inherit;font-weight:800;font-size:13px}
 /* ══ v8.2 (Rakesh, 27 Oct 15:20): the logo in the site's gold, same size and shape, no white box (computers) ══ */
 @media (min-width:900px){
   html.ts .ts-logo{background:none;box-shadow:none;padding:10px 4px}
@@ -2534,7 +2535,7 @@ function saState(st, text) {
   if (text != null) { $("saStat").textContent = text; $("scStat").textContent = text; }
 }
 function saWhatsApp(msg) {
-  const h = esc(msg) + ' <a href="' + WA_SHENBA + '">WhatsApp her</a>';
+  const h = esc(msg) + ' <button type="button" class="sa-retry" data-retry>Try again</button> or <a href="' + WA_SHENBA + '">WhatsApp her</a>';
   $("saStat").innerHTML = h; $("scStat").innerHTML = h;
 }
 
@@ -2832,7 +2833,7 @@ function swIntro() {
       const stop = setInterval(() => { if (!calling) { clearInterval(stop); try { v.pause(); } catch (e) {} fin(); } }, 200);
       v.addEventListener("ended", () => clearInterval(stop), { once: true });
     });
-    if (!calling) { $("sbCall").classList.remove("kh-in"); sw.style.visibility = "hidden"; sw.classList.remove("vid"); swClear(); swBusy = false; return true; }
+    if (!calling) { $("sbCall").classList.remove("kh-in"); face.style.opacity = ""; sw.style.visibility = "hidden"; sw.classList.remove("vid"); swClear(); swBusy = false; return true; }
     await swShrink();
     if (starting) saState("connecting", "Connecting…");   // the server is still opening the call
     return true;
@@ -2959,7 +2960,9 @@ function playOutro() {
 }
 $("ozHome").addEventListener("click", ozDone);
 
+let voiceRetried = false;
 function openCall(start) {
+  voiceRetried = false;
   if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
   openDlg($("sbCall")); trapBack(); $("scThanks").hidden = true;
   if (calling || starting) return;
@@ -3496,6 +3499,7 @@ async function startVoice(resume, viaTap, serverOnly) {
     calling = false; stopPlay(); if (rec) { try { rec.stop(); } catch (x) {} }
     saState("error");
     if (e && e.name === "NotAllowedError") { $("saStat").textContent = "Mic blocked · call 99622 22415"; $("scStat").textContent = "Microphone is blocked. Allow it in your browser, or call 99622 22415."; }
+    else if (!voiceRetried) { voiceRetried = true; console.warn("Shenba voice failed, retrying on our server", e && (e.message || e)); setTimeout(() => { if (!calling && !starting && $("sbCall").open) startVoice(false, false, true); }, 700); }
     else saWhatsApp("Voice is not available right now.");
   } finally { starting = false; }
 }
@@ -3518,6 +3522,7 @@ async function endVoice(msg) {
 /* Talk opens the call page; the call (and the mic question) starts with that tap */
 face.addEventListener("click", async () => { await endChat(); openCall(true); });
 dock.addEventListener("click", e => { if (!face.contains(e.target) && !$("saMin").contains(e.target)) face.click(); });
+document.addEventListener("click", e => { if (e.target.closest("[data-retry]") && !calling && !starting) { voiceRetried = false; if (!$("sbCall").open) openCall(false); startVoice(false, true); } });
 $("scFace").addEventListener("click", () => { if (src) { stopPlay(); return; } if (!calling && !starting) startVoice(); });
 $("scEnd").addEventListener("click", () => endVoice());
 $("scX").addEventListener("click", async () => { if (await closeShenba("call")) untrap(); });
