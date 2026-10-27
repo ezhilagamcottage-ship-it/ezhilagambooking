@@ -1620,8 +1620,8 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
           <section class="khw-p" data-p="rooms" aria-label="Rooms"><header class="khw-h"><h2>Our rooms</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b" id="khRoomsSlot"></div></section>
           <section class="khw-p" data-p="gallery" aria-label="Gallery"><header class="khw-h"><h2>Gallery</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b"><p class="khw-lead">Tap a photo to see it large.</p><div class="khg"><button type="button" class="khg-i" data-i="0"><img src="img/photos/facade-dusk.webp" alt="Kutralam Ezhilagam at dusk" loading="lazy"><span>Kutralam Ezhilagam at dusk</span></button><button type="button" class="khg-i" data-i="1"><img src="img/photos/hill-view-window.webp" alt="Two beds beside a wide window on to the Courtallam hills" loading="lazy"><span>Two beds beside a wide window on to the Courtallam hills</span></button><button type="button" class="khg-i" data-i="2"><img src="img/photos/marutham-king-bed.webp" alt="Marutham, a teak king bed" loading="lazy"><span>Marutham, a teak king bed</span></button><button type="button" class="khg-i" data-i="3"><img src="img/photos/twin-beds-teak.webp" alt="Two teak beds with fresh linen" loading="lazy"><span>Two teak beds with fresh linen</span></button><button type="button" class="khg-i" data-i="4"><img src="img/photos/suite-living-tv.webp" alt="The suite sitting room, the bedroom beyond" loading="lazy"><span>The suite sitting room, the bedroom beyond</span></button><button type="button" class="khg-i" data-i="5"><img src="img/photos/bed-lamp-door.webp" alt="A double bed with a wall lamp" loading="lazy"><span>A double bed with a wall lamp</span></button><button type="button" class="khg-i" data-i="6"><img src="img/photos/paalai-two-beds.webp" alt="Paalai, two double beds" loading="lazy"><span>Paalai, two double beds</span></button><button type="button" class="khg-i" data-i="7"><img src="img/photos/bed-red-cushions-window.webp" alt="A double bed by the window" loading="lazy"><span>A double bed by the window</span></button><button type="button" class="khg-i" data-i="8"><img src="img/photos/paalai-twin-beds-tv.webp" alt="Paalai, two beds facing the TV" loading="lazy"><span>Paalai, two beds facing the TV</span></button><button type="button" class="khg-i" data-i="9"><img src="img/photos/suite-kitchen.webp" alt="The suite's own kitchen" loading="lazy"><span>The suite's own kitchen</span></button><button type="button" class="khg-i" data-i="10"><img src="img/photos/suite-sitting-room.webp" alt="The suite's sitting room" loading="lazy"><span>The suite's sitting room</span></button><button type="button" class="khg-i" data-i="11"><img src="img/photos/bed-close.webp" alt="Fresh linen and a red quilt" loading="lazy"><span>Fresh linen and a red quilt</span></button><button type="button" class="khg-i" data-i="12"><img src="img/photos/bed-towel.webp" alt="A rolled towel on the bed" loading="lazy"><span>A rolled towel on the bed</span></button><button type="button" class="khg-i" data-i="13"><img src="img/photos/bathroom.webp" alt="An attached bathroom with a water heater" loading="lazy"><span>An attached bathroom with a water heater</span></button></div></div></section>
           <section class="khw-p" data-p="location" aria-label="Location"><header class="khw-h"><h2>Find us in Courtallam</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b">
-            <div class="khv-map" id="khMapBox"><div id="khMap" role="img" aria-label="Map: the road from Tenkasi to Kutralam Ezhilagam, 6.7 km"></div><iframe hidden title="Kutralam Ezhilagam on the map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-fallback="https://maps.google.com/maps?q=8.9338032,77.264358&amp;z=17&amp;output=embed"></iframe>
-              <div class="khm-card" id="khmCard"><b>Kutralam Ezhilagam</b><span>6.7 km by road from Tenkasi</span></div>
+            <div class="khv-map" id="khMapBox"><div id="khMap" role="img" aria-label="Map: the road from Tenkasi Railway Station to Kutralam Ezhilagam, 6.9 km"></div><iframe hidden title="Kutralam Ezhilagam on the map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-fallback="https://maps.google.com/maps?q=8.9338032,77.264358&amp;z=17&amp;output=embed"></iframe>
+              <div class="khm-card" id="khmCard"><b>Kutralam Ezhilagam</b><span>6.9 km by road from Tenkasi Railway Station</span></div>
               <button type="button" class="khm-play" id="khmPlay" hidden>&#8635; Play the drive again</button></div>
             <p class="khv-big">No 46, Vairams Nagar, Five Falls Road, Courtallam</p>
             <ul class="khv-list"><li>Near the Vairams Nagar arch</li><li>A short walk to Courtallam Main Falls</li><li>Limited parking, first come first served</li></ul>
@@ -2516,6 +2516,9 @@ $("sbForm").addEventListener("submit", async ev => {
 });
 
 $("sbChatX").addEventListener("click", async () => { if (await closeShenba("chat")) untrap(); });
+/* v8.7 (computer): X only puts the chat away — reopening carries on; "End chat" ends it and starts fresh next time */
+window.__sbHideChat = () => { closeDlg($("sbChat")); untrap(); };
+window.__sbEndChat = async () => { if (await closeShenba("chat")) { untrap(); chat = null; history.length = 0; $("sbLog").innerHTML = ""; } };
 addEventListener("pagehide", () => { if (pendingResume()) return; bye(chat); bye(session); });   // a code is pending: keep the conversation
 $("sbLog").addEventListener("click", e => { if (e.target.dataset.talk) { e.preventDefault(); goVoice(); } });
 $("sbToVoice").addEventListener("click", () => goVoice());
@@ -3995,7 +3998,7 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   requestAnimationFrame(function(){ glide(cur,true); }); addEventListener("resize",function(){ glide(cur,true); });
   window.__khShowPane=show;
   /* Chat with Shenba opens inside the window instead of on top of the page */
-  if(chat&&cslot){ cslot.appendChild(chat);
+  if(false&&chat&&cslot){ cslot.appendChild(chat);
     chat.showModal=function(){ if(!this.open) HTMLDialogElement.prototype.show.call(this); show("chat"); };
     chat.addEventListener("close",function(){ if(cur==="chat") show("home"); });
   }
@@ -4005,6 +4008,7 @@ if (location.hash === "#talk") openCall(_fromAlbum);
     var v=t.dataset.kv || (t.dataset.ts==="reserve"||t.id==="tsReserve"?"reserve":t.dataset.ts==="rooms"?"rooms":null);
     if(!v&&t.matches("#tsMenu a[data-m]")){ var h=t.getAttribute("href"); v=h==="#rooms"?"rooms":h==="#top"?"home":null; if(!v) return; }
     if(!v) return; e.preventDefault(); e.stopPropagation();
+    if(v==="chat"){ var cb=document.getElementById("chatBtn"); if(cb) cb.click(); return; }
     var m=document.getElementById("tsMenu"); if(m){ m.classList.remove("on"); m.setAttribute("aria-hidden","true"); }
     show(v);
   },true);
@@ -4036,6 +4040,8 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   .khm-mark i{position:absolute;left:-15px;top:-15px;width:30px;height:30px;border-radius:50%;background:#fff7ea;box-shadow:0 0 0 2px #0f2342,0 6px 12px rgba(10,24,48,.3);display:grid;place-items:center;animation:khmIco .55s cubic-bezier(.16,1,.3,1) both}
   .khm-mark i svg{width:19px;height:19px}
   .khm-mark span{position:absolute;left:0;top:-22px;transform:translate(-50%,-100%);white-space:nowrap;font:600 12.5px/1 "Jost",sans-serif;color:#fff7ea;background:#0f2342;padding:6px 10px;border-radius:999px;box-shadow:0 0 0 1.5px #e3ad5f,0 6px 14px rgba(15,35,66,.3);animation:khmTag .6s cubic-bezier(.16,1,.3,1) .08s both}
+  .khm-mark.dn span{top:22px;transform:translate(-50%,0);animation-name:khmTagDn}
+  @keyframes khmTagDn{from{opacity:0;transform:translate(-50%,-30%)}}
   @keyframes khmIco{from{opacity:0;transform:scale(.3)}}
   @keyframes khmTag{from{opacity:0;transform:translate(-50%,-60%)}}
   .khm-home{width:64px;height:76px;margin:-76px 0 0 -32px;background:none;border:0}
@@ -4057,9 +4063,9 @@ if (location.hash === "#talk") openCall(_fromAlbum);
 (function(){
   if(!matchMedia("(min-width: 900px)").matches) return;
   var box=document.getElementById("khMapBox"), el=document.getElementById("khMap"), pane=box&&box.closest(".khw-p"); if(!box||!pane) return;
-  var ROUTE=[[8.961143,77.304473],[8.961012,77.304711],[8.960752,77.305223],[8.960615,77.306299],[8.96051,77.307151],[8.959494,77.306959],[8.959038,77.306885],[8.958601,77.306832],[8.958478,77.306826],[8.95836,77.306802],[8.958297,77.306759],[8.958256,77.306704],[8.958217,77.306632],[8.958195,77.306383],[8.958186,77.306255],[8.958182,77.306206],[8.958122,77.306094],[8.958075,77.30606],[8.958022,77.306022],[8.956037,77.305816],[8.955987,77.305392],[8.955935,77.304939],[8.955931,77.304902],[8.955634,77.304468],[8.954361,77.302399],[8.953891,77.301739],[8.953665,77.301388],[8.953538,77.301276],[8.953489,77.301233],[8.953342,77.301103],[8.952512,77.300742],[8.952267,77.300631],[8.9521,77.300496],[8.95197,77.300392],[8.951701,77.299998],[8.951438,77.299842],[8.950968,77.299719],[8.950855,77.299653],[8.950594,77.2995],[8.950344,77.299098],[8.950293,77.298938],[8.950177,77.298568],[8.950124,77.29826],[8.950068,77.29793],[8.950025,77.297589],[8.949972,77.297163],[8.94997,77.296889],[8.949968,77.296538],[8.949966,77.29632],[8.949871,77.295395],[8.949865,77.295339],[8.949789,77.294608],[8.949781,77.294542],[8.949744,77.294245],[8.949666,77.293619],[8.949469,77.292981],[8.949427,77.292877],[8.949278,77.292504],[8.948952,77.292227],[8.948685,77.292081],[8.948008,77.291898],[8.947082,77.291883],[8.946394,77.291872],[8.945535,77.291687],[8.945088,77.291478],[8.944775,77.291176],[8.94448,77.290716],[8.943603,77.290074],[8.943377,77.289824],[8.942922,77.289169],[8.942159,77.28833],[8.941596,77.287785],[8.940859,77.28703],[8.940531,77.286678],[8.940296,77.286411],[8.940282,77.286367],[8.940201,77.286117],[8.940064,77.285751],[8.939987,77.285547],[8.939944,77.285371],[8.939879,77.28511],[8.939833,77.284496],[8.939697,77.283864],[8.939599,77.283555],[8.939475,77.283282],[8.939331,77.283056],[8.938983,77.282688],[8.938578,77.282181],[8.938174,77.281659],[8.938032,77.281494],[8.937784,77.281207],[8.937313,77.280895],[8.936788,77.280689],[8.936259,77.280429],[8.935615,77.279893],[8.934437,77.278565],[8.934181,77.277849],[8.934089,77.277178],[8.933899,77.27648],[8.933849,77.276244],[8.933691,77.275485],[8.933618,77.275139],[8.933506,77.274315],[8.933481,77.274137],[8.93341,77.273588],[8.93336,77.273394],[8.933172,77.273117],[8.933072,77.272969],[8.932828,77.27283],[8.932641,77.27257],[8.932619,77.272539],[8.93252,77.271941],[8.932507,77.271455],[8.932543,77.271011],[8.932863,77.270608],[8.93293,77.270499],[8.932985,77.27041],[8.933175,77.270126],[8.933095,77.27003],[8.933025,77.269935],[8.933001,77.269852],[8.932981,77.269734],[8.932979,77.269602],[8.932977,77.269183],[8.933014,77.268564],[8.933172,77.267709],[8.933216,77.267405],[8.933342,77.266489],[8.933357,77.266202],[8.933322,77.266002],[8.933214,77.265687],[8.933023,77.265183],[8.932974,77.265053],[8.932889,77.264873],[8.933783,77.264428],[8.933759,77.264381]];
-  /* landmarks the car passes (positions on the road; Chitraruvi is by the Main Falls in Courtallam town) */
-  var MARKS=[{n:"Chitraruvi",p:[8.932977,77.269183],k:"fall"},{n:"Vairams Nagar arch",p:[8.932889,77.264873],k:"arch"}];
+  var ROUTE=[[8.964329,77.306158],[8.964083,77.306676],[8.963941,77.30662],[8.963562,77.306521],[8.963162,77.306342],[8.963086,77.30627],[8.963006,77.306263],[8.962642,77.306447],[8.961881,77.30678],[8.961347,77.307015],[8.961182,77.306988],[8.961059,77.30708],[8.960927,77.307159],[8.96051,77.307151],[8.959494,77.306959],[8.959038,77.306885],[8.958601,77.306832],[8.958478,77.306826],[8.95836,77.306802],[8.958297,77.306759],[8.958256,77.306704],[8.958217,77.306632],[8.958195,77.306383],[8.958186,77.306255],[8.958182,77.306206],[8.958122,77.306094],[8.958075,77.30606],[8.958022,77.306022],[8.956037,77.305816],[8.955987,77.305392],[8.955935,77.304939],[8.955931,77.304902],[8.955634,77.304468],[8.954361,77.302399],[8.953891,77.301739],[8.953665,77.301388],[8.953538,77.301276],[8.953489,77.301233],[8.953342,77.301103],[8.952512,77.300742],[8.952267,77.300631],[8.9521,77.300496],[8.95197,77.300392],[8.951701,77.299998],[8.951438,77.299842],[8.950968,77.299719],[8.950855,77.299653],[8.950594,77.2995],[8.950344,77.299098],[8.950293,77.298938],[8.950177,77.298568],[8.950124,77.29826],[8.950068,77.29793],[8.950025,77.297589],[8.949972,77.297163],[8.94997,77.296889],[8.949968,77.296538],[8.949966,77.29632],[8.949871,77.295395],[8.949865,77.295339],[8.949789,77.294608],[8.949781,77.294542],[8.949744,77.294245],[8.949666,77.293619],[8.949469,77.292981],[8.949427,77.292877],[8.949278,77.292504],[8.948952,77.292227],[8.948685,77.292081],[8.948008,77.291898],[8.947082,77.291883],[8.946394,77.291872],[8.945535,77.291687],[8.945088,77.291478],[8.944775,77.291176],[8.94448,77.290716],[8.943603,77.290074],[8.943377,77.289824],[8.942922,77.289169],[8.942159,77.28833],[8.941596,77.287785],[8.940859,77.28703],[8.940531,77.286678],[8.940296,77.286411],[8.940282,77.286367],[8.940201,77.286117],[8.940064,77.285751],[8.939987,77.285547],[8.939944,77.285371],[8.939879,77.28511],[8.939833,77.284496],[8.939697,77.283864],[8.939599,77.283555],[8.939475,77.283282],[8.939331,77.283056],[8.938983,77.282688],[8.938578,77.282181],[8.938174,77.281659],[8.938032,77.281494],[8.937784,77.281207],[8.937313,77.280895],[8.936788,77.280689],[8.936259,77.280429],[8.935615,77.279893],[8.934437,77.278565],[8.934181,77.277849],[8.934089,77.277178],[8.933899,77.27648],[8.933849,77.276244],[8.933691,77.275485],[8.933618,77.275139],[8.933506,77.274315],[8.933481,77.274137],[8.933438,77.273806],[8.93341,77.273588],[8.93336,77.273394],[8.933172,77.273117],[8.933072,77.272969],[8.932828,77.27283],[8.932641,77.27257],[8.932619,77.272539],[8.93252,77.271941],[8.932507,77.271455],[8.932543,77.271011],[8.932863,77.270608],[8.93293,77.270499],[8.932985,77.27041],[8.933175,77.270126],[8.933095,77.27003],[8.933025,77.269935],[8.933001,77.269852],[8.932981,77.269734],[8.932979,77.269602],[8.932977,77.269183],[8.933014,77.268564],[8.933172,77.267709],[8.933216,77.267405],[8.933342,77.266489],[8.933357,77.266202],[8.933322,77.266002],[8.933214,77.265687],[8.933023,77.265183],[8.932974,77.265053],[8.932889,77.264873],[8.933783,77.264428],[8.933759,77.264381]];
+  /* landmarks the car passes (Courtallam bus stand, Five Falls Main Road, Chitraruvi by Chitra Sabai, the Vairams Nagar arch) */
+  var MARKS=[{n:"Courtallam bus stand",p:[8.93331,77.273823],k:"bus"},{n:"Five Falls Main Road",p:[8.932985,77.27041],k:"road"},{n:"Chitraruvi",p:[8.932053,77.267987],k:"fall",dn:1},{n:"Vairams Nagar arch",p:[8.932889,77.264873],k:"arch",dn:1}];
   MARKS.forEach(function(m){ var best=0,bd=1e9; ROUTE.forEach(function(r,i){ var d=Math.abs(r[0]-m.p[0])+Math.abs(r[1]-m.p[1]); if(d<bd){bd=d;best=i;} }); m.i=best; });
   var HOME=[8.9338032,77.264358], TOWN=ROUTE[0], reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
   var map=null, line=null, car=null, home=null, run=0, card=document.getElementById("khmCard"), play=document.getElementById("khmPlay");
@@ -4069,8 +4075,10 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   var CAR='<svg viewBox="0 0 34 34"><g><rect x="10" y="4" width="14" height="26" rx="6" fill="#0f2342"/><rect x="11.5" y="9" width="11" height="6" rx="2" fill="#bcd3ea"/><rect x="11.5" y="21" width="11" height="4.5" rx="1.8" fill="#bcd3ea"/><rect x="12.5" y="15.6" width="9" height="4.8" rx="1.5" fill="#e3ad5f"/><rect x="11" y="4.6" width="3.4" height="2" rx="1" fill="#fff3c4"/><rect x="19.6" y="4.6" width="3.4" height="2" rx="1" fill="#fff3c4"/><rect x="11" y="28" width="3" height="1.5" rx=".7" fill="#e8443a"/><rect x="20" y="28" width="3" height="1.5" rx=".7" fill="#e8443a"/></g></svg>';
   var PIN='<span class="ring"></span><span class="pin"><svg viewBox="0 0 64 76"><path d="M32 74C32 74 6 46 6 28a26 26 0 0 1 52 0c0 18-26 46-26 46z" fill="#0f2342" stroke="#e3ad5f" stroke-width="3"/><g fill="#f3cd8e"><path d="M18 30 32 18l14 12v2H18z"/><rect x="21" y="32" width="22" height="14" rx="1.5"/></g><g fill="#0f2342"><rect x="24" y="35" width="4" height="4" rx=".6"/><rect x="36" y="35" width="4" height="4" rx=".6"/><rect x="29.5" y="38" width="5" height="8" rx="1"/></g></svg></span>';
   var ICO={fall:'<svg viewBox="0 0 24 24"><path d="M12 3c3 4.2 5.5 7.3 5.5 10.3A5.5 5.5 0 0 1 12 19a5.5 5.5 0 0 1-5.5-5.7C6.5 10.3 9 7.2 12 3z" fill="#3fb6dc" stroke="#0f2342" stroke-width="1.4"/><path d="M9.6 13.6a2.6 2.6 0 0 0 2.4 2.6" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>',
-    arch:'<svg viewBox="0 0 24 24"><path d="M3.5 20V10.5a8.5 8.5 0 0 1 17 0V20h-3.6v-9.2a4.9 4.9 0 0 0-9.8 0V20z" fill="#e3ad5f" stroke="#0f2342" stroke-width="1.4" stroke-linejoin="round"/><path d="M2.5 20h19" stroke="#0f2342" stroke-width="1.6" stroke-linecap="round"/></svg>'};
-  function markIcon(m){ return L.divIcon({className:"khm-mark",iconSize:[0,0],html:'<i>'+ICO[m.k]+'</i><span>'+m.n+'</span>'}); }
+    arch:'<svg viewBox="0 0 24 24"><path d="M3.5 20V10.5a8.5 8.5 0 0 1 17 0V20h-3.6v-9.2a4.9 4.9 0 0 0-9.8 0V20z" fill="#e3ad5f" stroke="#0f2342" stroke-width="1.4" stroke-linejoin="round"/><path d="M2.5 20h19" stroke="#0f2342" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    bus:'<svg viewBox="0 0 24 24"><rect x="4.5" y="3.5" width="15" height="15" rx="3" fill="#e8443a" stroke="#0f2342" stroke-width="1.4"/><rect x="6.6" y="6" width="10.8" height="5.4" rx="1" fill="#fff7ea"/><circle cx="8.3" cy="15" r="1.2" fill="#fff7ea"/><circle cx="15.7" cy="15" r="1.2" fill="#fff7ea"/><path d="M7 18.5v2M17 18.5v2" stroke="#0f2342" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    road:'<svg viewBox="0 0 24 24"><path d="M8 3 4 21h16L16 3z" fill="#3a4a5f" stroke="#0f2342" stroke-width="1.2" stroke-linejoin="round"/><path d="M12 5v2.6M12 10.4v2.8M12 16v3" stroke="#f3cd8e" stroke-width="1.8" stroke-linecap="round"/></svg>'};
+  function markIcon(m){ return L.divIcon({className:"khm-mark"+(m.dn?" dn":""),iconSize:[0,0],html:'<i>'+ICO[m.k]+'</i><span>'+m.n+'</span>'}); }
   function bearing(a,b){ var y=Math.sin((b[1]-a[1])*Math.PI/180)*Math.cos(b[0]*Math.PI/180), x=Math.cos(a[0]*Math.PI/180)*Math.sin(b[0]*Math.PI/180)-Math.sin(a[0]*Math.PI/180)*Math.cos(b[0]*Math.PI/180)*Math.cos((b[1]-a[1])*Math.PI/180); return Math.atan2(y,x)*180/Math.PI; }
   /* distances along the road, so the car keeps an even speed */
   var D=[0]; for(var i=1;i<ROUTE.length;i++){ var a=ROUTE[i-1], b=ROUTE[i], dy=(b[0]-a[0])*111, dx=(b[1]-a[1])*111*Math.cos(a[0]*Math.PI/180); D.push(D[i-1]+Math.sqrt(dx*dx+dy*dy)); } var LEN=D[D.length-1];
@@ -4081,33 +4089,109 @@ if (location.hash === "#talk") openCall(_fromAlbum);
     L.control.zoom({position:"bottomright"}).addTo(map);
     map.on("click",function(){ map.scrollWheelZoom.enable(); });
   }
+  /* v8.7: drive from Tenkasi Railway Station to Courtallam bus stand on the wide map, zoom in at the bus stand,
+     then follow the car along Five Falls Main Road (each landmark appears as it comes up) to the arch and the house */
+  function atD(d){ var i=1; while(i<D.length-1&&D[i]<d) i++; var f=(d-D[i-1])/((D[i]-D[i-1])||1), a=ROUTE[i-1], b=ROUTE[i]; return {p:[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f], i:i, h:bearing(a,b)}; }
   function start(){
     var me=++run; card.classList.remove("on"); play.hidden=true;
     MARKS.forEach(function(m){ m.on=null; });
     [line,car,home].forEach(function(x){ if(x) map.removeLayer(x); }); map.eachLayer(function(x){ if(x.options&&x.options.khTown) map.removeLayer(x); });
-    map.invalidateSize(); map.fitBounds(L.latLngBounds(ROUTE).pad(.25),{animate:false});
-    L.marker(TOWN,{khTown:1,interactive:false,icon:L.divIcon({className:"khm-town",html:'<i></i><span>Tenkasi</span>',iconSize:[0,0]})}).addTo(map);
-    var under=L.polyline(ROUTE,{color:"#0f2342",weight:9,opacity:.12,className:"khm-route",interactive:false}).addTo(map);
-    line=L.polyline([TOWN],{color:"#0f2342",weight:5,opacity:.95,className:"khm-route",interactive:false}).addTo(map); line._under=under;
+    map.invalidateSize(); map.fitBounds(L.latLngBounds(ROUTE).pad(.22),{animate:false});
+    L.marker(TOWN,{khTown:1,interactive:false,icon:L.divIcon({className:"khm-town",html:'<i></i><span>Tenkasi Railway Station</span>',iconSize:[0,0]})}).addTo(map);
+    L.polyline(ROUTE,{khTown:1,color:"#0f2342",weight:9,opacity:.12,className:"khm-route",interactive:false}).addTo(map);
+    line=L.polyline([TOWN],{color:"#0f2342",weight:5,opacity:.95,className:"khm-route",interactive:false}).addTo(map);
     car=L.marker(TOWN,{interactive:false,icon:L.divIcon({className:"khm-car",html:CAR,iconSize:[34,34]})}).addTo(map);
-    var finish=function(){ if(me!==run) return; map.removeLayer(car); car=null; line.setLatLngs(ROUTE);
-      map.flyToBounds(L.latLngBounds([HOME].concat(MARKS.map(function(m){return m.p;}))),{paddingTopLeft:[70,96],paddingBottomRight:[96,118],maxZoom:17,duration:reduce?0:2.4,easeLinearity:.2});
-      map.once("moveend",function(){ if(me!==run) return;
+    var sv=car.getElement().querySelector("svg"), iB=MARKS[0].i, DB=D[iB], ZC=17;
+    function pop(m){ if(!m.on) m.on=L.marker(m.p,{khTown:1,interactive:false,zIndexOffset:500,icon:markIcon(m)}).addTo(map); }
+    function place(s){ car.setLatLng(s.p); sv.style.transform="rotate("+s.h+"deg)"; line.setLatLngs(ROUTE.slice(0,s.i).concat([s.p])); }
+    function ease(k){ return k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2; }
+    function run2(T,from,to,each,done){ var t0=null; requestAnimationFrame(function step(ts){ if(me!==run) return; if(t0===null) t0=ts; var k=Math.min(1,(ts-t0)/T); each(from+(to-from)*ease(k),k); if(k<1) requestAnimationFrame(step); else done(); }); }
+    function arrive(){ if(me!==run) return; if(car){ map.removeLayer(car); car=null; } line.setLatLngs(ROUTE); MARKS.forEach(pop);
+      map.flyToBounds(L.latLngBounds([HOME,MARKS[2].p,MARKS[3].p]),{paddingTopLeft:[40,84],paddingBottomRight:[70,96],maxZoom:17,duration:reduce?0:1.1});
+      setTimeout(function(){ if(me!==run) return;
         home=L.marker(HOME,{title:"Kutralam Ezhilagam",icon:L.divIcon({className:"khm-home",html:PIN,iconSize:[64,76],iconAnchor:[32,76]})}).addTo(map);
         home.on("click",function(){ window.open("https://maps.app.goo.gl/uMu427TCwSHLzAVEA","_blank","noopener"); });
-        setTimeout(function(){ if(me!==run) return; card.classList.add("on"); play.hidden=false; },500); }); };
-    if(reduce){ MARKS.forEach(function(m){ m.on=L.marker(m.p,{khTown:1,interactive:false,icon:markIcon(m)}).addTo(map); }); return finish(); }
-    var T=4200, t0=null, sv=car.getElement().querySelector("svg");
-    setTimeout(function(){ requestAnimationFrame(function step(ts){ if(me!==run) return; if(t0===null) t0=ts; var k=Math.min(1,(ts-t0)/T), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2, s=at(e);
-      MARKS.forEach(function(m){ if(!m.on&&s.i>=m.i){ m.on=L.marker(m.p,{khTown:1,interactive:false,zIndexOffset:500,icon:markIcon(m)}).addTo(map); } });
-      car.setLatLng(s.p); sv.style.transform="rotate("+s.h+"deg)"; line.setLatLngs(ROUTE.slice(0,s.i).concat([s.p]));
-      if(k<1) requestAnimationFrame(step); else setTimeout(finish,250); }); },700);
+        setTimeout(function(){ if(me!==run) return; card.classList.add("on"); play.hidden=false; },500); }, reduce?0:950); }
+    if(reduce){ arrive(); return; }
+    setTimeout(function(){
+      run2(4400,0,DB,function(d){ place(atD(d)); },function(){
+        map.flyTo(ROUTE[iB],ZC,{duration:1.8,easeLinearity:.25});
+        setTimeout(function(){ if(me!==run) return; pop(MARKS[0]); },1200);
+        map.once("moveend",function(){ if(me!==run) return;
+          run2(4000,DB,LEN,function(d,k){ var s=atD(d); place(s); var ah=atD(Math.min(LEN,d+.09*Math.min(1,k*6))).p; map.setView(ah,ZC,{animate:false});
+            MARKS.forEach(function(m,j){ if(j>0&&d>=D[m.i]-.16) pop(m); }); },function(){ setTimeout(arrive,200); }); }); }); },700);
   }
   play.addEventListener("click",start);
   var seen=false;
   new MutationObserver(function(){ var on=pane.classList.contains("on");
     if(on&&!seen){ seen=true; load(function(){ if(!window.L) return fallback(); if(!map) setup(); setTimeout(start,780); }); }
     if(!on){ seen=false; run++; } }).observe(pane,{attributes:true,attributeFilter:["class"]});
+})();
+</script>
+<style>
+/* v8.7 (Rakesh, 27 Oct 19:31): on a computer Chat with Shenba opens in the middle of the screen, in the same
+   navy-and-gold design as Talk with Shenba: her full picture in a gold arch on the left (it glows while she
+   replies), the chat in the middle, the website dimmed behind, and clear "End chat" and close buttons. */
+@media (min-width:900px){
+  html.ts dialog#sbChat[open]{--cw:calc(min(740px,92vh) * .44);position:fixed;inset:0;margin:auto;width:min(1120px,94vw);height:min(740px,92vh);max-width:none;max-height:none;padding:0;
+    border:0;border-radius:28px;background:#f7f0e3;display:grid;grid-template-columns:var(--cw) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto;overflow:hidden;
+    box-shadow:0 0 0 2px #e3ad5f,0 0 0 9px rgba(247,240,227,.12),0 40px 100px rgba(0,0,0,.55);animation:khChatIn .6s cubic-bezier(.16,1,.3,1) both}
+  html.ts dialog#sbChat::backdrop{background:rgba(6,14,30,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:khFade .35s ease both}
+  @keyframes khChatIn{from{opacity:0;transform:translateY(22px) scale(.975)}}
+  @keyframes khFade{from{opacity:0}}
+  html.ts #sbChat .kh-carch{grid-column:1;grid-row:1/-1;position:relative;margin:16px 0 16px 16px;border-radius:calc(var(--cw) * .5) calc(var(--cw) * .5) 18px 18px;overflow:hidden;
+    background:radial-gradient(120% 80% at 50% 10%,#21477f 0%,#173563 45%,#0f2342 100%);box-shadow:inset 0 0 0 2px rgba(243,205,142,.95),inset 0 0 0 8px rgba(15,35,66,.35),inset 0 0 0 9px rgba(243,205,142,.5);transition:box-shadow .5s ease}
+  html.ts #sbChat .kh-carch.talking{box-shadow:inset 0 0 0 3px #f3cd8e,inset 0 0 0 9px rgba(227,173,95,.3),inset 0 0 0 10px rgba(243,205,142,.8),0 0 34px rgba(243,205,142,.55)}
+  html.ts #sbChat .kh-carch .lg{position:absolute;z-index:3;left:12%;right:12%;top:8%;height:50px;width:76%;object-fit:contain;filter:drop-shadow(0 3px 8px rgba(5,12,28,.45))}
+  html.ts #sbChat .kh-carch .pic{position:absolute;inset:0;height:100%;display:block;width:100%;object-fit:cover;object-position:50% 0;transition:transform 6s ease-out}
+  html.ts #sbChat .kh-carch .pic.blink{opacity:0}
+  html.ts #sbChat .kh-carch.talking .pic{transform:scale(1.015)}
+  html.ts #sbChat .kh-carch .shade{position:absolute;left:0;right:0;bottom:0;height:34%;z-index:2;background:linear-gradient(180deg,rgba(15,35,66,0),rgba(15,35,66,.88) 60%,#0f2342)}
+  html.ts #sbChat .kh-carch .who{position:absolute;z-index:3;left:0;right:0;bottom:22px;text-align:center;color:#f6ead6;font:400 13px/1.4 "Jost",var(--ts-sans)}
+  html.ts #sbChat .kh-carch .who b{display:block;font:400 32px/1.05 "DM Serif Display",var(--ts-serif);color:#f3cd8e}
+  html.ts #sbChat .kh-carch .who i{display:inline-block;width:9px;height:9px;border-radius:50%;background:#3fc1b0;margin-right:6px;box-shadow:0 0 0 3px rgba(63,193,176,.25);vertical-align:1px}
+  html.ts #sbChat .kh-carch .who .typ{display:block;min-height:1.4em;color:#7fe0d2}
+  html.ts dialog#sbChat .sb-head{grid-column:2;margin:16px 16px 6px 16px;padding:14px 16px 14px 22px;border-radius:18px;background:linear-gradient(180deg,#173563,#0f2342);box-shadow:0 0 0 1px rgba(227,173,95,.55);gap:12px}
+  html.ts dialog#sbChat .sb-head .sb-av,html.ts dialog#sbChat .sb-head .kh-chatlogo{display:none}
+  html.ts dialog#sbChat .sb-who b{font:400 26px/1.1 "DM Serif Display",var(--ts-serif);color:#f3cd8e}
+  html.ts dialog#sbChat .sb-who small{color:rgba(246,234,214,.78);font:400 13px/1.3 "Jost",var(--ts-sans)}
+  html.ts dialog#sbChat .kh-end{margin-left:auto;border:0;cursor:pointer;font:600 14px/1 "Jost",var(--ts-sans);color:#0f2342;background:#f3cd8e;padding:11px 18px;border-radius:999px;box-shadow:0 6px 16px rgba(0,0,0,.25);transition:transform .14s cubic-bezier(.22,1,.36,1),background-color .18s ease}
+  html.ts dialog#sbChat .kh-end:hover{background:#ffd99c}
+  html.ts dialog#sbChat .kh-end:active,html.ts dialog#sbChat .sb-x:active{transform:scale(.96)}
+  html.ts dialog#sbChat .sb-x{position:static;width:42px;height:42px;border-radius:50%;background:#fff;color:#0f2342;box-shadow:0 0 0 1px rgba(227,173,95,.7);font-size:17px;display:grid;place-items:center;flex:none;transition:transform .14s cubic-bezier(.22,1,.36,1)}
+  html.ts dialog#sbChat .sb-log{grid-column:2;margin:6px 16px;padding:18px 20px;border-radius:18px;background:#fffdf8;box-shadow:0 0 0 1px rgba(227,173,95,.45);overflow-y:auto}
+  html.ts dialog#sbChat .sb-log .sb-m{font:400 15.5px/1.55 "Jost",var(--ts-sans);max-width:78%}
+  html.ts dialog#sbChat .sb-log .sb-m.ai{background:#f4ecdd;color:#1f2a3d;border:0;border-radius:4px 18px 18px 18px}
+  html.ts dialog#sbChat .sb-log .sb-m.me{background:#0f2342;color:#f6ead6;border-radius:18px 4px 18px 18px}
+  html.ts dialog#sbChat .sb-bar{grid-column:2;margin:6px 16px 0;padding:0;border:0;background:none;gap:10px}
+  html.ts dialog#sbChat #sbIn{height:52px;border-radius:999px;border:0;box-shadow:0 0 0 1.5px #e3ad5f;background:#fff;font:400 16px "Jost",var(--ts-sans);padding:0 22px}
+  html.ts dialog#sbChat #sbIn:focus{box-shadow:0 0 0 2.5px #0f2342;outline:none}
+  html.ts dialog#sbChat .sb-send{width:52px;height:52px;border-radius:50%;background:#0f2342;color:#f3cd8e}
+  html.ts dialog#sbChat .sb-alt{grid-column:2;margin:10px 16px 16px;width:auto;border:0;border-radius:999px;padding:13px;background:linear-gradient(180deg,#f3cd8e,#e3ad5f);color:#0f2342;font:600 15px/1 "Jost",var(--ts-sans);cursor:pointer;transition:transform .14s cubic-bezier(.22,1,.36,1)}
+  html.ts dialog#sbChat .sb-alt:active{transform:scale(.985)}
+}
+@media (min-width:900px) and (prefers-reduced-motion:reduce){html.ts dialog#sbChat[open],html.ts dialog#sbChat::backdrop{animation:none}}
+</style>
+<script>
+(function(){ if(!matchMedia("(min-width: 900px)").matches) return;
+  var d=document.getElementById("sbChat"); if(!d||d.querySelector(".kh-carch")) return;
+  var a=document.createElement("div"); a.className="kh-carch"; a.setAttribute("aria-hidden","true");
+  a.innerHTML='<img class="lg" src="img/logo-gold.webp" alt="" width="490" height="174"><img class="pic" src="img/shenba-arch.webp" alt="" width="438" height="1003"><img class="pic blink" src="img/shenba-arch-closed.webp" alt="" width="438" height="1003"><div class="shade"></div><div class="who"><b>Shenba</b><i></i>Front desk &middot; Tamil &amp; English<span class="typ"></span></div>';
+  d.insertBefore(a,d.firstChild);
+  var head=d.querySelector(".sb-head"), x=document.getElementById("sbChatX");
+  var who=d.querySelector(".sb-who b"); if(who) who.textContent="Chat with Shenba";
+  var end=document.createElement("button"); end.type="button"; end.className="kh-end"; end.textContent="End chat"; if(head&&x) head.insertBefore(end,x);
+  end.addEventListener("click",function(){ if(window.__sbEndChat) window.__sbEndChat(); });
+  if(x){ x.setAttribute("aria-label","Close the chat window (the chat stays)"); x.title="Close"; }
+  window.addEventListener("click",function(e){ if(!e.target.closest||!e.target.closest("#sbChatX")) return; if(!d.open) return; e.preventDefault(); e.stopImmediatePropagation(); if(window.__sbHideChat) window.__sbHideChat(); },true);
+  d.addEventListener("cancel",function(e){ e.preventDefault(); if(window.__sbHideChat) window.__sbHideChat(); });
+  d.addEventListener("click",function(e){ if(e.target===d){ var r=d.getBoundingClientRect(); if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){ if(window.__sbHideChat) window.__sbHideChat(); } } });
+  /* her arch glows and the line under her name says so while she is replying */
+  var log=document.getElementById("sbLog"), typ=a.querySelector(".typ"), glowT=null;
+  if(log) new MutationObserver(function(){ var t=!!log.querySelector(".sb-typing"); if(t){ a.classList.add("talking"); typ.textContent="Typing\u2026"; clearTimeout(glowT); }
+      else { typ.textContent=""; clearTimeout(glowT); glowT=setTimeout(function(){ a.classList.remove("talking"); },1400); } }).observe(log,{childList:true});
+  /* a natural blink now and then */
+  var bl=a.querySelector(".pic.blink"); (function blink(){ setTimeout(function(){ if(d.open){ bl.style.opacity="1"; setTimeout(function(){ bl.style.opacity="0"; },130); } blink(); },2600+Math.random()*3200); })();
 })();
 </script>
 <style>
