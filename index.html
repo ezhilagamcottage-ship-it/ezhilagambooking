@@ -1620,7 +1620,9 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
           <section class="khw-p" data-p="rooms" aria-label="Rooms"><header class="khw-h"><h2>Our rooms</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b" id="khRoomsSlot"></div></section>
           <section class="khw-p" data-p="gallery" aria-label="Gallery"><header class="khw-h"><h2>Gallery</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b"><p class="khw-lead">Tap a photo to see it large.</p><div class="khg"><button type="button" class="khg-i" data-i="0"><img src="img/photos/facade-dusk.webp" alt="Kutralam Ezhilagam at dusk" loading="lazy"><span>Kutralam Ezhilagam at dusk</span></button><button type="button" class="khg-i" data-i="1"><img src="img/photos/hill-view-window.webp" alt="Two beds beside a wide window on to the Courtallam hills" loading="lazy"><span>Two beds beside a wide window on to the Courtallam hills</span></button><button type="button" class="khg-i" data-i="2"><img src="img/photos/marutham-king-bed.webp" alt="Marutham, a teak king bed" loading="lazy"><span>Marutham, a teak king bed</span></button><button type="button" class="khg-i" data-i="3"><img src="img/photos/twin-beds-teak.webp" alt="Two teak beds with fresh linen" loading="lazy"><span>Two teak beds with fresh linen</span></button><button type="button" class="khg-i" data-i="4"><img src="img/photos/suite-living-tv.webp" alt="The suite sitting room, the bedroom beyond" loading="lazy"><span>The suite sitting room, the bedroom beyond</span></button><button type="button" class="khg-i" data-i="5"><img src="img/photos/bed-lamp-door.webp" alt="A double bed with a wall lamp" loading="lazy"><span>A double bed with a wall lamp</span></button><button type="button" class="khg-i" data-i="6"><img src="img/photos/paalai-two-beds.webp" alt="Paalai, two double beds" loading="lazy"><span>Paalai, two double beds</span></button><button type="button" class="khg-i" data-i="7"><img src="img/photos/bed-red-cushions-window.webp" alt="A double bed by the window" loading="lazy"><span>A double bed by the window</span></button><button type="button" class="khg-i" data-i="8"><img src="img/photos/paalai-twin-beds-tv.webp" alt="Paalai, two beds facing the TV" loading="lazy"><span>Paalai, two beds facing the TV</span></button><button type="button" class="khg-i" data-i="9"><img src="img/photos/suite-kitchen.webp" alt="The suite's own kitchen" loading="lazy"><span>The suite's own kitchen</span></button><button type="button" class="khg-i" data-i="10"><img src="img/photos/suite-sitting-room.webp" alt="The suite's sitting room" loading="lazy"><span>The suite's sitting room</span></button><button type="button" class="khg-i" data-i="11"><img src="img/photos/bed-close.webp" alt="Fresh linen and a red quilt" loading="lazy"><span>Fresh linen and a red quilt</span></button><button type="button" class="khg-i" data-i="12"><img src="img/photos/bed-towel.webp" alt="A rolled towel on the bed" loading="lazy"><span>A rolled towel on the bed</span></button><button type="button" class="khg-i" data-i="13"><img src="img/photos/bathroom.webp" alt="An attached bathroom with a water heater" loading="lazy"><span>An attached bathroom with a water heater</span></button></div></div></section>
           <section class="khw-p" data-p="location" aria-label="Location"><header class="khw-h"><h2>Find us in Courtallam</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b">
-            <div class="khv-map"><iframe title="Kutralam Ezhilagam on the map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-src="https://maps.google.com/maps?q=8.9338032,77.264358&amp;z=17&amp;output=embed"></iframe></div>
+            <div class="khv-map" id="khMapBox"><div id="khMap" role="img" aria-label="Map: the road from Tenkasi to Kutralam Ezhilagam, 6.7 km"></div><iframe hidden title="Kutralam Ezhilagam on the map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-fallback="https://maps.google.com/maps?q=8.9338032,77.264358&amp;z=17&amp;output=embed"></iframe>
+              <div class="khm-card" id="khmCard"><b>Kutralam Ezhilagam</b><span>6.7 km by road from Tenkasi</span></div>
+              <button type="button" class="khm-play" id="khmPlay" hidden>&#8635; Play the drive again</button></div>
             <p class="khv-big">No 46, Vairams Nagar, Five Falls Road, Courtallam</p>
             <ul class="khv-list"><li>Near the Vairams Nagar arch</li><li>A short walk to Courtallam Main Falls</li><li>Limited parking, first come first served</li></ul>
             <div class="khv-cta"><a class="kh-btn gold" href="https://maps.app.goo.gl/uMu427TCwSHLzAVEA" target="_blank" rel="noopener">Open in Google Maps</a><button type="button" class="kh-btn line" data-kv="reserve">Reserve</button></div></div></section>
@@ -4017,6 +4019,82 @@ if (location.hash === "#talk") openCall(_fromAlbum);
 <script>
 /* v7.7: the call widget is never left see-through after it closes */
 (function(){ var d=document.getElementById("sbCall"); if(d) d.addEventListener("close",function(){ d.classList.remove("kh-in"); }); })();
+</script>
+<style>
+/* v8.6 (Rakesh, 27 Oct 18:49): Location — a car drives the real road from Tenkasi, the map zooms in, and the house appears */
+@media (min-width:900px){
+  #khMap{position:absolute;inset:0;background:#e9e4d8;z-index:1}
+  #khMap .leaflet-control-attribution{font:10px/1.4 "Jost",sans-serif;background:rgba(247,240,227,.85)}
+  .khm-route{stroke-linecap:round;stroke-linejoin:round}
+  #khMap .khm-tiles{filter:sepia(.18) saturate(.85) brightness(1.02)}
+  .khm-car{width:34px;height:34px;margin:-17px 0 0 -17px;filter:drop-shadow(0 3px 4px rgba(10,24,48,.35))}
+  .khm-car svg{width:34px;height:34px;display:block;transition:transform .12s linear}
+  .khm-town{background:none;border:0}
+  .khm-town span{display:inline-block;transform:translate(-50%,-140%);white-space:nowrap;font:600 13px/1 "Jost",sans-serif;color:#0f2342;background:#fff7ea;padding:7px 11px;border-radius:999px;box-shadow:0 0 0 1.5px #e3ad5f,0 6px 14px rgba(15,35,66,.25);animation:khmPop .5s cubic-bezier(.16,1,.3,1) both}
+  .khm-town i{position:absolute;left:-6px;top:-6px;width:12px;height:12px;border-radius:50%;background:#0f2342;box-shadow:0 0 0 3px #f3cd8e}
+  .khm-home{width:64px;height:76px;margin:-76px 0 0 -32px;background:none;border:0}
+  .khm-home .pin{position:absolute;inset:0;animation:khmDrop .8s cubic-bezier(.16,1,.3,1) both}
+  .khm-home svg{width:64px;height:76px;display:block;filter:drop-shadow(0 8px 10px rgba(10,24,48,.4))}
+  .khm-home .ring{position:absolute;left:50%;bottom:-6px;width:22px;height:10px;margin-left:-11px;border-radius:50%;background:rgba(227,173,95,.7);animation:khmRing 1.8s ease-out .7s infinite}
+  .khm-card{position:absolute;z-index:4;left:16px;bottom:16px;display:flex;flex-direction:column;gap:2px;padding:12px 16px;border-radius:14px;background:#0f2342;color:#f6ead6;box-shadow:inset 0 0 0 1px rgba(227,173,95,.55),0 12px 24px rgba(10,24,48,.3);opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .7s cubic-bezier(.16,1,.3,1);pointer-events:none}
+  .khm-card b{font:400 18px/1.15 "DM Serif Display",serif;color:#f3cd8e}
+  .khm-card span{font:400 13px/1.3 "Jost",sans-serif}
+  .khm-card.on{opacity:1;transform:none}
+  .khm-play{position:absolute;z-index:4;right:14px;top:14px;border:0;cursor:pointer;font:500 13px/1 "Jost",sans-serif;color:#0f2342;background:#f3cd8e;padding:9px 14px;border-radius:999px;box-shadow:0 6px 14px rgba(10,24,48,.25);transition:transform .14s cubic-bezier(.22,1,.36,1)}
+  .khm-play:active{transform:scale(.96)}
+  @keyframes khmPop{from{opacity:0;transform:translate(-50%,-110%) scale(.8)}}
+  @keyframes khmDrop{0%{opacity:0;transform:translateY(-60px) scale(.7)}60%{opacity:1}100%{transform:none}}
+  @keyframes khmRing{0%{transform:scale(.6);opacity:.9}100%{transform:scale(3.2);opacity:0}}
+}
+</style>
+<script>
+(function(){
+  if(!matchMedia("(min-width: 900px)").matches) return;
+  var box=document.getElementById("khMapBox"), el=document.getElementById("khMap"), pane=box&&box.closest(".khw-p"); if(!box||!pane) return;
+  var ROUTE=[[8.961143,77.304473],[8.961012,77.304711],[8.960752,77.305223],[8.960615,77.306299],[8.96051,77.307151],[8.959494,77.306959],[8.959038,77.306885],[8.958601,77.306832],[8.958478,77.306826],[8.95836,77.306802],[8.958297,77.306759],[8.958256,77.306704],[8.958217,77.306632],[8.958195,77.306383],[8.958186,77.306255],[8.958182,77.306206],[8.958122,77.306094],[8.958075,77.30606],[8.958022,77.306022],[8.956037,77.305816],[8.955987,77.305392],[8.955935,77.304939],[8.955931,77.304902],[8.955634,77.304468],[8.954361,77.302399],[8.953891,77.301739],[8.953665,77.301388],[8.953538,77.301276],[8.953489,77.301233],[8.953342,77.301103],[8.952512,77.300742],[8.952267,77.300631],[8.9521,77.300496],[8.95197,77.300392],[8.951701,77.299998],[8.951438,77.299842],[8.950968,77.299719],[8.950855,77.299653],[8.950594,77.2995],[8.950344,77.299098],[8.950293,77.298938],[8.950177,77.298568],[8.950124,77.29826],[8.950068,77.29793],[8.950025,77.297589],[8.949972,77.297163],[8.94997,77.296889],[8.949968,77.296538],[8.949966,77.29632],[8.949871,77.295395],[8.949865,77.295339],[8.949789,77.294608],[8.949781,77.294542],[8.949744,77.294245],[8.949666,77.293619],[8.949469,77.292981],[8.949427,77.292877],[8.949278,77.292504],[8.948952,77.292227],[8.948685,77.292081],[8.948008,77.291898],[8.947082,77.291883],[8.946394,77.291872],[8.945535,77.291687],[8.945088,77.291478],[8.944775,77.291176],[8.94448,77.290716],[8.943603,77.290074],[8.943377,77.289824],[8.942922,77.289169],[8.942159,77.28833],[8.941596,77.287785],[8.940859,77.28703],[8.940531,77.286678],[8.940296,77.286411],[8.940282,77.286367],[8.940201,77.286117],[8.940064,77.285751],[8.939987,77.285547],[8.939944,77.285371],[8.939879,77.28511],[8.939833,77.284496],[8.939697,77.283864],[8.939599,77.283555],[8.939475,77.283282],[8.939331,77.283056],[8.938983,77.282688],[8.938578,77.282181],[8.938174,77.281659],[8.938032,77.281494],[8.937784,77.281207],[8.937313,77.280895],[8.936788,77.280689],[8.936259,77.280429],[8.935615,77.279893],[8.934437,77.278565],[8.934181,77.277849],[8.934089,77.277178],[8.933899,77.27648],[8.933849,77.276244],[8.933691,77.275485],[8.933618,77.275139],[8.933506,77.274315],[8.933481,77.274137],[8.93341,77.273588],[8.93336,77.273394],[8.933172,77.273117],[8.933072,77.272969],[8.932828,77.27283],[8.932641,77.27257],[8.932619,77.272539],[8.93252,77.271941],[8.932507,77.271455],[8.932543,77.271011],[8.932863,77.270608],[8.93293,77.270499],[8.932985,77.27041],[8.933175,77.270126],[8.933095,77.27003],[8.933025,77.269935],[8.933001,77.269852],[8.932981,77.269734],[8.932979,77.269602],[8.932977,77.269183],[8.933014,77.268564],[8.933172,77.267709],[8.933216,77.267405],[8.933342,77.266489],[8.933357,77.266202],[8.933322,77.266002],[8.933214,77.265687],[8.933023,77.265183],[8.932974,77.265053],[8.932889,77.264873],[8.933783,77.264428],[8.933759,77.264381]];
+  var HOME=[8.9338032,77.264358], TOWN=ROUTE[0], reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var map=null, line=null, car=null, home=null, run=0, card=document.getElementById("khmCard"), play=document.getElementById("khmPlay");
+  function fallback(){ var f=box.querySelector("iframe"); if(f){ f.src=f.dataset.fallback; f.hidden=false; } el.remove(); card.remove(); play.remove(); }
+  function load(cb){ if(window.L) return cb(); var l=document.createElement("link"); l.rel="stylesheet"; l.href="js/leaflet/leaflet.css"; document.head.appendChild(l);
+    var s=document.createElement("script"); s.src="js/leaflet/leaflet.js"; s.onload=cb; s.onerror=fallback; document.head.appendChild(s); }
+  var CAR='<svg viewBox="0 0 34 34"><g><rect x="10" y="4" width="14" height="26" rx="6" fill="#0f2342"/><rect x="11.5" y="9" width="11" height="6" rx="2" fill="#bcd3ea"/><rect x="11.5" y="21" width="11" height="4.5" rx="1.8" fill="#bcd3ea"/><rect x="12.5" y="15.6" width="9" height="4.8" rx="1.5" fill="#e3ad5f"/><rect x="11" y="4.6" width="3.4" height="2" rx="1" fill="#fff3c4"/><rect x="19.6" y="4.6" width="3.4" height="2" rx="1" fill="#fff3c4"/><rect x="11" y="28" width="3" height="1.5" rx=".7" fill="#e8443a"/><rect x="20" y="28" width="3" height="1.5" rx=".7" fill="#e8443a"/></g></svg>';
+  var PIN='<span class="ring"></span><span class="pin"><svg viewBox="0 0 64 76"><path d="M32 74C32 74 6 46 6 28a26 26 0 0 1 52 0c0 18-26 46-26 46z" fill="#0f2342" stroke="#e3ad5f" stroke-width="3"/><g fill="#f3cd8e"><path d="M18 30 32 18l14 12v2H18z"/><rect x="21" y="32" width="22" height="14" rx="1.5"/></g><g fill="#0f2342"><rect x="24" y="35" width="4" height="4" rx=".6"/><rect x="36" y="35" width="4" height="4" rx=".6"/><rect x="29.5" y="38" width="5" height="8" rx="1"/></g></svg></span>';
+  function bearing(a,b){ var y=Math.sin((b[1]-a[1])*Math.PI/180)*Math.cos(b[0]*Math.PI/180), x=Math.cos(a[0]*Math.PI/180)*Math.sin(b[0]*Math.PI/180)-Math.sin(a[0]*Math.PI/180)*Math.cos(b[0]*Math.PI/180)*Math.cos((b[1]-a[1])*Math.PI/180); return Math.atan2(y,x)*180/Math.PI; }
+  /* distances along the road, so the car keeps an even speed */
+  var D=[0]; for(var i=1;i<ROUTE.length;i++){ var a=ROUTE[i-1], b=ROUTE[i], dy=(b[0]-a[0])*111, dx=(b[1]-a[1])*111*Math.cos(a[0]*Math.PI/180); D.push(D[i-1]+Math.sqrt(dx*dx+dy*dy)); } var LEN=D[D.length-1];
+  function at(t){ var d=t*LEN, i=1; while(i<D.length-1&&D[i]<d) i++; var f=(d-D[i-1])/((D[i]-D[i-1])||1), a=ROUTE[i-1], b=ROUTE[i]; return {p:[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f], i:i, h:bearing(a,b)}; }
+  function setup(){
+    map=L.map(el,{zoomControl:false,attributionControl:true,scrollWheelZoom:false,zoomSnap:0,fadeAnimation:true});
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,className:"khm-tiles",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}).addTo(map);
+    L.control.zoom({position:"bottomright"}).addTo(map);
+    map.on("click",function(){ map.scrollWheelZoom.enable(); });
+  }
+  function start(){
+    var me=++run; card.classList.remove("on"); play.hidden=true;
+    [line,car,home].forEach(function(x){ if(x) map.removeLayer(x); }); map.eachLayer(function(x){ if(x.options&&x.options.khTown) map.removeLayer(x); });
+    map.invalidateSize(); map.fitBounds(L.latLngBounds(ROUTE).pad(.25),{animate:false});
+    L.marker(TOWN,{khTown:1,interactive:false,icon:L.divIcon({className:"khm-town",html:'<i></i><span>Tenkasi</span>',iconSize:[0,0]})}).addTo(map);
+    var under=L.polyline(ROUTE,{color:"#0f2342",weight:9,opacity:.12,className:"khm-route",interactive:false}).addTo(map);
+    line=L.polyline([TOWN],{color:"#0f2342",weight:5,opacity:.95,className:"khm-route",interactive:false}).addTo(map); line._under=under;
+    car=L.marker(TOWN,{interactive:false,icon:L.divIcon({className:"khm-car",html:CAR,iconSize:[34,34]})}).addTo(map);
+    var finish=function(){ if(me!==run) return; map.removeLayer(car); car=null; line.setLatLngs(ROUTE);
+      map.flyTo(HOME,16,{duration:reduce?0:2.4,easeLinearity:.2});
+      map.once("moveend",function(){ if(me!==run) return;
+        home=L.marker(HOME,{title:"Kutralam Ezhilagam",icon:L.divIcon({className:"khm-home",html:PIN,iconSize:[64,76],iconAnchor:[32,76]})}).addTo(map);
+        home.on("click",function(){ window.open("https://maps.app.goo.gl/uMu427TCwSHLzAVEA","_blank","noopener"); });
+        setTimeout(function(){ if(me!==run) return; card.classList.add("on"); play.hidden=false; },500); }); };
+    if(reduce) return finish();
+    var T=4200, t0=null, sv=car.getElement().querySelector("svg");
+    setTimeout(function(){ requestAnimationFrame(function step(ts){ if(me!==run) return; if(t0===null) t0=ts; var k=Math.min(1,(ts-t0)/T), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2, s=at(e);
+      car.setLatLng(s.p); sv.style.transform="rotate("+s.h+"deg)"; line.setLatLngs(ROUTE.slice(0,s.i).concat([s.p]));
+      if(k<1) requestAnimationFrame(step); else setTimeout(finish,250); }); },700);
+  }
+  play.addEventListener("click",start);
+  var seen=false;
+  new MutationObserver(function(){ var on=pane.classList.contains("on");
+    if(on&&!seen){ seen=true; load(function(){ if(!window.L) return fallback(); if(!map) setup(); setTimeout(start,780); }); }
+    if(!on){ seen=false; run++; } }).observe(pane,{attributes:true,attributeFilter:["class"]});
+})();
 </script>
 <style>
 /* v8.6 desktop: the page turn's shadow on the page underneath, and the menu highlight that glides */
