@@ -1359,7 +1359,7 @@ if(location.hash==="#bookings")go("bookings");
   if(seen||location.hash||matchMedia("(prefers-reduced-motion: reduce)").matches){el.remove();reveal();return}
   try{sessionStorage.setItem("liteIntro","1")}catch(e){}
   /* v9.2 (Rakesh, 28 Oct 03:39): a tad faster (logo at 1.4x, shorter hold, quicker lift) with a soft
-     nature sound - a breeze through the trees and a few birds. Phones only allow sound after a touch,
+     nature sound - a dense morning forest with birds and insects and a waterfall far away. Phones only allow sound after a touch,
      so if it is held back it starts on the guest's first touch while the opening is still on screen. */
   const v=$("#introV");let done=false;v.playbackRate=1.4;v.defaultPlaybackRate=1.4;
   const finish=()=>{if(done)return;done=true;el.classList.add("done");reveal();natureFade();setTimeout(()=>el.remove(),900)};
@@ -1368,20 +1368,11 @@ if(location.hash==="#bookings")go("bookings");
   setTimeout(go,3000);$("#introSkip").onclick=finish;
   let ac=null,out=null;
   function natureFade(){try{if(out&&ac)out.gain.setTargetAtTime(0,ac.currentTime,.25)}catch(e){}}
+  /* v9.2: the sound is a short recording - a dense morning forest, birds and insects, a waterfall far off (img/forest-morning.mp3) */
   function nature(){if(ac)return;try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return}
-    const t0=ac.currentTime+.05,sr=ac.sampleRate,len=Math.floor(sr*4.2);out=ac.createGain();out.gain.value=3.5;out.connect(ac.destination);
-    /* breeze: soft brown-ish noise through a slowly opening band filter */
-    const b=ac.createBuffer(1,len,sr),x=b.getChannelData(0);let l=0;for(let i=0;i<len;i++){l=(l+.04*(Math.random()*2-1))/1.04;x[i]=l*28}
-    const n=ac.createBufferSource();n.buffer=b;const bp=ac.createBiquadFilter();bp.type="bandpass";bp.Q.value=.6;
-    bp.frequency.setValueAtTime(380,t0);bp.frequency.linearRampToValueAtTime(900,t0+1.8);bp.frequency.linearRampToValueAtTime(520,t0+4);
-    const g=ac.createGain();g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.55,t0+1.1);g.gain.linearRampToValueAtTime(.35,t0+2.6);g.gain.linearRampToValueAtTime(0,t0+4.1);
-    n.connect(bp);bp.connect(g);g.connect(out);n.start(t0);
-    /* birds: short two-note chirps, a little apart, panned left and right */
-    const chirp=(at,f,pan)=>{const o=ac.createOscillator(),e=ac.createGain(),pn=ac.createStereoPanner?ac.createStereoPanner():null;o.type="sine";
-      o.frequency.setValueAtTime(f,at);o.frequency.exponentialRampToValueAtTime(f*1.35,at+.05);o.frequency.exponentialRampToValueAtTime(f*.9,at+.11);
-      e.gain.setValueAtTime(0,at);e.gain.linearRampToValueAtTime(.22,at+.012);e.gain.exponentialRampToValueAtTime(.0008,at+.13);
-      o.connect(e);if(pn){pn.pan.value=pan;e.connect(pn);pn.connect(out)}else e.connect(out);o.start(at);o.stop(at+.15)};
-    [[.55,3100,-.5],[.72,3500,-.5],[1.4,4200,.6],[1.52,3900,.6],[1.64,4400,.6],[2.35,2900,-.2],[2.5,3300,-.2],[3.05,4000,.4]].forEach(a=>chirp(t0+a[0],a[1],a[2]));
+    out=ac.createGain();out.gain.value=.9;out.connect(ac.destination);
+    fetch("img/forest-morning.mp3").then(r=>r.arrayBuffer()).then(b=>new Promise((ok,no)=>ac.decodeAudioData(b,ok,no))).then(buf=>{
+      if(done&&ac.state!=="running")return;const s=ac.createBufferSource();s.buffer=buf;s.connect(out);s.start(ac.currentTime+.02)}).catch(()=>{});
     if(ac.state==="suspended"){const kick=()=>{ac.resume();removeEventListener("pointerdown",kick,true);removeEventListener("touchstart",kick,true)};
       addEventListener("pointerdown",kick,true);addEventListener("touchstart",kick,true)}}
   nature();})();
