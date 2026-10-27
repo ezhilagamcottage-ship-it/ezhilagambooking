@@ -595,12 +595,12 @@ html[data-nav=done]::view-transition-new(root){animation:vtRiseIn .6s var(--ease
 .rcpt-by{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin:8px 0 0;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.rcpt-by img{height:16px;width:auto;display:block}
 
 /* ===== logo intro (same clip and rhythm as the main site), then the lite page ===== */
-#intro{position:fixed;inset:0;z-index:300;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:transform 1s cubic-bezier(.77,0,.18,1),opacity .6s ease .5s}
+#intro{position:fixed;inset:0;z-index:300;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:transform .8s cubic-bezier(.77,0,.18,1),opacity .6s ease .5s}
 #intro video{width:min(620px,84vw);height:auto;display:block}
-#intro .tl{width:0;height:1px;background:var(--maroon);transition:width 1.2s cubic-bezier(.65,0,.35,1)}
-#intro .tc{opacity:0;transform:translateY(8px);transition:opacity .8s .3s,transform .8s .3s;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
+#intro .tl{width:0;height:1px;background:var(--maroon);transition:width .8s cubic-bezier(.65,0,.35,1)}
+#intro .tc{opacity:0;transform:translateY(8px);transition:opacity .55s .15s,transform .55s .15s;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
 #intro.go .tl{width:min(220px,50vw)}#intro.go .tc{opacity:1;transform:none}
-#intro .cn{display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:7px 8px 7px 16px;border-radius:999px;background:#fff;border:1px solid #d6dce7;box-shadow:0 8px 24px rgba(45,31,107,.16);opacity:0;transform:translateY(12px) scale(.96);transition:opacity .7s .55s,transform .7s cubic-bezier(.2,.8,.2,1) .55s}
+#intro .cn{display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:7px 8px 7px 16px;border-radius:999px;background:#fff;border:1px solid #d6dce7;box-shadow:0 8px 24px rgba(45,31,107,.16);opacity:0;transform:translateY(12px) scale(.96);transition:opacity .5s .3s,transform .5s cubic-bezier(.2,.8,.2,1) .3s}
 #intro.go .cn{opacity:1;transform:none}
 #intro .cn img{width:auto;height:30px;display:block}
 #intro .cn small{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6b7690}
@@ -1358,11 +1358,33 @@ if(location.hash==="#bookings")go("bookings");
   const reveal=()=>{document.body.classList.remove("intro-on")};
   if(seen||location.hash||matchMedia("(prefers-reduced-motion: reduce)").matches){el.remove();reveal();return}
   try{sessionStorage.setItem("liteIntro","1")}catch(e){}
-  const v=$("#introV");let done=false;
-  const finish=()=>{if(done)return;done=true;el.classList.add("done");reveal();setTimeout(()=>el.remove(),1100)};
-  const go=()=>{if(el.classList.contains("go"))return;el.classList.add("go");setTimeout(finish,2000)};
+  /* v9.2 (Rakesh, 28 Oct 03:39): a tad faster (logo at 1.4x, shorter hold, quicker lift) with a soft
+     nature sound - a breeze through the trees and a few birds. Phones only allow sound after a touch,
+     so if it is held back it starts on the guest's first touch while the opening is still on screen. */
+  const v=$("#introV");let done=false;v.playbackRate=1.4;v.defaultPlaybackRate=1.4;
+  const finish=()=>{if(done)return;done=true;el.classList.add("done");reveal();natureFade();setTimeout(()=>el.remove(),900)};
+  const go=()=>{if(el.classList.contains("go"))return;el.classList.add("go");setTimeout(finish,1250)};
   v.addEventListener("ended",go);const p=v.play();if(p&&p.catch)p.catch(go);
-  setTimeout(go,4200);$("#introSkip").onclick=finish;})();
+  setTimeout(go,3000);$("#introSkip").onclick=finish;
+  let ac=null,out=null;
+  function natureFade(){try{if(out&&ac)out.gain.setTargetAtTime(0,ac.currentTime,.25)}catch(e){}}
+  function nature(){if(ac)return;try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return}
+    const t0=ac.currentTime+.05,sr=ac.sampleRate,len=Math.floor(sr*4.2);out=ac.createGain();out.gain.value=3.5;out.connect(ac.destination);
+    /* breeze: soft brown-ish noise through a slowly opening band filter */
+    const b=ac.createBuffer(1,len,sr),x=b.getChannelData(0);let l=0;for(let i=0;i<len;i++){l=(l+.04*(Math.random()*2-1))/1.04;x[i]=l*28}
+    const n=ac.createBufferSource();n.buffer=b;const bp=ac.createBiquadFilter();bp.type="bandpass";bp.Q.value=.6;
+    bp.frequency.setValueAtTime(380,t0);bp.frequency.linearRampToValueAtTime(900,t0+1.8);bp.frequency.linearRampToValueAtTime(520,t0+4);
+    const g=ac.createGain();g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.55,t0+1.1);g.gain.linearRampToValueAtTime(.35,t0+2.6);g.gain.linearRampToValueAtTime(0,t0+4.1);
+    n.connect(bp);bp.connect(g);g.connect(out);n.start(t0);
+    /* birds: short two-note chirps, a little apart, panned left and right */
+    const chirp=(at,f,pan)=>{const o=ac.createOscillator(),e=ac.createGain(),pn=ac.createStereoPanner?ac.createStereoPanner():null;o.type="sine";
+      o.frequency.setValueAtTime(f,at);o.frequency.exponentialRampToValueAtTime(f*1.35,at+.05);o.frequency.exponentialRampToValueAtTime(f*.9,at+.11);
+      e.gain.setValueAtTime(0,at);e.gain.linearRampToValueAtTime(.22,at+.012);e.gain.exponentialRampToValueAtTime(.0008,at+.13);
+      o.connect(e);if(pn){pn.pan.value=pan;e.connect(pn);pn.connect(out)}else e.connect(out);o.start(at);o.stop(at+.15)};
+    [[.55,3100,-.5],[.72,3500,-.5],[1.4,4200,.6],[1.52,3900,.6],[1.64,4400,.6],[2.35,2900,-.2],[2.5,3300,-.2],[3.05,4000,.4]].forEach(a=>chirp(t0+a[0],a[1],a[2]));
+    if(ac.state==="suspended"){const kick=()=>{ac.resume();removeEventListener("pointerdown",kick,true);removeEventListener("touchstart",kick,true)};
+      addEventListener("pointerdown",kick,true);addEventListener("touchstart",kick,true)}}
+  nature();})();
 
 /* v8.6: Chat with Shenba in a window on this page (the chat itself comes from the main site's chat, themed to match) */
 (function(){const w=$("#chatWin");let open=false;
