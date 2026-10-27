@@ -7,6 +7,13 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v8.7 — 27 Oct 2026
+
+**Computer site** (Rakesh).
+- Chat with Shenba opens in the middle of the screen in the Talk with Shenba design: her full picture in a gold arch (glows and says "Typing…" while she replies), the website dimmed behind, gold "End chat" and a close button. Close keeps the chat; End chat starts fresh next time.
+- Location drive now starts at Tenkasi Railway Station (6.9 km by road), zooms in at Courtallam bus stand and follows the car along Five Falls Main Road past Chitraruvi to the Vairams Nagar arch and the house.
+- img/route-to-ezhilagam.mp4 / .gif remade the same way; the guest WhatsApp caption says 6.9 km from Tenkasi Railway Station.
+
 ## v8.6 — 27 Oct 2026
 
 **Phone site** (Rakesh).
