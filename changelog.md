@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v7.4 — 27 Oct 2026
+
+**Duphora pill beside the logo on computers** (Rakesh). On the computer home page the "Powered by Duphora" pill now sits right next to the Kutralam Ezhilagam logo plate, lined up with its bottom edge so it clears the Lite/Desk switch and the Reserve buttons at every screen width. At the end of the opening the pill glides from under the logo straight into that place, instead of fading out. Phones unchanged.
+
 ## v7.3 — 27 Oct 2026
 
 **Duphora is now the builder on the site** (Rakesh). The builder's pill now reads "Powered by" with the Duphora logo, in the logo opening and in the phone header, on the full site and the lite site. The receipt card (after payment and in My Bookings) and the booking voucher carry a small "Powered by Duphora" line at the foot. The previous builder's logo file is removed and its name appears nowhere on the site.

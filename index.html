@@ -950,6 +950,12 @@ html.ts .wrap{display:none!important}
 .ts-logo{position:absolute;z-index:40;top:22px;left:calc(var(--ts-rail) + 28px);background:var(--ts-cream);padding:10px 16px;border-radius:2px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
 .ts-logo .logo-wrap{width:210px}
 .ts-logo .logo{display:block;width:100%;height:auto}
+/* v7.4 (Rakesh, 27 Oct 12:43): on a computer the Powered by Duphora pill sits beside the hotel's logo plate */
+.ts-dcn{position:absolute;left:calc(100% + 14px);bottom:0;display:inline-flex;align-items:center;gap:9px;padding:6px 6px 6px 15px;
+  border-radius:999px;background:rgba(255,255,255,.97);border:1px solid rgba(214,220,231,.9);box-shadow:0 10px 30px rgba(0,0,0,.18);white-space:nowrap;pointer-events:none}
+.ts-dcn small{font:400 9.5px/1.2 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6b7690}
+.ts-dcn img{height:26px;width:auto;display:block}
+@media (max-width:899px){ .ts-dcn{display:none} }
 .ts-act{position:fixed;z-index:70;top:22px;right:max(22px,env(safe-area-inset-right));display:flex;gap:10px}
 .ts-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:0 20px;border:0;border-radius:2px;cursor:pointer;text-decoration:none;
   font:400 12.5px/1 var(--ts-sans);letter-spacing:.12em;text-transform:uppercase;transition:background .3s,color .3s,transform .2s}
@@ -1195,7 +1201,7 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
 <div id="tsDock"></div>
 
 <section class="ts-hero" id="top" aria-label="Photographs of Kutralam Ezhilagam">
-  <div class="ts-logo" id="tsLogo"></div>
+  <div class="ts-logo" id="tsLogo"><span class="ts-dcn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="89" height="26"></span></div>
   <div class="ts-title" id="tsTitle"><p class="ts-cap" style="margin:0 0 16px;animation-delay:.1s">Kutralam Ezhilagam &middot; Courtallam</p></div>
 </section>
 
@@ -3325,14 +3331,14 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   document.body.style.overflow = "hidden";
   var v = $("tsIntroV"), ended = false;
   /* v5.6 (Rakesh, 25 Oct 16:26): when the opening ends the logo glides to its
-     place at the top-left and the Duphora pill to the top-right, while the
+     place at the top-left and the Duphora pill beside it (phone: top-right), while the
      white screen fades away behind them. On a computer, where the header has no
      pill, the pill fades out instead. Falls back to the old lift if anything is
      missing. */
   var finish = function () {
     if (ended) return; ended = true; document.body.style.overflow = "";
     var EASE = "cubic-bezier(.65,0,.25,1)", D = 1100;
-    var tLogo = document.querySelector("#tsLogo .logo"), hCn = document.querySelector(".ts-rail .ts-cn"), iCn = intro.querySelector(".cn");
+    var tLogo = document.querySelector("#tsLogo .logo"), hCn = [document.querySelector(".ts-rail .ts-cn"), document.querySelector("#tsLogo .ts-dcn")].filter(function (el) { return el && getComputedStyle(el).display !== "none"; })[0] || null, iCn = intro.querySelector(".cn");
     if (!tLogo || !Element.prototype.animate) { intro.classList.add("done"); setTimeout(function () { intro.remove(); }, 1100); return; }
     try {
       /* the logo inside the video frame (measured from the clip: 4.6–98.3% across, 12–88% down) */
@@ -3348,7 +3354,7 @@ if (location.hash === "#talk") openCall(_fromAlbum);
       var sx = to.width / from.w, sy = to.height / from.h;
       fly.animate([{ transform: "none" }, { transform: "translate(" + (to.left - from.x) + "px," + (to.top - from.y) + "px) scale(" + sx + "," + sy + ")" }],
                   { duration: D, easing: EASE, fill: "forwards" });
-      var pillOnHeader = hCn && hCn.offsetParent !== null && iCn;
+      var pillOnHeader = hCn && iCn;
       if (pillOnHeader) {
         var a = iCn.getBoundingClientRect(), b = hCn.getBoundingClientRect();
         hCn.style.visibility = "hidden";
