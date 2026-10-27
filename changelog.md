@@ -7,6 +7,12 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v9.0 — 27 Oct 2026
+
+**Payment** (Rakesh).
+- The Pay button always shows the amount on screen (full or 60%); it was showing an earlier order's figure.
+- "Opening secure payment" is near-instant: on Review & pay the Razorpay window's code loads and the order is prepared in the background once name and number are in; same on the computer booking page for cards. After 2.5 s of waiting the button says "Almost there…".
+
 ## v8.9 — 27 Oct 2026
 
 **Room choice, phone and computer** (Rakesh).
