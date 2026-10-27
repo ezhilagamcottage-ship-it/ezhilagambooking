@@ -9,7 +9,7 @@ and the one in the Drive filename, and they must always be the same number.
 
 ## v7.3 — 27 Oct 2026
 
-**Duphora replaces CloudNest Technologies** (Rakesh). The builder's pill now reads "Powered by" with the Duphora logo, in the logo opening and in the phone header, on the full site and the lite site. The receipt card (after payment and in My Bookings) and the booking voucher carry a small "Powered by Duphora" line at the foot. The old CloudNest logo file is removed and the name appears nowhere on the site.
+**Duphora is now the builder on the site** (Rakesh). The builder's pill now reads "Powered by" with the Duphora logo, in the logo opening and in the phone header, on the full site and the lite site. The receipt card (after payment and in My Bookings) and the booking voucher carry a small "Powered by Duphora" line at the foot. The previous builder's logo file is removed and its name appears nowhere on the site.
 
 ## v7.2 — 26 Oct 2026
 
