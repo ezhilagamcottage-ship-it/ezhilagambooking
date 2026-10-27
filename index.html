@@ -1370,6 +1370,27 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   html.ts #sbCall .sw-pic::after{z-index:3;box-shadow:inset 0 0 0 2px rgba(243,205,142,.95),inset 0 0 0 8px rgba(15,35,66,.35),inset 0 0 0 9px rgba(243,205,142,.5)}
   html.ts #sbCall .sw-vid,html.ts #sbCall .sw-pic img{position:absolute;z-index:1;clip-path:inset(2% 12% 0 12% round 999px 999px 24px 24px)}
   html.ts #sbCall .sw-glow{display:none}
+
+  /* v8.5: Shenba stays in her gold arch in the call widget (same place and size as her intro), alive: blinks, breath, lips */
+  html.ts dialog#sbCall{--khW:calc(min(700px,92vh) * .5625)}
+  html.ts #sbCall .sc-top{padding-left:calc(var(--khW) * .88 + 12px)}
+  html.ts #sbCall .sc-body{grid-template-columns:calc(var(--khW) * .88 - 30px) minmax(0,1fr)}
+  html.ts #sbCall .sc-actions{padding-left:calc(var(--khW) * .88 + 12px)}
+  html.ts #sbCall .sc-main{position:static;padding:0}
+  html.ts #sbCall .sc-face{position:absolute;z-index:2;left:calc(var(--khW) * .12);top:calc(min(700px,92vh) * .02);width:calc(var(--khW) * .76);height:calc(min(700px,92vh) * .98);margin:0;
+    border-radius:999px 999px 24px 24px/40% 40% 24px 24px;background:#0f2342;box-shadow:inset 0 0 0 2px rgba(243,205,142,.95),0 0 0 0 rgba(0,0,0,0);transition:box-shadow .35s}
+  html.ts #sbCall .sc-face svg{position:absolute;inset:0;width:100%;height:100%;border-radius:inherit}
+  html.ts #sbCall .sc-face::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;box-shadow:inset 0 0 0 2px rgba(243,205,142,.95),inset 0 0 0 8px rgba(15,35,66,.35),inset 0 0 0 9px rgba(243,205,142,.5)}
+  html.ts #sbCall .sc-main.listening .sc-face::after{box-shadow:inset 0 0 0 3px #3fc1b0,inset 0 0 0 9px rgba(15,122,110,.35),inset 0 0 0 10px rgba(63,193,176,.6)}
+  html.ts #sbCall .sc-main.speaking .sc-face::after{box-shadow:inset 0 0 0 3px #f3cd8e,inset 0 0 0 9px rgba(227,173,95,.3),inset 0 0 0 10px rgba(243,205,142,.8)}
+  html.ts #sbCall .sc-main.listening .sc-face,html.ts #sbCall .sc-main.speaking .sc-face{box-shadow:none}
+  html.ts #sbCall .sc-main::after{content:"";position:absolute;z-index:3;left:calc(var(--khW) * .12);width:calc(var(--khW) * .76);bottom:0;height:150px;pointer-events:none;
+    background:linear-gradient(180deg,rgba(10,24,48,0),rgba(10,24,48,.82) 55%,rgba(10,24,48,.92))}
+  html.ts #sbCall .sc-main>b,html.ts #sbCall .sc-main>small,html.ts #sbCall .sc-main>.sc-stat{position:absolute;z-index:4;left:calc(var(--khW) * .12);width:calc(var(--khW) * .76);text-align:center;padding:0 14px;box-sizing:border-box}
+  html.ts #sbCall .sc-main>b{bottom:74px;color:#f3cd8e;font-size:30px}
+  html.ts #sbCall .sc-main>small{bottom:56px;color:rgba(246,234,214,.8)}
+  html.ts #sbCall .sc-main>.sc-stat{bottom:16px;min-height:2.6em;display:flex;align-items:center;justify-content:center;color:#7fe0d2}
+  html.ts #sbCall .sc-stat a{color:#f3cd8e}
   html.ts #sbCall .sc-opts h3{font:400 20px/1.2 "DM Serif Display",var(--ts-serif);letter-spacing:0;text-transform:none;color:#0f2342;margin:0 0 8px}
   html.ts #sbCall .op-row{gap:14px;padding:4px 4px 10px}
   html.ts #sbCall .op{flex:0 0 calc(50% - 8px);max-width:none;border-radius:18px;border-color:rgba(227,173,95,.6);background:#fff;box-shadow:0 10px 24px rgba(15,35,66,.12);animation:khOpIn .5s cubic-bezier(.2,.8,.2,1) both}
@@ -2502,7 +2523,9 @@ async function goVoice() {
 /* ── Shenba's face: idle (call closed), listening, speaking ── */
 const dock = $("saDock"), face = $("saFace"), scMain = $("scMain");
 /* the call page shows the same animated Shenba, larger (a copy of the corner picture with its own ids) */
-$("scFace").innerHTML = face.querySelector("svg").outerHTML.replace(/id="sa/g, 'id="sc').replace(/url\(#sa/g, "url(#sc");
+$("scFace").innerHTML = matchMedia("(min-width: 900px)").matches   // v8.5: on a computer she stays in her gold arch, built from her intro video
+  ? '<svg viewBox="0 0 438 1003" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><radialGradient id="scFadeE"><stop offset=".6" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient><radialGradient id="scFadeM"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient><mask id="scEyesM" maskUnits="userSpaceOnUse" x="0" y="0" width="438" height="1003"><ellipse cx="222.8" cy="427.5" rx="82.4" ry="26.0" fill="url(#scFadeE)"/></mask><mask id="scMouthM" maskUnits="userSpaceOnUse" x="0" y="0" width="438" height="1003"><ellipse cx="222.7" cy="514.8" rx="53.8" ry="39.9" fill="url(#scFadeM)"/></mask></defs><g class="sa-body"><g class="sa-head"><image href="img/shenba-arch.webp" x="0" y="0" width="438" height="1003"/><g mask="url(#scEyesM)"><image class="sa-lid" href="img/shenba-arch-closed.webp" x="0" y="0" width="438" height="1003"/></g><g mask="url(#scMouthM)"><image class="sa-v sa-mopen" data-v="talk" href="img/shenba-arch-talk.webp" x="0" y="0" width="438" height="1003"/><image class="sa-v" data-v="aa" href="img/shenba-arch-aa.webp" x="0" y="0" width="438" height="1003"/><image class="sa-v" data-v="oo" href="img/shenba-arch-oo.webp" x="0" y="0" width="438" height="1003"/><image class="sa-v" data-v="ee" href="img/shenba-arch-ee.webp" x="0" y="0" width="438" height="1003"/><image class="sa-v" data-v="mbp" href="img/shenba-arch-mbp.webp" x="0" y="0" width="438" height="1003"/><image class="sa-v" data-v="fv" href="img/shenba-arch-fv.webp" x="0" y="0" width="438" height="1003"/></g></g></g></svg>'
+  : face.querySelector("svg").outerHTML.replace(/id="sa/g, 'id="sc').replace(/url\(#sa/g, "url(#sc");
 let calling = false, starting = false;
 /* Natural blinks (Rakesh, 23 Oct 2026): uneven gaps, now and then a double blink; a blink when the turn passes,
    slow thoughtful blinks while she is thinking, and a warm slow double blink when she first greets the guest. */
@@ -2769,6 +2792,7 @@ const swCalm = () => matchMedia("(prefers-reduced-motion: reduce)").matches || !
 /* the intro video (v2.8): 1080 x 1920; where her face sits in it, and what she says (kept in step with the server) */
 const KH_CUT = (function(){ try { return matchMedia("(min-width: 900px)").matches && !!document.createElement("video").canPlayType('video/webm; codecs="vp9, opus"') && !/^((?!chrome|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent); } catch (e) { return false; } })();
 if (matchMedia("(min-width: 900px)").matches) document.documentElement.classList.add(KH_CUT ? "kh-cut" : "kh-nocut");
+const KH_DESK = matchMedia("(min-width: 900px)").matches;
 const INTRO = { src: KH_CUT ? "img/shenba-intro-cut.webm" : "img/shenba-intro.mp4", face: { x: 0.5, y: 0.43, r: 0.14 }, w: 720, h: 1280,
   line: "வாங்க! எழிலகம் room booking-க்கு help பண்ண நான் இருக்கேன், ஷென்பா. உங்க check-in date சொல்லுங்க?" };
 let swMedia = { face: SW_FACE, w: 720, h: 1260 };
@@ -2809,6 +2833,10 @@ async function swWelcome() {
 /* she shrinks from full size into her circle (the end of the welcome, photo or video) */
 async function swShrink() {
   $("sbCall").classList.remove("kh-in");
+  if (KH_DESK) { const sw = $("sw"), face = $("scFace"); face.style.opacity = "";
+    sw.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 650, easing: "ease-in-out", fill: "forwards" }); await swWait(660);
+    sw.style.visibility = "hidden"; swClear(); swBusy = false; sw.classList.remove("vid"); swMedia = { face: SW_FACE, w: 720, h: 1260 };
+    setTimeout(() => saBlink("warm"), 300); return; }
   const sw = $("sw"), pic = $("swPic"), face = $("scFace");
   const h = swGeo(), tx = h.cx - h.fx, ty = h.cy - h.fy;
   $("swSay").animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" });
@@ -2893,7 +2921,8 @@ async function swNandri(booked) {
   sw.style.visibility = "visible"; sw.style.opacity = 1;
   // 1. her circle opens into the full picture
   face.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: "forwards" });
-  if (!swCalm()) {
+  if (KH_DESK) { sw.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 450, fill: "forwards" }); await swWait(450); }
+  else if (!swCalm()) {
     pic.animate([{ clipPath: `circle(${g.fr}px at ${g.fx}px ${g.fy}px)`, transform: `translate(${tx}px,${ty}px) scale(${g.k})` },
                  { clipPath: `circle(${Math.hypot(g.W, g.H)}px at ${g.fx}px ${g.fy}px)`, transform: "none" }],
       { duration: 900, easing: "cubic-bezier(.3,0,.2,1)", fill: "forwards" });
