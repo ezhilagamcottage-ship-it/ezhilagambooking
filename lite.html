@@ -261,7 +261,48 @@ svg.i{width:22px;height:22px;flex:none}
 .sheet p{margin:0;font-size:11px;color:var(--muted)}
 .app{padding-bottom:calc(var(--dockh) + 96px)}
 .toast{position:fixed;left:50%;bottom:calc(var(--dockh) + 84px);transform:translateX(-50%);background:var(--ink);color:var(--white);padding:9px 16px;border-radius:999px;font-size:13px;z-index:40;white-space:nowrap}
-@media (prefers-reduced-motion:no-preference){.screen{animation:rise .25s ease-out}@keyframes rise{from{transform:translateY(8px);opacity:.5}to{transform:none;opacity:1}}}
+/* v8.6 page transitions (27 Oct): only when the page changes, never on a counter tap.
+   Going deeper slides the new page in from the right over the old one; Back slides it away again;
+   the four top tabs cross-fade with the content arriving in reading order; a room's photo travels into the room page. */
+:root{--ease-out:cubic-bezier(.22,1,.36,1);--ease-expo:cubic-bezier(.16,1,.3,1);--ease-exit:cubic-bezier(.55,.055,.675,.19)}
+#dock{view-transition-name:dock}
+.toptabs{view-transition-name:toptabs}
+.tt button[aria-current="page"]{view-transition-name:tabpill}
+html[data-nav=fwd] .toptabs,html[data-nav=back] .toptabs,html[data-nav=done] .toptabs,html[data-nav=fwd] .tt button,html[data-nav=back] .tt button,html[data-nav=done] .tt button{view-transition-name:none}
+.dhero .ph img{view-transition-name:roomph}
+::view-transition-group(*){animation-duration:.46s;animation-timing-function:var(--ease-out)}
+::view-transition-group(tabpill){animation-duration:.42s;animation-timing-function:var(--ease-expo)}
+::view-transition-group(roomph){animation-duration:.52s;animation-timing-function:var(--ease-expo)}
+::view-transition-image-pair(roomph){isolation:auto}
+::view-transition-old(roomph),::view-transition-new(roomph){animation:none;mix-blend-mode:normal;height:100%;object-fit:cover;overflow:clip}
+html[data-nav=fwd]::view-transition-old(root){animation:vtPushOld .46s var(--ease-out) both}
+html[data-nav=fwd]::view-transition-new(root){animation:vtPushNew .46s var(--ease-out) both}
+html[data-nav=back]::view-transition-old(root){animation:vtBackOld .4s var(--ease-out) both;z-index:2}
+html[data-nav=back]::view-transition-new(root){animation:vtBackNew .4s var(--ease-out) both}
+html[data-nav^=tab]::view-transition-old(root){animation:vtFadeOut .16s var(--ease-exit) both}
+html[data-nav^=tab]::view-transition-new(root){animation:vtFadeIn .3s var(--ease-out) .06s both}
+html[data-nav=done]::view-transition-old(root){animation:vtFadeOut .2s var(--ease-exit) both}
+html[data-nav=done]::view-transition-new(root){animation:vtRiseIn .6s var(--ease-expo) .05s both}
+@keyframes vtPushOld{to{transform:translateX(-28%);filter:brightness(.9)}}
+@keyframes vtPushNew{from{transform:translateX(100%);box-shadow:-18px 0 40px rgba(40,10,15,.18)}to{transform:none;box-shadow:-18px 0 40px rgba(40,10,15,0)}}
+@keyframes vtBackOld{to{transform:translateX(100%);box-shadow:-18px 0 40px rgba(40,10,15,0)}}
+@keyframes vtBackNew{from{transform:translateX(-28%);filter:brightness(.9)}}
+@keyframes vtFadeOut{to{opacity:0}}
+@keyframes vtFadeIn{from{opacity:0}}
+@keyframes vtRiseIn{from{opacity:0;transform:translateY(24px) scale(.985)}}
+/* content of a freshly opened tab arrives block by block (also the fallback where page transitions are missing) */
+@keyframes scrIn{from{opacity:0;transform:translateY(18px)}}
+@keyframes scrFwd{from{opacity:.4;transform:translateX(40px)}}
+@keyframes scrBack{from{opacity:.4;transform:translateX(-40px)}}
+@media (prefers-reduced-motion:no-preference){
+  .screen.in-tab>*:not(.toptabs){animation:scrIn .56s var(--ease-expo) both}
+  .screen.in-tab>*:nth-child(2){animation-delay:.07s}.screen.in-tab>*:nth-child(3){animation-delay:.14s}
+  .screen.in-tab>*:nth-child(4){animation-delay:.21s}.screen.in-tab>*:nth-child(5){animation-delay:.28s}.screen.in-tab>*:nth-child(n+6){animation-delay:.34s}
+  .screen.in-fwd{animation:scrFwd .36s var(--ease-out) both}.screen.in-back{animation:scrBack .32s var(--ease-out) both}
+  .btn,.det,.fbtn,.rcard,.tt button,.datechip,.stp{transition:transform .14s var(--ease-out),background-color .18s ease,color .18s ease}
+  .btn:active:not(:disabled),.det:active,.fbtn:active,.rcard:active,.tt button:active,.datechip:active{transform:scale(.97)}
+}
+@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 
 /* ===== v4: planner first, availability list, Budget / Luxury ===== */
 .band.tall{padding-block:20px 92px}
@@ -1070,8 +1111,8 @@ function dock(){const s=S.screen;
   return ""}
 
 function render(){
-  $("#view").innerHTML=`<div class="screen">${V[S.screen]()}<div class="byline"><span class="by-pill" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="68" height="20"></span></div></div>`;
-  $("#dockin").innerHTML=dock();S.anim="";bindCarousel();
+  $("#view").innerHTML=`<div class="screen${S.enter?" in-"+S.enter:""}">${V[S.screen]()}<div class="byline"><span class="by-pill" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="68" height="20"></span></div></div>`;
+  $("#dockin").innerHTML=dock();S.anim="";S.enter="";bindCarousel();
   requestAnimationFrame(()=>document.documentElement.style.setProperty("--dockh",$("#dock").offsetHeight+"px"));
   renderShenba();
   const q=$("#q");if(q){q.oninput=e=>{S.q=e.target.value;const box=$("#results");if(box)box.innerHTML=filtered().map(resultCard).join("")||'<div class="empty"><b>No rooms match</b>Try another word or category.</div>'};
@@ -1089,7 +1130,27 @@ function shenbaMsg(){const bits=[];
   return `Vanakkam Shenba! I'm looking at Kutralam Ezhilagam.\n${bits.join("\n")}`}
 function renderShenba(){const onBar=TABS.includes(S.screen)||S.screen==="done";$("#fab").hidden=onBar||S.screen==="pay";document.querySelectorAll("[data-shenba].ab").forEach(b=>b.setAttribute("aria-expanded",S.shenba));$("#sheet").classList.toggle("fromBar",onBar);$("#fab").setAttribute("aria-expanded",S.shenba);$("#sheet").hidden=!S.shenba;
   $("#waShenba").href=`https://wa.me/${SHENBA_WA}?text=${encodeURIComponent(shenbaMsg())}`}
-function go(screen,push=true){if(push&&S.screen!==screen)HIST.push(S.screen);S.screen=screen;if(TABS.includes(screen)){S.tab=screen;HIST.length=0}render();window.scrollTo(0,0)}
+const SCROLLS={};
+const RM=matchMedia("(prefers-reduced-motion: reduce)");
+function go(screen,push=true){const from=S.screen;if(from===screen&&push){render();window.scrollTo(0,0);return}
+  const ti=TABS.indexOf(from),tj=TABS.indexOf(screen);
+  const kind=screen==="done"?"done":ti>=0&&tj>=0?"tab":(!push||(tj>=0&&ti<0))?"back":"fwd";
+  SCROLLS[from]=window.scrollY;
+  const roomId=S.roomId;
+  const apply=()=>{if(push&&from!==screen)HIST.push(from);S.screen=screen;if(tj>=0){S.tab=screen;HIST.length=0}
+    S.enter=kind==="tab"||kind==="done"?"tab":"";render();
+    window.scrollTo(0,kind==="back"&&SCROLLS[screen]?SCROLLS[screen]:0);
+    if(kind==="back"&&from==="room")tagRoomPhoto(roomId)};
+  if(!document.startViewTransition||RM.matches){apply();if(!RM.matches&&kind!=="tab"&&kind!=="done"){const s=$("#view .screen");s&&s.classList.add("in-"+kind)}return}
+  if(screen==="room"&&NAV_SRC){NAV_SRC.style.viewTransitionName="roomph"}
+  document.documentElement.dataset.nav=kind;
+  let vt;try{vt=document.startViewTransition(apply)}catch(e){apply();delete document.documentElement.dataset.nav;return}
+  vt.finished.finally(()=>{delete document.documentElement.dataset.nav;document.querySelectorAll('[style*="view-transition-name"]').forEach(el=>el.style.viewTransitionName="");NAV_SRC=null})}
+let NAV_SRC=null;
+/* the room card photo that should travel into (or back out of) the room page */
+function photoOf(el){const box=el&&el.closest("article,.rcard,.avcard,.slide,li,.card")||el;return box&&box.querySelector("img")}
+function tagRoomPhoto(id){const els=[...document.querySelectorAll(`[data-room="${id}"]`)];
+  for(const el of els){const im=photoOf(el);if(im){const r=im.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight){im.style.viewTransitionName="roomph";return}}}}
 function toast(t){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2000)}
 const dropBusy=()=>{S.pick=S.pick.filter(n=>{const r=byName(n);return r&&!busyOn(r)})};
 
@@ -1124,7 +1185,7 @@ document.addEventListener("click",e=>{
     if(!S.pick.includes(r.name)){if(capOf(picked())>=pax())S.pick=[r.name];else S.pick.push(r.name)}
     if(capOf(picked())>=pax())go("pay");else{toast(`Add a room for ${pax()-capOf(picked())} more guests`);go("rooms")}return}
   if(d.cat){S.cat=d.cat;render();return}
-  if(d.room){S.roomId=d.room;S.pi=null;go("room");return}
+  if(d.room){S.roomId=d.room;S.pi=null;NAV_SRC=photoOf(t);go("room");return}
   if(d.mon){S.anim=+d.mon>0?"slide-l":"slide-r";S.month=new Date(S.month.getFullYear(),S.month.getMonth()+ +d.mon,1);render();return}
   if(d.day){const dt=new Date(+d.day);if(!S.checkIn||S.checkOut||dt<=S.checkIn){S.checkIn=dt;S.checkOut=null;S.anim="sweep"}else{S.checkOut=dt;S.anim="sweep";if(S.screen==="home"&&S.plan===1){render();setTimeout(()=>{if(S.plan===1&&S.checkOut){S.plan=2;render()}},900);return}}render();return}
   if(d.step){const k=d.step,min=k==="adults"?1:0;S[k]=Math.max(min,Math.min(30,S[k]+ +d.d));render();return}
