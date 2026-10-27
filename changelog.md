@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v9.3 — 28 Oct 2026
+
+**Computer opening** (Rakesh): a tad faster (logo at 1.4x, shorter hold, quicker glide) and "Enter with sound" now plays the morning forest sound (birds, insects, distant waterfall) instead of the breeze and chimes.
+
 ## v9.2 — 28 Oct 2026
 
 **Opening and Location** (Rakesh).
