@@ -725,6 +725,32 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-red)}
 .nolift{font:400 11px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:#a62a23;padding:4px 8px;border-radius:2px}
 #vcard .v-room{white-space:normal;line-height:1.35}
 .roomrow p b.nl{font-weight:400;color:#a62a23;letter-spacing:.04em}
+
+/* v8.9: chosen rooms on top with a swipe gallery; no-A/C rooms when A/C is ticked */
+.opt .why{color:var(--ts-red,var(--brand));font-weight:600;margin-top:3px}
+.opt.on .why{color:#fde68a}
+.selroom{background:var(--card);border:2px solid var(--ts-red,var(--ink));overflow:hidden;margin-bottom:10px}
+.selroom .gw{position:relative}
+.selroom .gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;aspect-ratio:16/9;background:#eee}
+.selroom .gal::-webkit-scrollbar{display:none}
+.selroom .gal img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:center;scroll-snap-stop:always}
+.selroom .gcount{position:absolute;right:10px;top:10px;background:rgba(20,10,8,.62);color:#fff;font-size:12px;padding:4px 10px;border-radius:999px}
+.selroom .gnav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.92);font-size:26px;line-height:1;color:var(--ts-red,var(--ink));cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.selroom .gnav.l{left:10px}.selroom .gnav.r{right:10px}
+.selroom .sbody{padding:12px 16px 14px}
+.selroom .srow2{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.selroom h3{margin:0;font-size:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.selroom .seltag{font:600 11px/1 system-ui,sans-serif;color:#fff;background:var(--ts-red,var(--ink));padding:5px 8px;border-radius:999px;letter-spacing:.02em}
+.selroom p{margin:3px 0 0;font-size:12px;color:var(--mute)}
+.selroom .price{text-align:right;font-size:18px;font-weight:700}
+.selroom .price small{display:block;font-size:11px;font-weight:400;color:var(--mute)}
+.selroom .sact2{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.selroom .more{border:0;background:none;padding:0;cursor:pointer;font-size:12px;font-weight:600;color:var(--ts-red,var(--brand));letter-spacing:.06em;text-transform:uppercase}
+.selroom .unpick{border:1.5px solid var(--ts-red,var(--ink));background:none;color:var(--ts-red,var(--ink));border-radius:999px;padding:8px 16px;font-weight:600;cursor:pointer}
+.roomrow.noac{cursor:default;opacity:1;background:#f4f7fb}
+.roomrow.noac .noacb{font:600 10px/1 system-ui,sans-serif;color:#2c6fa8;background:#e3eef8;padding:4px 7px;border-radius:999px;margin-left:4px;vertical-align:3px}
+.roomrow.noac .acmsg{color:var(--ink);margin-top:5px}
+.acswap{margin-left:auto;flex:none;border:0;cursor:pointer;background:var(--ts-red,var(--ink));color:#fff;font-weight:600;font-size:13px;padding:10px 14px;border-radius:999px}
 </style>
 </head>
 <body>
@@ -1270,25 +1296,45 @@ function roomCost(r) { return r.rate + (S.wantAc && r.ac ? AC_ADDON[r.type] : 0)
    Premium = the fewest rooms, suites preferred — a family would rather be in
    one room than three, and will pay for it. */
 function packages() {
-  const free = freeRooms();
+  /* v8.9 (Rakesh, 27 Oct 21:35-21:40): a set of rooms should feel like one stay - same floor if possible, same
+     kind (studios with studios, suites with suites), all A/C or all non-A/C, a shared balcony counts. With A/C
+     chosen, Aambal and Shenbagam (no A/C) are left out. Budget = cheapest coherent set; Premium = suites first,
+     fewest rooms, fewest spare beds - and always a different set from Budget. */
+  const free = freeRooms().filter((r) => !(S.wantAc && !r.ac));
   if (!free.length) return {};
-  const fits = (set) => set.reduce((a, r) => a + r.pax, 0) >= paxTotal();
+  const p = paxTotal(), cap = (s) => s.reduce((a, r) => a + r.pax, 0);
+  const fits = (set) => cap(set) >= p;
   const cost = (set) => set.reduce((a, r) => a + roomCost(r), 0);
   const subsets = [];
   for (let m = 1; m < (1 << free.length); m++) {
     const set = free.filter((_, i) => m & (1 << i));
     if (set.length > 4 || !fits(set)) continue;
-    /* minimal: dropping any room must break it */
     if (set.some((_, i) => fits(set.filter((_, j) => j !== i)))) continue;
     subsets.push(set);
   }
   if (!subsets.length) return {};
-  const budget = subsets.slice().sort((a, b) => cost(a) - cost(b))[0];
-  const premium = subsets.slice().sort((a, b) =>
-    a.length - b.length ||
-    (b.filter(r => r.type === "Suite").length - a.filter(r => r.type === "Suite").length) ||
-    cost(b) - cost(a))[0];
+  const uniq = (s, f) => new Set(s.map(f)).size, bal = (r) => /balcony/i.test((r.amen || []).join(" "));
+  const mix = (s) => s.length < 2 ? 0 : (uniq(s, r => r.floor) > 1 ? 2 : 0) + (uniq(s, r => r.type) > 1 ? 2 : 0) + (uniq(s, r => !!r.ac) > 1 ? 1 : 0) + (uniq(s, bal) > 1 ? .5 : 0);
+  const score = (s) => cost(s) * (1 + .06 * mix(s));
+  const budget = subsets.slice().sort((a, b) => score(a) - score(b) || a.length - b.length)[0];
+  const suiteN = (s) => s.filter(r => r.type === "Suite").length, key = (s) => s.map(r => r.name).sort().join();
+  const lux = subsets.slice().sort((a, b) => (suiteN(b) / b.length - suiteN(a) / a.length) || a.length - b.length || mix(a) - mix(b) || (cap(a) - p) - (cap(b) - p) || cost(a) - cost(b));
+  const premium = lux.find(s => key(s) !== key(budget) && suiteN(s) > 0) || lux.find(s => key(s) !== key(budget)) || null;
   return { budget, premium };
+}
+function setWhy(set) {
+  if (set.length < 2) { const r = set[0]; return r.floor + " floor" + (S.wantAc && r.ac ? " · A/C" : !r.ac ? " · no A/C" : "") + (/balcony/i.test((r.amen || []).join(" ")) ? " · balcony" : ""); }
+  const one = (f) => new Set(set.map(f)).size === 1, bits = [];
+  bits.push(one(r => r.floor) ? "Same floor · " + set[0].floor : "Different floors");
+  if (one(r => r.type)) bits.push(set[0].type === "Suite" ? "both suites" : "both studios");
+  if (S.wantAc && set.every(r => r.ac)) bits.push("all A/C");
+  return bits.join(" · ");
+}
+/* v8.8/8.9: the A/C room priced just above a non-A/C room, skipping any booked on the dates */
+function nextAc(r) {
+  if (!r || r.ac) return null;
+  const free = freeRooms(), up = ROOMS.filter(x => x.ac && x.rate > r.rate && free.includes(x)).sort((a, b) => a.rate - b.rate);
+  return up.find(x => x.pax >= r.pax) || up[0] || null;
 }
 const paxTotal = () => Math.max(1, (Number(S.adults) || 0) + (Number(S.children) || 0));
 const tariff = () => S.pick.reduce((a, n) => a + roomCost(ROOMS.find(r => r.name === n)), 0)
@@ -1357,7 +1403,7 @@ function stepDates(app) {
       <span style="font-size:13.5px;font-weight:600">Air conditioning</span>
       <span class="hint">+${inr(500)}–${inr(1000)} a room</span>
     </label>`);
-  acRow.querySelector("#ac").onchange = (e) => { S.wantAc = e.target.checked; render(); };
+  acRow.querySelector("#ac").onchange = (e) => { S.wantAc = e.target.checked; if (S.wantAc) S.pick = S.pick.filter(n => (ROOMS.find(r => r.name === n) || {}).ac); render(); };
   card.appendChild(acRow);
 
   const list = $(`<div id="rooms" class="stack"></div>`);
@@ -1386,6 +1432,17 @@ function waitRotate(el) {
   }, 2400);
 }
 
+/* v8.9: a chosen room shows at the top with every photo to swipe through */
+function selCard(r, nights) {
+  const ph = (r.photos || []).length ? r.photos : (r.thumbs || []);
+  return $(`<article class="selroom">
+    <div class="gw"><div class="gal">${ph.map((u, k) => `<img src="${u}" alt="${esc(r.name)} photo ${k + 1}" ${k ? 'loading="lazy"' : ""}>`).join("")}</div>
+      <span class="gcount">1 / ${ph.length}</span>${ph.length > 1 ? `<button type="button" class="gnav l" data-gal="-1" aria-label="Previous photo">&#8249;</button><button type="button" class="gnav r" data-gal="1" aria-label="Next photo">&#8250;</button>` : ""}</div>
+    <div class="sbody"><div class="srow2"><div><h3>${r.name} <span class="seltag">&#10003; Selected</span></h3>
+      <p>${r.type} · ${r.floor} Floor · sleeps ${r.pax}${S.wantAc && r.ac ? " · A/C" : !r.ac ? " · no A/C" : ""}</p></div>
+      <div class="price">${inr(roomCost(r) * nights)}<small>${nights} night${nights > 1 ? "s" : ""} · ${inr(roomCost(r))}/night</small></div></div>
+      <div class="sact2"><button type="button" class="more" data-sdetail="${r.name}">Photos &amp; walkthrough →</button><button type="button" class="unpick" data-unpick="${r.name}">Remove</button></div></div></article>`);
+}
 function drawRooms(list) {
   if (S.loading) { const p = $(`<p class="loading" style="transition:opacity .25s;font-size:15px"></p>`); list.appendChild(p); waitRotate(p); return; }
   if (!S.busy) return;
@@ -1406,14 +1463,13 @@ function drawRooms(list) {
       <div class="top">
         <div><p class="tag ${tone}">${label}</p>
           <h3>${set.map(r=>r.name).join(" + ")}</h3>
-          <p>sleeps ${set.reduce((a,r)=>a+r.pax,0)} · ${set.length} room${set.length>1?"s":""}</p></div>
+          <p>sleeps ${set.reduce((a,r)=>a+r.pax,0)} · ${set.length} room${set.length>1?"s":""}</p><p class="why">${setWhy(set)}</p></div>
         <div class="price">${inr(c)}<small>${nights} night${nights>1?"s":""}</small></div>
       </div></button>`;
   };
   list.appendChild($(`<div class="stack">
     ${chip("Budget", pk.budget, "")}
-    ${pk.premium && pk.budget && pk.premium.map(r=>r.name).join() !== pk.budget.map(r=>r.name).join()
-      ? chip("Premium", pk.premium, "gold") : ""}
+    ${pk.premium ? chip("Luxury", pk.premium, "gold") : ""}
   </div>`));
 
   /* ── Budget and Premium, with what actually fits at the top ────────────
@@ -1429,7 +1485,7 @@ function drawRooms(list) {
    * upsell wearing one. */
   const p = paxTotal();
   const suits = (r) => r.pax >= p;
-  const tight = free.filter(suits).sort((a, b) => a.pax - b.pax)[0];
+  const tight = free.filter(r => suits(r) && !(S.wantAc && !r.ac)).sort((a, b) => a.pax - b.pax || a.rate - b.rate)[0];
 
   const band = (title, tone, rooms) => {
     if (!rooms.length) return;
@@ -1437,9 +1493,19 @@ function drawRooms(list) {
     rooms.forEach((r) => {
       const on = S.pick.includes(r.name);
       const rec = tight && r.name === tight.name;
+      if (tone === "picked") { list.appendChild(selCard(r, nights)); return; }
+      if (S.wantAc && !r.ac) {
+        const n = nextAc(r);
+        list.appendChild($(`<div class="opt roomrow noac">
+          <div class="meta"><h3>${r.name} <span class="noacb">No A/C</span></h3>
+            <p>${r.type} · ${r.floor} Floor · sleeps ${r.pax}</p>
+            <p class="acmsg">A/C is not available in ${r.name}.${n ? ` Next room with A/C: <b>${n.name}</b> · ${inr(roomCost(n))}/night with A/C` : " Every A/C room above it is booked on your dates."}</p></div>
+          ${n ? `<button type="button" class="acswap" data-acswap="${r.name}">Choose ${n.name}</button>` : ""}</div>`));
+        return;
+      }
       list.appendChild($(`
         <button data-room="${r.name}" class="opt roomrow ${on ? "on" : ""}">
-          ${r.thumbs && r.thumbs[0]
+          ${r.thumbs && r.thumbs[0] && !S.pick.length
             ? `<img class="rthumb" alt="" loading="lazy" src="${r.thumbs[0]}">` : ""}
           <div class="meta">
             <h3>${r.name}${rec ? ` <span class="rec">Best fit</span>` : ""}</h3>
@@ -1464,7 +1530,7 @@ function drawRooms(list) {
     .filter(Boolean);
   const rest = (type) => free.filter((r) => r.type === type && !S.pick.includes(r.name));
 
-  band(chosen.length > 1 ? "Your rooms · tap to remove" : "Your room · tap to remove",
+  band(chosen.length > 1 ? "Your rooms · " + chosen.length + " selected · sleeps " + chosen.reduce((a, r) => a + r.pax, 0) + " of " + p : "Your room",
        "picked", chosen);
   band("Budget · studio rooms", "", rest("Studio"));
   band("Premium · suites", "gold", rest("Suite"));
@@ -1481,9 +1547,18 @@ function drawRooms(list) {
     No single room sleeps ${p}. Pick two or more below — the total updates as you go,
     or message us and we will arrange it.</p>`));
 
+  const toTop = () => requestAnimationFrame(() => { const y = document.querySelector(".sechead.picked"); if (y) y.scrollIntoView({ behavior: "smooth", block: "start" }); });
   list.querySelectorAll("[data-pkg]").forEach((b) => b.onclick = () => {
-    S.pick = b.dataset.pkg.split(","); S.error = ""; render();
+    S.pick = b.dataset.pkg.split(","); S.error = ""; render(); toTop();
   });
+  list.querySelectorAll("[data-acswap]").forEach((b) => b.onclick = () => {
+    const from = ROOMS.find(r => r.name === b.dataset.acswap), to = nextAc(from); if (!to) return;
+    S.pick = S.pick.filter(x => x !== from.name); if (!S.pick.includes(to.name)) S.pick.push(to.name); S.error = ""; render(); toTop();
+  });
+  list.querySelectorAll("[data-unpick]").forEach((b) => b.onclick = () => { S.pick = S.pick.filter(x => x !== b.dataset.unpick); render(); });
+  list.querySelectorAll("[data-sdetail]").forEach((b) => b.onclick = () => openRoom(b.dataset.sdetail));
+  list.querySelectorAll("[data-gal]").forEach((b) => b.onclick = () => { const g = b.closest(".gw").querySelector(".gal"); g.scrollBy({ left: g.clientWidth * (+b.dataset.gal), behavior: "smooth" }); });
+  list.querySelectorAll(".selroom .gal").forEach((g) => g.onscroll = () => { const k = Math.round(g.scrollLeft / g.clientWidth); g.closest(".gw").querySelector(".gcount").textContent = (k + 1) + " / " + g.children.length; });
   list.querySelectorAll("[data-room]").forEach((b) => b.onclick = (ev) => {
     /* The room row does two jobs, so it has to be told which one was meant.
        Tapping the words opens the pictures; tapping anywhere else picks the
@@ -1494,9 +1569,9 @@ function drawRooms(list) {
       openRoom(ev.target.dataset.detail);
       return;
     }
-    const n = b.dataset.room;
-    S.pick = S.pick.includes(n) ? S.pick.filter(x => x !== n) : S.pick.concat(n);
-    S.error = ""; render();
+    const n = b.dataset.room, add = !S.pick.includes(n);
+    S.pick = add ? S.pick.concat(n) : S.pick.filter(x => x !== n);
+    S.error = ""; render(); if (add) toTop();
   });
 
   /* Hover preview. Built only when the device actually has a pointer, so a
