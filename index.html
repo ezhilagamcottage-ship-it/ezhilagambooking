@@ -1341,6 +1341,11 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   html.ts dialog#sbCall>:not(.sw){transition:opacity .45s}
   html.ts dialog#sbCall.kh-in>:not(.sw){opacity:0;pointer-events:none}
   html.ts #sbCall .sc-top{justify-content:flex-start;gap:16px;padding:20px 72px 8px 30px;background:none}
+  html.ts #sbCall .sc-top .sb-x{top:50%;transform:translateY(-50%);right:14px;background:rgba(255,255,255,.1);color:#f3cd8e;box-shadow:0 0 0 1px rgba(243,205,142,.6)}
+  html.ts .sb-head .kh-chatlogo{height:34px;width:auto;margin-left:auto;margin-right:6px}
+  html.ts dialog#sbCall .sc-top{margin:14px 16px 6px calc(var(--khW) * .88 + 4px);padding:12px 64px 12px 18px;border-radius:18px;background:linear-gradient(180deg,#173563,#0f2342);box-shadow:0 0 0 1px rgba(227,173,95,.55)}
+  html.ts dialog#sbCall .sc-top::after{color:#f3cd8e}
+  html.ts dialog#sbCall .sc-top img{height:40px}
   html.ts #sbCall .sc-top img{height:42px}
   html.ts #sbCall .sc-top::after{content:"Talk with Shenba";font:400 28px/1 "DM Serif Display",var(--ts-serif);color:#0f2342}
   html.ts #sbCall .sc-top .sb-x{right:20px;top:18px;width:42px;height:42px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(227,173,95,.7);color:#0f2342}
@@ -3008,14 +3013,14 @@ $("ozHome").addEventListener("click", ozDone);
 
 let voiceRetried = false;
 function openCall(start) {
-  voiceRetried = false; khShown = ""; $("scOpts").hidden = true; $("scOptRow").innerHTML = "";
+  voiceRetried = false; khShown = ""; khNumBuf = ""; khEndSoon = 0; $("scOpts").hidden = true; $("scOptRow").innerHTML = "";
   if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
   openDlg($("sbCall")); trapBack(); $("scThanks").hidden = true;
   if (calling || starting) return;
   if (start) { cardReset(); startVoice(); }
   else { saState("idle", "Tap Shenba to start talking"); }
 }
-window.__saCard = { cardMerge, cardReset, askPhone, showThanks, confirmLeave, saveResume, pendingResume, showOptions, khWatch };   /* used by the preview only */
+window.__saCard = { cardMerge, cardReset, askPhone, showThanks, confirmLeave, saveResume, pendingResume, showOptions, khWatch, khDigits };   /* used by the preview only */
 setTimeout(() => { if (SHENBA_WEB && pendingResume()) resumeShenba(); }, 700);   // came back while a WhatsApp code was waiting
 
 /* ── the call (v1.7, our own server) ──
@@ -3159,13 +3164,40 @@ function optEl(o, where) {
    for the guest to tap or say, and a mobile number spoken by the guest (or read back by her) shows in the card at once. */
 const KH_ROOMS = {"Aambal": [1199, 2, "Studio", "Ground", false], "Thillai": [1899, 4, "Studio", "Ground", true], "Marutham": [2099, 4, "Studio", "Second", true], "Mullai": [2199, 4, "Studio", "Second", true], "Paalai": [2699, 5, "Studio", "First", true], "Kurinji": [2899, 5, "Studio", "Second", true], "Shenbagam": [4599, 10, "Suite", "First", false], "Mavval": [4899, 10, "Suite", "First", true], "Vaagai": [5499, 15, "Suite", "Ground", true]};   // name: [rate per night, sleeps, type, floor, has A/C] - from the booking page
 const KH_TA = { "முல்லை": "Mullai", "குறிஞ்சி": "Kurinji", "மருதம்": "Marutham", "பாலை": "Paalai", "தில்லை": "Thillai", "ஆம்பல்": "Aambal", "செண்பகம்": "Shenbagam", "சென்பகம்": "Shenbagam", "மாவல்": "Mavval", "வாகை": "Vaagai" };
-let khShown = "";
+let khShown = "", khNumBuf = "", khNumT = 0, khEndSoon = 0;
+/* a spoken number in English, Tamil or Tanglish words (also "double 9"), or Tamil digits, turned into plain digits */
+const KH_W = { zero: 0, oh: 0, o: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9,
+  "சைபர்": 0, "பூஜ்ஜியம்": 0, "பூஜ்யம்": 0, "ஜீரோ": 0, "ஒன்று": 1, "ஒண்ணு": 1, "ஒன்னு": 1, "இரண்டு": 2, "ரெண்டு": 2, "மூன்று": 3, "மூணு": 3, "நான்கு": 4, "நாலு": 4,
+  "ஐந்து": 5, "அஞ்சு": 5, "ஆறு": 6, "ஏழு": 7, "எட்டு": 8, "ஒன்பது": 9, "ஒம்பது": 9,
+  onnu: 1, rendu: 2, irandu: 2, moonu: 3, munu: 3, naalu: 4, nalu: 4, anju: 5, ainthu: 5, aaru: 6, aru: 6, ezhu: 7, elu: 7, ettu: 8, onbadhu: 9, ombadhu: 9, ombodhu: 9, onbathu: 9 };
+function khDigits(t) {
+  t = String(t).replace(/[௦-௯]/g, d => String("௦௧௨௩௪௫௬௭௮௯".indexOf(d))).toLowerCase();
+  let out = "", rep = 1;
+  for (const w of t.split(/[\s,.\-–!?:;()]+/)) {
+    if (!w) continue;
+    if (/^(double|டபுள்)$/.test(w)) { rep = 2; continue; }
+    if (/^(triple|ட்ரிபிள்)$/.test(w)) { rep = 3; continue; }
+    if (/^\+?\d+$/.test(w)) { const d = w.replace("+", ""); out += d.length === 1 ? d.repeat(rep) : d; rep = 1; continue; }
+    if (w in KH_W) { out += String(KH_W[w]).repeat(rep); rep = 1; continue; }
+    if (/^(and|um|ah|my|number|is|என்|நம்பர்|number-u|numberu)$/.test(w)) continue;
+    out += " "; rep = 1;
+  }
+  return out.replace(/ +/g, " ");
+}
 function khWatch(m) {
   const text = String((m && (m.message || m.text)) || ""), from = String((m && (m.source || m.role)) || "");
   if (!text) return;
-  const num = text.replace(/[\s\-–.,]/g, "").match(/(?:\+?91)?([6-9]\d{9})(?!\d)/);
-  if (num) cardMerge({ phone: num[1] });
-  if (/user/i.test(from) || !matchMedia("(min-width: 900px)").matches) return;
+  const isUser = /user/i.test(from), digits = khDigits(text);
+  // the guest may say the number in pieces, across pauses: keep the last 25 seconds of the guest's digits together
+  if (isUser) { const now = Date.now(); if (now - khNumT > 25000) khNumBuf = ""; khNumT = now; khNumBuf = (khNumBuf + digits).slice(-14); }
+  const hit = (isUser ? khNumBuf.replace(/ /g, "") : digits).match(/(?:91)?([6-9]\d{9})(?!\d)/);
+  if (hit && hit[1] !== card.phone) { cardMerge({ phone: hit[1] }); khNumBuf = "";
+    if (isUser && agentConv) { try { agentConv.sendContextualUpdate("The guest's WhatsApp number is " + hit[1].replace(/(\d{5})(\d{5})/, "$1 $2") +
+      " - it is already on their screen. Do not ask them to confirm it. Call create_enquiry now (and show_booking_details with the phone) so the room photos and details reach their WhatsApp, then carry on."); } catch (e) {} } }
+  // she has sent the payment link or promised the voucher: the call ends with her thank-you once she finishes this line
+  if (!isUser && (/voucher/i.test(text) && /(வரும்|வந்துடும்|வந்திடும்|varum|vandhudum|will come|will be sent|on whatsapp|அனுப்ப)/i.test(text)
+      || /(link|லிங்க்)/i.test(text) && /(அனுப்பிட்டேன்|அனுப்பியிருக்கேன்|அனுப்பிருக்கேன்|share பண்ணிட்டேன்|anuppitten|anupitten|sent|shared|have sent|i've sent)/i.test(text))) khEndSoon = Date.now();
+  if (isUser || !matchMedia("(min-width: 900px)").matches) return;
   const names = [];
   for (const n in KH_ROOMS) if (new RegExp("\\b" + n, "i").test(text) && !names.includes(n)) names.push(n);
   for (const t in KH_TA) if (text.includes(t) && !names.includes(KH_TA[t])) names.push(KH_TA[t]);
@@ -3388,12 +3420,14 @@ const webContext = () => "WEBSITE CALL: the guest is talking to you on the Kutra
   "the number, e.g. 'இந்த room photos-உம் price-உம் உங்க WhatsApp-க்கு அனுப்பட்டுமா? Number சொல்லுங்க', 5) their name, then hold the " +
   "room and send the payment link. Do not ask the number before you have shown rooms and prices - EXCEPT ask for it at once " +
   "('உங்க WhatsApp number சொல்லுங்க, details அனுப்பிடுறேன்') if the guest says they are only checking or will decide later, goes " +
-  "quiet, or is about to leave. Take the 10-digit number and say it back digit by digit. THE MOMENT the guest gives a number " +
+  "quiet, or is about to leave. The number the guest says is shown on their screen at once, so do NOT ask them to confirm it and do not read it back digit by digit - say 'நன்றி, WhatsApp-க்கு அனுப்புறேன்' and carry on. THE MOMENT the guest gives a number " +
   "(and you know the dates), silently call create_enquiry straight away - guest_name: their name if known, otherwise 'Website " +
   "guest'; phone; check_in; check_out; adults; children; room_code and ac if they picked one; language; notes: 'Website Talk " +
   "with Shenba call - please send room photos, tariff and the Talk with Shenba link https://kutralamezhilagam.com' - so the " +
   "room photos and details reach their WhatsApp while you keep talking; then tell them briefly they are on WhatsApp. Also call " +
-  "show_booking_details with the phone. Keep every reply short and lively. Before checking rooms say one short natural line " +
+  "show_booking_details with the phone. ENDING (Rakesh, 27 Oct 2026): once you have sent the payment link, or told them the voucher will " +
+  "come on WhatsApp ('voucher WhatsApp-ல வரும்'), say ONE short warm thank-you with நன்றி and end the call yourself at once - do not " +
+  "wait for them to say bye. Keep every reply short and lively. Before checking rooms say one short natural line " +
   "such as 'Availability check பண்றேன்' or 'நீங்க கேட்ட dates-ல room available-ஆ-ன்னு பாக்குறேன்' - never the same line twice, " +
   "and do not keep saying ம்ம் or சரி. Call show_booking_details silently every time you learn or change a detail. The guest " +
   "sees the details and a Proceed to pay button on the screen, so you need not read details back. There is no time limit on " +
@@ -3411,6 +3445,8 @@ async function startAgent(intro) {
       const sp = m.mode === "speaking";
       saState(sp ? "speaking" : "listening", sp ? "Shenba is speaking…" : "Listening… go ahead");
       if (sp) lipSync();
+      if (!sp && khEndSoon && Date.now() - khEndSoon < 60000) { const mark = khEndSoon;
+        setTimeout(() => { if (agentConv === conv && calling && khEndSoon === mark && !src) khFinish(); }, 2600); }
     },
     onMessage: m => { agentHeard = true; try { khWatch(m); } catch (e) {} },
     onDisconnect: d => { if (agentConv === conv) agentGone(d); },
@@ -3431,6 +3467,13 @@ async function startAgent(intro) {
     try { conv.setMicMuted(false); } catch (e) {}
   }
   if (calling && agentConv === conv) saState("listening", intro ? "Listening… tell Shenba your check-in date" : "Listening… go ahead");
+}
+async function khFinish() {   // v8.5: she sent the link / promised the voucher and finished speaking: close with her thank-you
+  khEndSoon = 0;
+  try { const r = await Promise.race([fetch(PRIME + "?action=voiceCard&conv=" + encodeURIComponent(convId), { cache: "no-store" }), new Promise((_, n) => setTimeout(n, 2500))]);
+    const j = await r.json(); if (j && j.ok && j.status && j.status !== "none") cardMerge(j); } catch (e) {}
+  await endVoice("Call ended · thank you!");
+  if ($("sbCall").open && !agentHand) showThanks(card.status === "pending_payment" || !!card.payUrl);
 }
 async function agentGone(d) {   // the live call ended by itself (she said nandri and hung up, or the line dropped)
   agentConv = null; voice = null;
@@ -3883,6 +3926,10 @@ if (location.hash === "#talk") openCall(_fromAlbum);
 <script>
 /* v8.2: the gold logo on computers */
 (function(){ if(!matchMedia("(min-width: 900px)").matches) return; var l=document.querySelector("#tsLogo .logo, .mast .logo"); if(l){ l.src="img/logo-gold.webp"; l.width=490; l.height=174; } })();
+/* v8.5: the gold logo also heads the Talk and Chat with Shenba windows */
+(function(){ if(!matchMedia("(min-width: 900px)").matches) return;
+  var t=document.querySelector("#sbCall .sc-top img"); if(t){ t.src="img/logo-gold.webp"; t.width=490; t.height=174; }
+  var h=document.querySelector("#sbChat .sb-head"), x=document.getElementById("sbChatX"); if(h&&x&&!h.querySelector(".kh-chatlogo")){ var i=document.createElement("img"); i.className="kh-chatlogo"; i.src="img/logo-gold.webp"; i.alt="Kutralam Ezhilagam"; h.insertBefore(i,x); } })();
 </script>
 <script>
 /* v8.1 (Rakesh, 27 Oct 14:51): on a computer the menu opens each page inside the window on the right, with a small
