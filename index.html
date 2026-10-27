@@ -1620,9 +1620,8 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
           <section class="khw-p" data-p="rooms" aria-label="Rooms"><header class="khw-h"><h2>Our rooms</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b" id="khRoomsSlot"></div></section>
           <section class="khw-p" data-p="gallery" aria-label="Gallery"><header class="khw-h"><h2>Gallery</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b"><p class="khw-lead">Tap a photo to see it large.</p><div class="khg"><button type="button" class="khg-i" data-i="0"><img src="img/photos/facade-dusk.webp" alt="Kutralam Ezhilagam at dusk" loading="lazy"><span>Kutralam Ezhilagam at dusk</span></button><button type="button" class="khg-i" data-i="1"><img src="img/photos/hill-view-window.webp" alt="Two beds beside a wide window on to the Courtallam hills" loading="lazy"><span>Two beds beside a wide window on to the Courtallam hills</span></button><button type="button" class="khg-i" data-i="2"><img src="img/photos/marutham-king-bed.webp" alt="Marutham, a teak king bed" loading="lazy"><span>Marutham, a teak king bed</span></button><button type="button" class="khg-i" data-i="3"><img src="img/photos/twin-beds-teak.webp" alt="Two teak beds with fresh linen" loading="lazy"><span>Two teak beds with fresh linen</span></button><button type="button" class="khg-i" data-i="4"><img src="img/photos/suite-living-tv.webp" alt="The suite sitting room, the bedroom beyond" loading="lazy"><span>The suite sitting room, the bedroom beyond</span></button><button type="button" class="khg-i" data-i="5"><img src="img/photos/bed-lamp-door.webp" alt="A double bed with a wall lamp" loading="lazy"><span>A double bed with a wall lamp</span></button><button type="button" class="khg-i" data-i="6"><img src="img/photos/paalai-two-beds.webp" alt="Paalai, two double beds" loading="lazy"><span>Paalai, two double beds</span></button><button type="button" class="khg-i" data-i="7"><img src="img/photos/bed-red-cushions-window.webp" alt="A double bed by the window" loading="lazy"><span>A double bed by the window</span></button><button type="button" class="khg-i" data-i="8"><img src="img/photos/paalai-twin-beds-tv.webp" alt="Paalai, two beds facing the TV" loading="lazy"><span>Paalai, two beds facing the TV</span></button><button type="button" class="khg-i" data-i="9"><img src="img/photos/suite-kitchen.webp" alt="The suite's own kitchen" loading="lazy"><span>The suite's own kitchen</span></button><button type="button" class="khg-i" data-i="10"><img src="img/photos/suite-sitting-room.webp" alt="The suite's sitting room" loading="lazy"><span>The suite's sitting room</span></button><button type="button" class="khg-i" data-i="11"><img src="img/photos/bed-close.webp" alt="Fresh linen and a red quilt" loading="lazy"><span>Fresh linen and a red quilt</span></button><button type="button" class="khg-i" data-i="12"><img src="img/photos/bed-towel.webp" alt="A rolled towel on the bed" loading="lazy"><span>A rolled towel on the bed</span></button><button type="button" class="khg-i" data-i="13"><img src="img/photos/bathroom.webp" alt="An attached bathroom with a water heater" loading="lazy"><span>An attached bathroom with a water heater</span></button></div></div></section>
           <section class="khw-p" data-p="location" aria-label="Location"><header class="khw-h"><h2>Find us in Courtallam</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b">
-            <div class="khv-map" id="khMapBox"><div id="khMap" role="img" aria-label="Map: the road from Tenkasi Railway Station to Kutralam Ezhilagam, 6.9 km"></div><iframe hidden title="Kutralam Ezhilagam on the map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-fallback="https://maps.google.com/maps?q=8.9338032,77.264358&amp;z=17&amp;output=embed"></iframe>
-              <div class="khm-card" id="khmCard"><b>Kutralam Ezhilagam</b><span>6.9 km by road from Tenkasi Railway Station</span></div>
-              <button type="button" class="khm-play" id="khmPlay" hidden>&#8635; Play the drive again</button></div>
+            <div class="khv-map khv-clip" id="khClipBox"><video id="khClip" muted playsinline loop preload="none" poster="img/route-web-poster.jpg" aria-label="The drive from Tenkasi Railway Station to Kutralam Ezhilagam, past Courtallam bus stand, Five Falls Main Road, Chitraruvi and the Vairams Nagar arch"><source src="img/route-web.mp4" type="video/mp4"></video>
+              <button type="button" class="khm-play" id="khClipPlay">&#8635; Play the drive again</button></div>
             <p class="khv-big">No 46, Vairams Nagar, Five Falls Road, Courtallam</p>
             <ul class="khv-list"><li>Near the Vairams Nagar arch</li><li>A short walk to Courtallam Main Falls</li><li>Limited parking, first come first served</li></ul>
             <div class="khv-cta"><a class="kh-btn gold" href="https://maps.app.goo.gl/uMu427TCwSHLzAVEA" target="_blank" rel="noopener">Open in Google Maps</a><button type="button" class="kh-btn line" data-kv="reserve">Reserve</button></div></div></section>
@@ -4126,6 +4125,22 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   new MutationObserver(function(){ var on=pane.classList.contains("on");
     if(on&&!seen){ seen=true; load(function(){ if(!window.L) return fallback(); if(!map) setup(); setTimeout(start,780); }); }
     if(!on){ seen=false; run++; } }).observe(pane,{attributes:true,attributeFilter:["class"]});
+})();
+</script>
+<style>
+/* v9.2 (Rakesh, 27 Oct 22:13): the Location page plays the same route clip the guests get on WhatsApp
+   (Tenkasi Railway Station -> Courtallam bus stand -> Five Falls Main Road -> Chitraruvi -> arch -> house) */
+@media (min-width:900px){
+  .khw .khv-map.khv-clip{aspect-ratio:4/5;max-height:52vh;margin-inline:auto;background:#0f2342}
+  .khv-clip video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;background:#0f2342}
+  .khv-clip .khm-play{display:none}
+}
+</style>
+<script>
+(function(){ var v=document.getElementById("khClip"), box=document.getElementById("khClipBox"), pane=box&&box.closest(".khw-p"), again=document.getElementById("khClipPlay"); if(!v||!pane) return;
+  function play(){ try{ v.currentTime=0; var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){} }
+  again.addEventListener("click",play);
+  new MutationObserver(function(){ if(pane.classList.contains("on")){ if(v.paused) setTimeout(play,700); } else { try{ v.pause(); }catch(e){} } }).observe(pane,{attributes:true,attributeFilter:["class"]});
 })();
 </script>
 <style>
