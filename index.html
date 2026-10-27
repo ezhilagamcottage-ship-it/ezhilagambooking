@@ -1385,6 +1385,14 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   @media (prefers-reduced-motion:reduce){ .kh-shenba,.kh-sh-bub,#khFab,#khFab::after{animation:none} }
 }
 
+/* ══ v8.2 (Rakesh, 27 Oct 15:20): the logo in the site's gold, same size and shape, no white box (computers) ══ */
+@media (min-width:900px){
+  html.ts .ts-logo{background:none;box-shadow:none;padding:10px 4px}
+  html.ts .ts-logo .lens{display:none}
+  html.ts .ts-logo .logo-wrap::before,html.ts .ts-logo .logo-wrap::after{display:none}
+  html.ts .ts-logo .logo-wrap{background:none;box-shadow:none}
+  html.ts .ts-logo .logo{filter:drop-shadow(0 2px 10px rgba(0,0,0,.35))}
+}
 /* ══ v8.1 (Rakesh, 27 Oct 14:51): Shenba on the left, the welcome in the middle, and on the right a window where
    Rooms, Gallery, Location, Contact, Reserve and Chat with Shenba open with a small page turn. The page itself never moves. ══ */
 #khLb{display:none}
@@ -3751,8 +3759,16 @@ if (location.hash === "#talk") openCall(_fromAlbum);
       v.style.visibility = "hidden";
       var logoBox = document.getElementById("tsLogo"); logoBox.style.visibility = "hidden";
       var sx = to.width / from.w, sy = to.height / from.h;
-      fly.animate([{ transform: "none" }, { transform: "translate(" + (to.left - from.x) + "px," + (to.top - from.y) + "px) scale(" + sx + "," + sy + ")" }],
-                  { duration: D, easing: EASE, fill: "forwards" });
+      var flyTo = "translate(" + (to.left - from.x) + "px," + (to.top - from.y) + "px) scale(" + sx + "," + sy + ")";
+      fly.animate([{ transform: "none" }, { transform: flyTo }], { duration: D, easing: EASE, fill: "forwards" });
+      /* v8.2: on a computer the logo turns from its own colours to the site's gold as it glides into place */
+      var flyG = null;
+      if (matchMedia("(min-width: 900px)").matches) {
+        flyG = fly.cloneNode(); flyG.src = "img/logo-gold.webp"; flyG.style.opacity = "0"; document.body.appendChild(flyG);
+        flyG.animate([{ transform: "none" }, { transform: flyTo }], { duration: D, easing: EASE, fill: "forwards" });
+        flyG.animate([{ opacity: 0 }, { opacity: 0, offset: .3 }, { opacity: 1 }], { duration: D, fill: "forwards" });
+        fly.animate([{ opacity: 1 }, { opacity: 1, offset: .3 }, { opacity: 0 }], { duration: D, fill: "forwards" });
+      }
       var pillOnHeader = hCn && iCn;
       if (pillOnHeader) {
         var a = iCn.getBoundingClientRect(), b = hCn.getBoundingClientRect();
@@ -3769,7 +3785,7 @@ if (location.hash === "#talk") openCall(_fromAlbum);
                     { duration: D * 0.8, delay: D * 0.15, easing: "ease-out", fill: "forwards" });
       setTimeout(function () {
         logoBox.style.visibility = ""; if (hCn) hCn.style.visibility = "";
-        fly.remove(); intro.remove();
+        fly.remove(); if (flyG) flyG.remove(); intro.remove();
       }, D + 40);
     } catch (e) {
       intro.classList.add("done"); setTimeout(function () { intro.remove(); }, 1100);
@@ -3788,6 +3804,10 @@ if (location.hash === "#talk") openCall(_fromAlbum);
 (function(){var h=document.querySelector(".ts-hero"),r=document.documentElement;if(!h)return;
  var t=function(){r.classList.toggle("kh-top",window.innerWidth>=900&&window.scrollY<h.offsetHeight-120)};
  t();addEventListener("scroll",t,{passive:true});addEventListener("resize",t);})();
+</script>
+<script>
+/* v8.2: the gold logo on computers */
+(function(){ if(!matchMedia("(min-width: 900px)").matches) return; var l=document.querySelector("#tsLogo .logo, .mast .logo"); if(l){ l.src="img/logo-gold.webp"; l.width=490; l.height=174; } })();
 </script>
 <script>
 /* v8.1 (Rakesh, 27 Oct 14:51): on a computer the menu opens each page inside the window on the right, with a small
