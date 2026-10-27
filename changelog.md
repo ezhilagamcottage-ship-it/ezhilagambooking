@@ -7,6 +7,16 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v8.0 — 27 Oct 2026
+
+**New computer home page in navy and gold** (Rakesh). Phones keep the maroon lite site.
+- First screen after the sample Rakesh chose: logo plate with the Duphora pill, gold pill menu (Home, Rooms, Gallery, Location, Contact, Chat with Shenba), "Live with Nature" in a large gold serif, six amenity icons (walk to the falls, home food on order, fast Wi-Fi, OTT premium, family friendly, smoke & alcohol free), Book now, address and both numbers, and the room photos rotating in a gold frame with gold leaves and dots.
+- Photo library: Rakesh's 14 photos in `img/photos/` (labels and the camera watermark cropped off). Eight rotate in the frame; the room cards below use them too.
+- Page turns: Rooms, Gallery, Location, Contact and Reserve each open their own page with a right-to-left page turn and a soft paper-flip sound. Home turns back. Gallery opens photos large; Location has the map inside the page; Reserve opens the dates-and-guests panel by itself. Chat and Talk with Shenba never turn the page.
+- Reserve now: a gold floating button on every page, above Talk with Shenba.
+- Shenba stands on the home page (her full photo, cut out with soft edges). Tapping her plays her spoken intro straight on the page (cut out of its background, `img/shenba-intro-cut.webm`), then she settles into a large circle and the Talk widget opens over the home page with the booking card beside her. Her thank-you clips are cut out too. Safari plays the original clips with soft faded edges.
+- Opening: guests choose "Enter with sound & mic" (soft breeze and wind chimes under the logo animation, and the microphone question) or "Enter quietly"; it carries on quietly after 12 seconds.
+
 ## v7.5 — 27 Oct 2026
 
 **One website, no Lite/Desk switch** (Rakesh). The Lite / Desk switch at the top of the home page and of the photo-album page is removed. kutralamezhilagam.com opens only the main website (phones still get the lite site, as before). The wooden-desk photo album stays available on its own address, https://www.kutralamezhilagam.com/album, for sharing elsewhere; nothing on the main website links to it any more. Its Reserve, Talk and Chat buttons still work.
