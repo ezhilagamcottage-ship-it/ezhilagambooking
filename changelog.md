@@ -7,6 +7,13 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v8.9 — 27 Oct 2026
+
+**Room choice, phone and computer** (Rakesh).
+- A chosen room moves to the top with all its photos to swipe through (arrows and counter), price, details and Remove; the other rooms show without pictures.
+- Budget and Luxury picks always offered; sets of rooms keep to the same floor, same kind (studios/suites), all A/C or all non-A/C, shared balcony — each pick says why ("Same floor · Second · both studios · all A/C").
+- Computer booking page: With A/C ticked, Aambal and Shenbagam show "No A/C" with the next free A/C room and a Choose button.
+
 ## v8.8 — 27 Oct 2026
 
 **Phone site — With A/C** (Rakesh).
