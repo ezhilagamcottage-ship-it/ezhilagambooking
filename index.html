@@ -3962,11 +3962,35 @@ if (location.hash === "#talk") openCall(_fromAlbum);
     var done=function(){ front.classList.remove("turning"); front.classList.remove("on"); var sh=front.querySelector(".kh-shade"); if(sh) sh.remove();
       cur=p; busy=false; if(p==="reserve") setTimeout(openBook,120); if(queued){ var q=queued; queued=null; show(q); } };
     if(reduce){ done(); return; }
-    sound(); front.classList.add("turning");
-    var sh=document.createElement("i"); sh.className="kh-shade"; front.appendChild(sh); sh.animate([{opacity:0},{opacity:1}],{duration:600,fill:"forwards"});
-    var a=front.animate([{transform:"perspective(1600px) rotateY(0deg)"},{transform:"perspective(1600px) rotateY(-14deg)",offset:.2},{transform:"perspective(1600px) rotateY(-180deg)"}],{duration:820,easing:"cubic-bezier(.55,.06,.3,1)"});
-    a.onfinish=done; a.oncancel=done;
+    /* v8.6 (Rakesh, 27 Oct 18:41): a calmer, more book-like turn. Moving on in the menu turns the page over to the left;
+       going back to an earlier page brings that page back over from the left. The page underneath is in shadow while it is
+       covered and clears as the page lifts away; the new page's heading, words and pictures then settle in, in reading order. */
+    sound();
+    var fwd=ORDER.indexOf(p)>ORDER.indexOf(cur), mover=fwd?front:back, under=fwd?back:front, T=fwd?780:720;
+    mover.classList.add("turning");
+    var sh=document.createElement("i"); sh.className="kh-shade"; mover.appendChild(sh);
+    sh.animate(fwd?[{opacity:0},{opacity:.9}]:[{opacity:.9},{opacity:0}],{duration:T,easing:"cubic-bezier(.65,0,.35,1)",fill:"forwards"});
+    var us=document.createElement("i"); us.className="kh-under"; under.appendChild(us);
+    us.animate(fwd?[{opacity:.55},{opacity:0}]:[{opacity:0},{opacity:.5}],{duration:T,easing:fwd?"cubic-bezier(.33,1,.68,1)":"cubic-bezier(.32,0,.67,0)",fill:"forwards"});
+    var R="perspective(1800px) ";
+    var kf=fwd?[{transform:R+"rotateY(0deg) translateZ(0)"},{transform:R+"rotateY(-16deg) translateZ(14px)",offset:.18},{transform:R+"rotateY(-180deg) translateZ(0)"}]
+             :[{transform:R+"rotateY(-180deg) translateZ(0)"},{transform:R+"rotateY(-20deg) translateZ(14px)",offset:.82},{transform:R+"rotateY(0deg) translateZ(0)"}];
+    var a=mover.animate(kf,{duration:T,easing:"cubic-bezier(.65,0,.35,1)"});
+    var fin=function(){ us.remove(); if(!fwd){ back.classList.remove("turning"); var s2=back.querySelector(".kh-shade"); if(s2) s2.remove(); } done(); };
+    a.onfinish=fin; a.oncancel=fin;
+    /* the arriving page's parts */
+    if(p!=="chat"){ var parts=[].slice.call(back.querySelectorAll(".khw-h, .khw-b > *")).slice(0,9);
+      parts.forEach(function(el,i){ el.animate([{opacity:0,transform:"translateY(16px)"},{opacity:1,transform:"none"}],{duration:620,delay:(fwd?300:T*.62)+i*70,easing:"cubic-bezier(.16,1,.3,1)",fill:"backwards"}); }); }
   }
+  var ORDER=["home","rooms","gallery","location","contact","reserve","chat"];
+  /* the menu's highlight glides to the page that is open */
+  var navs=[].slice.call(document.querySelectorAll(".kh-nav")), inds=navs.map(function(n){ if(getComputedStyle(n).position==="static") n.style.position="relative"; var i=document.createElement("span"); i.className="kh-ind"; i.setAttribute("aria-hidden","true"); n.insertBefore(i,n.firstChild); return i; });
+  function glide(p,instant){ navs.forEach(function(n,k){ var i=inds[k], b=n.querySelector('[data-kv="'+p+'"]'); var plain=b&&!b.classList.contains("kh-chat")&&!b.classList.contains("kh-res")&&b.offsetWidth;
+      if(!plain){ i.style.opacity="0"; return; } if(instant) i.style.transition="none";
+      i.style.width=b.offsetWidth+"px"; i.style.height=b.offsetHeight+"px"; i.style.transform="translate("+b.offsetLeft+"px,"+b.offsetTop+"px)"; i.style.opacity="1";
+      if(instant){ void i.offsetWidth; i.style.transition=""; } }); }
+  var _mark=mark; mark=function(p){ _mark(p); glide(p); };
+  requestAnimationFrame(function(){ glide(cur,true); }); addEventListener("resize",function(){ glide(cur,true); });
   window.__khShowPane=show;
   /* Chat with Shenba opens inside the window instead of on top of the page */
   if(chat&&cslot){ cslot.appendChild(chat);
@@ -3983,17 +4007,30 @@ if (location.hash === "#talk") openCall(_fromAlbum);
     show(v);
   },true);
   addEventListener("keydown",function(e){ if(e.key==="Escape"&&cur!=="home"&&cur!=="chat"&&!document.querySelector("#tsBook.on")&&document.getElementById("khLb").hidden) show("home"); });
-  var lb=document.getElementById("khLb"), items=[].slice.call(win.querySelectorAll(".khg-i")), li=0;
-  function lbShow(i){ li=(i+items.length)%items.length; var im=items[li].querySelector("img"); lb.querySelector("img").src=im.src; lb.querySelector("img").alt=im.alt; lb.querySelector("figcaption").textContent=im.alt; lb.hidden=false; }
+  var lbDir=1, lb=document.getElementById("khLb"), items=[].slice.call(win.querySelectorAll(".khg-i")), li=0;
+  function lbShow(i){ li=(i+items.length)%items.length; var im=items[li].querySelector("img"); lb.querySelector("img").src=im.src; lb.querySelector("img").alt=im.alt; lb.querySelector("figcaption").textContent=im.alt; var was=lb.hidden; lb.hidden=false; if(!reduce){ if(was) lb.animate([{opacity:0},{opacity:1}],{duration:260,easing:"ease"}); lb.querySelector("img").animate(was?[{opacity:0,transform:"scale(.94)"},{opacity:1,transform:"none"}]:[{opacity:0,transform:"translateX("+(lbDir*28)+"px)"},{opacity:1,transform:"none"}],{duration:was?560:420,easing:"cubic-bezier(.16,1,.3,1)"}); } }
   items.forEach(function(b,i){ b.addEventListener("click",function(){ lbShow(i); }); });
-  lb.addEventListener("click",function(e){ var k=e.target.closest("[data-lb]"); if(!k){ if(e.target===lb) lb.hidden=true; return; } k=k.dataset.lb; if(k==="x") lb.hidden=true; else lbShow(li+(k==="n"?1:-1)); });
-  addEventListener("keydown",function(e){ if(lb.hidden) return; if(e.key==="Escape") lb.hidden=true; else if(e.key==="ArrowRight") lbShow(li+1); else if(e.key==="ArrowLeft") lbShow(li-1); });
+  lb.addEventListener("click",function(e){ var k=e.target.closest("[data-lb]"); if(!k){ if(e.target===lb) lb.hidden=true; return; } k=k.dataset.lb; if(k==="x") lb.hidden=true; else { lbDir=k==="n"?1:-1; lbShow(li+lbDir); } });
+  addEventListener("keydown",function(e){ if(lb.hidden) return; if(e.key==="Escape") lb.hidden=true; else if(e.key==="ArrowRight"){ lbDir=1; lbShow(li+1); } else if(e.key==="ArrowLeft"){ lbDir=-1; lbShow(li-1); } });
 })();
 </script>
 <script>
 /* v7.7: the call widget is never left see-through after it closes */
 (function(){ var d=document.getElementById("sbCall"); if(d) d.addEventListener("close",function(){ d.classList.remove("kh-in"); }); })();
 </script>
+<style>
+/* v8.6 desktop: the page turn's shadow on the page underneath, and the menu highlight that glides */
+@media (min-width:900px){
+  .khw-p .kh-under{position:absolute;inset:0;z-index:8;pointer-events:none;background:linear-gradient(90deg,rgba(10,24,48,.38),rgba(10,24,48,.12) 60%,rgba(10,24,48,.04));opacity:0}
+  .kh-nav .kh-ind{position:absolute;left:0;top:0;border-radius:999px;background:rgba(10,24,48,.16);pointer-events:none;opacity:0;transition:transform .5s cubic-bezier(.16,1,.3,1),width .5s cubic-bezier(.16,1,.3,1),opacity .2s ease}
+  .kh-nav button[aria-current="page"]{background:none}
+  .kh-nav a,.kh-nav button{position:relative;transition:background-color .18s ease,transform .14s cubic-bezier(.22,1,.36,1)}
+  .kh-nav a:active,.kh-nav button:active{transform:scale(.96)}
+  .khg-i img{transition:transform .6s cubic-bezier(.33,1,.68,1)}
+  .khg-i:hover img{transform:scale(1.04)}
+}
+@media (prefers-reduced-motion:reduce){.kh-nav .kh-ind{transition:none}}
+</style>
 <style>
 /* v8.6 (Rakesh, 27 Oct 18:29): Chat with Shenba inside the phone site — same maroon theme, her round face */
 html.sb-embed,html.sb-embed body{background:#FBF7F2!important;overflow:hidden}
