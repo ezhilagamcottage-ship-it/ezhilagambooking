@@ -1363,8 +1363,25 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   html.ts #sbCall .sw{inset:0 auto 0 0;height:100%;width:auto;aspect-ratio:9/16;overflow:visible}
   html.ts #sbCall .sw-veil,html.ts #sbCall .sw-shade{display:none}
   html.ts #sbCall .sw-vid{background:transparent}
-  html.ts #sbCall .sw-pic{-webkit-mask-image:linear-gradient(180deg,#000 78%,transparent 99%),linear-gradient(90deg,transparent 0,#000 13%,#000 87%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(180deg,#000 78%,transparent 99%),linear-gradient(90deg,transparent 0,#000 13%,#000 87%,transparent 100%);mask-composite:intersect}
-  html.kh-nocut #sbCall .sw-pic{-webkit-mask-image:radial-gradient(ellipse 46% 50% at 50% 46%,#000 62%,transparent 100%);mask-image:radial-gradient(ellipse 46% 50% at 50% 46%,#000 62%,transparent 100%)}
+  /* v8.5: her intro in a crisp gold arch (no faded edges); the arch cuts cleanly through her shoulders */
+  html.ts #sbCall .sw-pic{background:none}
+  html.ts #sbCall .sw-pic::before,html.ts #sbCall .sw-pic::after{content:"";position:absolute;top:2%;bottom:0;left:12%;right:12%;border-radius:999px 999px 24px 24px/40% 40% 24px 24px;pointer-events:none}
+  html.ts #sbCall .sw-pic::before{z-index:0;background:radial-gradient(120% 70% at 50% 28%,#2a5590 0%,#173563 48%,#0f2342 100%);box-shadow:0 30px 70px rgba(3,10,24,.55)}
+  html.ts #sbCall .sw-pic::after{z-index:3;box-shadow:inset 0 0 0 2px rgba(243,205,142,.95),inset 0 0 0 8px rgba(15,35,66,.35),inset 0 0 0 9px rgba(243,205,142,.5)}
+  html.ts #sbCall .sw-vid,html.ts #sbCall .sw-pic img{position:absolute;z-index:1;clip-path:inset(2% 12% 0 12% round 999px 999px 24px 24px)}
+  html.ts #sbCall .sw-glow{display:none}
+  html.ts #sbCall .sc-opts h3{font:400 20px/1.2 "DM Serif Display",var(--ts-serif);letter-spacing:0;text-transform:none;color:#0f2342;margin:0 0 8px}
+  html.ts #sbCall .op-row{gap:14px;padding:4px 4px 10px}
+  html.ts #sbCall .op{flex:0 0 calc(50% - 8px);max-width:none;border-radius:18px;border-color:rgba(227,173,95,.6);background:#fff;box-shadow:0 10px 24px rgba(15,35,66,.12);animation:khOpIn .5s cubic-bezier(.2,.8,.2,1) both}
+  html.ts #sbCall .op:nth-child(2){animation-delay:.12s}html.ts #sbCall .op:nth-child(3){animation-delay:.24s}
+  html.ts #sbCall .op.sel{border-color:#0f7a6e;box-shadow:0 0 0 3px rgba(15,122,110,.25),0 10px 24px rgba(15,35,66,.12)}
+  html.ts #sbCall .op img{aspect-ratio:16/10}
+  html.ts #sbCall .op .nm{font:400 20px/1.15 "DM Serif Display",var(--ts-serif);color:#0f2342}
+  html.ts #sbCall .op .pr{color:#0f2342}
+  html.ts #sbCall .op .go{color:#0f7a6e}
+  html.ts #sbCall .op.sel .go{color:#fff}
+  html.ts #sbCall .op .tag{background:rgba(15,35,66,.85);color:#f3cd8e}
+  @keyframes khOpIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
   html.ts #sbCall .sw-say{bottom:6%}
   html.ts #sbCall .ty{inset:0 auto 0 0;width:auto;height:100%;aspect-ratio:9/16;border-radius:28px 0 0 28px}
 
@@ -2962,14 +2979,14 @@ $("ozHome").addEventListener("click", ozDone);
 
 let voiceRetried = false;
 function openCall(start) {
-  voiceRetried = false;
+  voiceRetried = false; khShown = ""; $("scOpts").hidden = true; $("scOptRow").innerHTML = "";
   if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
   openDlg($("sbCall")); trapBack(); $("scThanks").hidden = true;
   if (calling || starting) return;
   if (start) { cardReset(); startVoice(); }
   else { saState("idle", "Tap Shenba to start talking"); }
 }
-window.__saCard = { cardMerge, cardReset, askPhone, showThanks, confirmLeave, saveResume, pendingResume, showOptions };   /* used by the preview only */
+window.__saCard = { cardMerge, cardReset, askPhone, showThanks, confirmLeave, saveResume, pendingResume, showOptions, khWatch };   /* used by the preview only */
 setTimeout(() => { if (SHENBA_WEB && pendingResume()) resumeShenba(); }, 700);   // came back while a WhatsApp code was waiting
 
 /* ── the call (v1.7, our own server) ──
@@ -3108,6 +3125,30 @@ function optEl(o, where) {
   b.addEventListener("click", () => chooseOption(o, where, b));
   return b;
 }
+
+/* v8.5 (Rakesh, 27 Oct 15:46): on a computer, the rooms Shenba names during a live call slide in as cards (photo, tariff)
+   for the guest to tap or say, and a mobile number spoken by the guest (or read back by her) shows in the card at once. */
+const KH_ROOMS = {"Aambal": [1199, 2, "Studio", "Ground", false], "Thillai": [1899, 4, "Studio", "Ground", true], "Marutham": [2099, 4, "Studio", "Second", true], "Mullai": [2199, 4, "Studio", "Second", true], "Paalai": [2699, 5, "Studio", "First", true], "Kurinji": [2899, 5, "Studio", "Second", true], "Shenbagam": [4599, 10, "Suite", "First", false], "Mavval": [4899, 10, "Suite", "First", true], "Vaagai": [5499, 15, "Suite", "Ground", true]};   // name: [rate per night, sleeps, type, floor, has A/C] - from the booking page
+const KH_TA = { "முல்லை": "Mullai", "குறிஞ்சி": "Kurinji", "மருதம்": "Marutham", "பாலை": "Paalai", "தில்லை": "Thillai", "ஆம்பல்": "Aambal", "செண்பகம்": "Shenbagam", "சென்பகம்": "Shenbagam", "மாவல்": "Mavval", "வாகை": "Vaagai" };
+let khShown = "";
+function khWatch(m) {
+  const text = String((m && (m.message || m.text)) || ""), from = String((m && (m.source || m.role)) || "");
+  if (!text) return;
+  const num = text.replace(/[\s\-–.,]/g, "").match(/(?:\+?91)?([6-9]\d{9})(?!\d)/);
+  if (num) cardMerge({ phone: num[1] });
+  if (/user/i.test(from) || !matchMedia("(min-width: 900px)").matches) return;
+  const names = [];
+  for (const n in KH_ROOMS) if (new RegExp("\\b" + n, "i").test(text) && !names.includes(n)) names.push(n);
+  for (const t in KH_TA) if (text.includes(t) && !names.includes(KH_TA[t])) names.push(KH_TA[t]);
+  if (!names.length) return;
+  const at = n => { const i = text.search(new RegExp(n, "i")); const t = Object.keys(KH_TA).filter(k => KH_TA[k] === n).map(k => text.indexOf(k)).filter(i => i >= 0); return Math.min(i < 0 ? 1e9 : i, ...t, 1e9); };
+  names.sort((a, b) => at(a) - at(b));
+  const pick = names.slice(0, 3), key = pick.join(","); if (key === khShown) return; khShown = key;
+  const nights = +card.nights || (card.checkIn && card.checkOut ? nightsOf(card.checkIn, card.checkOut) : 0) || 1;
+  showOptions(pick.map((n, i) => { const r = KH_ROOMS[n], add = r[2] === "Suite" ? 1000 : 500;
+    return { n: i + 1, name: n, ac: false, ac_label: "Non-AC", type: r[2], max_guests: r[1], floor: r[3] + " floor" + (r[4] ? " · A/C +" + inr(add) + "/night" : ""),
+      total: r[0] * nights, per_night: r[0], nights, photo: "img/rooms/" + n.toLowerCase() + ".webp", check_in: card.checkIn, check_out: card.checkOut }; }), "call");
+}
 function showOptions(opts, where) {
   if (where === "chat") {
     if (!opts.length) return;
@@ -3124,12 +3165,12 @@ function chooseOption(o, where, el) {
   el.parentNode.querySelectorAll(".op").forEach(x => { x.classList.toggle("sel", x === el); x.querySelector(".go").textContent = x === el ? "✓ Selected" : "Tap to choose"; });
   if (where === "chat") { chatTap({ kind: "option", n: o.n }, "Option " + o.n + ": " + o.name + " · " + o.ac_label + " · " + inr(o.total)); return; }
   cardMerge({ room: o.name, ac: o.ac_label, total: o.total, list_total: o.total, check_in: o.check_in, check_out: o.check_out });
-  sendTap({ kind: "option", n: o.n });
+  sendTap({ kind: "option", n: o.n, name: o.name });
 }
 function sendTap(t) {   // the voice loop picks it up at once: Shenba stops talking / listening and answers the tap
   if (agentConv) {   // live agent: the tap reaches her as the guest's words
     const say = t.kind === "pay" ? "(On the screen I tapped Proceed to pay.) Please hold this room for me now and send the payment link."
-      : t.kind === "option" ? "(On the screen I tapped Option " + t.n + ".) I would like this one." : "";
+      : t.kind === "option" ? "(On the screen I tapped Option " + t.n + (t.name ? ", " + t.name : "") + ".) I would like this one." : "";
     if (say) { try { agentConv.sendUserMessage(say); } catch (e) {} }
     return;
   }
@@ -3342,7 +3383,7 @@ async function startAgent(intro) {
       saState(sp ? "speaking" : "listening", sp ? "Shenba is speaking…" : "Listening… go ahead");
       if (sp) lipSync();
     },
-    onMessage: () => { agentHeard = true; },
+    onMessage: m => { agentHeard = true; try { khWatch(m); } catch (e) {} },
     onDisconnect: d => { if (agentConv === conv) agentGone(d); },
     onError: () => {}
   };
