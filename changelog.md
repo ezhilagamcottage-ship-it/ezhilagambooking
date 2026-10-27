@@ -7,6 +7,12 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v8.8 — 27 Oct 2026
+
+**Phone site — With A/C** (Rakesh).
+- Aambal and Shenbagam have no A/C. With A/C chosen, their cards and room pages say so, their Select becomes "No A/C", and they offer the next free A/C room priced just above (Aambal → Thillai, then Marutham, Mullai…; Shenbagam → Mavval, then Vaagai) with a one-tap "Choose" swap.
+- Switching to With A/C drops an already-picked non-A/C room with a short notice; Best fit and Our picks only use A/C rooms then.
+
 ## v8.7 — 27 Oct 2026
 
 **Computer site** (Rakesh).
