@@ -7,6 +7,12 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v9.1 — 27 Oct 2026
+
+**Confirm your booking** (Rakesh).
+- Before Razorpay opens, phone and computer show a final card in the site theme with everything the booking voucher will say: reference, rooms (type, floor, A/C), check-in 12:00 PM / check-out 10:00 AM, nights, guests, name, WhatsApp, total, pay now and balance, with the Razorpay pay button under it. It stays visible above (phone) or beside (computer) Razorpay's window.
+- Razorpay's description line now shows rooms, nights, dates and guests.
+
 ## v9.0 — 27 Oct 2026
 
 **Payment** (Rakesh).
