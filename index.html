@@ -4111,6 +4111,25 @@ if (location.hash === "#talk") openCall(_fromAlbum);
 })();
 </script>
 <style>
+/* v8.6 (Rakesh, 27 Oct 19:07): on a computer the gold logo heads Shenba's arch instead of the title band,
+   and a "voice not available" line sits neatly under her name with its two buttons */
+@media (min-width:900px){
+  html.ts dialog#sbCall .sc-top img{display:none}
+  html.ts #sbCall .kh-archlogo{position:absolute;z-index:4;left:calc(var(--khW) * .12);width:calc(var(--khW) * .76);top:calc(min(700px,92vh) * .02 + 44px);height:52px;object-fit:contain;pointer-events:none;
+    filter:drop-shadow(0 3px 8px rgba(5,12,28,.45));animation:khLogoIn .9s cubic-bezier(.16,1,.3,1) .15s both}
+  @keyframes khLogoIn{from{opacity:0;transform:translateY(-10px)}}
+  html.ts #sbCall .sc-main>b{bottom:96px}
+  html.ts #sbCall .sc-main>small{bottom:78px}
+  html.ts #sbCall .sc-main>.sc-stat{bottom:12px;min-height:0;height:62px;flex-wrap:wrap;align-content:center;gap:4px 8px;font:500 13.5px/1.35 "Jost",var(--ts-sans);padding:0 22px}
+  html.ts #sbCall .sc-stat .sa-retry{font:600 13px/1 "Jost",var(--ts-sans);padding:8px 14px;border-radius:999px;border:0;cursor:pointer;background:#f3cd8e;color:#0f2342}
+  html.ts #sbCall .sc-stat a{font:600 13px/1 "Jost",var(--ts-sans)}
+}
+</style>
+<script>
+(function(){ if(!matchMedia("(min-width: 900px)").matches) return; var m=document.getElementById("scMain"); if(!m||m.querySelector(".kh-archlogo")) return;
+  var i=document.createElement("img"); i.className="kh-archlogo"; i.src="img/logo-gold.webp"; i.alt="Kutralam Ezhilagam"; i.width=490; i.height=174; m.insertBefore(i,m.firstChild); })();
+</script>
+<style>
 /* v8.6 desktop: the page turn's shadow on the page underneath, and the menu highlight that glides */
 @media (min-width:900px){
   .khw-p .kh-under{position:absolute;inset:0;z-index:8;pointer-events:none;background:linear-gradient(90deg,rgba(10,24,48,.38),rgba(10,24,48,.12) 60%,rgba(10,24,48,.04));opacity:0}
