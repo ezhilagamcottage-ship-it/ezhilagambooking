@@ -630,6 +630,20 @@ body.intro-on .app,body.intro-on .dock{opacity:0}
 @keyframes cwIn{from{transform:translateY(100%)}to{transform:none}}
 @keyframes cwP{50%{transform:scale(1.06)}}
 @media (min-width:600px){#chatWin{inset:auto 16px 16px auto;width:420px;height:min(760px,calc(100dvh - 32px));border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}}
+
+/* v8.8: no-A/C rooms when With A/C is chosen */
+.acnote{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin:10px 16px 0;padding:10px 12px;border-radius:var(--r-md);background:#EEF4FA;color:var(--ink)}
+.acnote .ai{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#2C6FA8}
+.acnote .ai svg{width:16px;height:16px}
+.acnote b{font-weight:600}
+.acnote>div>b{display:block;font-size:13px}
+.acnote span{font-size:12.5px;color:var(--muted)}
+.acnote .btn.mini{white-space:nowrap}
+.stack>.acnote{margin:0}
+.avcard.noac .ph img{filter:saturate(.75)}
+.sel[disabled]{opacity:.55;border-style:dashed;cursor:not-allowed}
+@keyframes cardFlash{0%,100%{box-shadow:var(--shadow)}40%{box-shadow:0 0 0 4px rgba(122,31,43,.35),var(--shadow)}}
+.avcard.flash{animation:cardFlash 1.2s ease 2}
 </style>
 </head>
 <body class="intro-on">
@@ -747,6 +761,11 @@ const img=(r,alt)=>`<div class="ph"><img src="${r.ph}" alt="${esc(alt||r.name+' 
 /* ---------- Prices and availability ---------- */
 const acAdd=r=>r.noAc?0:(T.acAddon[r.cat]||0);
 const acOn=r=>S.wantAc&&!r.noAc;
+/* v8.8 (Rakesh, 27 Oct 21:11): Aambal and Shenbagam have no A/C. With A/C chosen, those rooms say so and offer
+   the A/C room priced just above them (Aambal -> Thillai, Shenbagam -> Mavval), skipping any booked on the dates. */
+const nextAc=r=>{if(!r||!r.noAc)return null;const up=ROOMS.filter(x=>!x.noAc&&x.rate>r.rate).sort((a,b)=>a.rate-b.rate);
+  return up.find(x=>!(nights()>0&&busyOn(x))&&x.max>=r.max)||up.find(x=>!(nights()>0&&busyOn(x)))||null};
+const acNote=(r,where)=>{const n=nextAc(r);return `<div class="acnote" role="note"><span class="ai">${ic.snow}</span><div><b>A/C is not available in ${r.name}</b>${n?`<span>Next room with A/C: <b>${n.name}</b> · ${inr(n.rate+acAdd(n))}/night with A/C</span>`:`<span>Every A/C room above it is booked on your dates.</span>`}</div>${n?(where==="room"?`<button class="btn mini" data-room="${n.id}">See ${n.name}</button>`:`<button class="btn mini" data-acswap="${r.name}">Choose ${n.name}</button>`):""}</div>`};
 function nightRate(r){return T.rooms[r.name]}
 const roomNight=(r,d)=>nightRate(r,d)+(acOn(r)?acAdd(r):0);
 const stayCost=r=>nightList().reduce((a,d)=>a+roomNight(r,d),0);
@@ -758,7 +777,7 @@ const freeRooms=()=>ROOMS.filter(r=>!busyOn(r));
 const capOf=set=>set.reduce((a,r)=>a+r.max,0);
 /* Earlier wizard logic. Budget = the cheapest set of free rooms that sleeps everyone.
    Luxury = the fewest rooms, suites preferred. Sets are minimal: dropping any room breaks them. */
-function packages(){const free=freeRooms(),p=pax();if(!free.length)return{};
+function packages(){const free=freeRooms().filter(r=>!(S.wantAc&&r.noAc)),p=pax();if(!free.length)return{};
   const fits=set=>capOf(set)>=p,sets=[];
   for(let m=1;m<(1<<free.length);m++){const set=free.filter((_,i)=>m&(1<<i));
     if(set.length>4||!fits(set))continue;if(set.some((_,i)=>fits(set.filter((_,j)=>j!==i))))continue;sets.push(set)}
@@ -766,7 +785,7 @@ function packages(){const free=freeRooms(),p=pax();if(!free.length)return{};
   const budget=sets.slice().sort((a,b)=>setCost(a)-setCost(b))[0];
   const luxury=sets.slice().sort((a,b)=>a.length-b.length||(b.filter(r=>r.cat==="suite").length-a.filter(r=>r.cat==="suite").length)||setCost(b)-setCost(a))[0];
   return{budget,luxury}}
-const bestFit=()=>freeRooms().filter(r=>r.max>=pax()).sort((a,b)=>a.max-b.max||a.rate-b.rate)[0];
+const bestFit=()=>freeRooms().filter(r=>r.max>=pax()&&!(S.wantAc&&r.noAc)).sort((a,b)=>a.max-b.max||a.rate-b.rate)[0];
 const picked=()=>S.pick.map(byName).filter(Boolean);
 function quote(set=picked()){const n=Math.max(nights(),1);const rows=set.map(r=>{const base=nightList().reduce((a,d)=>a+nightRate(r,d),0),ac=acOn(r)?acAdd(r)*n:0;return{r,base,ac,avg:Math.round(base/n)}});
   const total=rows.reduce((a,x)=>a+x.base+x.ac,0);return{n,rows,total,ac:rows.reduce((a,x)=>a+x.ac,0),advance:Math.ceil(total/2)}}
@@ -855,14 +874,15 @@ function bindCarousel(){const car=$("#car");if(!car)return;let x0=null;
   car.addEventListener("pointerdown",e=>{x0=e.clientX;carHold=Date.now()+8000});
   car.addEventListener("pointerup",e=>{if(x0==null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>40)showSlide(S.slide+(dx<0?1:-1),dx<0?1:-1)});}
 
-const avCard=(r,i,tight)=>{const on=S.pick.includes(r.name),n=Math.max(nights(),1);return `<div class="avcard rise${on?" on":""}" style="--i:${i}">
+const avCard=(r,i,tight)=>{const on=S.pick.includes(r.name),n=Math.max(nights(),1);return `<div class="avcard rise${on?" on":""}${S.wantAc&&r.noAc?" noac":""}" style="--i:${i}" data-card="${r.name}">
   <button class="ph" data-room="${r.id}" aria-label="Photos and details of ${r.name}"><img src="${r.ph}" alt="${esc(r.name)} room" loading="lazy">
     ${tight?`<span class="fit">${ic.star} Best fit</span>`:""}<span class="pcount">${r.photos.length} photos</span></button>
   <div class="avbody"><h4>${r.name}</h4>
     <div class="stayprice num"><b>${inr(stayCost(r))}</b><small>${n} night${n>1?"s":""} · ${inr(Math.round(stayCost(r)/n))}/night</small></div>
     <div class="spec">${ic.users} Sleeps ${r.max} · ${r.floor} floor${r.nolift?" · no lift":""}${acOn(r)?" · A/C":r.noAc?" · no A/C":""}</div></div>
+  ${S.wantAc&&r.noAc?acNote(r,"list"):""}
   <div class="avfoot"><button class="det" data-room="${r.id}">Photos &amp; details ${sm(ic.right)}</button>
-    <button class="sel" data-pick="${r.name}" aria-pressed="${on}"><span class="box">${ic.check}</span>${on?"Selected":"Select"}</button></div></div>`};
+    ${S.wantAc&&r.noAc?`<button class="sel" disabled aria-disabled="true">No A/C</button>`:`<button class="sel" data-pick="${r.name}" aria-pressed="${on}"><span class="box">${ic.check}</span>${on?"Selected":"Select"}</button>`}</div></div>`};
 const pickCard=(kind,set)=>{const on=set.map(r=>r.name).sort().join()===S.pick.slice().sort().join();return `<button class="pick ${kind==="lux"?"lux":""} rise" style="--i:0" data-pkg="${set.map(r=>r.name).join(",")}" aria-pressed="${on}">
   <span class="k">${kind==="lux"?ic.crown+" Luxury pick":ic.piggy+" Budget pick"}</span><h4>${set.map(r=>r.name).join(" + ")}</h4>
   <small>${set.length} room${set.length>1?"s":""} · sleeps ${capOf(set)}</small><strong class="num">${inr(setCost(set))}</strong></button>`};
@@ -912,6 +932,7 @@ V.room=()=>{const r=room(),busy=nights()>0&&busyOn(r);return `
     <div><div class="titleline"><h2>${r.name}</h2><button class="h2" data-fav="${r.id}" aria-pressed="${S.favs.includes(r.id)}" aria-label="Save ${r.name}">${ic.heart}</button></div>
       <div class="subline">${ic.pin} ${r.cat==="suite"?"Luxury":"Budget"} · Vairams Nagar, Courtallam</div></div>
     ${nights()?`<p class="${busy?"warn":"hint"}" style="margin:0">${busy?`Booked for ${fmt(S.checkIn)} – ${fmt(S.checkOut)}. Change your dates or pick another room.`:`Free for ${fmt(S.checkIn)} – ${fmt(S.checkOut)} · ${inr(stayCost(r))} for ${nights()} night${nights()>1?"s":""}`}</p>`:""}
+    ${S.wantAc&&r.noAc?acNote(r,"room"):""}
     <p class="desc">${esc(r.blurb)} A short walk to Courtallam Main Falls.</p>
     <section class="sect"><h3 style="font:600 15px var(--sans)">Facilities</h3>
       <div class="facs"><div class="fac"><span class="bub">${ic.wifi}</span>WiFi</div><div class="fac"><span class="bub">${r.noAc?ic.falls:ic.snow}</span>${r.noAc?"Near falls":"AC"}</div><div class="fac"><span class="bub">${ic.bolt}</span>24hr power</div><div class="fac"><span class="bub">${ic.car}</span>Parking</div></div></section>
@@ -1185,7 +1206,10 @@ document.addEventListener("click",e=>{
   if(d.pkg){S.pick=d.pkg.split(",");render();toast(S.pick.length>1?"Rooms selected":"Room selected");return}
   if(d.retry!==undefined){AVAIL_ERR=false;render();loadAvail();return}
   if(d.small!==undefined){S.showSmall=true;render();return}
-  if(d.wantac){S.wantAc=d.wantac==="1";render();return}
+  if(d.wantac){S.wantAc=d.wantac==="1";const had=S.wantAc?S.pick.map(byName).filter(x=>x&&x.noAc):[];
+    if(had.length){S.pick=S.pick.filter(nm=>!had.some(x=>x.name===nm));const nx=nextAc(had[0]);toast(`${had[0].name} has no A/C${nx?` — try ${nx.name} with A/C`:""}`)}render();return}
+  if(d.acswap){const from=byName(d.acswap),to=nextAc(from);if(to){S.pick=S.pick.filter(nm=>nm!==from.name);if(!S.pick.includes(to.name))S.pick.push(to.name);S.wantAc=true;render();
+      requestAnimationFrame(()=>{const el=document.querySelector(`[data-card="${to.name}"]`);if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.add("flash")}});toast(`${to.name} with A/C selected`)}return}
   if(d.gotoPay!==undefined){S.problem=null;openSignin("pay");return}
   if(d.signout!==undefined){signOut();return}
   if(d.nogoogle!==undefined){S.noGoogle=true;const n=S.afterSignin;S.signin=false;S.afterSignin=null;renderSignin();if(n&&S.screen!==n)go(n);else render();return}
