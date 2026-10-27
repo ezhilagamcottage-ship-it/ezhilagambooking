@@ -25,6 +25,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Sora:wght@600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Jost:wght@400;500&display=swap">
 <style>
 /* Hand-written and inlined, for the same reason the booking page is: this
    page is opened on a phone signal at the falls, and a stylesheet that has to
@@ -1171,6 +1172,72 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   .ts-cn small{font:400 7.5px/1.2 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6b7690}
 }
 @media (max-width:360px){ .ts-logo .logo-wrap{width:100px} .ts-cn small{display:none} .ts-cn img{height:20px} }
+/* ══ v7.6 (Rakesh, 27 Oct 13:10): computer home screen in navy and gold, after the "Hotel & Resort" sample.
+   Logo plate top-left with the Duphora pill, gold pill menu, big serif title, amenity icons, Book now,
+   the room photos in a gold frame on the right, gold leaves and dots. Phones are not touched. ══ */
+.kh{display:none}
+@media (min-width:900px){
+  html.ts{--kh-navy:#0f2342;--kh-navy2:#173563;--kh-deep:#0a1830;--kh-gold:#e3ad5f;--kh-gold2:#f3cd8e;--kh-mist:rgba(243,205,142,.14)}
+  html.ts .ts-rail{background:var(--kh-deep);box-shadow:1px 0 0 rgba(227,173,95,.25)}
+  html.ts .ts-emb i{background:var(--kh-gold)!important}
+  html.ts .ts-burger i{background:var(--kh-gold)!important}
+  html.ts .ts-wa{color:var(--kh-gold2)}
+  html.ts .ts-hero{height:auto;min-height:max(100vh,640px);background:radial-gradient(120% 90% at 30% 20%,var(--kh-navy2) 0%,var(--kh-navy) 55%,var(--kh-deep) 100%)}
+  html.ts .ts-hero>*:not(.ts-logo):not(.kh){display:none!important}
+  html.ts .ts-logo{border-radius:14px;padding:10px 16px;background:#fff;box-shadow:0 0 0 1px rgba(227,173,95,.55),0 12px 30px rgba(0,0,0,.35)}
+  html.ts .ts-act{top:26px;transition:opacity .35s,transform .35s}
+  html.kh-top .ts-act{opacity:0;transform:translateY(-12px);pointer-events:none}
+  html.ts .ts-act .ts-btn.c,html.ts #chatBtn{border-radius:999px;min-height:40px;padding:0 20px;font-family:"Jost",var(--ts-sans);letter-spacing:.14em}
+  html.ts .ts-act .ts-btn.c{background:var(--kh-gold);color:var(--kh-deep);box-shadow:0 8px 22px rgba(0,0,0,.25)}
+  html.ts .ts-act .ts-btn.c:hover{background:var(--kh-gold2)}
+  html.ts #chatBtn{background:var(--kh-deep);color:var(--kh-gold2);box-shadow:inset 0 0 0 1.5px var(--kh-gold),0 8px 22px rgba(0,0,0,.2)}
+  html.ts #chatBtn:hover{background:#12284b}
+  .kh{display:block;position:relative;min-height:max(100vh,640px);box-sizing:border-box;padding:150px 5vw 150px 6vw;z-index:2;color:#f6ead6;font-family:"Jost",var(--ts-sans);overflow:hidden}
+  .kh::before{content:"";position:absolute;width:min(62vw,760px);aspect-ratio:1;border-radius:50%;right:-12vw;top:50%;transform:translateY(-50%);border:1px solid var(--kh-mist);box-shadow:0 0 0 60px rgba(255,255,255,.012),0 0 0 61px var(--kh-mist)}
+  .kh::after{content:"";position:absolute;width:220px;aspect-ratio:1;border-radius:50%;left:-70px;bottom:-60px;border:1px solid var(--kh-mist)}
+  .kh-nav{position:absolute;top:44px;right:max(28px,env(safe-area-inset-right));display:flex;gap:4px;padding:5px;border-radius:999px;background:linear-gradient(180deg,var(--kh-gold2),var(--kh-gold));box-shadow:0 8px 24px rgba(0,0,0,.28);z-index:3}
+  .kh-nav a,.kh-nav button{font:500 14px/1 "Jost",var(--ts-sans);color:var(--kh-deep);text-decoration:none;padding:9px 18px;border-radius:999px;border:0;background:none;cursor:pointer;letter-spacing:.02em}
+  .kh-nav .kh-chat{background:var(--kh-deep);color:var(--kh-gold2);margin-left:4px}
+  .kh-nav .kh-chat:hover{background:#12284b}
+  .kh-nav a:hover,.kh-nav button:hover,.kh-nav a:focus-visible,.kh-nav button:focus-visible{background:rgba(10,24,48,.12);outline:none}
+  .kh-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:5vw;align-items:center}
+  .kh-copy{position:relative;min-width:0;z-index:2}
+  .kh-eye{margin:0 0 14px;font:500 12px/1 "Jost",var(--ts-sans);letter-spacing:.32em;text-transform:uppercase;color:var(--kh-gold)}
+  .kh h1{margin:0;font:400 clamp(46px,5.4vw,82px)/1 "DM Serif Display",var(--ts-serif);color:var(--kh-gold);letter-spacing:.005em;text-transform:none;text-wrap:balance}
+  .kh-sub{margin:14px 0 0;font:400 clamp(20px,1.8vw,26px)/1.25 "Jost",var(--ts-sans);color:var(--kh-gold2)}
+  .kh-lead{margin:14px 0 0;max-width:46ch;font-size:15px;line-height:1.6;color:rgba(246,234,214,.78)}
+  .kh-amen{list-style:none;margin:26px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:16px 20px}
+  .kh-amen li{display:flex;flex-direction:column;align-items:center;gap:8px;width:62px;text-align:center;font:500 9.5px/1.25 "Jost",var(--ts-sans);letter-spacing:.12em;text-transform:uppercase;color:rgba(246,234,214,.85)}
+  .kh-amen svg{width:30px;height:30px;color:var(--kh-gold);fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .kh-line{height:2px;width:min(32vw,440px);margin:26px 0 0;background:linear-gradient(90deg,var(--kh-gold),rgba(227,173,95,0))}
+  .kh-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+  .kh-btn{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:0 28px;border-radius:999px;border:0;cursor:pointer;font:500 14px/1 "Jost",var(--ts-sans);letter-spacing:.16em;text-transform:uppercase;transition:transform .2s,background .2s}
+  .kh-btn:hover{transform:translateY(-1px)}
+  .kh-btn.gold{background:linear-gradient(180deg,var(--kh-gold2),var(--kh-gold));color:var(--kh-deep);box-shadow:0 10px 26px rgba(0,0,0,.3)}
+  .kh-btn.ghost{background:transparent;color:var(--kh-gold2);box-shadow:inset 0 0 0 1.5px var(--kh-gold)}
+  .kh-btn:focus-visible{outline:2px solid var(--kh-gold2);outline-offset:3px}
+  .kh-addr{margin:22px 0 0;font:500 11.5px/1.6 "Jost",var(--ts-sans);letter-spacing:.14em;text-transform:uppercase;color:rgba(246,234,214,.7)}
+  .kh-addr b{color:var(--kh-gold2);font-weight:500}
+  .kh-pic{position:relative;justify-self:center;width:min(100%,500px);aspect-ratio:4/4.3;max-height:calc(100vh - 330px);min-height:320px;z-index:2}
+  .kh-pic .fr{position:absolute;inset:0;border:2px solid var(--kh-gold);border-radius:22px}
+  .kh-pic .ph{position:absolute;inset:16px;border-radius:16px;overflow:hidden;background:var(--kh-deep);box-shadow:0 24px 60px rgba(0,0,0,.45)}
+  .kh-pic .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:khFade 40s infinite;transform:scale(1.04)}
+  .kh-pic .ph img:nth-child(1){animation-delay:0s}.kh-pic .ph img:nth-child(2){animation-delay:5s}.kh-pic .ph img:nth-child(3){animation-delay:10s}.kh-pic .ph img:nth-child(4){animation-delay:15s}.kh-pic .ph img:nth-child(5){animation-delay:20s}.kh-pic .ph img:nth-child(6){animation-delay:25s}.kh-pic .ph img:nth-child(7){animation-delay:30s}.kh-pic .ph img:nth-child(8){animation-delay:35s}
+  @keyframes khFade{0%{opacity:0;transform:scale(1.04)}2.5%{opacity:1}12.5%{opacity:1}15%{opacity:0;transform:scale(1)}100%{opacity:0}}
+  .kh-pic .ph img:first-child{opacity:1}
+  .kh-dots{position:absolute;width:96px;height:60px;background:radial-gradient(circle,var(--kh-gold) 1.6px,transparent 2px) 0 0/16px 16px;opacity:.8}
+  .kh-dots.a{top:-46px;left:34%}
+  .kh-vdots{position:absolute;right:-34px;top:20%;width:6px;height:120px;background:radial-gradient(circle,var(--kh-gold) 1.6px,transparent 2px) 0 0/6px 20px;opacity:.85}
+  .kh-leaf{position:absolute;color:var(--kh-gold);fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;pointer-events:none}
+  .kh-leaf.l1{width:110px;top:150px;left:44vw;transform:rotate(14deg);opacity:.9}
+  .kh-leaf.l2{width:150px;bottom:-6px;left:40%;opacity:.8}
+  .kh-leaf.l3{width:84px;left:-74px;top:4px;transform:rotate(-24deg);opacity:.45}
+  .kh-base{position:absolute;right:5vw;bottom:96px;width:30vw;height:2px;background:linear-gradient(270deg,var(--kh-gold),rgba(227,173,95,0))}
+  @media (max-height:820px){ .kh{padding-top:132px} .kh-amen{margin-top:18px} .kh-cta{margin-top:18px} .kh-line{margin-top:18px} .kh-lead{display:none} .kh-sub{margin-top:10px} }
+  @media (max-width:1239px){ .kh-nav{top:134px;right:auto;left:6vw} .kh{padding-top:206px} .kh-leaf.l1{display:none} .kh-amen{gap:14px 12px} .kh-amen li{width:54px} .kh-pic{aspect-ratio:4/5;max-height:calc(100vh - 390px)} .kh-leaf.l3{display:none} }
+  @media (prefers-reduced-motion:reduce){ .kh-pic .ph img{animation:none} }
+}
+
 </style>
 </head>
 <body>
@@ -1197,6 +1264,30 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
 
 <section class="ts-hero" id="top" aria-label="Photographs of Kutralam Ezhilagam">
   <div class="ts-logo" id="tsLogo"><span class="ts-dcn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="89" height="26"></span></div>
+  <div class="kh" aria-label="Kutralam Ezhilagam">
+    <nav class="kh-nav" aria-label="Home sections"><a href="#top">Home</a><a href="#rooms">Rooms</a><a href="#spaces">Gallery</a><a href="https://www.google.com/maps/search/?api=1&amp;query=Kutralam+Ezhilagam+Vairams+Nagar+Courtallam" target="_blank" rel="noopener">Location</a><a href="#contact">Contact</a><button type="button" class="kh-chat" data-ts="chat">Chat with Shenba</button></nav>
+    <svg class="kh-leaf l1" viewBox="0 0 120 160" aria-hidden="true"><path d="M60 158C58 120 56 80 62 6"/><path d="M60 128c-18-4-30-16-34-34 18 2 30 14 34 34z"/><path d="M60 128c16-6 26-18 28-36-16 4-26 16-28 36z"/><path d="M59 92c-16-6-24-18-26-34 16 4 24 16 26 34z"/><path d="M60 92c14-6 22-18 22-34-14 6-22 18-22 34z"/><path d="M60 56c-12-6-18-16-18-30 12 6 18 16 18 30z"/><path d="M61 56c10-6 16-16 15-28-10 6-15 16-15 28z"/><circle cx="62" cy="6" r="3"/></svg>
+    <div class="kh-grid">
+      <div class="kh-copy">
+        <p class="kh-eye">Courtallam &middot; Tamil Nadu</p>
+        <h1>Live with Nature</h1>
+        <p class="kh-sub">A short walk from Courtallam Main Falls</p>
+        <p class="kh-lead">Nine rooms, studios and suites for two to fifteen, in Vairams Nagar on Five Falls Road. Wake up to the hills and walk to the falls.</p>
+        <ul class="kh-amen"><li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="6" r="2.6"/><path d="M15 10l-4 7 4 2 1 9"/><path d="M15 10l5 5 4 1"/><path d="M11 17l-3 8"/></svg>Walk to the falls</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 18h22"/><path d="M7 18a9 9 0 0118 0"/><path d="M16 9V7"/><path d="M4 22h24"/></svg>Home food on order</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 13a16 16 0 0122 0"/><path d="M9 17a10 10 0 0114 0"/><path d="M13 21a4 4 0 016 0"/><circle cx="16" cy="25" r="1.2"/></svg>Fast Wi-Fi</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="15" rx="2"/><path d="M12 26h8"/><path d="M14 12l5 2.5-5 2.5z"/></svg>OTT premium</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="8" r="2.6"/><circle cx="22" cy="11" r="2"/><path d="M7 26v-8a4 4 0 018 0v8"/><path d="M19 26v-6a3 3 0 016 0v6"/></svg>Family friendly</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 20h18v4H4z"/><path d="M25 18v6"/><path d="M28 18v6"/><path d="M5 5l22 22"/></svg>Smoke &amp; alcohol free</li></ul>
+        <div class="kh-line"></div>
+        <div class="kh-cta"><button type="button" class="kh-btn gold" data-ts="reserve">Book now</button><button type="button" class="kh-btn ghost" data-ts="talk">Talk with Shenba</button></div>
+        <p class="kh-addr">No 46, Vairams Nagar, Five Falls Road, Courtallam<br>Booking <b>99622 22415</b> &middot; Reception <b>82483 20685</b></p>
+        <svg class="kh-leaf l3" viewBox="0 0 120 160" aria-hidden="true"><path d="M60 158C58 120 56 80 62 6"/><path d="M60 128c-18-4-30-16-34-34 18 2 30 14 34 34z"/><path d="M60 128c16-6 26-18 28-36-16 4-26 16-28 36z"/><path d="M59 92c-16-6-24-18-26-34 16 4 24 16 26 34z"/><path d="M60 92c14-6 22-18 22-34-14 6-22 18-22 34z"/><path d="M60 56c-12-6-18-16-18-30 12 6 18 16 18 30z"/><path d="M61 56c10-6 16-16 15-28-10 6-15 16-15 28z"/><circle cx="62" cy="6" r="3"/></svg>
+      </div>
+      <div class="kh-pic">
+        <span class="kh-dots a" aria-hidden="true"></span><span class="kh-vdots" aria-hidden="true"></span>
+        <span class="fr" aria-hidden="true"></span>
+        <div class="ph"><img src="img/photos/facade-dusk.webp" alt="Kutralam Ezhilagam at dusk"><img src="img/photos/hill-view-window.webp" alt="Two beds beside a wide window on to the Courtallam hills" loading="lazy"><img src="img/photos/marutham-king-bed.webp" alt="Marutham, a king bed in a bright room" loading="lazy"><img src="img/photos/twin-beds-teak.webp" alt="Two teak beds with fresh linen" loading="lazy"><img src="img/photos/suite-living-tv.webp" alt="The suite sitting room, with the bedroom beyond" loading="lazy"><img src="img/photos/bed-lamp-door.webp" alt="A double bed with a wall lamp" loading="lazy"><img src="img/photos/paalai-two-beds.webp" alt="Paalai, two double beds" loading="lazy"><img src="img/photos/bed-red-cushions-window.webp" alt="A double bed by the window" loading="lazy"></div>
+      </div>
+    </div>
+    <svg class="kh-leaf l2" viewBox="0 0 120 160" aria-hidden="true"><path d="M60 158C58 120 56 80 62 6"/><path d="M60 128c-18-4-30-16-34-34 18 2 30 14 34 34z"/><path d="M60 128c16-6 26-18 28-36-16 4-26 16-28 36z"/><path d="M59 92c-16-6-24-18-26-34 16 4 24 16 26 34z"/><path d="M60 92c14-6 22-18 22-34-14 6-22 18-22 34z"/><path d="M60 56c-12-6-18-16-18-30 12 6 18 16 18 30z"/><path d="M61 56c10-6 16-16 15-28-10 6-15 16-15 28z"/><circle cx="62" cy="6" r="3"/></svg>
+    <span class="kh-base" aria-hidden="true"></span>
+  </div>
   <div class="ts-title" id="tsTitle"><p class="ts-cap" style="margin:0 0 16px;animation-delay:.1s">Kutralam Ezhilagam &middot; Courtallam</p></div>
 </section>
 
@@ -1220,16 +1311,16 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
 
   <section class="ts-sec" id="spaces">
     <div class="ts-spaces">
-      <article class="ts-sp"><div class="ph"><img src="img/ke-hills-window.webp" alt="Twin beds beside a wide window looking on to the Courtallam hills" loading="lazy"></div>
+      <article class="ts-sp"><div class="ph"><img src="img/photos/hill-view-window.webp" alt="Two beds beside a wide window looking on to the Courtallam hills" loading="lazy"></div>
         <div class="row"><h3>Hill-view rooms</h3><button type="button" class="ts-link" data-ts="rooms">View rooms</button></div>
         <p>Wide picture windows on to the Courtallam hills and forest. Ground, first and second floors, with balconies over the grounds.</p></article>
       <article class="ts-sp"><div class="ph"><img src="img/ke-pool.webp" alt="The spacious family rooftop terrace under a pergola, with soft ambient lights in the evening" loading="lazy"></div>
         <div class="row"><h3>Spacious rooftop terrace</h3><button type="button" class="ts-link" data-ts="reserve">Reserve</button></div>
         <p>A spacious open terrace under a pergola for the whole family to relax together, with soft ambient lights in the evening and the hills all around.</p></article>
-      <article class="ts-sp"><div class="ph"><img src="img/ke-suite-living.webp" alt="The suite living room with a sofa and television" loading="lazy"></div>
+      <article class="ts-sp"><div class="ph"><img src="img/photos/suite-living-tv.webp" alt="The suite sitting room with television, the bedroom beyond" loading="lazy"></div>
         <div class="row"><h3>Suites for families</h3><button type="button" class="ts-link" data-ts="rooms">View rooms</button></div>
         <p>A sitting room with sofa and television and the bedroom beyond. One suite has its own kitchen; the largest sleeps fifteen.</p></article>
-      <article class="ts-sp"><div class="ph"><img src="img/ke-ac-room.webp" alt="An air-conditioned room with a teak bed and fresh linen" loading="lazy"></div>
+      <article class="ts-sp"><div class="ph"><img src="img/photos/marutham-king-bed.webp" alt="Marutham, a teak king bed with fresh linen" loading="lazy"></div>
         <div class="row"><h3>A/C &amp; Non A/C</h3><button type="button" class="ts-link" data-ts="reserve">Reserve</button></div>
         <p>Teak beds and fresh linen, air conditioning where you want it, and 24/7 power backup.</p></article>
     </div>
@@ -1248,7 +1339,7 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   </section>
 </main>
 
-<footer class="ts-foot">
+<footer class="ts-foot" id="contact">
   <div class="ts-fg">
     <div><p class="big">Kutralam Ezhilagam</p><p>No 46, Vairams Nagar, Five Falls Road, Courtallam</p></div>
     <div><h4 class="ts-cap">Booking</h4><a href="tel:+919962222415">99622 22415</a><h4 class="ts-cap" style="margin-top:18px">Reception</h4><a href="tel:+918248320685">82483 20685</a></div>
@@ -3377,5 +3468,11 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   setTimeout(function () { if (!intro.classList.contains("go")) go(); }, 4200);
   $("tsSkip").onclick = finish;
 })();
+</script>
+<script>
+/* v7.6: on a computer, the fixed Reserve / Chat buttons wait until the navy first screen has scrolled away */
+(function(){var h=document.querySelector(".ts-hero"),r=document.documentElement;if(!h)return;
+ var t=function(){r.classList.toggle("kh-top",window.innerWidth>=900&&window.scrollY<h.offsetHeight-120)};
+ t();addEventListener("scroll",t,{passive:true});addEventListener("resize",t);})();
 </script>
 </body></html>
