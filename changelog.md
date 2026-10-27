@@ -7,6 +7,10 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v7.5 — 27 Oct 2026
+
+**One website, no Lite/Desk switch** (Rakesh). The Lite / Desk switch at the top of the home page and of the photo-album page is removed. kutralamezhilagam.com opens only the main website (phones still get the lite site, as before). The wooden-desk photo album stays available on its own address, https://www.kutralamezhilagam.com/album, for sharing elsewhere; nothing on the main website links to it any more. Its Reserve, Talk and Chat buttons still work.
+
 ## v7.4 — 27 Oct 2026
 
 **Duphora pill beside the logo on computers** (Rakesh). On the computer home page the "Powered by Duphora" pill now sits right next to the Kutralam Ezhilagam logo plate, lined up with its bottom edge so it clears the Lite/Desk switch and the Reserve buttons at every screen width. At the end of the opening the pill glides from under the logo straight into that place, instead of fading out. Phones unchanged.
