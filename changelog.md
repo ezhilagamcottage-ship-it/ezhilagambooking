@@ -7,6 +7,13 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v8.5 — 27 Oct 2026
+
+**Talk with Shenba, number and ending** (Rakesh).
+- A mobile number spoken in any form (digits, English or Tamil or Tanglish words, "double nine", Tamil numerals, in pieces) shows in the booking card at once, and Shenba is told to send the WhatsApp details straight away without asking the guest to confirm it.
+- Once she has sent the payment link or said the voucher will come on WhatsApp, she says a short நன்றி and ends the call; if she does not, the page ends it after her line and shows the thank-you.
+- The Talk with Shenba and Chat with Shenba windows carry the gold logo on navy.
+
 ## v8.4 — 27 Oct 2026
 
 **Talk with Shenba on computers** (Rakesh).
