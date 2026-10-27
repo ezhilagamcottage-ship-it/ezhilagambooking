@@ -11,7 +11,7 @@
 </script>
 <script>
 /* v7.7 (Rakesh, 27 Oct 13:33): on a computer the opening first offers sound and the microphone. "Enter with sound"
-   plays a soft breeze with wind chimes under the logo animation and asks for the microphone (for Talk with Shenba);
+   plays the morning forest sound under the logo animation and asks for the microphone (for Talk with Shenba);
    "Enter quietly" plays it silent. Browsers only allow sound after a tap, so the choice comes first. */
 window.__khGate = function (run, finish) {
   try { if (!matchMedia("(min-width: 900px)").matches) return run(); } catch (e) { return run(); }
@@ -34,24 +34,16 @@ window.__khGate = function (run, finish) {
     navigator.mediaDevices.getUserMedia({ audio: true }).then(function (m) { m.getTracks().forEach(function (t) { t.stop(); }); st.textContent = "Sound on ✓  Microphone ready ✓"; })
       .catch(function () { st.textContent = "Sound on ✓  Microphone off. You can still chat with Shenba by typing."; });
   }
+  /* v9.3 (Rakesh, 28 Oct 03:59): the same sound as the phone - a dense morning forest, birds and insects,
+     a waterfall far off (img/forest-morning.mp3) - instead of the breeze and chimes */
   function breeze() {
     try {
       var A = window.__khAC = window.__khAC || new (window.AudioContext || window.webkitAudioContext)(); if (A.state === "suspended") A.resume();
-      var T = A.currentTime, D = 8.5, sr = A.sampleRate, len = Math.floor(sr * D), buf = A.createBuffer(2, len, sr);
-      for (var c = 0; c < 2; c++) { var d = buf.getChannelData(c), b0 = 0, b1 = 0, b2 = 0;
-        for (var i = 0; i < len; i++) { var w = Math.random() * 2 - 1; b0 = .997 * b0 + w * .029; b1 = .985 * b1 + w * .032; b2 = .95 * b2 + w * .048; d[i] = (b0 + b1 + b2) * .55; } }
-      var n = A.createBufferSource(); n.buffer = buf;
-      var bp = A.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = .6; bp.frequency.value = 520;
-      var lfo = A.createOscillator(), lg = A.createGain(); lfo.frequency.value = .16; lg.gain.value = 260; lfo.connect(lg); lg.connect(bp.frequency);
-      var wg = A.createGain(); wg.gain.setValueAtTime(0, T); wg.gain.linearRampToValueAtTime(.34, T + 1.6); wg.gain.setValueAtTime(.34, T + D - 2.6); wg.gain.linearRampToValueAtTime(0, T + D);
-      n.connect(bp); bp.connect(wg); wg.connect(A.destination); n.start(T); lfo.start(T); n.stop(T + D); lfo.stop(T + D);
-      var notes = [784, 880, 1047, 1175, 1319, 1568, 1760], t = T + .5;
-      while (t < T + D - 1.8) { var f = notes[Math.floor(Math.random() * notes.length)], o = A.createOscillator(), o2 = A.createOscillator(), ng = A.createGain(), pan = A.createStereoPanner ? A.createStereoPanner() : null;
-        o.type = "sine"; o.frequency.value = f; o2.type = "sine"; o2.frequency.value = f * 2.76;
-        var v = .05 + Math.random() * .045; ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(v, t + .01); ng.gain.exponentialRampToValueAtTime(.0005, t + 2.4);
-        var g2 = A.createGain(); g2.gain.value = .25; o.connect(ng); o2.connect(g2); g2.connect(ng);
-        if (pan) { pan.pan.value = Math.random() * 1.4 - .7; ng.connect(pan); pan.connect(A.destination); } else ng.connect(A.destination);
-        o.start(t); o2.start(t); o.stop(t + 2.5); o2.stop(t + 2.5); t += .45 + Math.random() * .75; }
+      fetch("img/forest-morning.mp3").then(function (r) { return r.arrayBuffer(); }).then(function (ab) {
+        return new Promise(function (ok, no) { A.decodeAudioData(ab, ok, no); }); }).then(function (buf) {
+        var s = A.createBufferSource(), gn = A.createGain(), T = A.currentTime + .02; s.buffer = buf; gn.gain.value = .9;
+        s.connect(gn); gn.connect(A.destination); s.start(T);
+      }).catch(function () {});
     } catch (e) {}
   }
   g.querySelector("#khGateOn").onclick = function () { go(true); };
@@ -971,8 +963,8 @@ html.ts .wrap{display:none!important}
 #tsIntro{position:fixed;inset:0;z-index:300;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
   transition:transform 1s cubic-bezier(.77,0,.18,1)}
 #tsIntro video,#tsIntro img{width:min(620px,84vw);height:auto;display:block}
-#tsIntro .tl{width:0;height:1px;background:var(--ts-red);transition:width 1.2s cubic-bezier(.65,0,.35,1)}
-#tsIntro .tc{opacity:0;transform:translateY(8px);transition:opacity .8s .3s,transform .8s .3s;color:var(--ts-ink)}
+#tsIntro .tl{width:0;height:1px;background:var(--ts-red);transition:width .8s cubic-bezier(.65,0,.35,1)}
+#tsIntro .tc{opacity:0;transform:translateY(8px);transition:opacity .55s .15s,transform .55s .15s;color:var(--ts-ink)}
 #tsIntro.go .tl{width:min(220px,50vw)} #tsIntro.go .tc{opacity:1;transform:none}
 #tsIntro.done{transform:translateY(-100%)}
 /* Powered by Duphora — the builder's pill, under the hotel's logo */
@@ -3867,7 +3859,7 @@ if (location.hash === "#talk") openCall(_fromAlbum);
      missing. */
   var finish = function () {
     if (ended) return; ended = true; document.body.style.overflow = "";
-    var EASE = "cubic-bezier(.65,0,.25,1)", D = 1100;
+    var EASE = "cubic-bezier(.65,0,.25,1)", D = 850;
     var tLogo = document.querySelector("#tsLogo .logo"), hCn = [document.querySelector(".ts-rail .ts-cn"), document.querySelector("#tsLogo .ts-dcn")].filter(function (el) { return el && getComputedStyle(el).display !== "none"; })[0] || null, iCn = intro.querySelector(".cn");
     if (!tLogo || !Element.prototype.animate) { intro.classList.add("done"); setTimeout(function () { intro.remove(); }, 1100); return; }
     try {
@@ -3914,10 +3906,11 @@ if (location.hash === "#talk") openCall(_fromAlbum);
       intro.classList.add("done"); setTimeout(function () { intro.remove(); }, 1100);
     }
   };
-  var go = function () { intro.classList.add("go"); setTimeout(finish, 2300); };
+  /* v9.3: a tad faster, as on the phone - logo at 1.4x, a shorter hold, a quicker glide */
+  var go = function () { intro.classList.add("go"); setTimeout(finish, 1400); };
   v.addEventListener("ended", go);
-  var run = function () { var p = v.play(); if (p && p.catch) p.catch(function () { go(); });
-  setTimeout(function () { if (!intro.classList.contains("go")) go(); }, 4200); };
+  var run = function () { try { v.playbackRate = 1.4; v.defaultPlaybackRate = 1.4; } catch (e) {} var p = v.play(); if (p && p.catch) p.catch(function () { go(); });
+  setTimeout(function () { if (!intro.classList.contains("go")) go(); }, 3000); };
   if (window.__khGate) window.__khGate(run, finish); else run();
   $("tsSkip").onclick = finish;
 })();
