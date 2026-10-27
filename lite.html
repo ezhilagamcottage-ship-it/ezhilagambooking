@@ -545,6 +545,7 @@ svg.i{width:22px;height:22px;flex:none}
 @keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 .rcpt .pill.grey{background:#EEE8E4;color:var(--muted)}
+.rcpt-by{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin:8px 0 0;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.rcpt-by img{height:16px;width:auto;display:block}
 
 /* ===== logo intro (same clip and rhythm as the main site), then the lite page ===== */
 #intro{position:fixed;inset:0;z-index:300;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:transform 1s cubic-bezier(.77,0,.18,1),opacity .6s ease .5s}
@@ -552,12 +553,11 @@ svg.i{width:22px;height:22px;flex:none}
 #intro .tl{width:0;height:1px;background:var(--maroon);transition:width 1.2s cubic-bezier(.65,0,.35,1)}
 #intro .tc{opacity:0;transform:translateY(8px);transition:opacity .8s .3s,transform .8s .3s;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
 #intro.go .tl{width:min(220px,50vw)}#intro.go .tc{opacity:1;transform:none}
-#intro .cn{display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:7px 18px 7px 8px;border-radius:999px;background:#fff;border:1px solid #d6dce7;box-shadow:0 8px 24px rgba(31,111,235,.14);opacity:0;transform:translateY(12px) scale(.96);transition:opacity .7s .55s,transform .7s cubic-bezier(.2,.8,.2,1) .55s}
+#intro .cn{display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:7px 8px 7px 16px;border-radius:999px;background:#fff;border:1px solid #d6dce7;box-shadow:0 8px 24px rgba(45,31,107,.16);opacity:0;transform:translateY(12px) scale(.96);transition:opacity .7s .55s,transform .7s cubic-bezier(.2,.8,.2,1) .55s}
 #intro.go .cn{opacity:1;transform:none}
-#intro .cn img{width:30px;height:30px;display:block}
-#intro .cn span{display:flex;flex-direction:column;line-height:1.1;text-align:left}
+#intro .cn img{width:auto;height:30px;display:block}
 #intro .cn small{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6b7690}
-#intro .cn b{font-weight:600;font-size:15px;color:#0b1220}#intro .cn b i{font-style:normal;color:#1f6feb}
+
 #intro button{position:absolute;right:max(20px,env(safe-area-inset-right,0px));bottom:max(20px,env(safe-area-inset-bottom,0px));font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 #intro.done{transform:translateY(-100%)}
 body.intro-on{overflow:hidden}
@@ -570,7 +570,7 @@ body.intro-on .app,body.intro-on .dock{opacity:0}
 </style>
 </head>
 <body class="intro-on">
-<div id="intro" aria-hidden="true"><video id="introV" muted playsinline preload="auto" poster="img/logo-intro.jpg"><source src="img/logo-intro.mp4" type="video/mp4"></video><span class="tl"></span><span class="tc">Courtallam &middot; Live with Nature</span><span class="cn"><img src="img/cloudnest.webp" alt="" width="30" height="30"><span><small>Powered by</small><b><i>CloudNest</i> Technologies</b></span></span><button type="button" id="introSkip">Skip</button></div>
+<div id="intro" aria-hidden="true"><video id="introV" muted playsinline preload="auto" poster="img/logo-intro.jpg"><source src="img/logo-intro.mp4" type="video/mp4"></video><span class="tl"></span><span class="tc">Courtallam &middot; Live with Nature</span><span class="cn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="102" height="30"></span><button type="button" id="introSkip">Skip</button></div>
 
 <div class="app" id="app"><div id="view"></div></div>
 <div class="dock" id="dock"><div class="in gut" id="dockin"></div></div>
@@ -964,7 +964,7 @@ function receiptCard(b,open){return `<article class="rcpt${open?" open":""}"><he
   <div class="prow">${ic.users}<span>Guests</span><b>${esc(b.guests)}</b></div>
   <div class="prow">${ic.wallet}<span>Paid</span><b class="num">${inr(b.paid)}</b></div>
   ${b.balance>0?`<div class="prow">${ic.clock}<span>Balance before check-in</span><b class="num">${inr(b.balance)}</b></div>`:""}
-  <footer class="num"><span>Razorpay ${esc(b.payRef||"")}</span><span>${esc(b.paidOn||"")}</span></footer></article>`}
+  <footer class="num"><span>Razorpay ${esc(b.payRef||"")}</span><span>${esc(b.paidOn||"")}</span></footer><p class="rcpt-by">Powered by <img src="img/duphora.webp" alt="Duphora" width="55" height="16"></p></article>`}
 
 V.bookings=()=>{const list=receipts();return `${topTabs()}
   <div class="gut stack" style="padding-top:8px">${pageTitle(ACCOUNT?`Welcome back, ${esc(ACCOUNT.given||firstName(ACCOUNT.name))}`:"My Bookings")}
@@ -1124,7 +1124,7 @@ $("#shenImg").src=SHENBA_IMG;$("#shenImg2").src=SHENBA_IMG;
 render();startCarousel();loadAvail();if(CFG.GOOGLE_CLIENT_ID){loadGsi();refreshSignin()}else GSI_FAILED=true;
 if(location.hash==="#bookings")go("bookings");
 /* Logo intro: once per visit, never on a deep link, skipped for reduced motion. Same rhythm as index.html:
-   clip plays (3.3 s), line + caption + CloudNest pill rise, then the white screen lifts away. */
+   clip plays (3.3 s), line + caption + Duphora pill rise, then the white screen lifts away. */
 (function(){const el=$("#intro");let seen=false;try{seen=sessionStorage.getItem("liteIntro")==="1"}catch(e){}
   const reveal=()=>{document.body.classList.remove("intro-on")};
   if(seen||location.hash||matchMedia("(prefers-reduced-motion: reduce)").matches){el.remove();reveal();return}
