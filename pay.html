@@ -327,7 +327,7 @@ function render(d) {
     <div><b>Home food</b>Made to order</div><div><b>24/7 power backup</b>Hot water · Wi-Fi</div></div>
   <p class="note">Your booking is confirmed only after payment. The voucher comes to your WhatsApp right after.</p>` : ""}
   ${paid ? `<p class="note ok">Your reservation voucher has been sent to your WhatsApp. Please show it at check-in with an original photo ID for every adult. See you in Courtallam!</p>
-  <div class="btns"><a class="ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Kutralam+Ezhilagam+Courtallam">📍 Directions</a><a class="ghost" href="tel:+918248320685">📞 Reception</a></div>` : ""}
+  <div class="btns"><a class="ghost" href="https://maps.app.goo.gl/uMu427TCwSHLzAVEA">📍 Directions</a><a class="ghost" href="tel:+918248320685">📞 Reception</a></div>` : ""}
   ${/expired|cancelled/.test(d.status) ? `<div class="btns"><a class="ghost" href="tel:+919962222415">📞 Call us</a><a class="ghost" href="https://wa.me/916374213184">💬 WhatsApp</a></div>` : ""}`;
   barEl.innerHTML = canPay ? `<div class="paybar"><div class="in"><div class="amt"><small>Total</small><b>${inr(d.total)}</b></div>
     <button class="pay" id="pay" type="button">${I.lock}Pay securely</button></div></div>` : "";
