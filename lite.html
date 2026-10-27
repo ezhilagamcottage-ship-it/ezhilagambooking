@@ -664,6 +664,34 @@ body.intro-on .app,body.intro-on .dock{opacity:0}
 .selroom h4 .seltag svg{width:12px;height:12px}
 .selroom .sact2{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .selroom .sact2 .det{font-size:12px;font-weight:600;color:var(--maroon);display:flex;align-items:center;gap:2px}
+
+/* v9.1: final confirmation before Razorpay */
+.cfsheet{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-start;justify-content:center}
+.cfsheet[hidden]{display:none}
+.cfbg{position:absolute;inset:0;background:rgba(40,10,15,.55);animation:fadein .25s ease}
+.cfbox{position:relative;width:100%;max-width:480px;margin-top:max(10px,env(safe-area-inset-top,0px));background:var(--white);border-radius:0 0 var(--r-xl) var(--r-xl);border-radius:var(--r-xl);margin-inline:10px;padding:16px 16px 14px;box-shadow:0 20px 50px rgba(30,5,10,.35);animation:cfIn .45s cubic-bezier(.16,1,.3,1) both;max-height:calc(100dvh - 20px);overflow:auto}
+@keyframes cfIn{from{opacity:0;transform:translateY(-16px)}}
+.cfhead{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.cflogo{height:34px;width:auto}
+.cfhead h2{font:400 20px/1.1 var(--serif);color:var(--maroon)}
+.cfhead small{font-size:11px;color:var(--muted)}
+.cfx{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--maroon-soft);color:var(--maroon)}
+.cfx svg{width:16px;height:16px}
+.cfroom{display:flex;flex-direction:column;gap:6px;margin:10px 0 8px}
+.cfroom div{display:flex;justify-content:space-between;gap:8px;align-items:baseline;background:var(--maroon-soft);border-radius:var(--r-md);padding:9px 12px}
+.cfroom b{font:400 19px var(--serif);color:var(--ink)}
+.cfroom span{font-size:12px;color:var(--maroon);font-weight:600;text-align:right}
+.cfgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+.cfr{display:flex;flex-direction:column;gap:1px;padding:6px 0}
+.cfr span{font-size:11px;color:var(--muted);text-transform:none}
+.cfr b{font-weight:600;font-size:14px;color:var(--ink)}
+.cfr b small{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
+.cfr.wide{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--line)}
+.cfmoney{margin-top:6px;border-top:1px solid var(--line);padding-top:4px}
+.cfmoney .cfr{flex-direction:row;justify-content:space-between;align-items:baseline;padding:5px 0}
+.cfmoney .cfr.now b{font:400 24px var(--serif);color:var(--maroon)}
+.cfpay{width:100%;margin-top:10px}
+.cfnote{margin:8px 0 0;font-size:11px;color:var(--muted);text-align:center}
 </style>
 </head>
 <body class="intro-on">
@@ -1115,7 +1143,8 @@ async function primePost(payload){const r=await fetch(CFG.SCRIPT_URL,{method:"PO
 function loadRzp(){if(window.Razorpay)return Promise.resolve(true);if(loadRzp._p)return loadRzp._p;
   loadRzp._p=new Promise(res=>{const t=setTimeout(()=>res(false),9000),el=document.createElement("script");el.src="https://checkout.razorpay.com/v1/checkout.js";el.async=true;
     el.onload=()=>{clearTimeout(t);res(!!window.Razorpay)};el.onerror=()=>{clearTimeout(t);loadRzp._p=null;res(false)};document.head.appendChild(el)});return loadRzp._p}
-function setBusy(label){S.paying=label||"";const b=$("#payBtn");if(b){b.disabled=!!label;b.innerHTML=label?`<span class="spin light"></span> ${label}`:payLabel()}}
+function setBusy(label){S.paying=label||"";const b=$("#payBtn");if(b){b.disabled=!!label;b.innerHTML=label?`<span class="spin light"></span> ${label}`:payLabel()}
+  const f=$("#cfPay");if(f){f.disabled=!!label;f.innerHTML=label?`<span class="spin light"></span> ${label}`:`${ic.lock} Pay ${inr(terms(quote(picked())).now)} with Razorpay`}}
 function payLabel(){const set=picked(),t=terms(quote(set));return `${ic.lock} Pay ${inr(t.now)} · Confirm room`}  /* v9.0: always the amount on screen now (was an old order's figure) */
 /* v9.0 (Rakesh, 27 Oct 21:47: "Opening secure payment seems to be so slow"). The wait was the booking desk
    (Google Apps Script) pricing the stay and asking Razorpay for an order - 3 to 6 seconds. Now the payment
@@ -1131,6 +1160,27 @@ let PRE=null,preT=null;
 function payPrewarm(){if(S.screen!=="pay")return;loadRzp();clearTimeout(preT);
   preT=setTimeout(()=>{if(S.screen!=="pay"||S.paying||readyToPay())return;const b=orderBody(),k=orderKey(b);if(PRE&&PRE.k===k)return;
     PRE={k,p:primePost(b).catch(()=>null)}},700)}
+/* v9.1 (Rakesh, 27 Oct 21:57): before Razorpay opens, the guest sees everything the booking voucher will say
+   - room, nights, dates and times, head count, name, WhatsApp, A/C, total, paying now, balance - in our own
+   theme, with the Razorpay pay button under it. The card sits at the top so it stays readable while
+   Razorpay's sheet is open at the bottom. */
+function openConfirm(){let el=$("#cfsheet");if(!el){el=document.createElement("div");el.id="cfsheet";el.className="cfsheet";document.body.appendChild(el)}
+  const set=picked(),q=quote(set),t=terms(q),n=Math.max(nights(),1),ac=S.wantAc&&set.some(r=>!r.noAc),ref=S.ref||(S.ref="EZ"+Date.now().toString(36).toUpperCase().slice(-6));
+  const row=(k,v,cls)=>`<div class="cfr${cls?" "+cls:""}"><span>${k}</span><b>${v}</b></div>`;
+  el.innerHTML=`<div class="cfbg" data-cfclose></div><div class="cfbox" role="dialog" aria-modal="true" aria-labelledby="cfT">
+    <div class="cfhead"><img src="img/logo-hd.webp" alt="Kutralam Ezhilagam" class="cflogo"><div><h2 id="cfT">Confirm your booking</h2><small class="num">Ref ${esc(ref)} · voucher on WhatsApp after payment</small></div><button class="cfx" data-cfclose aria-label="Back to edit">${ic.close}</button></div>
+    <div class="cfroom">${set.map(r=>`<div><b>${esc(r.name)}</b><span>${catName(r)} · ${r.floor} floor · ${ac&&!r.noAc?"A/C":"Non-A/C"}</span></div>`).join("")}</div>
+    <div class="cfgrid">
+      ${row("Check-in",`${fmtD(S.checkIn)}<small>12:00 PM</small>`)}${row("Check-out",`${fmtD(S.checkOut)}<small>10:00 AM</small>`)}
+      ${row("Stay",`${n} night${n>1?"s":""}`)}${row("Guests",esc(guestLine()))}
+      ${row("Name",esc(S.name.trim()),"wide")}${row("WhatsApp","+91 "+esc(phoneDigits().replace(/(\d{5})(\d{5})/,"$1 $2")),"wide")}
+    </div>
+    <div class="cfmoney num">${row("Total for the stay",inr(t.part?q.total:t.full))}
+      ${t.part?row("Pay now (60%)",inr(t.now),"now")+row("Balance before check-in",inr(t.balance)):row("Pay now · in full",inr(t.now),"now")+row("At the desk","Nothing to pay")}</div>
+    <button class="btn pill cfpay" id="cfPay" data-payrz>${ic.lock} Pay ${inr(t.now)} with Razorpay</button>
+    <p class="cfnote">UPI · cards · net banking · secured by Razorpay. Photo ID for every adult at check-in.</p></div>`;
+  el.hidden=false;document.body.style.overflow="hidden";payPrewarm()}
+function closeConfirm(){const el=$("#cfsheet");if(el){el.hidden=true;document.body.style.overflow=""}}
 async function startPayment(){const why=readyToPay();
   if(why){toast(why);if(!ACCOUNT&&!GSI_FAILED){openSignin("pay")}else if(/name/.test(why))$("#gname")?.focus();else $("#gphone")?.focus();return}
   if(S.paying)return;
@@ -1144,7 +1194,7 @@ async function startPayment(){const why=readyToPay();
   if(!rz){setBusy("");toast("The payment window could not open. Check your connection and try again.");return}
   S.orderAmt=Math.round((Number(order.amount)||0)/100);
   const checkout=new window.Razorpay({key:order.keyId,order_id:order.orderId,amount:order.amount,currency:order.currency||"INR",
-    name:"Kutralam Ezhilagam",description:`${set.map(r=>r.name).join(" + ")} · ${fmt(S.checkIn)} to ${fmt(S.checkOut)}`,image:"/img/pay-logo.png",
+    name:"Kutralam Ezhilagam",description:`${set.map(r=>r.name).join(" + ")} · ${Math.max(nights(),1)}N · ${fmt(S.checkIn)}–${fmt(S.checkOut)} · ${S.adults+S.teens+S.kids} guests`,image:"/img/pay-logo.png",
     prefill:{name:S.name.trim(),email:ACCOUNT?ACCOUNT.email:"",contact:"91"+digits},notes:{ref},theme:{color:"#7A1F2B"},
     method:{card:true,netbanking:true,upi:true,wallet:false,emi:false,paylater:false,cardless_emi:false},
     modal:{confirm_close:true,ondismiss:()=>{setBusy("");toast("Payment not completed. Your room is still free to book.")}},
@@ -1167,7 +1217,7 @@ async function finishPayment(resp,ctx){setBusy("Confirming your booking…");
     dates:`${fmt(S.checkIn)} – ${fmt(S.checkOut)} · ${q.n} night${q.n>1?"s":""}`,guests:guestLine(),paid,total,balance:Math.max(0,total-paid),
     payRef:"…"+String(resp.razorpay_payment_id||"").slice(-6),paidOn:new Date().toLocaleString("en-IN",{day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"}),
     name:S.name.trim(),given:ACCOUNT?ACCOUNT.given:firstName(S.name),email:ACCOUNT?ACCOUNT.email:"",phone:digits,emailed:!!v.emailed};
-  saveReceipt(rec);S.lastReceipt=rec;S.paying="";S.orderAmt=0;S.ref=null;S.pick=[];go("done")}
+  saveReceipt(rec);S.lastReceipt=rec;S.paying="";S.orderAmt=0;S.ref=null;S.pick=[];closeConfirm();go("done")}
 function payProblem(msg,resp){S.problem={msg,pay:resp&&resp.razorpay_payment_id};render();window.scrollTo({top:0,behavior:"smooth"})}
 
 /* ---------- Sign-in sheet (between "Review & pay" on the rooms list and the pay page) ---------- */
@@ -1292,7 +1342,9 @@ document.addEventListener("click",e=>{
   if(d.zoom){S.pi=+d.zoom;render();window.scrollTo({top:0,behavior:"smooth"});return}
   if(d.shenba!==undefined){S.shenba=!S.shenba;renderShenba();return}
   if(d.copy){navigator.clipboard?.writeText(d.copy).then(()=>toast("Number copied"),()=>toast(d.copy));return}
-  if(d.confirm!==undefined){startPayment();return}
+  if(d.confirm!==undefined){if(readyToPay()||S.paying){startPayment();return}openConfirm();return}
+  if(d.cfclose!==undefined){closeConfirm();return}
+  if(d.payrz!==undefined){startPayment();return}
 });
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-room][role=button]")){e.preventDefault();e.target.click()}});
 $("#sheet").querySelector("[aria-label=Close]").innerHTML=ic.close;
