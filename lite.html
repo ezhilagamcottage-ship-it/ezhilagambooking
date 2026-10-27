@@ -1116,7 +1116,7 @@ function loadRzp(){if(window.Razorpay)return Promise.resolve(true);if(loadRzp._p
   loadRzp._p=new Promise(res=>{const t=setTimeout(()=>res(false),9000),el=document.createElement("script");el.src="https://checkout.razorpay.com/v1/checkout.js";el.async=true;
     el.onload=()=>{clearTimeout(t);res(!!window.Razorpay)};el.onerror=()=>{clearTimeout(t);loadRzp._p=null;res(false)};document.head.appendChild(el)});return loadRzp._p}
 function setBusy(label){S.paying=label||"";const b=$("#payBtn");if(b){b.disabled=!!label;b.innerHTML=label?`<span class="spin light"></span> ${label}`:payLabel()}}
-function payLabel(){const set=picked(),t=terms(quote(set));return `${ic.lock} Pay ${inr(S.orderAmt||t.now)} · Confirm room`}
+function payLabel(){const set=picked(),t=terms(quote(set));return `${ic.lock} Pay ${inr(t.now)} · Confirm room`}  /* v9.0: always the amount on screen now (was an old order's figure) */
 /* v9.0 (Rakesh, 27 Oct 21:47: "Opening secure payment seems to be so slow"). The wait was the booking desk
    (Google Apps Script) pricing the stay and asking Razorpay for an order - 3 to 6 seconds. Now the payment
    window's code loads as soon as Review & pay opens, and the order is asked for quietly in the background
