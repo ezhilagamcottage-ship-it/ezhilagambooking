@@ -566,6 +566,11 @@ body.intro-on .app,body.intro-on .dock{opacity:0}
 .spin{width:18px;height:18px;border:2.5px solid var(--maroon-line);border-top-color:var(--maroon);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .lfoot{text-align:center;font-size:12px;color:var(--muted);padding:18px 16px 0}
+/* v8.4 (Rakesh, 27 Oct 15:38): Powered by Duphora, centred at the foot of every phone page */
+.byline{display:flex;justify-content:center;padding:26px 16px 6px}
+.by-pill{display:inline-flex;align-items:center;gap:9px;padding:6px 6px 6px 14px;border-radius:999px;background:var(--white);box-shadow:0 0 0 1px rgba(110,30,36,.10),0 6px 18px rgba(60,20,20,.10)}
+.by-pill small{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.by-pill img{height:20px;width:auto;display:block}
 .lfoot a{color:var(--maroon);font-weight:600}
 </style>
 </head>
@@ -706,7 +711,7 @@ const bestFit=()=>freeRooms().filter(r=>r.max>=pax()).sort((a,b)=>a.max-b.max||a
 const picked=()=>S.pick.map(byName).filter(Boolean);
 function quote(set=picked()){const n=Math.max(nights(),1);const rows=set.map(r=>{const base=nightList().reduce((a,d)=>a+nightRate(r,d),0),ac=acOn(r)?acAdd(r)*n:0;return{r,base,ac,avg:Math.round(base/n)}});
   const total=rows.reduce((a,x)=>a+x.base+x.ac,0);return{n,rows,total,ac:rows.reduce((a,x)=>a+x.ac,0),advance:Math.ceil(total/2)}}
-const filtered=()=>{const q=S.q.trim().toLowerCase();return ROOMS.filter(r=>(S.cat==="all"||r.cat===S.cat)&&(!q||[r.name,r.note,r.blurb,r.amen.join(" "),r.floor+" floor",catName(r),r.kitchen?"kitchen":"",r.noAc?"non-ac non a/c":"ac a/c",r.cat==="suite"?"luxury":"budget"].join(" ").toLowerCase().includes(q)))};
+const filtered=()=>{const q="";return ROOMS.filter(r=>(S.cat==="all"||r.cat===S.cat)&&(!q||[r.name,r.note,r.blurb,r.amen.join(" "),r.floor+" floor",catName(r),r.kitchen?"kitchen":"",r.noAc?"non-ac non a/c":"ac a/c",r.cat==="suite"?"luxury":"budget"].join(" ").toLowerCase().includes(q)))};
 
 const WAIT=["Peeking into our nine rooms for you…","Fluffing the pillows while we check your dates…","Asking the falls which rooms are free…","Checking the room keys at the front desk…","Brewing a fresh filter coffee while we look…","Placing jasmine at the door while we look…"];
 const waitLine=()=>WAIT[Math.floor(Math.random()*WAIT.length)];
@@ -830,7 +835,7 @@ const resultCard=r=>`<div class="rcard" role="button" tabindex="0" data-room="${
   <div class="rfoot"><span class="l">${r.noAc?`${ic.falls} Non-A/C · cool hill air`:`${ic.snow} A/C +${inr(acAdd(r))}/night`}</span><span class="r">View Details ${sm(ic.right)}</span></div></div>`;
 const searchBar=(autof)=>`<label class="searchbar">${ic.search}<input id="q" type="search" placeholder="Search room, budget, luxury, kitchen" value="${esc(S.q)}" aria-label="Search rooms" ${autof?"autofocus":""}><span class="flt" aria-hidden="true">${ic.filter}</span></label>`;
 V.search=()=>`${topTabs()}
-  <div class="gut stack" style="padding-top:8px">${pageTitle("All Rooms")}${searchBar(true)}
+  <div class="gut stack" style="padding-top:8px">${pageTitle("All Rooms")}
   <div class="chipline">${CATS.map(c=>`<button class="chip" data-cat="${c.id}" aria-pressed="${S.cat===c.id}">${c.label}</button>`).join("")}</div>
   <div class="stack" id="results">${filtered().map(resultCard).join("")||'<div class="empty"><b>No rooms match</b>Try another word or category.</div>'}</div></div>`;
 V.favs=()=>{const f=ROOMS.filter(r=>S.favs.includes(r.id));return `${topTabs()}
@@ -1053,7 +1058,7 @@ function dock(){const s=S.screen;
   return ""}
 
 function render(){
-  $("#view").innerHTML=`<div class="screen">${V[S.screen]()}</div>`;
+  $("#view").innerHTML=`<div class="screen">${V[S.screen]()}<div class="byline"><span class="by-pill" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="68" height="20"></span></div></div>`;
   $("#dockin").innerHTML=dock();S.anim="";bindCarousel();
   requestAnimationFrame(()=>document.documentElement.style.setProperty("--dockh",$("#dock").offsetHeight+"px"));
   renderShenba();
