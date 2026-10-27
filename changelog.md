@@ -7,6 +7,20 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v8.6 — 27 Oct 2026
+
+**Phone site** (Rakesh).
+- Guests: Adults (13+) and Children only — teenagers count as adults.
+- Chat with Shenba opens in a maroon window on the same page, with her round face; X or Back closes it.
+- Page changes slide in and out like an app; the top tabs cross-fade with a gliding highlight; a room's photo grows into the room page; Back returns to the same scroll spot.
+- Our Rooms slideshow shows one room at a time — the old card leaves before the next arrives — and returns to the room just viewed.
+
+**Computer site.**
+- Calmer book-like page turn: forward turns left, going back turns the page back from the left; the menu highlight glides; gallery photos open with a soft zoom.
+- Location: a car drives the real road from Tenkasi, past Chitraruvi and the Vairams Nagar arch, the map zooms in and the house pin drops.
+- Talk with Shenba: the gold logo heads her arch; "voice not available" line tidied with small Try again / WhatsApp buttons.
+- img/route-to-ezhilagam.mp4 / .gif: the route clip sent to website guests after their voucher.
+
 ## v8.5 — 27 Oct 2026
 
 **Talk with Shenba, number and ending** (Rakesh).
