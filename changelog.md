@@ -7,6 +7,12 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v9.2 — 28 Oct 2026
+
+**Opening and Location** (Rakesh).
+- Phone opening a tad faster (logo at 1.4x, shorter hold, quicker lift) with a soft dense-morning-forest sound — birds, insects, a waterfall far off (img/forest-morning.mp3). Phones start sound on the guest's first touch.
+- Computer Location page plays the route clip (Tenkasi Railway Station → Courtallam bus stand → Five Falls Main Road → Chitraruvi → Vairams Nagar arch → house), "Just 450 m from Chitraruvi" (img/route-web.mp4).
+
 ## v9.1 — 27 Oct 2026
 
 **Confirm your booking** (Rakesh).
