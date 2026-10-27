@@ -1384,6 +1384,71 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   @keyframes khGateIn{from{opacity:0;transform:translate(-50%,18px)}to{opacity:1;transform:translate(-50%,0)}}
   @media (prefers-reduced-motion:reduce){ .kh-shenba,.kh-sh-bub,#khFab,#khFab::after{animation:none} }
 }
+
+/* ══ v8.1 (Rakesh, 27 Oct 14:51): Shenba on the left, the welcome in the middle, and on the right a window where
+   Rooms, Gallery, Location, Contact, Reserve and Chat with Shenba open with a small page turn. The page itself never moves. ══ */
+#khLb{display:none}
+@media (min-width:900px){
+  #khLb:not([hidden]){display:flex}
+  .kh{padding:132px 3vw 104px 2.5vw}
+  .kh-grid{grid-template-columns:auto minmax(0,1fr) minmax(0,min(36vw,580px));gap:2.6vw;align-items:center}
+  .kh-leaf.l1,.kh-leaf.l2,.kh-leaf.l3{display:none}
+  .kh-amen{gap:14px 10px} .kh-amen li{width:57px}
+  .kh h1{font-size:clamp(38px,3.5vw,66px);white-space:nowrap}
+  .kh-shenba{position:relative;left:auto;bottom:auto;order:-1;align-self:end;height:min(calc(100vh - 200px),760px);min-height:420px;margin-bottom:-74px}
+  .kh-sh-bub{left:50%;top:auto;bottom:13%;transform:translateX(-50%);align-items:center;text-align:center;border-radius:999px;padding:9px 18px;animation:khBub2 4s ease-in-out infinite}
+  .kh-sh-bub b{font-size:16px}.kh-sh-bub small{font-size:11px}
+  @keyframes khBub2{0%,100%{transform:translateX(-50%)}50%{transform:translate(-50%,-5px)}}
+  .kh-pic.khw{justify-self:stretch;width:100%;aspect-ratio:auto;height:calc(100vh - 250px);min-height:430px;max-height:720px}
+  .khw-in{position:absolute;inset:16px;border-radius:16px;overflow:hidden;background:#f7f0e3;box-shadow:0 24px 60px rgba(0,0,0,.45);isolation:isolate}
+  .khw .ph{inset:0;border-radius:0;box-shadow:none}
+  .khw-p{position:absolute;inset:0;display:none;flex-direction:column;background:#f7f0e3;color:#24324a;transform-origin:0 50%;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .khw-p.on{display:flex}
+  .khw-p.turning{z-index:3}
+  .khw-p .kh-shade{position:absolute;inset:0;z-index:9;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.1) 70%,rgba(0,0,0,.35));opacity:0}
+  .khw-h{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px 12px 22px;background:linear-gradient(180deg,#173563,#0f2342);box-shadow:0 1px 0 rgba(227,173,95,.55)}
+  .khw-h h2{margin:0;font:400 24px/1.15 "DM Serif Display",var(--ts-serif);color:#f3cd8e}
+  .khw-x{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;background:rgba(255,255,255,.1);color:#f3cd8e;font-size:22px;line-height:1}
+  .khw-x:hover{background:rgba(255,255,255,.2)}
+  .khw-b{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:18px 22px 22px}
+  .khw-lead{margin:0 0 14px;font:400 14.5px/1.55 "Jost",var(--ts-sans);color:#4a556b}
+  .khw .khv-map{aspect-ratio:16/10;border-radius:14px;box-shadow:0 0 0 2px var(--kh-gold),0 12px 26px rgba(15,35,66,.2)}
+  .khw .khv-big{font-size:19px;margin-top:16px}
+  .khw .khv-list{margin-top:12px;font-size:14px}
+  .khw .khv-cta{margin-top:18px}
+  .khw .kh-btn{min-height:42px;padding:0 20px;font-size:12.5px}
+  .khw .khg{margin-top:0;columns:2 160px;column-gap:12px}
+  .khw .khg-i{margin-bottom:12px;border-radius:12px}
+  .khw .khc{grid-template-columns:1fr;gap:10px;margin-top:0}
+  .khw .khc-c{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:14px;padding:14px 18px;border-radius:14px}
+  .khw .khc-c small{grid-column:1/-1}
+  .khw .khc-c a{margin-top:6px;font-size:24px}
+  .khw .khc-c p{margin:6px 0 0;text-align:right;max-width:170px}
+  .khw .khc2{grid-template-columns:1fr;gap:12px;margin-top:18px;padding-top:16px}
+  .khw .khc2 h3{font-size:18px;margin-bottom:4px}
+  .khw .khv-pics{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto;gap:10px;height:auto;margin-top:20px}
+  .khw .khv-pics img{aspect-ratio:1;height:auto;border-radius:12px}
+  .khw .khv-pics img:first-child{grid-row:auto}
+  .khw #rooms{padding:0;margin:0}
+  .khw .ts-room .ph{position:relative;inset:auto;border-radius:10px;box-shadow:none;overflow:hidden}
+  .khw .ts-room .ph img{position:static;inset:auto;opacity:1;animation:none;transform:none;width:100%;height:auto;aspect-ratio:4/3}
+  .khw .ts-room{flex:0 0 min(240px,70%)}
+  .khw .ts-room:nth-child(even){margin-top:0}
+  .khw .ts-room h3{font-size:22px;margin-top:12px}
+  .khw #rooms .ts-in{max-width:none;padding:0;margin:0}
+  .khw #rooms .ts-rhead{margin-bottom:14px;justify-content:flex-end}
+  .khw #rooms .ts-rhead>div:first-child{display:none}
+  .khw .khw-chat{padding:0;position:relative}
+  .khw dialog#sbChat{position:absolute;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;border-radius:0;box-shadow:none;z-index:1}
+  .khw dialog#sbChat .sb-head{background:linear-gradient(180deg,#173563,#0f2342)}
+  .kh-nav button[aria-current="page"]{background:rgba(10,24,48,.16)}
+  @media (max-width:1239px){ .kh{padding-top:200px} .kh-pic.khw{height:calc(100vh - 310px)} }
+  @media (max-width:1179px){
+    .kh-grid{grid-template-columns:minmax(0,1fr) minmax(0,46vw)}
+    .kh-shenba{display:none}
+    html.kh-top #tsDock{opacity:1;transform:none;pointer-events:auto}
+  }
+}
 /* ══ v7.6 page turns (Rakesh, 27 Oct 13:21) ══ */
 #khPages{display:none}
 @media (min-width:900px){
@@ -1494,10 +1559,34 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
         <img src="img/shenba-full.webp" alt="" width="407" height="1126">
         <span class="kh-sh-bub"><b>Vanakkam! I'm Shenba</b><small>Tap me to talk &middot; Tamil &amp; English</small></span>
       </button>
-      <div class="kh-pic">
+      <div class="kh-pic khw" id="khWin" aria-live="polite">
         <span class="kh-dots a" aria-hidden="true"></span><span class="kh-vdots" aria-hidden="true"></span>
         <span class="fr" aria-hidden="true"></span>
-        <div class="ph"><img src="img/photos/facade-dusk.webp" alt="Kutralam Ezhilagam at dusk"><img src="img/photos/hill-view-window.webp" alt="Two beds beside a wide window on to the Courtallam hills" loading="lazy"><img src="img/photos/marutham-king-bed.webp" alt="Marutham, a king bed in a bright room" loading="lazy"><img src="img/photos/twin-beds-teak.webp" alt="Two teak beds with fresh linen" loading="lazy"><img src="img/photos/suite-living-tv.webp" alt="The suite sitting room, with the bedroom beyond" loading="lazy"><img src="img/photos/bed-lamp-door.webp" alt="A double bed with a wall lamp" loading="lazy"><img src="img/photos/paalai-two-beds.webp" alt="Paalai, two double beds" loading="lazy"><img src="img/photos/bed-red-cushions-window.webp" alt="A double bed by the window" loading="lazy"></div>
+        <div class="khw-in" id="khWinIn">
+          <section class="khw-p on" data-p="home" aria-label="Photographs"><div class="ph"><img src="img/photos/facade-dusk.webp" alt="Kutralam Ezhilagam at dusk"><img src="img/photos/hill-view-window.webp" alt="Two beds beside a wide window on to the Courtallam hills" loading="lazy"><img src="img/photos/marutham-king-bed.webp" alt="Marutham, a king bed in a bright room" loading="lazy"><img src="img/photos/twin-beds-teak.webp" alt="Two teak beds with fresh linen" loading="lazy"><img src="img/photos/suite-living-tv.webp" alt="The suite sitting room, with the bedroom beyond" loading="lazy"><img src="img/photos/bed-lamp-door.webp" alt="A double bed with a wall lamp" loading="lazy"><img src="img/photos/paalai-two-beds.webp" alt="Paalai, two double beds" loading="lazy"><img src="img/photos/bed-red-cushions-window.webp" alt="A double bed by the window" loading="lazy"></div></section>
+          <section class="khw-p" data-p="rooms" aria-label="Rooms"><header class="khw-h"><h2>Our rooms</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b" id="khRoomsSlot"></div></section>
+          <section class="khw-p" data-p="gallery" aria-label="Gallery"><header class="khw-h"><h2>Gallery</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b"><p class="khw-lead">Tap a photo to see it large.</p><div class="khg"><button type="button" class="khg-i" data-i="0"><img src="img/photos/facade-dusk.webp" alt="Kutralam Ezhilagam at dusk" loading="lazy"><span>Kutralam Ezhilagam at dusk</span></button><button type="button" class="khg-i" data-i="1"><img src="img/photos/hill-view-window.webp" alt="Two beds beside a wide window on to the Courtallam hills" loading="lazy"><span>Two beds beside a wide window on to the Courtallam hills</span></button><button type="button" class="khg-i" data-i="2"><img src="img/photos/marutham-king-bed.webp" alt="Marutham, a teak king bed" loading="lazy"><span>Marutham, a teak king bed</span></button><button type="button" class="khg-i" data-i="3"><img src="img/photos/twin-beds-teak.webp" alt="Two teak beds with fresh linen" loading="lazy"><span>Two teak beds with fresh linen</span></button><button type="button" class="khg-i" data-i="4"><img src="img/photos/suite-living-tv.webp" alt="The suite sitting room, the bedroom beyond" loading="lazy"><span>The suite sitting room, the bedroom beyond</span></button><button type="button" class="khg-i" data-i="5"><img src="img/photos/bed-lamp-door.webp" alt="A double bed with a wall lamp" loading="lazy"><span>A double bed with a wall lamp</span></button><button type="button" class="khg-i" data-i="6"><img src="img/photos/paalai-two-beds.webp" alt="Paalai, two double beds" loading="lazy"><span>Paalai, two double beds</span></button><button type="button" class="khg-i" data-i="7"><img src="img/photos/bed-red-cushions-window.webp" alt="A double bed by the window" loading="lazy"><span>A double bed by the window</span></button><button type="button" class="khg-i" data-i="8"><img src="img/photos/paalai-twin-beds-tv.webp" alt="Paalai, two beds facing the TV" loading="lazy"><span>Paalai, two beds facing the TV</span></button><button type="button" class="khg-i" data-i="9"><img src="img/photos/suite-kitchen.webp" alt="The suite's own kitchen" loading="lazy"><span>The suite's own kitchen</span></button><button type="button" class="khg-i" data-i="10"><img src="img/photos/suite-sitting-room.webp" alt="The suite's sitting room" loading="lazy"><span>The suite's sitting room</span></button><button type="button" class="khg-i" data-i="11"><img src="img/photos/bed-close.webp" alt="Fresh linen and a red quilt" loading="lazy"><span>Fresh linen and a red quilt</span></button><button type="button" class="khg-i" data-i="12"><img src="img/photos/bed-towel.webp" alt="A rolled towel on the bed" loading="lazy"><span>A rolled towel on the bed</span></button><button type="button" class="khg-i" data-i="13"><img src="img/photos/bathroom.webp" alt="An attached bathroom with a water heater" loading="lazy"><span>An attached bathroom with a water heater</span></button></div></div></section>
+          <section class="khw-p" data-p="location" aria-label="Location"><header class="khw-h"><h2>Find us in Courtallam</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b">
+            <div class="khv-map"><iframe title="Kutralam Ezhilagam on the map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-src="https://maps.google.com/maps?q=8.9338032,77.264358&amp;z=17&amp;output=embed"></iframe></div>
+            <p class="khv-big">No 46, Vairams Nagar, Five Falls Road, Courtallam</p>
+            <ul class="khv-list"><li>Near the Vairams Nagar arch</li><li>A short walk to Courtallam Main Falls</li><li>Limited parking, first come first served</li></ul>
+            <div class="khv-cta"><a class="kh-btn gold" href="https://maps.app.goo.gl/uMu427TCwSHLzAVEA" target="_blank" rel="noopener">Open in Google Maps</a><button type="button" class="kh-btn line" data-kv="reserve">Reserve</button></div></div></section>
+          <section class="khw-p" data-p="contact" aria-label="Contact"><header class="khw-h"><h2>We're happy to help</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b">
+            <div class="khc">
+              <div class="khc-c"><small>Booking</small><a href="tel:+919962222415">99622 22415</a><p>Rooms, rates and availability</p></div>
+              <div class="khc-c"><small>Reception</small><a href="tel:+918248320685">082483 20685</a><p>At the front desk, day and night</p></div>
+              <div class="khc-c"><small>WhatsApp Shenba</small><a href="https://wa.me/916374213184" target="_blank" rel="noopener">63742 13184</a><p>Our assistant (AI), Tamil &amp; English</p></div>
+            </div>
+            <div class="khc2"><div><h3>Stay</h3><p>Check-in 12:00 PM &middot; check-out 10:00 AM</p></div>
+              <div><h3>House rules</h3><p>Government photo ID for every adult. Wedding proof is mandatory for couples. Strictly no smoking or alcohol on the premises.</p></div>
+              <div><h3>Address</h3><p>No 46, Vairams Nagar, Five Falls Road, Courtallam</p></div></div></div></section>
+          <section class="khw-p" data-p="reserve" aria-label="Reserve"><header class="khw-h"><h2>Reserve your stay</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b">
+            <p class="khw-lead">Choose your dates and guests. You'll see the rooms that are free for your dates next, then pay securely.</p>
+            <ul class="khv-list"><li>Check-in 12:00 PM &middot; check-out 10:00 AM</li><li>Rates include tax</li><li>Booking 99622 22415 &middot; Reception 082483 20685</li></ul>
+            <div class="khv-cta"><button type="button" class="kh-btn gold" id="khOpenBook">Choose dates &amp; guests</button></div>
+            <div class="khv-pics"><img src="img/photos/hill-view-window.webp" alt="" loading="lazy"><img src="img/photos/marutham-king-bed.webp" alt="" loading="lazy"><img src="img/photos/suite-living-tv.webp" alt="" loading="lazy"></div></div></section>
+          <section class="khw-p" data-p="chat" aria-label="Chat with Shenba"><div class="khw-b khw-chat" id="khChatSlot"></div></section>
+        </div>
       </div>
     </div>
     <svg class="kh-leaf l2" viewBox="0 0 120 160" aria-hidden="true"><path d="M60 158C58 120 56 80 62 6"/><path d="M60 128c-18-4-30-16-34-34 18 2 30 14 34 34z"/><path d="M60 128c16-6 26-18 28-36-16 4-26 16-28 36z"/><path d="M59 92c-16-6-24-18-26-34 16 4 24 16 26 34z"/><path d="M60 92c14-6 22-18 22-34-14 6-22 18-22 34z"/><path d="M60 56c-12-6-18-16-18-30 12 6 18 16 18 30z"/><path d="M61 56c10-6 16-16 15-28-10 6-15 16-15 28z"/><circle cx="62" cy="6" r="3"/></svg>
@@ -1565,45 +1654,11 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
 </footer>
 
 
-<!-- v7.6: the computer site turns like a book. Each page below is shown by a right-to-left page turn. -->
+<div class="khlb" id="khLb" hidden><button type="button" class="x" data-lb="x" aria-label="Close">&times;</button><button type="button" class="nv p" data-lb="p" aria-label="Previous photo">&larr;</button><figure><img alt=""><figcaption></figcaption></figure><button type="button" class="nv n" data-lb="n" aria-label="Next photo">&rarr;</button></div>
 <button type="button" id="khFab" data-kv="reserve" aria-label="Reserve now">
   <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg>
   <span><b>Reserve now</b><small>Best rate, booked direct</small></span>
 </button>
-<div id="khPages">
-<section class="khv" data-v="rooms" aria-label="Rooms"><header class="khv-top"><button type="button" class="khv-logo" data-kv="home" aria-label="Kutralam Ezhilagam, home"><img src="img/logo-hd.webp" alt="" width="484" height="163"></button><span class="khv-cn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="75" height="22"></span><nav class="kh-nav khv-nav" aria-label="Pages"><button type="button" data-kv="home">Home</button><button type="button" data-kv="rooms" aria-current="page">Rooms</button><button type="button" data-kv="gallery">Gallery</button><button type="button" data-kv="location">Location</button><button type="button" data-kv="contact">Contact</button><button type="button" class="kh-res" data-kv="reserve">Reserve</button><button type="button" class="kh-chat" data-ts="chat">Chat with Shenba</button></nav></header><div class="khv-body" id="khRoomsSlot"></div></section>
-<section class="khv" data-v="gallery" aria-label="Gallery"><header class="khv-top"><button type="button" class="khv-logo" data-kv="home" aria-label="Kutralam Ezhilagam, home"><img src="img/logo-hd.webp" alt="" width="484" height="163"></button><span class="khv-cn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="75" height="22"></span><nav class="kh-nav khv-nav" aria-label="Pages"><button type="button" data-kv="home">Home</button><button type="button" data-kv="rooms">Rooms</button><button type="button" data-kv="gallery" aria-current="page">Gallery</button><button type="button" data-kv="location">Location</button><button type="button" data-kv="contact">Contact</button><button type="button" class="kh-res" data-kv="reserve">Reserve</button><button type="button" class="kh-chat" data-ts="chat">Chat with Shenba</button></nav></header><div class="khv-body">
-  <p class="khv-eye">Gallery</p><h2 class="khv-h">Inside Kutralam Ezhilagam</h2>
-  <p class="khv-lead">Our rooms, suites and the house itself. Tap a photo to see it large.</p>
-  <div class="khg"><button type="button" class="khg-i" data-i="0"><img src="img/photos/facade-dusk.webp" alt="Kutralam Ezhilagam at dusk" loading="lazy"><span>Kutralam Ezhilagam at dusk</span></button><button type="button" class="khg-i" data-i="1"><img src="img/photos/hill-view-window.webp" alt="Two beds beside a wide window on to the Courtallam hills" loading="lazy"><span>Two beds beside a wide window on to the Courtallam hills</span></button><button type="button" class="khg-i" data-i="2"><img src="img/photos/marutham-king-bed.webp" alt="Marutham, a teak king bed" loading="lazy"><span>Marutham, a teak king bed</span></button><button type="button" class="khg-i" data-i="3"><img src="img/photos/twin-beds-teak.webp" alt="Two teak beds with fresh linen" loading="lazy"><span>Two teak beds with fresh linen</span></button><button type="button" class="khg-i" data-i="4"><img src="img/photos/suite-living-tv.webp" alt="The suite sitting room, the bedroom beyond" loading="lazy"><span>The suite sitting room, the bedroom beyond</span></button><button type="button" class="khg-i" data-i="5"><img src="img/photos/bed-lamp-door.webp" alt="A double bed with a wall lamp" loading="lazy"><span>A double bed with a wall lamp</span></button><button type="button" class="khg-i" data-i="6"><img src="img/photos/paalai-two-beds.webp" alt="Paalai, two double beds" loading="lazy"><span>Paalai, two double beds</span></button><button type="button" class="khg-i" data-i="7"><img src="img/photos/bed-red-cushions-window.webp" alt="A double bed by the window" loading="lazy"><span>A double bed by the window</span></button><button type="button" class="khg-i" data-i="8"><img src="img/photos/paalai-twin-beds-tv.webp" alt="Paalai, two beds facing the TV" loading="lazy"><span>Paalai, two beds facing the TV</span></button><button type="button" class="khg-i" data-i="9"><img src="img/photos/suite-kitchen.webp" alt="The suite's own kitchen" loading="lazy"><span>The suite's own kitchen</span></button><button type="button" class="khg-i" data-i="10"><img src="img/photos/suite-sitting-room.webp" alt="The suite's sitting room" loading="lazy"><span>The suite's sitting room</span></button><button type="button" class="khg-i" data-i="11"><img src="img/photos/bed-close.webp" alt="Fresh linen and a red quilt" loading="lazy"><span>Fresh linen and a red quilt</span></button><button type="button" class="khg-i" data-i="12"><img src="img/photos/bed-towel.webp" alt="A rolled towel on the bed" loading="lazy"><span>A rolled towel on the bed</span></button><button type="button" class="khg-i" data-i="13"><img src="img/photos/bathroom.webp" alt="An attached bathroom with a water heater" loading="lazy"><span>An attached bathroom with a water heater</span></button></div></div>
-  <div class="khlb" id="khLb" hidden><button type="button" class="x" data-lb="x" aria-label="Close">&times;</button><button type="button" class="nv p" data-lb="p" aria-label="Previous photo">&larr;</button><figure><img alt=""><figcaption></figcaption></figure><button type="button" class="nv n" data-lb="n" aria-label="Next photo">&rarr;</button></div>
-</section>
-<section class="khv" data-v="location" aria-label="Location"><header class="khv-top"><button type="button" class="khv-logo" data-kv="home" aria-label="Kutralam Ezhilagam, home"><img src="img/logo-hd.webp" alt="" width="484" height="163"></button><span class="khv-cn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="75" height="22"></span><nav class="kh-nav khv-nav" aria-label="Pages"><button type="button" data-kv="home">Home</button><button type="button" data-kv="rooms">Rooms</button><button type="button" data-kv="gallery">Gallery</button><button type="button" data-kv="location" aria-current="page">Location</button><button type="button" data-kv="contact">Contact</button><button type="button" class="kh-res" data-kv="reserve">Reserve</button><button type="button" class="kh-chat" data-ts="chat">Chat with Shenba</button></nav></header><div class="khv-body khv-two">
-  <div><p class="khv-eye">Location</p><h2 class="khv-h">Find us in Courtallam</h2>
-    <p class="khv-big">No 46, Vairams Nagar,<br>Five Falls Road, Courtallam</p>
-    <ul class="khv-list"><li>Near the Vairams Nagar arch</li><li>A short walk to Courtallam Main Falls</li><li>Limited parking, first come first served</li></ul>
-    <div class="khv-cta"><a class="kh-btn gold" href="https://maps.app.goo.gl/uMu427TCwSHLzAVEA" target="_blank" rel="noopener">Open in Google Maps</a><button type="button" class="kh-btn line" data-kv="reserve">Reserve</button></div></div>
-  <div class="khv-map"><iframe title="Kutralam Ezhilagam on the map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-src="https://maps.google.com/maps?q=8.9338032,77.264358&amp;z=17&amp;output=embed"></iframe></div>
-</div></section>
-<section class="khv" data-v="contact" aria-label="Contact"><header class="khv-top"><button type="button" class="khv-logo" data-kv="home" aria-label="Kutralam Ezhilagam, home"><img src="img/logo-hd.webp" alt="" width="484" height="163"></button><span class="khv-cn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="75" height="22"></span><nav class="kh-nav khv-nav" aria-label="Pages"><button type="button" data-kv="home">Home</button><button type="button" data-kv="rooms">Rooms</button><button type="button" data-kv="gallery">Gallery</button><button type="button" data-kv="location">Location</button><button type="button" data-kv="contact" aria-current="page">Contact</button><button type="button" class="kh-res" data-kv="reserve">Reserve</button><button type="button" class="kh-chat" data-ts="chat">Chat with Shenba</button></nav></header><div class="khv-body">
-  <p class="khv-eye">Contact</p><h2 class="khv-h">We're happy to help</h2>
-  <div class="khc">
-    <div class="khc-c"><small>Booking</small><a href="tel:+919962222415">99622 22415</a><p>Rooms, rates and availability</p></div>
-    <div class="khc-c"><small>Reception</small><a href="tel:+918248320685">082483 20685</a><p>At the front desk, day and night</p></div>
-    <div class="khc-c"><small>WhatsApp Shenba</small><a href="https://wa.me/916374213184" target="_blank" rel="noopener">63742 13184</a><p>Our assistant (AI), Tamil &amp; English</p></div>
-  </div>
-  <div class="khc2"><div><h3>Stay</h3><p>Check-in 12:00 PM</p><p>Check-out 10:00 AM</p></div>
-    <div><h3>House rules</h3><p>Government photo ID for every adult. Wedding proof is mandatory for couples. Strictly no smoking or alcohol on the premises.</p></div>
-    <div><h3>Address</h3><p>No 46, Vairams Nagar, Five Falls Road, Courtallam</p></div></div>
-</div></section>
-<section class="khv" data-v="reserve" aria-label="Reserve"><header class="khv-top"><button type="button" class="khv-logo" data-kv="home" aria-label="Kutralam Ezhilagam, home"><img src="img/logo-hd.webp" alt="" width="484" height="163"></button><span class="khv-cn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="75" height="22"></span><nav class="kh-nav khv-nav" aria-label="Pages"><button type="button" data-kv="home">Home</button><button type="button" data-kv="rooms">Rooms</button><button type="button" data-kv="gallery">Gallery</button><button type="button" data-kv="location">Location</button><button type="button" data-kv="contact">Contact</button><button type="button" class="kh-res" data-kv="reserve">Reserve</button><button type="button" class="kh-chat" data-ts="chat">Chat with Shenba</button></nav></header><div class="khv-body khv-two">
-  <div><p class="khv-eye">Reserve</p><h2 class="khv-h">Reserve your stay</h2>
-    <p class="khv-lead">Choose your dates and guests. You'll see the rooms that are free for your dates next, then pay securely.</p>
-    <ul class="khv-list"><li>Check-in 12:00 PM &middot; check-out 10:00 AM</li><li>Rates include tax</li><li>Booking 99622 22415 &middot; Reception 082483 20685</li></ul>
-    <div class="khv-cta"><button type="button" class="kh-btn gold" id="khOpenBook">Choose dates &amp; guests</button></div></div>
-  <div class="khv-pics"><img src="img/photos/hill-view-window.webp" alt="" loading="lazy"><img src="img/photos/marutham-king-bed.webp" alt="" loading="lazy"><img src="img/photos/suite-living-tv.webp" alt="" loading="lazy"></div>
-</div></section>
-</div>
 <div id="tsBook" role="dialog" aria-modal="true" aria-label="Reserve a room">
   <div class="veil" data-close></div>
   <div class="pan">
@@ -3735,62 +3790,60 @@ if (location.hash === "#talk") openCall(_fromAlbum);
  t();addEventListener("scroll",t,{passive:true});addEventListener("resize",t);})();
 </script>
 <script>
-/* v7.6 (Rakesh, 27 Oct 13:21): on a computer every button except Talk and Chat with Shenba turns the page
-   from right to left, like a book, with a soft page-flip sound, and shows its own page. */
+/* v8.1 (Rakesh, 27 Oct 14:51): on a computer the menu opens each page inside the window on the right, with a small
+   right-to-left page turn and a soft paper sound. The rest of the page stays still. */
 (function(){
-  if (!window.matchMedia("(min-width: 900px)").matches) return;
-  var root=document.documentElement, hero=document.querySelector(".ts-hero"), pages=document.getElementById("khPages");
-  if(!hero||!pages||!Element.prototype.animate) return;
+  if (!matchMedia("(min-width: 900px)").matches) return;
+  var win=document.getElementById("khWinIn"); if(!win||!Element.prototype.animate) return;
   var slot=document.getElementById("khRoomsSlot"), rooms=document.getElementById("rooms"); if(slot&&rooms) slot.appendChild(rooms);
-  var cur="home", busy=false, ac=null, reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-  function el(v){return v==="home"?hero:pages.querySelector('.khv[data-v="'+v+'"]');}
+  var chat=document.getElementById("sbChat"), cslot=document.getElementById("khChatSlot");
+  var cur="home", busy=false, queued=null, ac=null, reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function pane(p){ return win.querySelector('.khw-p[data-p="'+p+'"]'); }
   function sound(){ try{
-      ac=ac||new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==="suspended") ac.resume();
-      var sr=ac.sampleRate, d=.62, b=ac.createBuffer(1,Math.floor(sr*d),sr), x=b.getChannelData(0), last=0;
-      for(var i=0;i<x.length;i++){var t=i/sr, e=t<.06?t/.06:Math.exp(-(t-.06)*5.5); if(t>.40&&t<.47) e+=.9*Math.exp(-(t-.40)*55);
-        var n=Math.random()*2-1; last=last*.55+n*.45; x[i]=last*e*(.75+.25*Math.sin(t*90));}
-      var s=ac.createBufferSource(); s.buffer=b;
-      var bp=ac.createBiquadFilter(); bp.type="bandpass"; bp.Q.value=.7; bp.frequency.setValueAtTime(900,ac.currentTime); bp.frequency.exponentialRampToValueAtTime(3800,ac.currentTime+.45);
-      var hp=ac.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=350;
-      var g=ac.createGain(); g.gain.value=.55; s.connect(bp); bp.connect(hp); hp.connect(g); g.connect(ac.destination); s.start();
+      ac=ac||window.__khAC||new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==="suspended") ac.resume();
+      var sr=ac.sampleRate, d=.55, b=ac.createBuffer(1,Math.floor(sr*d),sr), x=b.getChannelData(0), l=0;
+      for(var i=0;i<x.length;i++){var t=i/sr, e=t<.05?t/.05:Math.exp(-(t-.05)*6); if(t>.34&&t<.40) e+=.8*Math.exp(-(t-.34)*60); var n=Math.random()*2-1; l=l*.55+n*.45; x[i]=l*e*(.75+.25*Math.sin(t*90));}
+      var s=ac.createBufferSource(); s.buffer=b; var bp=ac.createBiquadFilter(); bp.type="bandpass"; bp.Q.value=.7; bp.frequency.setValueAtTime(900,ac.currentTime); bp.frequency.exponentialRampToValueAtTime(3800,ac.currentTime+.4);
+      var hp=ac.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=350; var g=ac.createGain(); g.gain.value=.45; s.connect(bp); bp.connect(hp); hp.connect(g); g.connect(ac.destination); s.start();
     }catch(e){} }
-  function show(v){
-    if(busy||v===cur) { if(v==="reserve"&&cur==="reserve") openBook(); return; }
-    var front=el(cur), back=el(v); if(!front||!back) return; busy=true;
-    if(cur==="home") window.scrollTo(0,0);
-    if(back!==hero){ back.classList.add("on"); back.scrollTop=0; var f=back.querySelector("iframe[data-src]"); if(f){f.src=f.dataset.src; f.removeAttribute("data-src");} }
-    root.classList.add("kh-inview");
-    var done=function(){ front.classList.remove("kh-turning"); if(front!==hero) front.classList.remove("on");
-      var sh=front.querySelector(":scope > .kh-shade"); if(sh) sh.remove();
-      cur=v; busy=false; root.classList.toggle("kh-inview",v!=="home"); document.body.style.overflow=v==="home"?"":"hidden";
-      if(v==="reserve") setTimeout(openBook,150); };
+  function mark(p){ document.querySelectorAll(".kh-nav [data-kv]").forEach(function(b){ if(b.dataset.kv===p) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); }); }
+  function openBook(){ var r=document.getElementById("tsReserve"); if(r&&r.onclick) r.onclick(); }
+  function show(p){
+    if(busy){ queued=p; return; }
+    if(p===cur){ if(p==="reserve") openBook(); return; }
+    var front=pane(cur), back=pane(p); if(!front||!back) return; busy=true;
+    if(window.scrollY>4) window.scrollTo({top:0,behavior:"smooth"});
+    back.classList.add("on"); var bb=back.querySelector(".khw-b"); if(bb&&p!=="chat") bb.scrollTop=0;
+    var f=back.querySelector("iframe[data-src]"); if(f){ f.src=f.dataset.src; f.removeAttribute("data-src"); }
+    mark(p);
+    var done=function(){ front.classList.remove("turning"); front.classList.remove("on"); var sh=front.querySelector(".kh-shade"); if(sh) sh.remove();
+      cur=p; busy=false; if(p==="reserve") setTimeout(openBook,120); if(queued){ var q=queued; queued=null; show(q); } };
     if(reduce){ done(); return; }
-    sound(); front.classList.add("kh-turning");
-    var sh=document.createElement("i"); sh.className="kh-shade"; front.appendChild(sh);
-    sh.animate([{opacity:0},{opacity:1}],{duration:700,fill:"forwards"});
-    var a=front.animate([{transform:"perspective(2400px) rotateY(0deg)"},{transform:"perspective(2400px) rotateY(-12deg)",offset:.18},{transform:"perspective(2400px) rotateY(-180deg)"}],{duration:950,easing:"cubic-bezier(.55,.06,.3,1)"});
+    sound(); front.classList.add("turning");
+    var sh=document.createElement("i"); sh.className="kh-shade"; front.appendChild(sh); sh.animate([{opacity:0},{opacity:1}],{duration:600,fill:"forwards"});
+    var a=front.animate([{transform:"perspective(1600px) rotateY(0deg)"},{transform:"perspective(1600px) rotateY(-14deg)",offset:.2},{transform:"perspective(1600px) rotateY(-180deg)"}],{duration:820,easing:"cubic-bezier(.55,.06,.3,1)"});
     a.onfinish=done; a.oncancel=done;
   }
-  function openBook(){ var r=document.getElementById("tsReserve"); if(r&&r.__khOrig) r.__khOrig(); }
-  var tr=document.getElementById("tsReserve"); if(tr){ tr.__khOrig=tr.onclick; }
+  window.__khShowPane=show;
+  /* Chat with Shenba opens inside the window instead of on top of the page */
+  if(chat&&cslot){ cslot.appendChild(chat);
+    chat.showModal=function(){ if(!this.open) HTMLDialogElement.prototype.show.call(this); show("chat"); };
+    chat.addEventListener("close",function(){ if(cur==="chat") show("home"); });
+  }
   document.getElementById("khOpenBook").addEventListener("click",openBook);
-  /* every Reserve / Rooms / page button, on any page; Talk and Chat are left alone */
   window.addEventListener("click",function(e){
     var t=e.target.closest("[data-kv],[data-ts='reserve'],[data-ts='rooms'],#tsReserve,#tsMenu a[data-m]"); if(!t) return;
     var v=t.dataset.kv || (t.dataset.ts==="reserve"||t.id==="tsReserve"?"reserve":t.dataset.ts==="rooms"?"rooms":null);
-    if(!v&&t.matches("#tsMenu a[data-m]")){ var h=t.getAttribute("href"); v=h==="#rooms"?"rooms":h==="#top"?"home":null;
-      if(!v){ if(cur!=="home"){ e.preventDefault(); var id=h; show("home"); setTimeout(function(){var x=document.querySelector(id); if(x) x.scrollIntoView({behavior:"smooth"});},1000);} return; } }
+    if(!v&&t.matches("#tsMenu a[data-m]")){ var h=t.getAttribute("href"); v=h==="#rooms"?"rooms":h==="#top"?"home":null; if(!v) return; }
     if(!v) return; e.preventDefault(); e.stopPropagation();
-    var m=document.getElementById("tsMenu"); if(m) m.classList.remove("on");
+    var m=document.getElementById("tsMenu"); if(m){ m.classList.remove("on"); m.setAttribute("aria-hidden","true"); }
     show(v);
   },true);
-  addEventListener("keydown",function(e){ if(e.key==="Escape"&&cur!=="home"&&!document.querySelector("#tsBook.on")&&document.getElementById("khLb").hidden) show("home"); });
-  /* gallery: large view */
-  var lb=document.getElementById("khLb"), items=[].slice.call(pages.querySelectorAll(".khg-i")), li=0;
+  addEventListener("keydown",function(e){ if(e.key==="Escape"&&cur!=="home"&&cur!=="chat"&&!document.querySelector("#tsBook.on")&&document.getElementById("khLb").hidden) show("home"); });
+  var lb=document.getElementById("khLb"), items=[].slice.call(win.querySelectorAll(".khg-i")), li=0;
   function lbShow(i){ li=(i+items.length)%items.length; var im=items[li].querySelector("img"); lb.querySelector("img").src=im.src; lb.querySelector("img").alt=im.alt; lb.querySelector("figcaption").textContent=im.alt; lb.hidden=false; }
   items.forEach(function(b,i){ b.addEventListener("click",function(){ lbShow(i); }); });
-  lb.addEventListener("click",function(e){ var k=e.target.closest("[data-lb]"); if(!k){ if(e.target===lb) lb.hidden=true; return; }
-    k=k.dataset.lb; if(k==="x") lb.hidden=true; else lbShow(li+(k==="n"?1:-1)); });
+  lb.addEventListener("click",function(e){ var k=e.target.closest("[data-lb]"); if(!k){ if(e.target===lb) lb.hidden=true; return; } k=k.dataset.lb; if(k==="x") lb.hidden=true; else lbShow(li+(k==="n"?1:-1)); });
   addEventListener("keydown",function(e){ if(lb.hidden) return; if(e.key==="Escape") lb.hidden=true; else if(e.key==="ArrowRight") lbShow(li+1); else if(e.key==="ArrowLeft") lbShow(li-1); });
 })();
 </script>
