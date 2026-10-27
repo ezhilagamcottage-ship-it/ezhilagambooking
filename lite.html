@@ -644,6 +644,26 @@ body.intro-on .app,body.intro-on .dock{opacity:0}
 .sel[disabled]{opacity:.55;border-style:dashed;cursor:not-allowed}
 @keyframes cardFlash{0%,100%{box-shadow:var(--shadow)}40%{box-shadow:0 0 0 4px rgba(122,31,43,.35),var(--shadow)}}
 .avcard.flash{animation:cardFlash 1.2s ease 2}
+
+/* v8.9: chosen rooms on top with a swipe gallery */
+.pick .why{color:var(--maroon);font-weight:500}
+.pick.lux .why{color:#9A6B12}
+.selroom{position:relative;background:var(--card);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);border:2px solid var(--maroon);margin-bottom:12px}
+.selroom .gw{position:relative;margin:8px 8px 0}
+.selroom .gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:var(--r-md);aspect-ratio:4/3;background:var(--maroon-soft)}
+.selroom .gal::-webkit-scrollbar{display:none}
+.selroom .gal img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:center;scroll-snap-stop:always}
+.selroom .gcount{position:absolute;right:10px;top:10px;background:rgba(20,8,10,.6);color:#fff;font-size:12px;padding:4px 10px;border-radius:999px}
+.selroom .gnav{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:var(--shadow-sm);color:var(--maroon)}
+.selroom .gnav svg{width:18px;height:18px}
+.selroom .gnav.l{left:8px}.selroom .gnav.r{right:8px}.selroom .gnav.r svg{transform:rotate(180deg)}
+.selroom .sbody{padding:12px 16px 14px}
+.selroom .srow2{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.selroom h4{font:400 22px/1.15 var(--serif);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.selroom h4 .seltag{display:inline-flex;align-items:center;gap:4px;font:600 11px var(--sans);color:#fff;background:var(--maroon);padding:4px 8px;border-radius:999px}
+.selroom h4 .seltag svg{width:12px;height:12px}
+.selroom .sact2{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.selroom .sact2 .det{font-size:12px;font-weight:600;color:var(--maroon);display:flex;align-items:center;gap:2px}
 </style>
 </head>
 <body class="intro-on">
@@ -778,13 +798,29 @@ const capOf=set=>set.reduce((a,r)=>a+r.max,0);
 /* Earlier wizard logic. Budget = the cheapest set of free rooms that sleeps everyone.
    Luxury = the fewest rooms, suites preferred. Sets are minimal: dropping any room breaks them. */
 function packages(){const free=freeRooms().filter(r=>!(S.wantAc&&r.noAc)),p=pax();if(!free.length)return{};
+  /* v8.9 (Rakesh, 27 Oct 21:35): a set of rooms should feel like one stay - same floor if possible, same kind
+     (studios with studios, suites with suites), all A/C or all non-A/C, and a shared feature like a balcony
+     counts in its favour. Budget = cheapest coherent set; Luxury = suites first, fewest rooms, least spare beds. */
   const fits=set=>capOf(set)>=p,sets=[];
   for(let m=1;m<(1<<free.length);m++){const set=free.filter((_,i)=>m&(1<<i));
     if(set.length>4||!fits(set))continue;if(set.some((_,i)=>fits(set.filter((_,j)=>j!==i))))continue;sets.push(set)}
   if(!sets.length)return{};
-  const budget=sets.slice().sort((a,b)=>setCost(a)-setCost(b))[0];
-  const luxury=sets.slice().sort((a,b)=>a.length-b.length||(b.filter(r=>r.cat==="suite").length-a.filter(r=>r.cat==="suite").length)||setCost(b)-setCost(a))[0];
+  const uniq=(set,f)=>new Set(set.map(f)).size, bal=r=>/balcony/i.test((r.amen||[]).join(" "));
+  const mix=set=>set.length<2?0:(uniq(set,r=>r.floor)>1?2:0)+(uniq(set,r=>r.cat)>1?2:0)+(uniq(set,r=>!!r.noAc)>1?1:0)+(uniq(set,bal)>1?.5:0);
+  /* each mismatch makes a set "feel" a few percent dearer: different floors or kinds 12%, A/C mix 6%, balcony 3% */
+  const score=s=>setCost(s)*(1+.06*mix(s));
+  const budget=sets.slice().sort((a,b)=>score(a)-score(b)||a.length-b.length)[0];
+  const suiteN=s=>s.filter(r=>r.cat==="suite").length, spare=s=>capOf(s)-p, key=s=>s.map(r=>r.name).sort().join();
+  const lux=sets.slice().sort((a,b)=>(suiteN(b)/b.length-suiteN(a)/a.length)||a.length-b.length||mix(a)-mix(b)||spare(a)-spare(b)||setCost(a)-setCost(b));
+  const luxury=lux.find(s=>key(s)!==key(budget)&&suiteN(s)>0)||lux.find(s=>key(s)!==key(budget))||lux[0];
   return{budget,luxury}}
+/* a short line on why a set belongs together */
+function setWhy(set){if(set.length<2){const r=set[0];return `${r.floor} floor${r.noAc?" · non-A/C":S.wantAc?" · A/C":""}${/balcony/i.test(r.amen.join(" "))?" · balcony":""}`}
+  const one=(f)=>new Set(set.map(f)).size===1, bits=[];
+  bits.push(one(r=>r.floor)?`Same floor · ${set[0].floor}`:"Different floors");
+  if(one(r=>r.cat))bits.push(set[0].cat==="suite"?"both suites":"both studios");
+  if(S.wantAc&&set.every(r=>!r.noAc))bits.push("all A/C");
+  return bits.join(" · ")}
 const bestFit=()=>freeRooms().filter(r=>r.max>=pax()&&!(S.wantAc&&r.noAc)).sort((a,b)=>a.max-b.max||a.rate-b.rate)[0];
 const picked=()=>S.pick.map(byName).filter(Boolean);
 function quote(set=picked()){const n=Math.max(nights(),1);const rows=set.map(r=>{const base=nightList().reduce((a,d)=>a+nightRate(r,d),0),ac=acOn(r)?acAdd(r)*n:0;return{r,base,ac,avg:Math.round(base/n)}});
@@ -874,9 +910,17 @@ function bindCarousel(){const car=$("#car");if(!car)return;let x0=null;
   car.addEventListener("pointerdown",e=>{x0=e.clientX;carHold=Date.now()+8000});
   car.addEventListener("pointerup",e=>{if(x0==null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>40)showSlide(S.slide+(dx<0?1:-1),dx<0?1:-1)});}
 
+/* v8.9: the chosen room(s) sit at the top with every photo to swipe through */
+const selCard=r=>{const n=Math.max(nights(),1);return `<article class="selroom rise" data-card="${r.name}">
+  <div class="gw"><div class="gal" onscroll="galN(this)">${r.photos.map((ph,k)=>`<img src="${ph}" alt="${esc(r.name)} photo ${k+1}" ${k?'loading="lazy"':""}>`).join("")}</div>
+  <span class="gcount num">1 / ${r.photos.length}</span>${r.photos.length>1?`<button class="gnav l" data-gal="-1" aria-label="Previous photo">${ic.back}</button><button class="gnav r" data-gal="1" aria-label="Next photo">${ic.back}</button>`:""}</div>
+  <div class="sbody"><div class="srow2"><div><h4>${r.name} <span class="seltag">${ic.check} Selected</span></h4><div class="spec">${ic.users} Sleeps ${r.max} · ${r.floor} floor${acOn(r)?" · A/C":r.noAc?" · no A/C":""}</div></div>
+    <div class="stayprice num"><b>${inr(stayCost(r))}</b><small>${n} night${n>1?"s":""} · ${inr(Math.round(stayCost(r)/n))}/night</small></div></div>
+    <div class="sact2"><button class="det" data-room="${r.id}">Photos &amp; details ${sm(ic.right)}</button><button class="sel" data-pick="${r.name}" aria-pressed="true">Remove</button></div></div></article>`};
+window.galN=g=>{const k=Math.round(g.scrollLeft/g.clientWidth),t=g.parentElement.querySelector(".gcount");if(t)t.textContent=`${k+1} / ${g.children.length}`};
 const avCard=(r,i,tight)=>{const on=S.pick.includes(r.name),n=Math.max(nights(),1);return `<div class="avcard rise${on?" on":""}${S.wantAc&&r.noAc?" noac":""}" style="--i:${i}" data-card="${r.name}">
-  <button class="ph" data-room="${r.id}" aria-label="Photos and details of ${r.name}"><img src="${r.ph}" alt="${esc(r.name)} room" loading="lazy">
-    ${tight?`<span class="fit">${ic.star} Best fit</span>`:""}<span class="pcount">${r.photos.length} photos</span></button>
+  ${S.pick.length?"":`<button class="ph" data-room="${r.id}" aria-label="Photos and details of ${r.name}"><img src="${r.ph}" alt="${esc(r.name)} room" loading="lazy">
+    ${tight?`<span class="fit">${ic.star} Best fit</span>`:""}<span class="pcount">${r.photos.length} photos</span></button>`}
   <div class="avbody"><h4>${r.name}</h4>
     <div class="stayprice num"><b>${inr(stayCost(r))}</b><small>${n} night${n>1?"s":""} · ${inr(Math.round(stayCost(r)/n))}/night</small></div>
     <div class="spec">${ic.users} Sleeps ${r.max} · ${r.floor} floor${r.nolift?" · no lift":""}${acOn(r)?" · A/C":r.noAc?" · no A/C":""}</div></div>
@@ -885,7 +929,7 @@ const avCard=(r,i,tight)=>{const on=S.pick.includes(r.name),n=Math.max(nights(),
     ${S.wantAc&&r.noAc?`<button class="sel" disabled aria-disabled="true">No A/C</button>`:`<button class="sel" data-pick="${r.name}" aria-pressed="${on}"><span class="box">${ic.check}</span>${on?"Selected":"Select"}</button>`}</div></div>`};
 const pickCard=(kind,set)=>{const on=set.map(r=>r.name).sort().join()===S.pick.slice().sort().join();return `<button class="pick ${kind==="lux"?"lux":""} rise" style="--i:0" data-pkg="${set.map(r=>r.name).join(",")}" aria-pressed="${on}">
   <span class="k">${kind==="lux"?ic.crown+" Luxury pick":ic.piggy+" Budget pick"}</span><h4>${set.map(r=>r.name).join(" + ")}</h4>
-  <small>${set.length} room${set.length>1?"s":""} · sleeps ${capOf(set)}</small><strong class="num">${inr(setCost(set))}</strong></button>`};
+  <small>${set.length} room${set.length>1?"s":""} · sleeps ${capOf(set)}</small><small class="why">${setWhy(set)}</small><strong class="num">${inr(setCost(set))}</strong></button>`};
 V.rooms=()=>{if(!BUSY)return `<div class="bar gut"><button data-tab="home" aria-label="Change dates">${ic.back}</button><h1>Available Rooms</h1><span></span></div>
   <div class="gut stack" style="padding-top:16px">${AVAIL_ERR?`<div class="empty"><div class="tick">${ic.cal}</div><b>Could not reach our booking desk</b>Check your connection and try again, or ask Shenba.<br><br><button class="btn" data-retry style="margin:0 auto;padding:0 22px">Try again</button></div>`
   :`<div class="loading"><span class="spin"></span><span id="waitLine">${waitLine()}</span></div>`}</div>`;
@@ -893,18 +937,20 @@ V.rooms=()=>{if(!BUSY)return `<div class="bar gut"><button data-tab="home" aria-
   const srt=(a,b)=>a.max-b.max||a.rate-b.rate;
   /* Only rooms that sleep the whole group, unless no single room does (then every free room, to combine) */
   const shown=tight?free.filter(r=>r.max>=p||S.pick.includes(r.name)):free, small=tight?free.filter(r=>r.max<p&&!S.pick.includes(r.name)):[];
-  const studios=shown.filter(r=>r.cat==="studio").sort(srt),suites=shown.filter(r=>r.cat==="suite").sort(srt);
+  const sel=picked(), notSel=r=>!S.pick.includes(r.name);
+  const studios=shown.filter(r=>r.cat==="studio"&&notSel(r)).sort(srt),suites=shown.filter(r=>r.cat==="suite"&&notSel(r)).sort(srt);
   let i=1;const sameSet=pk.budget&&pk.luxury&&pk.budget.map(r=>r.name).join()===pk.luxury.map(r=>r.name).join();
   return `<div class="bar gut"><button data-tab="home" aria-label="Change dates">${ic.back}</button><h1>Available Rooms</h1><span></span></div>
   <div class="gut stack" style="padding-top:16px">
     <div class="staysum num"><div><span>Check-in</span><b>${fmt(S.checkIn)}</b></div><div><span>Check-out</span><b>${fmt(S.checkOut)}</b></div><div><span>Guests</span><b>${p} · ${nights()}N</b></div><button data-tab="home" aria-label="Edit dates and guests">${ic.edit}</button></div>
     <div class="toggle" role="group" aria-label="Cooling"><button data-wantac="0" aria-pressed="${!S.wantAc}">Non-A/C</button><button data-wantac="1" aria-pressed="${S.wantAc}">With A/C</button></div>
+    ${sel.length?`<section class="sect" id="yoursel"><div class="sh"><h3>Your room${sel.length>1?"s":""}</h3><span>${sel.length} selected · sleeps ${capOf(sel)} of ${p}</span></div>${sel.map(selCard).join("")}</section>`:""}
     ${!free.length?`<div class="empty"><div class="tick">${ic.cal}</div><b>Fully booked on these dates</b>Try other dates, or ask Shenba to put you on the waitlist.</div>`:`
     ${pk.budget?`<section class="sect"><div class="sh"><h3>Our picks for ${p} guest${p>1?"s":""}</h3></div><div class="picks">${pickCard("budget",pk.budget)}${pk.luxury&&!sameSet?pickCard("lux",pk.luxury):`<div class="pick" style="justify-content:center;text-align:center"><small>This is also our roomiest choice for your group.</small></div>`}</div></section>`:""}
     ${!tight?`<p class="warn">No single room sleeps ${p}. Select two or more rooms below, or tap a pick above.</p>`:""}
     ${studios.length?`<section class="sect"><div class="bandhead"><span class="ico">${sm(ic.bed)}</span><div><h3>Budget</h3><small>Studio Rooms · from ${inr(Math.min(...studios.map(r=>r.rate)))} a night</small></div></div>${studios.map(r=>avCard(r,i++,tight&&tight.name===r.name)).join("")}</section>`:""}
     ${suites.length?`<section class="sect"><div class="bandhead lux"><span class="ico">${sm(ic.crown)}</span><div><h3>Luxury</h3><small>Premium Family Suites · from ${inr(Math.min(...suites.map(r=>r.rate)))} a night</small></div></div>${suites.map(r=>avCard(r,i++,tight&&tight.name===r.name)).join("")}</section>`:""}`}
-    ${small.length?(S.showSmall?`<section class="sect"><div class="bandhead"><span class="ico">${sm(ic.users)}</span><div><h3>Smaller rooms</h3><small>Sleep fewer than ${p} · combine two or more</small></div></div>${small.sort(srt).map(r=>avCard(r,i++,false)).join("")}</section>`
+    ${small.length?(S.showSmall?`<section class="sect"><div class="bandhead"><span class="ico">${sm(ic.users)}</span><div><h3>Smaller rooms</h3><small>Sleep fewer than ${p} · combine two or more</small></div></div>${small.filter(notSel).sort(srt).map(r=>avCard(r,i++,false)).join("")}</section>`
       :`<button class="btn out" data-small style="width:100%">Show ${small.length} smaller room${small.length>1?"s":""} to combine</button>`):""}
     ${booked.length?`<div class="booked"><b style="color:var(--ink)">Booked on your dates:</b>${booked.map(r=>`<span>${r.name}</span>`).join("")}</div>`:""}
     ${beyond()?`<p class="note">Your dates go past our ${AVAIL_DAYS}-day booking calendar, so Shenba confirms these rooms before payment.</p>`:`<p class="note">Live availability from our booking desk. Prices include taxes.</p>`}
@@ -1202,8 +1248,10 @@ document.addEventListener("click",e=>{
     if(!S.plan)return go2(1);if(S.plan===1){if(nights())return go2(2);toast("Tap check-in, then check-out");return go2(1)}
     $("[data-find]")?.click();return}
   if(d.find!==undefined){dropBusy();S.showSmall=false;if(S.want){const w=byName(S.want);if(w&&!busyOn(w)&&!S.pick.includes(w.name)&&capOf(picked())<pax())S.pick.push(w.name);S.want=null}go("rooms");return}
-  if(d.pick){const i=S.pick.indexOf(d.pick);i>-1?S.pick.splice(i,1):S.pick.push(d.pick);render();return}
-  if(d.pkg){S.pick=d.pkg.split(",");render();toast(S.pick.length>1?"Rooms selected":"Room selected");return}
+  if(d.gal){const g=t.closest(".gw").querySelector(".gal");g.scrollBy({left:g.clientWidth*(+d.gal),behavior:"smooth"});return}
+  if(d.pick){const i=S.pick.indexOf(d.pick),add=i<0;add?S.pick.push(d.pick):S.pick.splice(i,1);render();
+    if(add)requestAnimationFrame(()=>{const y=$("#yoursel");if(y)window.scrollTo({top:y.getBoundingClientRect().top+scrollY-96,behavior:"smooth"})});return}
+  if(d.pkg){S.pick=d.pkg.split(",");render();toast(S.pick.length>1?"Rooms selected":"Room selected");requestAnimationFrame(()=>{const y=$("#yoursel");if(y)window.scrollTo({top:y.getBoundingClientRect().top+scrollY-96,behavior:"smooth"})});return}
   if(d.retry!==undefined){AVAIL_ERR=false;render();loadAvail();return}
   if(d.small!==undefined){S.showSmall=true;render();return}
   if(d.wantac){S.wantAc=d.wantac==="1";const had=S.wantAc?S.pick.map(byName).filter(x=>x&&x.noAc):[];
