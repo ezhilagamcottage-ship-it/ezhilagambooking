@@ -572,6 +572,17 @@ body.intro-on .app,body.intro-on .dock{opacity:0}
 .by-pill small{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .by-pill img{height:20px;width:auto;display:block}
 .lfoot a{color:var(--maroon);font-weight:600}
+
+/* v8.6: Chat with Shenba opens inside this page, in the same theme */
+#chatWin{position:fixed;inset:0;z-index:80;background:var(--maroon);padding-top:env(safe-area-inset-top,0px);display:flex;flex-direction:column;animation:cwIn .32s cubic-bezier(.2,.8,.2,1)}
+#chatWin[hidden]{display:none}
+#chatWin iframe{flex:1;width:100%;border:0;background:#FBF7F2;display:block}
+#chatWin .cw-wait{position:absolute;inset:env(safe-area-inset-top,0px) 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#FBF7F2;color:var(--maroon);font-weight:600;pointer-events:none;transition:opacity .3s}
+#chatWin .cw-wait img{width:84px;height:84px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px var(--maroon-soft),0 0 0 5px var(--maroon);animation:cwP 1.4s ease-in-out infinite}
+#chatWin.ready .cw-wait{opacity:0}
+@keyframes cwIn{from{transform:translateY(100%)}to{transform:none}}
+@keyframes cwP{50%{transform:scale(1.06)}}
+@media (min-width:600px){#chatWin{inset:auto 16px 16px auto;width:420px;height:min(760px,calc(100dvh - 32px));border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}}
 </style>
 </head>
 <body class="intro-on">
@@ -580,6 +591,7 @@ body.intro-on .app,body.intro-on .dock{opacity:0}
 <div class="app" id="app"><div id="view"></div></div>
 <div class="dock" id="dock"><div class="in gut" id="dockin"></div></div>
 <button class="fab" id="fab" data-shenba aria-expanded="false" aria-controls="sheet" aria-label="Ask Shenba, our booking assistant"><span class="face"><img id="shenImg" alt=""></span><span class="lbl">Ask Shenba<small>Online now</small></span></button>
+<div id="chatWin" hidden role="dialog" aria-label="Chat with Shenba"></div>
 <div class="sheet" id="sheet" hidden role="dialog" aria-label="Talk to Shenba">
   <div class="hd"><img id="shenImg2" alt="Shenba"><div><b>Shenba</b><small>Booking assistant · Tamil &amp; English</small></div><button data-shenba aria-label="Close"></button></div>
   <a class="p" href="/shenba">Talk with Shenba</a>
@@ -619,7 +631,7 @@ const today=new Date();today.setHours(0,0,0,0);
 const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
 const S={tab:"home",screen:"home",cat:"all",q:"",roomId:"thillai",pi:null,
   checkIn:null,checkOut:null,month:new Date(today.getFullYear(),today.getMonth(),1),
-  adults:2,teens:1,kids:1,wantAc:false,pick:[],name:"",phone:"",payMode:"full",shenba:false,anim:"",plan:0,slide:0,
+  adults:2,teens:0,kids:1,wantAc:false,pick:[],name:"",phone:"",payMode:"full",shenba:false,anim:"",plan:0,slide:0,
   favs:store.get("favs",[]),bookings:store.get("bookings",[])};
 const HIST=[];
 
@@ -760,7 +772,7 @@ function planHTML(){const st=S.plan,ready=nights()>0,free=ready?freeRooms():[];
   return `<div class="plan open" id="plan">${steps}<div class="pbody step-in">
     <button class="datechip num" data-plan="1">${sm(ic.cal)} ${fmtD(S.checkIn)} → ${fmtD(S.checkOut)} · ${nights()} night${nights()>1?"s":""} <u>Change</u></button>
     <p class="pq">How many guests?</p>
-    <div class="glist flat">${counter("adults","Adult","18+ years",1,ic.users)}${counter("teens","Teenager","13–17 years",0,ic.user)}${counter("kids","Children","5–12 years",0,ic.kid)}</div>
+    <div class="glist flat">${counter("adults","Adult","13+ years",1,ic.users)}${counter("kids","Children","5–12 years",0,ic.kid)}</div>
     <button class="btn pill" data-find>Show available rooms ${ic.arrow}</button>
     <p class="hint" style="text-align:center">${beyond()?"Shenba confirms rooms for dates this far ahead.":!BUSY?(AVAIL_ERR?"Could not check rooms just now":"Checking which rooms are free…"):`${free.length} of 9 rooms free on your dates`}</p></div></div>`}
 V.home=()=>{const prop=[HERO],order=slideOrder();return `
@@ -1139,5 +1151,16 @@ if(location.hash==="#bookings")go("bookings");
   const go=()=>{if(el.classList.contains("go"))return;el.classList.add("go");setTimeout(finish,2000)};
   v.addEventListener("ended",go);const p=v.play();if(p&&p.catch)p.catch(go);
   setTimeout(go,4200);$("#introSkip").onclick=finish;})();
+
+/* v8.6: Chat with Shenba in a window on this page (the chat itself comes from the main site's chat, themed to match) */
+(function(){const w=$("#chatWin");let open=false;
+  const show=()=>{if(!w.firstChild){w.innerHTML=`<iframe title="Chat with Shenba" src="/?embed=chat#chat" allow="microphone"></iframe><div class="cw-wait"><img src="${SHENBA_IMG}" alt="">Shenba is coming…</div>`;
+      w.querySelector("iframe").addEventListener("load",()=>setTimeout(()=>w.classList.add("ready"),400))}
+    w.hidden=false;open=true;document.body.style.overflow="hidden";S.shenba=false;renderShenba();try{history.pushState({ezlChat:1},"")}catch(e){}};
+  const hide=fromPop=>{if(!open)return;open=false;w.hidden=true;document.body.style.overflow="";if(!fromPop&&history.state&&history.state.ezlChat)history.back()};
+  document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('a[href="/shenba#chat"]');if(!a)return;e.preventDefault();show()});
+  addEventListener("popstate",()=>hide(true));
+  addEventListener("message",e=>{if(e.origin!==location.origin||!e.data)return;if(e.data.ezl==="chat-close")hide();if(e.data.ezl==="talk")location.href="/shenba"});
+})();
 </script>
 </body></html>

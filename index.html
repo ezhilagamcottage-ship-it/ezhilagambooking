@@ -2,6 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>/* v8.6: /?embed=chat is the chat window inside the phone site */try{if(/[?&]embed=chat/.test(location.search))document.documentElement.classList.add("sb-embed")}catch(e){}</script>
 <script>
 /* v7.0: phones get the lite site (/lite), which opens with the same logo intro. ?full=1 or the
    "Full website" link keeps the full site for the rest of the visit; deep links (#talk, #chat, …) stay here. */
@@ -2385,7 +2386,7 @@ function toWhatsApp(note) {
   chat = null;
   add("note", note || "Shenba will continue with you on WhatsApp…");
   stat("Opening WhatsApp…");
-  setTimeout(() => { location.href = WA_SHENBA; }, 1200);
+  setTimeout(() => { (window.top || window).location.href = WA_SHENBA; }, 1200);
 }
 async function api(path, body) {
   const r = await fetch(API + path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -2490,7 +2491,7 @@ function askPhone(sess, waitingFor) {
 }
 
 $("chatBtn").addEventListener("click", async () => {
-  if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
+  if (!SHENBA_WEB) { (window.top || window).location.href = WA_SHENBA; return; }
   fellBack = false;
   openDlg($("sbChat")); trapBack();
   if (!chat && !history.length) {
@@ -3014,7 +3015,7 @@ $("ozHome").addEventListener("click", ozDone);
 let voiceRetried = false;
 function openCall(start) {
   voiceRetried = false; khShown = ""; khNumBuf = ""; khEndSoon = 0; $("scOpts").hidden = true; $("scOptRow").innerHTML = "";
-  if (!SHENBA_WEB) { location.href = WA_SHENBA; return; }
+  if (!SHENBA_WEB) { (window.top || window).location.href = WA_SHENBA; return; }
   openDlg($("sbCall")); trapBack(); $("scThanks").hidden = true;
   if (calling || starting) return;
   if (start) { cardReset(); startVoice(); }
@@ -3992,5 +3993,31 @@ if (location.hash === "#talk") openCall(_fromAlbum);
 <script>
 /* v7.7: the call widget is never left see-through after it closes */
 (function(){ var d=document.getElementById("sbCall"); if(d) d.addEventListener("close",function(){ d.classList.remove("kh-in"); }); })();
+</script>
+<style>
+/* v8.6 (Rakesh, 27 Oct 18:29): Chat with Shenba inside the phone site — same maroon theme, her round face */
+html.sb-embed,html.sb-embed body{background:#FBF7F2!important;overflow:hidden}
+html.sb-embed body>*:not(dialog):not(script):not(style){display:none!important}
+html.sb-embed #sbChat{--bg:#FBF7F2;--ink:#2B1A1C;--brand:#7A1F2B;--card:#fff;--line:#EBD3CF;--mute:#7b6a66;--gold:#7A1F2B;
+  position:fixed;inset:0;margin:0;width:100%;max-width:none;height:100%;max-height:none;border-radius:0;box-shadow:none;transform:none;animation:none}
+html.sb-embed #sbChat::backdrop{background:#FBF7F2}
+html.sb-embed #sbChat .sb-head{background:linear-gradient(180deg,#7A1F2B 0%,#5C1420 100%);border-radius:0}
+html.sb-embed #sbChat .sb-who b{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:19px}
+html.sb-embed #sbChat .sb-av{position:relative;background:#fff;padding:2px;overflow:visible;box-shadow:0 0 0 2px #E8C9A0}
+html.sb-embed #sbChat .sb-av img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+html.sb-embed #sbChat .sb-av::after{content:"";position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:#3fbf6a;box-shadow:0 0 0 2px #7A1F2B}
+html.sb-embed #sbChat .sb-alt{color:#7A1F2B;background:#F5E6E3}
+html.sb-embed #sbChat .sb-send{background:#7A1F2B}
+html.sb-embed #sbChat .sb-m.me{background:#7A1F2B;color:#fff}
+html.sb-embed #sbChat #sbIn{border-color:#7A1F2B}
+</style>
+<script>
+(function(){ if(!document.documentElement.classList.contains("sb-embed")) return;
+  var post=function(k){ try{ parent.postMessage({ezl:k}, location.origin); }catch(e){} };
+  var av=document.querySelector("#sbChat .sb-av"); if(av) av.innerHTML='<img src="img/shenba.webp" alt="">';
+  window.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest("#sbChatX,#sbToVoice,[data-talk]"); if(!t) return;
+    e.preventDefault(); e.stopImmediatePropagation(); post(t.id==="sbChatX"?"chat-close":"talk"); },true);
+  var d=document.getElementById("sbChat"); if(d) d.addEventListener("cancel",function(e){ e.preventDefault(); post("chat-close"); });
+})();
 </script>
 </body></html>
