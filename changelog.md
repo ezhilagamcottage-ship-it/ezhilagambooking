@@ -7,6 +7,15 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v8.4 — 27 Oct 2026
+
+**Talk with Shenba on computers** (Rakesh).
+- Her intro plays in a crisp gold arch (no faded edges); when it ends she stays in the same arch through the call, alive: blinks, breathing, lips moving with her voice, gold while she speaks and teal while she listens. Her new face layers are cut from her own intro video (`img/shenba-arch*.webp`); the small round avatars use the same face (`img/shenba*.webp`).
+- Room cards: the rooms she names during a live call (English or Tamil) slide in with photo and tariff for the guest's dates; the guest taps one or says it.
+- A mobile number spoken by the guest (or read back by her) shows in the booking card at once.
+
+**Phone site** (Rakesh). The search box on All Rooms is gone (the category buttons and rooms move up), and a "Powered by Duphora" pill sits centred at the foot of every page.
+
 ## v8.3 — 27 Oct 2026
 
 **Talk with Shenba when a call can't connect** (Rakesh). Her face circle no longer disappears if the call stops during her intro. If both the live line and our server fail, the page quietly tries once more on our server, then shows "Voice is not available right now. Try again or WhatsApp her" with a green Try again button.
