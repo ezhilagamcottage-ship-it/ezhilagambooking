@@ -7,6 +7,12 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v8.1 — 27 Oct 2026
+
+**Right-side window on the computer home page** (Rakesh). Shenba stands on the left, the welcome sits in the middle, and the frame on the right is a window: Rooms, Gallery, Location, Contact, Chat with Shenba and Reserve open inside it with a small right-to-left page turn and the paper sound, while the rest of the page stays still. Home or the × on a window page goes back to the photos. Below about 1180 px wide Shenba's figure is hidden and the floating Talk card shows instead.
+
+**Hotel map pin** (Rakesh). The Location map and "Open in Google Maps", and the payment page's Directions button, now use the hotel's own Google Maps pin (https://maps.app.goo.gl/uMu427TCwSHLzAVEA, 8.93380, 77.26436).
+
 ## v8.0 — 27 Oct 2026
 
 **New computer home page in navy and gold** (Rakesh). Phones keep the maroon lite site.
