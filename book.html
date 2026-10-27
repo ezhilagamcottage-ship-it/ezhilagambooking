@@ -1368,6 +1368,20 @@ function render() {
 
   ({ 1: stepDates, 2: stepGuest, 3: stepPay, 4: stepDone })[S.step](app);
   openModal();
+  if (S.step === 3) bookPrewarm();
+}
+/* v9.0: on the Pay step the card window's code loads at once and the order is asked for in the
+   background, so "Pay by card" opens Razorpay almost immediately instead of after 3-6 seconds. */
+let BPRE = null;
+function bookOrderBody() { return { action: "rzpOrder", room: S.pick.join(","), checkIn: S.checkIn, checkOut: S.checkOut,
+  wantAc: S.wantAc, part: S.partPay, name: S.guest.name.trim(), phone: S.guest.phone, ref: S.ref }; }
+const bookKey = (b) => [b.ref, b.room, b.checkIn, b.checkOut, b.wantAc, b.part, b.name, b.phone].join("|");
+function bookPrewarm() {
+  loadRzp();
+  if (!S.pick.length || !S.guest.name || !/^[6-9]\d{9}$/.test(S.guest.phone || "")) return;
+  const b = bookOrderBody(), k = bookKey(b);
+  if (BPRE && BPRE.k === k) return;
+  BPRE = { k, p: post(b).catch(() => null) };
 }
 
 /* ── step 1 ───────────────────────────────────────────────────────────── */
@@ -2139,13 +2153,11 @@ async function payByCard(btn) {
      rooms and dates and creates the order for its own figure, so a browser
      with the console open cannot buy a suite for a rupee. */
   let d;
+  const body = bookOrderBody(), pre = BPRE && BPRE.k === bookKey(body) ? BPRE.p : null;
+  loadRzp();
   try {
-    d = await post({
-      action: "rzpOrder",
-      room: S.pick.join(","), checkIn: S.checkIn, checkOut: S.checkOut,
-      wantAc: S.wantAc, part: S.partPay,
-      name: S.guest.name.trim(), phone: S.guest.phone, ref: S.ref
-    });
+    d = pre ? await pre : null;
+    if (!d || !d.ok || !d.orderId) { BPRE = null; d = await post(body); }
   } catch (e) { return done("Could not reach the booking system. Please try again."); }
   if (!d || !d.ok) return done((d && d.message) || "Could not start the card payment.");
 

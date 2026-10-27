@@ -1117,14 +1117,29 @@ function loadRzp(){if(window.Razorpay)return Promise.resolve(true);if(loadRzp._p
     el.onload=()=>{clearTimeout(t);res(!!window.Razorpay)};el.onerror=()=>{clearTimeout(t);loadRzp._p=null;res(false)};document.head.appendChild(el)});return loadRzp._p}
 function setBusy(label){S.paying=label||"";const b=$("#payBtn");if(b){b.disabled=!!label;b.innerHTML=label?`<span class="spin light"></span> ${label}`:payLabel()}}
 function payLabel(){const set=picked(),t=terms(quote(set));return `${ic.lock} Pay ${inr(S.orderAmt||t.now)} · Confirm room`}
+/* v9.0 (Rakesh, 27 Oct 21:47: "Opening secure payment seems to be so slow"). The wait was the booking desk
+   (Google Apps Script) pricing the stay and asking Razorpay for an order - 3 to 6 seconds. Now the payment
+   window's code loads as soon as Review & pay opens, and the order is asked for quietly in the background
+   once the name and number are filled in (and again only if the rooms, dates, A/C or pay-in-full/60%
+   change). Tapping Pay then opens Razorpay almost at once. An order that is never paid costs nothing. */
+function orderBody(){const set=picked(),q=quote(set),t=terms(q),digits=phoneDigits(),ref=S.ref||(S.ref="EZ"+Date.now().toString(36).toUpperCase().slice(-6));
+  return {action:"rzpOrder",room:set.map(r=>r.name).join(","),checkIn:iso(S.checkIn),checkOut:iso(S.checkOut),
+      wantAc:S.wantAc&&set.some(r=>!r.noAc),part:t.part,name:S.name.trim(),phone:digits,email:ACCOUNT?ACCOUNT.email:"",googleToken:ACCOUNT?ACCOUNT.token:"",
+      adults:S.adults+S.teens,children:S.kids,ref,source:"Website lite"}}
+const orderKey=b=>[b.ref,b.room,b.checkIn,b.checkOut,b.wantAc,b.part,b.name,b.phone,b.adults,b.children].join("|");
+let PRE=null,preT=null;
+function payPrewarm(){if(S.screen!=="pay")return;loadRzp();clearTimeout(preT);
+  preT=setTimeout(()=>{if(S.screen!=="pay"||S.paying||readyToPay())return;const b=orderBody(),k=orderKey(b);if(PRE&&PRE.k===k)return;
+    PRE={k,p:primePost(b).catch(()=>null)}},700)}
 async function startPayment(){const why=readyToPay();
   if(why){toast(why);if(!ACCOUNT&&!GSI_FAILED){openSignin("pay")}else if(/name/.test(why))$("#gname")?.focus();else $("#gphone")?.focus();return}
   if(S.paying)return;
-  const set=picked(),q=quote(set),t=terms(q),digits=phoneDigits(),ref=S.ref||(S.ref="EZ"+Date.now().toString(36).toUpperCase().slice(-6));
-  setBusy("Opening secure payment…");
-  const [rz,order]=await Promise.all([loadRzp(),primePost({action:"rzpOrder",room:set.map(r=>r.name).join(","),checkIn:iso(S.checkIn),checkOut:iso(S.checkOut),
-      wantAc:S.wantAc&&set.some(r=>!r.noAc),part:t.part,name:S.name.trim(),phone:digits,email:ACCOUNT?ACCOUNT.email:"",googleToken:ACCOUNT?ACCOUNT.token:"",
-      adults:S.adults+S.teens,children:S.kids,ref,source:"Website lite"}).catch(()=>null)]);
+  const set=picked(),q=quote(set),t=terms(q),digits=phoneDigits(),body=orderBody(),ref=body.ref,k=orderKey(body);
+  setBusy("Opening secure payment…");const slow=setTimeout(()=>{if(S.paying)setBusy("Almost there…")},2500);
+  const pre=PRE&&PRE.k===k?PRE.p:null;
+  let [rz,order]=await Promise.all([loadRzp(),pre||primePost(body).catch(()=>null)]);
+  if(pre&&(!order||!order.ok||!order.orderId)){PRE=null;order=await primePost(body).catch(()=>null)}
+  clearTimeout(slow);
   if(!order||!order.ok||!order.orderId){setBusy("");toast((order&&order.message)||"We couldn't reach our booking desk. Nothing was charged. Please try again.");return}
   if(!rz){setBusy("");toast("The payment window could not open. Check your connection and try again.");return}
   S.orderAmt=Math.round((Number(order.amount)||0)/100);
@@ -1192,7 +1207,7 @@ function render(){
   $("#view").innerHTML=`<div class="screen${S.enter?" in-"+S.enter:""}">${V[S.screen]()}<div class="byline"><span class="by-pill" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="68" height="20"></span></div></div>`;
   $("#dockin").innerHTML=dock();S.anim="";S.enter="";bindCarousel();
   requestAnimationFrame(()=>document.documentElement.style.setProperty("--dockh",$("#dock").offsetHeight+"px"));
-  renderShenba();
+  renderShenba();payPrewarm();
   const q=$("#q");if(q){q.oninput=e=>{S.q=e.target.value;const box=$("#results");if(box)box.innerHTML=filtered().map(resultCard).join("")||'<div class="empty"><b>No rooms match</b>Try another word or category.</div>'};
     if(S.screen==="search"){q.focus();q.setSelectionRange(q.value.length,q.value.length)}}
   const nm=$("#gname");if(nm)nm.oninput=e=>{S.name=e.target.value;refreshPayCta()};
@@ -1200,7 +1215,7 @@ function render(){
     const h=$("#phint"),ok=phoneOk();if(h){h.className=ok?"good":v.length===10?"bad":"";h.textContent=!v?"Your booking voucher comes here":v.length<10?`${v.length} of 10 digits`:ok?"✓ We'll send your voucher here":"A mobile number starts with 6, 7, 8 or 9"}refreshPayCta()};
   if(GSI_READY)drawGoogleButtons();else if(document.querySelector(".gbtn"))loadGsi().then(ok=>ok?drawGoogleButtons():render());
 }
-function refreshPayCta(){const b=$("#payBtn"),u=document.querySelector(".under");if(!b||S.paying)return;const why=readyToPay();b.classList.toggle("soft",!!why);if(u)u.textContent=why||"You'll see the amount again on Razorpay before you pay"}
+function refreshPayCta(){payPrewarm();const b=$("#payBtn"),u=document.querySelector(".under");if(!b||S.paying)return;const why=readyToPay();b.classList.toggle("soft",!!why);if(u)u.textContent=why||"You'll see the amount again on Razorpay before you pay"}
 function shenbaMsg(){const bits=[];
   if(S.pick.length&&["rooms","pay"].includes(S.screen))bits.push(`Rooms: ${S.pick.join(" + ")}`);else if(S.screen==="room")bits.push(`Room: ${room().name}`);
   if(S.checkIn&&S.checkOut)bits.push(`Dates: ${fmt(S.checkIn)} – ${fmt(S.checkOut)}`);
