@@ -8,6 +8,57 @@
 (function(){try{var q=location.search;if(/[?&]full=1/.test(q))sessionStorage.setItem("fullSite","1");
   if(sessionStorage.getItem("fullSite")!=="1"&&!location.hash&&window.matchMedia("(max-width: 820px)").matches)location.replace("/lite"+q);}catch(e){}})();
 </script>
+<script>
+/* v7.7 (Rakesh, 27 Oct 13:33): on a computer the opening first offers sound and the microphone. "Enter with sound"
+   plays a soft breeze with wind chimes under the logo animation and asks for the microphone (for Talk with Shenba);
+   "Enter quietly" plays it silent. Browsers only allow sound after a tap, so the choice comes first. */
+window.__khGate = function (run, finish) {
+  try { if (!matchMedia("(min-width: 900px)").matches) return run(); } catch (e) { return run(); }
+  var g = document.createElement("div"); g.id = "khGate"; g.setAttribute("role", "dialog"); g.setAttribute("aria-label", "Sound and microphone");
+  g.innerHTML = '<h3>Welcome to Kutralam Ezhilagam</h3><p>Turn on sound and your microphone so Shenba, our assistant, can greet you and talk with you.</p>'
+    + '<div class="row"><button type="button" class="on" id="khGateOn"><svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 010 6"/><path d="M18 6.5a7.5 7.5 0 010 11"/></svg>Enter with sound &amp; mic</button>'
+    + '<button type="button" class="off" id="khGateOff">Enter quietly</button></div><div class="st" id="khGateSt"></div>';
+  document.body.appendChild(g);
+  var st = g.querySelector("#khGateSt"), done = false, auto;
+  try { navigator.permissions && navigator.permissions.query({ name: "microphone" }).then(function (p) { if (p.state === "granted") { st.textContent = "Microphone is ready ✓"; g.querySelector("#khGateOn").lastChild.nodeValue = "Enter with sound"; } }).catch(function () {}); } catch (e) {}
+  function go(withSound) {
+    if (done) return; done = true; clearTimeout(auto);
+    if (withSound) { breeze(); askMic(); try { sessionStorage.setItem("khSound", "1"); } catch (e) {} }
+    setTimeout(function () { g.animate ? g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500, fill: "forwards" }).onfinish = function () { g.remove(); } : g.remove(); }, withSound ? 1400 : 0);
+    run();
+  }
+  function askMic() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    st.textContent = "Allow the microphone in your browser's question above…";
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (m) { m.getTracks().forEach(function (t) { t.stop(); }); st.textContent = "Sound on ✓  Microphone ready ✓"; })
+      .catch(function () { st.textContent = "Sound on ✓  Microphone off. You can still chat with Shenba by typing."; });
+  }
+  function breeze() {
+    try {
+      var A = window.__khAC = window.__khAC || new (window.AudioContext || window.webkitAudioContext)(); if (A.state === "suspended") A.resume();
+      var T = A.currentTime, D = 8.5, sr = A.sampleRate, len = Math.floor(sr * D), buf = A.createBuffer(2, len, sr);
+      for (var c = 0; c < 2; c++) { var d = buf.getChannelData(c), b0 = 0, b1 = 0, b2 = 0;
+        for (var i = 0; i < len; i++) { var w = Math.random() * 2 - 1; b0 = .997 * b0 + w * .029; b1 = .985 * b1 + w * .032; b2 = .95 * b2 + w * .048; d[i] = (b0 + b1 + b2) * .55; } }
+      var n = A.createBufferSource(); n.buffer = buf;
+      var bp = A.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = .6; bp.frequency.value = 520;
+      var lfo = A.createOscillator(), lg = A.createGain(); lfo.frequency.value = .16; lg.gain.value = 260; lfo.connect(lg); lg.connect(bp.frequency);
+      var wg = A.createGain(); wg.gain.setValueAtTime(0, T); wg.gain.linearRampToValueAtTime(.34, T + 1.6); wg.gain.setValueAtTime(.34, T + D - 2.6); wg.gain.linearRampToValueAtTime(0, T + D);
+      n.connect(bp); bp.connect(wg); wg.connect(A.destination); n.start(T); lfo.start(T); n.stop(T + D); lfo.stop(T + D);
+      var notes = [784, 880, 1047, 1175, 1319, 1568, 1760], t = T + .5;
+      while (t < T + D - 1.8) { var f = notes[Math.floor(Math.random() * notes.length)], o = A.createOscillator(), o2 = A.createOscillator(), ng = A.createGain(), pan = A.createStereoPanner ? A.createStereoPanner() : null;
+        o.type = "sine"; o.frequency.value = f; o2.type = "sine"; o2.frequency.value = f * 2.76;
+        var v = .05 + Math.random() * .045; ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(v, t + .01); ng.gain.exponentialRampToValueAtTime(.0005, t + 2.4);
+        var g2 = A.createGain(); g2.gain.value = .25; o.connect(ng); o2.connect(g2); g2.connect(ng);
+        if (pan) { pan.pan.value = Math.random() * 1.4 - .7; ng.connect(pan); pan.connect(A.destination); } else ng.connect(A.destination);
+        o.start(t); o2.start(t); o.stop(t + 2.5); o2.stop(t + 2.5); t += .45 + Math.random() * .75; }
+    } catch (e) {}
+  }
+  g.querySelector("#khGateOn").onclick = function () { go(true); };
+  g.querySelector("#khGateOff").onclick = function () { go(false); };
+  auto = setTimeout(function () { go(false); }, 12000);   // nobody answered: carry on quietly
+  setTimeout(function () { try { g.querySelector("#khGateOn").focus({ preventScroll: true }); } catch (e) {} }, 300);
+};
+</script>
 <title>Kutralam Ezhilagam · Courtallam</title>
 <meta name="description" content="Comfortable stay near Courtallam Main Falls. A/C and Non A/C rooms, family friendly, 24/7 power backup. Book direct.">
 <meta name="theme-color" content="#faf9f7">
@@ -1238,6 +1289,101 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   @media (prefers-reduced-motion:reduce){ .kh-pic .ph img{animation:none} }
 }
 
+
+/* ══ v7.7 (Rakesh, 27 Oct 13:33): Shenba standing on the home screen, Reserve always floating, the Talk call as a
+   widget over the page (her intro cut out of its background), and a sound + microphone welcome on the opening ══ */
+#khFab,.kh-shenba,#khGate{display:none}
+@media (min-width:900px){
+  /* Reserve now, on every page, above Talk with Shenba */
+  #khFab{position:fixed;z-index:66;right:max(22px,env(safe-area-inset-right));bottom:calc(max(22px,env(safe-area-inset-bottom)) + 118px);display:inline-flex;align-items:center;gap:12px;
+    padding:12px 22px 12px 16px;border:0;border-radius:999px;cursor:pointer;overflow:hidden;isolation:isolate;
+    background:linear-gradient(180deg,#f6d79f,#e3ad5f 55%,#d0913e);color:#0a1830;box-shadow:0 0 0 3px rgba(255,255,255,.85),0 14px 34px rgba(10,24,48,.38);
+    transition:transform .25s,bottom .45s cubic-bezier(.65,0,.25,1),box-shadow .25s;animation:khFabPulse 3.6s ease-in-out infinite}
+  #khFab::after{content:"";position:absolute;z-index:-1;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-18deg);animation:khShine 4.2s ease-in-out infinite 1s}
+  #khFab:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 0 0 3px #fff,0 18px 40px rgba(10,24,48,.45)}
+  #khFab:focus-visible{outline:3px solid #0a1830;outline-offset:3px}
+  #khFab svg{width:30px;height:30px;flex:none;fill:none;stroke:#0a1830;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  #khFab span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1}
+  #khFab b{font:600 17px/1.1 "Jost",var(--ts-sans);letter-spacing:.06em;text-transform:uppercase}
+  #khFab small{font:500 11.5px/1.2 "Jost",var(--ts-sans);opacity:.78;margin-top:3px}
+  @keyframes khShine{0%,62%{left:-60%}100%{left:130%}}
+  @keyframes khFabPulse{0%,100%{box-shadow:0 0 0 3px rgba(255,255,255,.85),0 14px 34px rgba(10,24,48,.38)}50%{box-shadow:0 0 0 3px rgba(255,255,255,.85),0 0 0 12px rgba(227,173,95,.22),0 14px 34px rgba(10,24,48,.38)}}
+  html.kh-top #khFab{bottom:max(28px,env(safe-area-inset-bottom))}
+  html.kh-top #tsDock{opacity:0;transform:translateY(24px);pointer-events:none}
+  #tsDock{transition:opacity .4s,transform .4s}
+  html.ts #tsReserve{display:none}
+  html:has(#sbCall[open]) #khFab,html:has(#tsBook.on) #khFab{opacity:0;pointer-events:none}
+
+  /* Shenba standing in front of the photo frame */
+  .kh-grid{position:relative}
+  .kh-shenba{display:block;position:absolute;z-index:3;bottom:-104px;left:calc(52% - 4px);height:min(76vh,700px);aspect-ratio:407/1126;padding:0;border:0;background:none;cursor:pointer;
+    transform-origin:50% 100%;animation:khSway 7s ease-in-out infinite;transition:opacity .4s,filter .3s}
+  .kh-shenba img{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 18px 24px rgba(3,10,24,.45))}
+  .kh-shenba:hover img{filter:drop-shadow(0 18px 24px rgba(3,10,24,.45)) drop-shadow(0 0 18px rgba(243,205,142,.35))}
+  .kh-sh-glow{position:absolute;left:-30%;right:-30%;bottom:-2%;height:9%;border-radius:50%;background:radial-gradient(closest-side,rgba(3,10,24,.55),rgba(3,10,24,0))}
+  .kh-sh-bub{position:absolute;z-index:2;left:58%;top:6%;display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:max-content;padding:11px 16px;border-radius:16px 16px 16px 4px;
+    background:#fff;color:#0f2342;box-shadow:0 0 0 1.5px var(--kh-gold),0 12px 26px rgba(3,10,24,.35);animation:khBub 4s ease-in-out infinite}
+  .kh-sh-bub b{font:400 18px/1.15 "DM Serif Display",var(--ts-serif)}
+  .kh-sh-bub small{font:500 11.5px/1.2 "Jost",var(--ts-sans);color:#6b5530;letter-spacing:.04em}
+  .kh-shenba:focus-visible{outline:none}.kh-shenba:focus-visible .kh-sh-bub{box-shadow:0 0 0 3px var(--kh-gold2),0 12px 26px rgba(3,10,24,.35)}
+  @keyframes khSway{0%,100%{transform:rotate(0)}50%{transform:rotate(.6deg) translateY(-2px)}}
+  @keyframes khBub{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  html:has(#sbCall[open]) .kh-shenba{opacity:0;pointer-events:none}
+  .kh-pic{justify-self:end;width:min(100%,470px)}
+  @media (max-width:1239px){ .kh-shenba{left:44%;height:min(66vh,560px);bottom:-96px} .kh-sh-bub{left:52%} }
+
+  /* the Talk call as a widget over the home page */
+  html.ts dialog#sbCall{width:min(1080px,94vw);max-width:none;height:min(700px,92vh);max-height:none;margin:auto;border-radius:28px;overflow:hidden;
+    background:#f8f1e4;color:#24324a;box-shadow:0 0 0 1px rgba(227,173,95,.75),0 40px 90px rgba(5,12,28,.45);transition:background .45s,box-shadow .45s}
+  html.ts dialog#sbCall::backdrop{background:rgba(8,16,32,.34);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  html.ts dialog#sbCall.kh-in{background:transparent;box-shadow:none}
+  html.ts dialog#sbCall.kh-in::backdrop{background:rgba(8,16,32,.42);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+  html.ts dialog#sbCall>:not(.sw){transition:opacity .45s}
+  html.ts dialog#sbCall.kh-in>:not(.sw){opacity:0;pointer-events:none}
+  html.ts #sbCall .sc-top{justify-content:flex-start;gap:16px;padding:20px 72px 8px 30px;background:none}
+  html.ts #sbCall .sc-top img{height:42px}
+  html.ts #sbCall .sc-top::after{content:"Talk with Shenba";font:400 28px/1 "DM Serif Display",var(--ts-serif);color:#0f2342}
+  html.ts #sbCall .sc-top .sb-x{right:20px;top:18px;width:42px;height:42px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(227,173,95,.7);color:#0f2342}
+  html.ts #sbCall .sc-body{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);grid-auto-rows:min-content;column-gap:34px;row-gap:14px;align-items:start;padding:4px 30px 10px}
+  html.ts #sbCall .sc-main{grid-column:1;grid-row:1/span 4;align-self:center;position:sticky;top:0;padding:6px 0 10px}
+  html.ts #sbCall .sc-face{width:280px;height:280px;margin:6px 0 16px;background:#f3e6cf;box-shadow:0 0 0 7px #fff,0 0 0 10px var(--kh-gold),0 24px 50px rgba(15,35,66,.28)}
+  html.ts #sbCall .sc-main.listening .sc-face{box-shadow:0 0 0 7px #fff,0 0 0 11px #0f7a6e,0 0 0 22px rgba(15,122,110,.18),0 24px 50px rgba(15,35,66,.28)}
+  html.ts #sbCall .sc-main.speaking .sc-face{box-shadow:0 0 0 7px #fff,0 0 0 11px var(--kh-gold),0 0 0 24px rgba(227,173,95,.25),0 24px 50px rgba(15,35,66,.28)}
+  html.ts #sbCall .sc-main b{font:400 30px/1.1 "DM Serif Display",var(--ts-serif);color:#0f2342}
+  html.ts #sbCall .sc-main small{font-size:13px}
+  html.ts #sbCall .sc-stat{font-size:15px;color:#0f7a6e}
+  html.ts #sbCall .sc-opts,html.ts #sbCall .sc-card{grid-column:2}
+  html.ts #sbCall .sc-card{background:#fff;border:1px solid rgba(227,173,95,.6);border-radius:20px;padding:10px 22px 8px;box-shadow:0 14px 30px rgba(15,35,66,.08)}
+  html.ts #sbCall .sc-card h3{font:400 22px/1.2 "DM Serif Display",var(--ts-serif);letter-spacing:0;text-transform:none;color:#0f2342;margin:8px 0 4px}
+  html.ts #sbCall .sc-row{font-size:15px;padding:10px 0}
+  html.ts #sbCall .sc-row.total b{color:#0f2342;font-size:19px}
+  html.ts #sbCall .sc-actions{justify-content:flex-end;padding:10px 30px 22px calc(30px + 380px + 34px);background:none}
+  html.ts #sbCall .sc-pay{max-width:none;background:linear-gradient(180deg,#f6d79f,#e3ad5f 60%,#d0913e);color:#0a1830}
+  /* her intro plays on the left, straight on the page: no box, no background, soft edges */
+  html.ts #sbCall .sw{inset:0 auto 0 0;height:100%;width:auto;aspect-ratio:9/16;overflow:visible}
+  html.ts #sbCall .sw-veil,html.ts #sbCall .sw-shade{display:none}
+  html.ts #sbCall .sw-vid{background:transparent}
+  html.ts #sbCall .sw-pic{-webkit-mask-image:linear-gradient(180deg,#000 78%,transparent 99%),linear-gradient(90deg,transparent 0,#000 13%,#000 87%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(180deg,#000 78%,transparent 99%),linear-gradient(90deg,transparent 0,#000 13%,#000 87%,transparent 100%);mask-composite:intersect}
+  html.kh-nocut #sbCall .sw-pic{-webkit-mask-image:radial-gradient(ellipse 46% 50% at 50% 46%,#000 62%,transparent 100%);mask-image:radial-gradient(ellipse 46% 50% at 50% 46%,#000 62%,transparent 100%)}
+  html.ts #sbCall .sw-say{bottom:6%}
+  html.ts #sbCall .ty{inset:0 auto 0 0;width:auto;height:100%;aspect-ratio:9/16;border-radius:28px 0 0 28px}
+
+  /* opening: sound and microphone */
+  #khGate{position:fixed;z-index:320;left:50%;bottom:9vh;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:12px;width:min(520px,92vw);
+    padding:22px 26px 18px;border-radius:22px;background:#fff;text-align:center;box-shadow:0 0 0 1px rgba(227,173,95,.6),0 24px 60px rgba(15,35,66,.2);animation:khGateIn .7s cubic-bezier(.2,.8,.2,1) both}
+  #khGate[hidden]{display:none}
+  #khGate h3{margin:0;font:400 26px/1.15 "DM Serif Display",var(--ts-serif);color:#0f2342}
+  #khGate p{margin:0;font:400 14.5px/1.5 "Jost",var(--ts-sans);color:#4a556b}
+  #khGate .row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:4px}
+  #khGate .on{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border:0;border-radius:999px;cursor:pointer;background:#0f2342;color:#f3cd8e;
+    font:500 14px/1 "Jost",var(--ts-sans);letter-spacing:.1em;text-transform:uppercase;box-shadow:inset 0 0 0 1.5px var(--kh-gold),0 10px 24px rgba(15,35,66,.25)}
+  #khGate .on svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  #khGate .off{min-height:48px;padding:0 18px;border:0;background:none;cursor:pointer;font:500 13.5px/1 "Jost",var(--ts-sans);color:#6b7690;text-decoration:underline;text-underline-offset:3px}
+  #khGate .st{min-height:1.3em;font:500 12.5px/1.3 "Jost",var(--ts-sans);color:#0f7a6e}
+  #khGate button:focus-visible{outline:3px solid var(--kh-gold);outline-offset:3px}
+  @keyframes khGateIn{from{opacity:0;transform:translate(-50%,18px)}to{opacity:1;transform:translate(-50%,0)}}
+  @media (prefers-reduced-motion:reduce){ .kh-shenba,.kh-sh-bub,#khFab,#khFab::after{animation:none} }
+}
 /* ══ v7.6 page turns (Rakesh, 27 Oct 13:21) ══ */
 #khPages{display:none}
 @media (min-width:900px){
@@ -1343,6 +1489,11 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
         <p class="kh-addr">No 46, Vairams Nagar, Five Falls Road, Courtallam<br>Booking <b>99622 22415</b> &middot; Reception <b>82483 20685</b></p>
         <svg class="kh-leaf l3" viewBox="0 0 120 160" aria-hidden="true"><path d="M60 158C58 120 56 80 62 6"/><path d="M60 128c-18-4-30-16-34-34 18 2 30 14 34 34z"/><path d="M60 128c16-6 26-18 28-36-16 4-26 16-28 36z"/><path d="M59 92c-16-6-24-18-26-34 16 4 24 16 26 34z"/><path d="M60 92c14-6 22-18 22-34-14 6-22 18-22 34z"/><path d="M60 56c-12-6-18-16-18-30 12 6 18 16 18 30z"/><path d="M61 56c10-6 16-16 15-28-10 6-15 16-15 28z"/><circle cx="62" cy="6" r="3"/></svg>
       </div>
+      <button type="button" class="kh-shenba" data-ts="talk" aria-label="Talk with Shenba, our voice assistant">
+        <span class="kh-sh-glow" aria-hidden="true"></span>
+        <img src="img/shenba-full.webp" alt="" width="407" height="1126">
+        <span class="kh-sh-bub"><b>Vanakkam! I'm Shenba</b><small>Tap me to talk &middot; Tamil &amp; English</small></span>
+      </button>
       <div class="kh-pic">
         <span class="kh-dots a" aria-hidden="true"></span><span class="kh-vdots" aria-hidden="true"></span>
         <span class="fr" aria-hidden="true"></span>
@@ -1415,6 +1566,10 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
 
 
 <!-- v7.6: the computer site turns like a book. Each page below is shown by a right-to-left page turn. -->
+<button type="button" id="khFab" data-kv="reserve" aria-label="Reserve now">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg>
+  <span><b>Reserve now</b><small>Best rate, booked direct</small></span>
+</button>
 <div id="khPages">
 <section class="khv" data-v="rooms" aria-label="Rooms"><header class="khv-top"><button type="button" class="khv-logo" data-kv="home" aria-label="Kutralam Ezhilagam, home"><img src="img/logo-hd.webp" alt="" width="484" height="163"></button><span class="khv-cn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="75" height="22"></span><nav class="kh-nav khv-nav" aria-label="Pages"><button type="button" data-kv="home">Home</button><button type="button" data-kv="rooms" aria-current="page">Rooms</button><button type="button" data-kv="gallery">Gallery</button><button type="button" data-kv="location">Location</button><button type="button" data-kv="contact">Contact</button><button type="button" class="kh-res" data-kv="reserve">Reserve</button><button type="button" class="kh-chat" data-ts="chat">Chat with Shenba</button></nav></header><div class="khv-body" id="khRoomsSlot"></div></section>
 <section class="khv" data-v="gallery" aria-label="Gallery"><header class="khv-top"><button type="button" class="khv-logo" data-kv="home" aria-label="Kutralam Ezhilagam, home"><img src="img/logo-hd.webp" alt="" width="484" height="163"></button><span class="khv-cn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="75" height="22"></span><nav class="kh-nav khv-nav" aria-label="Pages"><button type="button" data-kv="home">Home</button><button type="button" data-kv="rooms">Rooms</button><button type="button" data-kv="gallery" aria-current="page">Gallery</button><button type="button" data-kv="location">Location</button><button type="button" data-kv="contact">Contact</button><button type="button" class="kh-res" data-kv="reserve">Reserve</button><button type="button" class="kh-chat" data-ts="chat">Chat with Shenba</button></nav></header><div class="khv-body">
@@ -2531,11 +2686,13 @@ const SW_FACE = { x: 355 / 720, y: 228 / 1260, r: 96 / 720 };    // where her fa
 const swWait = ms => new Promise(r => setTimeout(r, ms));
 const swCalm = () => matchMedia("(prefers-reduced-motion: reduce)").matches || !Element.prototype.animate;
 /* the intro video (v2.8): 1080 x 1920; where her face sits in it, and what she says (kept in step with the server) */
-const INTRO = { src: "img/shenba-intro.mp4", face: { x: 0.5, y: 0.43, r: 0.14 }, w: 720, h: 1280,
+const KH_CUT = (function(){ try { return matchMedia("(min-width: 900px)").matches && !!document.createElement("video").canPlayType('video/webm; codecs="vp9, opus"') && !/^((?!chrome|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent); } catch (e) { return false; } })();
+if (matchMedia("(min-width: 900px)").matches) document.documentElement.classList.add(KH_CUT ? "kh-cut" : "kh-nocut");
+const INTRO = { src: KH_CUT ? "img/shenba-intro-cut.webm" : "img/shenba-intro.mp4", face: { x: 0.5, y: 0.43, r: 0.14 }, w: 720, h: 1280,
   line: "வாங்க! எழிலகம் room booking-க்கு help பண்ண நான் இருக்கேன், ஷென்பா. உங்க check-in date சொல்லுங்க?" };
 let swMedia = { face: SW_FACE, w: 720, h: 1260 };
 function swGeo() {
-  const D = $("sbCall").getBoundingClientRect(), F = $("scFace").getBoundingClientRect(), W = D.width, H = D.height;
+  const D = $("sw").getBoundingClientRect(), F = $("scFace").getBoundingClientRect(), W = D.width, H = D.height;
   const M = swMedia, k0 = Math.max(W / M.w, H / M.h), iw = M.w * k0, ox = (W - iw) / 2;
   const fx = ox + M.face.x * iw, fy = M.face.y * M.h * k0, fr = M.face.r * iw;
   const cx = F.left - D.left + F.width / 2, cy = F.top - D.top + F.height / 2, cr = F.width / 2;
@@ -2570,6 +2727,7 @@ async function swWelcome() {
 }
 /* she shrinks from full size into her circle (the end of the welcome, photo or video) */
 async function swShrink() {
+  $("sbCall").classList.remove("kh-in");
   const sw = $("sw"), pic = $("swPic"), face = $("scFace");
   const h = swGeo(), tx = h.cx - h.fx, ty = h.cy - h.fy;
   $("swSay").animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" });
@@ -2596,7 +2754,7 @@ function swIntro() {
   const p = v.play();
   if (!p || !p.then) return null;
   return p.then(async () => {
-    swBusy = true; swClear();
+    swBusy = true; swClear(); $("sbCall").classList.add("kh-in");   // v7.7: see-through while she speaks (computers)
     swMedia = { face: INTRO.face, w: INTRO.w, h: INTRO.h };
     const g = swGeo();
     pic.style.setProperty("--fx", g.fx + "px"); pic.style.setProperty("--fy", g.fy + "px");
@@ -2611,11 +2769,11 @@ function swIntro() {
       const stop = setInterval(() => { if (!calling) { clearInterval(stop); try { v.pause(); } catch (e) {} fin(); } }, 200);
       v.addEventListener("ended", () => clearInterval(stop), { once: true });
     });
-    if (!calling) { sw.style.visibility = "hidden"; sw.classList.remove("vid"); swClear(); swBusy = false; return true; }
+    if (!calling) { $("sbCall").classList.remove("kh-in"); sw.style.visibility = "hidden"; sw.classList.remove("vid"); swClear(); swBusy = false; return true; }
     await swShrink();
     if (starting) saState("connecting", "Connecting…");   // the server is still opening the call
     return true;
-  }).catch(() => { sw.classList.remove("vid"); swMedia = { face: SW_FACE, w: 720, h: 1260 }; swBusy = false; return false; });
+  }).catch(() => { $("sbCall").classList.remove("kh-in"); sw.classList.remove("vid"); swMedia = { face: SW_FACE, w: 720, h: 1260 }; swBusy = false; return false; });
 }
 /* warm the intro up once the page is idle, so it starts at once when the guest taps Talk */
 setTimeout(() => { const v = $("swVid"); if (v && !v.getAttribute("src")) { v.preload = "auto"; v.src = INTRO.src; } }, 4000);
@@ -2627,8 +2785,8 @@ function swVoice(booked) {   // her nandri, in the call's own audio (same loudne
 }
 /* v2.9: her nandri as a video (muted, with her voice from swVoice so it matches the call's loudness). Resolves true if it
    played; false means the photo walk below takes over. */
-const NANDRI = { hold: { src: "img/shenba-nandri-hold.mp4", end: "img/shenba-nandri-hold-end.jpg" },
-                 enq: { src: "img/shenba-nandri.mp4", end: "img/shenba-nandri-end.jpg" },
+const NANDRI = { hold: { src: KH_CUT ? "img/shenba-nandri-hold-cut.webm" : "img/shenba-nandri-hold.mp4", end: "img/shenba-nandri-hold-end.jpg" },
+                 enq: { src: KH_CUT ? "img/shenba-nandri-cut.webm" : "img/shenba-nandri.mp4", end: "img/shenba-nandri-end.jpg" },
                  face: { x: 0.5, y: 0.40, r: 0.15 }, w: 540, h: 960 };
 const OUTRO = "img/ezhilagam-outro.mp4";
 function swWarmEnd() {   // fetch the ending videos into the cache while the call is on (about 0.8 MB in all)
@@ -3564,8 +3722,9 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   };
   var go = function () { intro.classList.add("go"); setTimeout(finish, 2300); };
   v.addEventListener("ended", go);
-  var p = v.play(); if (p && p.catch) p.catch(function () { go(); });
-  setTimeout(function () { if (!intro.classList.contains("go")) go(); }, 4200);
+  var run = function () { var p = v.play(); if (p && p.catch) p.catch(function () { go(); });
+  setTimeout(function () { if (!intro.classList.contains("go")) go(); }, 4200); };
+  if (window.__khGate) window.__khGate(run, finish); else run();
   $("tsSkip").onclick = finish;
 })();
 </script>
@@ -3634,5 +3793,9 @@ if (location.hash === "#talk") openCall(_fromAlbum);
     k=k.dataset.lb; if(k==="x") lb.hidden=true; else lbShow(li+(k==="n"?1:-1)); });
   addEventListener("keydown",function(e){ if(lb.hidden) return; if(e.key==="Escape") lb.hidden=true; else if(e.key==="ArrowRight") lbShow(li+1); else if(e.key==="ArrowLeft") lbShow(li-1); });
 })();
+</script>
+<script>
+/* v7.7: the call widget is never left see-through after it closes */
+(function(){ var d=document.getElementById("sbCall"); if(d) d.addEventListener("close",function(){ d.classList.remove("kh-in"); }); })();
 </script>
 </body></html>
