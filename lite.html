@@ -53,8 +53,12 @@ html.embed .lines .tot b{font-size:23px}
 html.embed .opts2{gap:7px}
 html.embed .payopt{padding:8px 12px}
 html.embed .payopt strong{font-size:18px}
-html.embed .balnote,html.embed .paynote{padding:7px 10px}
-html.embed .trust{gap:3px;padding-top:1px}
+html.embed .balnote,html.embed .paynote{padding:5px 10px}
+/* advance ("Pay 60%") adds the balance reminder — the key figure is already on the pay option, so on the
+   embed we show it as one compact line and lay the trust points two-up, keeping the review scroll-free. */
+html.embed .balnote span,html.embed .paynote span{display:none}
+html.embed .balnote b,html.embed .paynote b{font-size:11.5px;line-height:1.25}
+html.embed .trust{display:grid;grid-template-columns:1fr 1fr;gap:3px 16px;padding-top:1px}
 html.embed .screen:has(.paywrap) .stack{padding-top:10px!important}
 html.embed .paysteps{padding-block:12px 0;max-width:460px;margin-inline:auto}
 /* Talk with Shenba lives on the desktop hero (to the left), so it is hidden inside the iPad */
@@ -136,6 +140,20 @@ html.embed .avcard{padding:3px 9px 3px 4px}
 html.embed .selroom{display:grid;grid-template-columns:minmax(260px,400px) 1fr;align-items:center;gap:4px}
 html.embed .selroom .gw{margin:12px}
 html.embed .selroom .sbody{padding:16px 20px}
+/* v11.0: once a room is chosen, the big "your room" card sits on the left and the OTHER rooms float
+   beside it in the empty space on the right (compact tiles) instead of stacking below and scrolling. */
+html.embed .selwrap{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:14px;align-items:start}
+html.embed .selwrap .selside .selroom{margin-bottom:0;grid-template-columns:1fr;align-items:stretch}
+html.embed .selwrap .selside .selroom .gw{margin:7px 7px 0}
+html.embed .selwrap .selside .selroom .gal{aspect-ratio:2/1;max-height:188px}
+html.embed .selwrap .selside .selroom .sbody{padding:9px 14px 12px}
+html.embed .otherside{display:flex;flex-direction:column;gap:5px;min-width:0}
+html.embed .otherside .othertitle{font:700 10px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0}
+html.embed .otherside .sect{gap:4px}
+html.embed .otherside .sect:has(.avcard){grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+html.embed .otherside .avcard{padding:3px 8px 3px 3px}
+html.embed .otherside .avcard>.ph{flex-basis:38px;width:38px;height:38px}
+html.embed .otherside .bandhead .ico{width:22px;height:22px}
 /* v10.8: dates/guests step fits with no internal scroll — the step button is on the frame bar,
    so the in-view step CTAs are hidden and the guest rows are compacted */
 html.embed .plan .btn.pill{display:none}
@@ -1170,14 +1188,25 @@ V.rooms=()=>{if(!BUSY)return `<div class="bar gut"><button data-tab="home" aria-
   <div class="gut stack" style="padding-top:16px">
     <div class="staysum num"><div><span>Check-in</span><b>${fmt(S.checkIn)}</b></div><div><span>Check-out</span><b>${fmt(S.checkOut)}</b></div><div><span>Guests</span><b>${p} · ${nights()}N</b></div><button data-tab="home" aria-label="Edit dates and guests">${ic.edit}</button></div>
     <div class="toggle" role="group" aria-label="Cooling"><button data-wantac="0" aria-pressed="${!S.wantAc}">Non-A/C</button><button data-wantac="1" aria-pressed="${S.wantAc}">With A/C</button></div>
-    ${sel.length?`<section class="sect" id="yoursel"><div class="sh"><h3>Your room${sel.length>1?"s":""}</h3><span>${sel.length} selected · sleeps ${capOf(sel)} of ${p}</span></div>${sel.map(selCard).join("")}</section>`:""}
-    ${!free.length?`<div class="empty"><div class="tick">${ic.cal}</div><b>Fully booked on these dates</b>Try other dates, or ask Shenba to put you on the waitlist.</div>`:`
-    ${pk.budget&&!picksRedundant?`<section class="sect"><div class="sh"><h3>Our picks for ${p} guest${p>1?"s":""}</h3></div><div class="picks">${pickCard("budget",pk.budget)}${pk.luxury&&!sameSet?pickCard("lux",pk.luxury):`<div class="pick" style="justify-content:center;text-align:center"><small>This is also our roomiest choice for your group.</small></div>`}</div></section>`:""}
-    ${!tight?`<p class="warn">No single room sleeps ${p}. Select two or more rooms below, or tap a pick above.</p>`:""}
-    ${studios.length?`<section class="sect"><div class="bandhead"><span class="ico">${sm(ic.bed)}</span><div><h3>Budget</h3><small>Studio Rooms · from ${inr(Math.min(...studios.map(r=>r.rate)))} a night</small></div></div>${studios.map(r=>avCard(r,i++,tight&&tight.name===r.name,r.name===recBudget?"Best value":"")).join("")}</section>`:""}
-    ${suites.length?`<section class="sect"><div class="bandhead lux"><span class="ico">${sm(ic.crown)}</span><div><h3>Luxury</h3><small>Premium Family Suites · from ${inr(Math.min(...suites.map(r=>r.rate)))} a night</small></div></div>${suites.map(r=>avCard(r,i++,tight&&tight.name===r.name,r.name===recLux?"Roomiest":"")).join("")}</section>`:""}`}
-    ${small.length?(S.showSmall?`<section class="sect"><div class="bandhead"><span class="ico">${sm(ic.users)}</span><div><h3>Smaller rooms</h3><small>Sleep fewer than ${p} · combine two or more</small></div></div>${small.filter(notSel).sort(srt).map(r=>avCard(r,i++,false)).join("")}</section>`
-      :`<button class="btn out" data-small style="width:100%">Show ${small.length} smaller room${small.length>1?"s":""} to combine</button>`):""}
+    ${(()=>{
+      const budgetBand=studios.length?`<section class="sect"><div class="bandhead"><span class="ico">${sm(ic.bed)}</span><div><h3>Budget</h3><small>Studio Rooms · from ${inr(Math.min(...studios.map(r=>r.rate)))} a night</small></div></div>${studios.map(r=>avCard(r,i++,tight&&tight.name===r.name,r.name===recBudget?"Best value":"")).join("")}</section>`:"";
+      const luxBand=suites.length?`<section class="sect"><div class="bandhead lux"><span class="ico">${sm(ic.crown)}</span><div><h3>Luxury</h3><small>Premium Family Suites · from ${inr(Math.min(...suites.map(r=>r.rate)))} a night</small></div></div>${suites.map(r=>avCard(r,i++,tight&&tight.name===r.name,r.name===recLux?"Roomiest":"")).join("")}</section>`:"";
+      /* v11.0: embed + a room already chosen → the selected card stays big on the left while the other
+         rooms float beside it on the right, so nothing stacks below and the panel never scrolls. */
+      if(IS_EMBED&&sel.length&&free.length&&(studios.length||suites.length))
+        return `<div class="selwrap">
+          <div class="selside">${sel.map(selCard).join("")}</div>
+          <aside class="otherside"><div class="othertitle">Other rooms</div>${budgetBand}${luxBand}</aside>
+        </div>`;
+      const yourSel=sel.length?`<section class="sect" id="yoursel"><div class="sh"><h3>Your room${sel.length>1?"s":""}</h3><span>${sel.length} selected · sleeps ${capOf(sel)} of ${p}</span></div>${sel.map(selCard).join("")}</section>`:"";
+      const picks=pk.budget&&!picksRedundant?`<section class="sect"><div class="sh"><h3>Our picks for ${p} guest${p>1?"s":""}</h3></div><div class="picks">${pickCard("budget",pk.budget)}${pk.luxury&&!sameSet?pickCard("lux",pk.luxury):`<div class="pick" style="justify-content:center;text-align:center"><small>This is also our roomiest choice for your group.</small></div>`}</div></section>`:"";
+      const warn=!tight?`<p class="warn">No single room sleeps ${p}. Select two or more rooms below, or tap a pick above.</p>`:"";
+      const smallB=small.length?(S.showSmall?`<section class="sect"><div class="bandhead"><span class="ico">${sm(ic.users)}</span><div><h3>Smaller rooms</h3><small>Sleep fewer than ${p} · combine two or more</small></div></div>${small.filter(notSel).sort(srt).map(r=>avCard(r,i++,false)).join("")}</section>`
+        :`<button class="btn out" data-small style="width:100%">Show ${small.length} smaller room${small.length>1?"s":""} to combine</button>`):"";
+      return `${yourSel}
+    ${!free.length?`<div class="empty"><div class="tick">${ic.cal}</div><b>Fully booked on these dates</b>Try other dates, or ask Shenba to put you on the waitlist.</div>`:`${picks}${warn}${budgetBand}${luxBand}`}
+    ${smallB}`;
+    })()}
     ${booked.length?`<div class="booked"><b style="color:var(--ink)">Booked on your dates:</b>${booked.map(r=>`<span>${r.name}</span>`).join("")}</div>`:""}
     ${beyond()?`<p class="note">Your dates go past our ${AVAIL_DAYS}-day booking calendar, so Shenba confirms these rooms before payment.</p>`:`<p class="note">Live availability from our booking desk. Prices include taxes.</p>`}
   </div>`};
