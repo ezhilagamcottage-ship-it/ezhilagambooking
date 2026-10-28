@@ -4124,7 +4124,10 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   /* v10.7: the booking step button sits on the frame, outside the iPad; it mirrors and drives the iframe */
   (function(){ var frame=document.getElementById("khLiteFrame"), btn=document.getElementById("khPadBtn"), lbl=document.getElementById("khPadLbl");
     if(!frame||!btn||!lbl) return;
-    window.addEventListener("message",function(e){ var d=e.data; if(!d||d.ke!=="cta") return;
+    var navbar=document.querySelector(".kh-navbar");
+    window.addEventListener("message",function(e){ var d=e.data; if(!d) return;
+      if(d.ke==="bar"){ if(navbar) navbar.style.display = d.hidden ? "none" : ""; return; }
+      if(d.ke!=="cta") return;
       if(typeof d.label==="string"&&d.label) lbl.textContent=d.label; btn.disabled = d.enabled===false;
       if(typeof d.wide==="boolean") document.documentElement.classList.toggle("kh-wide", d.wide); });
     btn.addEventListener("click",function(){ try{ frame.contentWindow.postMessage({ke:"primary"},"*"); }catch(_){} });
