@@ -38,8 +38,8 @@ img{display:block;max-width:100%}
 .num{font-variant-numeric:tabular-nums}
 .muted{color:var(--muted)}
 .app{max-width:480px;margin:0 auto;min-height:100%;padding-bottom:calc(100px + env(safe-area-inset-bottom,0px));background:var(--bg)}
-/* v10.5: when shown inside the desktop iPad frame, fill the wider screen (no side borders) */
-html.embed .app,html.embed .dock .in,html.embed .sibox,html.embed .cfbox{max-width:620px}
+/* v10.7: shown edge-to-edge inside the desktop booking panel — fill the whole width */
+html.embed .app,html.embed .dock .in,html.embed .sibox,html.embed .cfbox{max-width:760px}
 /* Talk with Shenba lives on the desktop hero (to the left), so it is hidden inside the iPad */
 html.embed .fab{display:none!important}
 html.embed .appbar{grid-template-columns:1fr}
@@ -53,6 +53,15 @@ html.embed .app:has(.plan) .hero2,html.embed .app:has(.plan) .homehead{display:n
 html.embed .app:has(.plan) .toptabs{margin-bottom:4px}
 html.embed .plan{padding:16px 14px;gap:10px}
 html.embed .day{height:40px}
+/* v10.7: the step button now lives on the desktop frame BELOW the iPad (outside the device),
+   so the in-device dock and the thank-you's own home button are hidden to avoid a duplicate */
+html.embed .dock{display:none!important}
+html.embed .app{padding-bottom:18px}
+html.embed .ethanks [data-reset]{display:none}
+/* the window already shows a navy "Book your stay" header, so inner step bars become a light sub-header */
+html.embed .bar{background:var(--white);color:var(--maroon);box-shadow:0 1px 0 var(--line);border-radius:0}
+html.embed .bar h1{color:var(--maroon)}
+html.embed .bar button{color:var(--maroon)}
 /* the Shenba thank-you shown in the iPad after a booking is confirmed */
 .ethanks{align-items:center;text-align:center;padding-top:14px}
 .ethanks .etlogo{height:34px;width:auto;object-fit:contain}
@@ -1298,8 +1307,26 @@ function render(){
   const ph=$("#gphone");if(ph)ph.oninput=e=>{const v=cleanPhone(e.target.value);if(e.target.value!==v)e.target.value=v;S.phone=v;
     const h=$("#phint"),ok=phoneOk();if(h){h.className=ok?"good":v.length===10?"bad":"";h.textContent=!v?"Your booking voucher comes here":v.length<10?`${v.length} of 10 digits`:ok?"✓ We'll send your voucher here":"A mobile number starts with 6, 7, 8 or 9"}refreshPayCta()};
   if(GSI_READY)drawGoogleButtons();else if(document.querySelector(".gbtn"))loadGsi().then(ok=>ok?drawGoogleButtons():render());
+  emitCta();
 }
-function refreshPayCta(){payPrewarm();const b=$("#payBtn"),u=document.querySelector(".under");if(!b||S.paying)return;const why=readyToPay();b.classList.toggle("soft",!!why);if(u)u.textContent=why||"You'll see the amount again on Razorpay before you pay"}
+/* ---------- v10.7: hand the primary step button to the desktop frame (outside the iPad) ---------- */
+const IS_EMBED=document.documentElement.classList.contains("embed");
+function primaryCtaInfo(){const s=S.screen;
+  if(s==="done")return{label:"Back to home",enabled:true,sel:".ethanks [data-reset],[data-reset]"};
+  if(s==="room")return{label:"Reserve this room",enabled:true,sel:"#dockin [data-reserve]"};
+  if(s==="rooms"){const set=picked(),cap=capOf(set),p=pax(),ok=set.length&&cap>=p,q=quote(set);
+    return{label:ok?`Review & pay · ${inr(q.total)}`:(set.length?"Add a room to fit everyone":"Select a room"),enabled:!!ok,sel:"#dockin [data-goto-pay]"};}
+  if(s==="pay"){const why=readyToPay();return{label:why||`Pay ${inr(terms(quote()).now)} · Confirm`,enabled:!why,sel:"#dockin #payBtn"};}
+  if(s==="home"){
+    if(S.plan===2)return{label:"Show available rooms",enabled:!!nights(),sel:"#dockin [data-homeres]"};
+    if(S.plan===1)return{label:nights()?"Next: Guests":"Pick your dates to continue",enabled:!!nights(),sel:"#dockin [data-homeres]"};
+    return{label:"Reserve now",enabled:true,sel:"#dockin [data-homeres]"};}
+  return{label:"Reserve now",enabled:true,sel:"#dockin [data-homeres]"};}
+function emitCta(){if(!IS_EMBED)return;try{const i=primaryCtaInfo();parent.postMessage({ke:"cta",label:i.label,enabled:i.enabled},"*")}catch(e){}}
+addEventListener("message",function(e){const d=e&&e.data;if(!d)return;
+  if(d.ke==="sync"){emitCta();return;}
+  if(d.ke==="primary"){const i=primaryCtaInfo();if(!i||i.enabled===false)return;const b=document.querySelector(i.sel);if(b)b.click();}});
+function refreshPayCta(){payPrewarm();const b=$("#payBtn"),u=document.querySelector(".under");if(!b||S.paying)return;const why=readyToPay();b.classList.toggle("soft",!!why);if(u)u.textContent=why||"You'll see the amount again on Razorpay before you pay";emitCta()}
 function shenbaMsg(){const bits=[];
   if(S.pick.length&&["rooms","pay"].includes(S.screen))bits.push(`Rooms: ${S.pick.join(" + ")}`);else if(S.screen==="room")bits.push(`Room: ${room().name}`);
   if(S.checkIn&&S.checkOut)bits.push(`Dates: ${fmt(S.checkIn)} – ${fmt(S.checkOut)}`);

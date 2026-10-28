@@ -1348,10 +1348,8 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   #khFab b{font:600 21px/1.1 "Jost",var(--ts-sans);letter-spacing:.06em;text-transform:uppercase}
   #khFab small{font:500 13px/1.2 "Jost",var(--ts-sans);opacity:.8;margin-top:3px}
   /* while the booking iPad is open, the Reserve fob shrinks to a small pill instead of hiding */
-  html.kh-booking #khFab{padding:12px 16px;gap:9px;animation:none;transform:scale(.82);transform-origin:bottom right}
-  html.kh-booking #khFab b{font-size:15px}
-  html.kh-booking #khFab small{display:none}
-  html.kh-booking #khFab svg{width:26px;height:26px}
+  /* v10.7: while the booking iPad is open, its step button lives on the frame, so hide the floating fob entirely */
+  html.kh-booking #khFab{opacity:0;transform:scale(.6);pointer-events:none;animation:none}
   @keyframes khShine{0%,62%{left:-60%}100%{left:130%}}
   @keyframes khFabPulse{0%,100%{box-shadow:0 0 0 3px rgba(255,255,255,.85),0 14px 34px rgba(10,24,48,.38)}50%{box-shadow:0 0 0 3px rgba(255,255,255,.85),0 0 0 12px rgba(227,173,95,.22),0 14px 34px rgba(10,24,48,.38)}}
   html.kh-top #khFab{bottom:max(28px,env(safe-area-inset-bottom))}
@@ -1510,12 +1508,16 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   .khw-h h2{margin:0;font:400 24px/1.15 "DM Serif Display",var(--ts-serif);color:#f3cd8e}
   .khw-x{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;background:rgba(255,255,255,.1);color:#f3cd8e;font-size:22px;line-height:1}
   .khw-x:hover{background:rgba(255,255,255,.2)}
-  /* the mobile booking site shown inside a portrait iPad — tall, so the booking fits in one view */
-  .khw-phonewrap{display:flex;align-items:center;justify-content:center;padding:0}
-  .kh-pad{position:relative;height:100%;width:auto;aspect-ratio:3/4.25;max-width:100%;background:#0a1830;border-radius:26px;padding:13px;box-shadow:0 0 0 2px #c0902f,0 18px 44px rgba(10,24,48,.45)}
-  .kh-pad-cam{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:#2a3850;box-shadow:0 0 0 1px rgba(227,173,95,.35)}
-  .kh-pad-screen{width:100%;height:100%;border-radius:13px;overflow:hidden;background:#fff;position:relative}
-  .kh-pad-screen iframe{width:100%;height:100%;border:0;display:block}
+  /* v10.7: the booking site fills the whole panel inside the window's single border — no inner device
+     frame — with the step button on the bar below (outside the booking screen) */
+  .khw-p[data-p="reserve"] .khw-b{overflow:hidden;padding:0}
+  .khw-phonewrap{display:flex;flex-direction:column;background:#0a1830}
+  .kh-stage{flex:1;min-height:0;position:relative;overflow:hidden}
+  .kh-stage iframe{width:100%;height:100%;border:0;display:block}
+  .kh-navbar{flex:none;display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 22px calc(18px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,#0f2342,#0a1830);box-shadow:0 -1px 0 rgba(227,173,95,.5)}
+  .kh-cta{min-width:min(460px,86%);min-height:54px;padding:0 30px;border:0;border-radius:999px;cursor:pointer;background:linear-gradient(180deg,#f3cd8e,#e3ad5f);color:#0a1830;font:600 16px/1.15 "Jost",var(--ts-sans);letter-spacing:.04em;box-shadow:0 12px 28px rgba(10,24,48,.45);display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:transform .18s,box-shadow .18s,opacity .2s}
+  .kh-cta:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 16px 36px rgba(10,24,48,.5)}
+  .kh-cta:disabled{opacity:.42;cursor:default;box-shadow:none}
   .khw-b{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:18px 22px 22px}
   .khw-lead{margin:0 0 14px;font:400 14.5px/1.55 "Jost",var(--ts-sans);color:#4a556b}
   .khw .khv-map{aspect-ratio:16/10;border-radius:14px;box-shadow:0 0 0 2px var(--kh-gold),0 12px 26px rgba(15,35,66,.2)}
@@ -1693,7 +1695,8 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
               <div><h3>House rules</h3><p>Government photo ID for every adult. Wedding proof is mandatory for couples. Strictly no smoking or alcohol on the premises.</p></div>
               <div><h3>Address</h3><p>No 46, Vairams Nagar, Five Falls Road, Courtallam</p></div></div></div></section>
           <section class="khw-p" data-p="reserve" aria-label="Reserve"><header class="khw-h"><h2>Book your stay</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b khw-phonewrap">
-            <div class="kh-pad"><span class="kh-pad-cam" aria-hidden="true"></span><div class="kh-pad-screen"><iframe id="khLiteFrame" title="Book Kutralam Ezhilagam" data-src="lite.html#book" loading="lazy" allow="microphone; autoplay"></iframe></div></div>
+            <div class="kh-stage"><iframe id="khLiteFrame" title="Book Kutralam Ezhilagam" data-src="lite.html#book" loading="lazy" allow="microphone; autoplay"></iframe></div>
+            <div class="kh-navbar"><button type="button" class="kh-cta" id="khPadBtn" disabled><span id="khPadLbl">Reserve now</span></button></div>
           </div></section>
           <section class="khw-p" data-p="chat" aria-label="Chat with Shenba"><div class="khw-b khw-chat" id="khChatSlot"></div></section>
         </div>
@@ -4092,6 +4095,14 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   }
   var _khOpen=document.getElementById("khOpenBook"); if(_khOpen) _khOpen.addEventListener("click",openBook);
   var _tb=document.getElementById("tsBook"); if(_tb) _tb.style.display="none";   /* old booking popup retired; booking lives in the phone frame */
+  /* v10.7: the booking step button sits on the frame, outside the iPad; it mirrors and drives the iframe */
+  (function(){ var frame=document.getElementById("khLiteFrame"), btn=document.getElementById("khPadBtn"), lbl=document.getElementById("khPadLbl");
+    if(!frame||!btn||!lbl) return;
+    window.addEventListener("message",function(e){ var d=e.data; if(!d||d.ke!=="cta") return;
+      if(typeof d.label==="string"&&d.label) lbl.textContent=d.label; btn.disabled = d.enabled===false; });
+    btn.addEventListener("click",function(){ try{ frame.contentWindow.postMessage({ke:"primary"},"*"); }catch(_){} });
+    frame.addEventListener("load",function(){ try{ frame.contentWindow.postMessage({ke:"sync"},"*"); }catch(_){} });
+  })();
   window.addEventListener("click",function(e){
     var t=e.target.closest("[data-kv],[data-ts='reserve'],[data-ts='rooms'],#tsReserve,#tsMenu a[data-m]"); if(!t) return;
     var v=t.dataset.kv || (t.dataset.ts==="reserve"||t.id==="tsReserve"?"reserve":t.dataset.ts==="rooms"?"rooms":null);
