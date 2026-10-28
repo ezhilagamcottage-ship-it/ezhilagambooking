@@ -807,27 +807,35 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-gold)}
 #cfsheet .cfpay:active{transform:scale(.98)}
 #cfsheet .cfpay:disabled{opacity:.7}
 #cfsheet .cfnote{margin:8px 0 0;font-size:11px;color:var(--mute);text-align:center}
-/* v10.2: inline checkout on the Pay step — summary left, Razorpay right, one place */
-.payside{display:none;flex-direction:column;background:#0f2342;border-radius:12px;padding:14px}
-.payside .pshead{display:flex;align-items:center;gap:10px;padding:2px 2px 12px}
-.payside .pshead img{height:24px;width:auto}
-.payside .pshead span{color:#f3cd8e;font:600 11px/1 "Jost",sans-serif;letter-spacing:.14em;text-transform:uppercase}
-.payside .cfembed{position:relative;flex:1;min-height:560px;background:#fbf6ec;border-radius:8px;overflow:hidden}
-.payside .cfembed iframe{width:100%!important;height:100%!important;border:0;display:block}
-.payside .psstart{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:9px;padding:28px}
-.payside .pslock{font-size:30px;line-height:1}
-.payside .psamt{margin:0;font:400 22px/1.1 "DM Serif Display",Georgia,serif;color:#0f2342}
-.payside .psamt b{font-weight:400}
-.payside .pssub{margin:0;font-size:12.5px;line-height:1.4;color:#6b7488;max-width:260px}
-.payside .paybtn{margin-top:8px;border:0;cursor:pointer;background:#e3ad5f;color:#0f2342;font:600 14px/1 "Jost",sans-serif;letter-spacing:.04em;padding:15px 24px;border-radius:999px;transition:transform .14s cubic-bezier(.22,1,.36,1)}
-.payside .paybtn:hover{background:#f3cd8e}
-.payside .paybtn:active{transform:scale(.98)}
-.payside .paybtn:disabled{opacity:.7;cursor:default}
-.payside .psfine{margin:4px 0 0;font-size:11px;line-height:1.4;color:#8a93a6;max-width:250px}
+/* v10.2: Pay step as one framed panel — stay details and the checkout inside the same frame */
+.payframe{border-radius:14px;overflow:hidden;background:var(--card);border:1px solid var(--line)}
+.pfhead{display:flex;align-items:center;gap:12px;padding:15px 20px;background:#0f2342}
+.pfhead .pflogo{height:28px;width:auto}
+.pfhead h2{margin:0;font:400 21px/1.1 "DM Serif Display",Georgia,serif;color:#fff;letter-spacing:0}
+.pfhead small{font-size:11px;color:rgba(243,205,142,.82)}
+.pfbody{display:block}
+.pfsum{padding:22px}
+.pfsum .pffine{color:#a8a29e}
+.pfpay{padding:16px 16px 18px;background:#0f2342}
+.pfpay-h{margin:0 0 10px;color:#f3cd8e;font:600 11px/1 "Jost",sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.pfpay .cfembed{position:relative;min-height:540px;background:#fbf6ec;border-radius:8px;overflow:hidden}
+.pfpay .cfembed iframe{width:100%!important;height:100%!important;border:0;display:block}
+.pfpay .psstart{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:9px;padding:28px}
+.pfpay .pslock{font-size:30px;line-height:1}
+.pfpay .psamt{margin:0;font:400 22px/1.1 "DM Serif Display",Georgia,serif;color:#0f2342}
+.pfpay .psamt b{font-weight:400}
+.pfpay .pssub{margin:0;font-size:12.5px;line-height:1.4;color:#6b7488;max-width:260px}
+.pfpay .paybtn{margin-top:8px;border:0;cursor:pointer;background:#e3ad5f;color:#0f2342;font:600 14px/1 "Jost",sans-serif;letter-spacing:.04em;padding:15px 24px;border-radius:999px;transition:transform .14s cubic-bezier(.22,1,.36,1)}
+.pfpay .paybtn:hover{background:#f3cd8e}
+.pfpay .paybtn:active{transform:scale(.98)}
+.pfpay .paybtn:disabled{opacity:.7;cursor:default}
+.pfpay .psfine{margin:4px 0 0;font-size:11px;line-height:1.4;color:#8a93a6;max-width:250px}
 @media (min-width:900px){
-  section.step:has(#payside){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:22px;align-items:start}
-  section.step:has(#payside)>.card:first-child{grid-column:1;position:sticky;top:24px}
-  section.step:has(#payside)>#payside{grid-column:2;display:flex}
+  .pfbody{display:grid;grid-template-columns:1fr 1fr;align-items:stretch}
+  .pfsum{display:flex;flex-direction:column;padding:26px}
+  .pfsum .pffine{margin-top:auto;padding-top:18px}
+  .pfpay{display:flex;flex-direction:column}
+  .pfpay .cfembed{flex:1}
 }
 </style>
 </head>
@@ -2474,8 +2482,7 @@ function stepPay(app) {
      has, so it says so instead of promising Google Pay. */
   const payLabel = pay.mcc ? "Pay with GPay / UPI" : "Pay with any UPI app";
 
-  app.appendChild($(`<section class="step">
-    <div class="card">
+  const sumInner = `
       <p class="sechead" style="margin-top:0">Your stay</p>
       ${S.pick.map((n) => `<h3 class="paroom">${esc(n)} <span class="pafl">${esc(roomFloor(n))} floor</span>${roomFloor(n) && roomFloor(n) !== "Ground" ? ` <span class="nolift">No lift</span>` : ""}</h3>`).join("")}
       <p class="note" style="font-size:12.5px;color:#78716c">${fmt(S.checkIn)} → ${fmt(S.checkOut)} · ${nights} night${nights>1?"s":""} · ${paxTotal()} guest${paxTotal()>1?"s":""}</p>
@@ -2490,11 +2497,9 @@ function stepPay(app) {
       <label class="row" style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px">
         <input id="part" type="checkbox" ${S.partPay ? "checked" : ""}>
         <span style="font-size:13px;font-weight:600">Pay ${CFG.ADVANCE_PC}% now, balance before check-in</span>
-      </label>
-    </div>
-    ${inlinePayOn() ? `<aside class="payside" id="payside" aria-label="Secure payment">
-      <div class="pshead"><img src="img/logo-gold.webp" alt="Kutralam Ezhilagam"><span>Secure checkout</span></div>
-      <div class="cfembed" id="rzpembed">
+      </label>`;
+
+  const checkoutInner = `<div class="cfembed" id="rzpembed">
         <div class="psstart" id="psStart">
           <div class="pslock" aria-hidden="true">&#128274;</div>
           <p class="psamt">Pay <b>${inr(amt)}</b> now</p>
@@ -2502,9 +2507,28 @@ function stepPay(app) {
           <button type="button" class="paybtn" id="psPay">Pay ${inr(amt)} securely</button>
           <p class="psfine">Opens right here · secured by Razorpay · your card details never touch our server</p>
         </div>
+      </div>`;
+
+  if (inlinePayOn()) {
+    /* one framed panel: details on the left, checkout on the right, all inside */
+    app.appendChild($(`<section class="step">
+      <div class="payframe">
+        <div class="pfhead"><img src="img/logo-gold.webp" alt="Kutralam Ezhilagam" class="pflogo">
+          <div><h2>Confirm &amp; pay</h2><small>Ref ${esc(S.ref)} · voucher on WhatsApp after payment</small></div></div>
+        <div class="pfbody">
+          <div class="pfsum">${sumInner}
+            <p class="fine pffine">Bring an original photo ID for every adult — it is checked in person at check-in.</p>
+          </div>
+          <div class="pfpay" id="payside">
+            <p class="pfpay-h">Secure checkout</p>
+            ${checkoutInner}
+          </div>
+        </div>
       </div>
-    </aside>` : ""}
     </section>`));
+  } else {
+    app.appendChild($(`<section class="step"><div class="card">${sumInner}</div></section>`));
+  }
 
   /* The footer button is drawn by foot(), not by this section, so changing
      the reference has to tell it. Without this the guest types all four
