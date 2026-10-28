@@ -1501,6 +1501,12 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   .khw-h h2{margin:0;font:400 24px/1.15 "DM Serif Display",var(--ts-serif);color:#f3cd8e}
   .khw-x{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;background:rgba(255,255,255,.1);color:#f3cd8e;font-size:22px;line-height:1}
   .khw-x:hover{background:rgba(255,255,255,.2)}
+  /* the mobile site shown in a phone mock-up, so the whole booking stays inside one window */
+  .khw-phonewrap{display:flex;align-items:center;justify-content:center;padding:14px 10px}
+  .kh-phone{position:relative;height:min(100%,700px);aspect-ratio:9/19.3;background:#0a1830;border-radius:40px;padding:11px;box-shadow:0 0 0 2px #c0902f,0 26px 60px rgba(10,24,48,.5)}
+  .kh-phone-ear{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:34%;height:16px;background:#0a1830;border-radius:0 0 13px 13px;z-index:3}
+  .kh-phone-screen{width:100%;height:100%;border-radius:30px;overflow:hidden;background:#fff;position:relative}
+  .kh-phone-screen iframe{width:100%;height:100%;border:0;display:block}
   .khw-b{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:18px 22px 22px}
   .khw-lead{margin:0 0 14px;font:400 14.5px/1.55 "Jost",var(--ts-sans);color:#4a556b}
   .khw .khv-map{aspect-ratio:16/10;border-radius:14px;box-shadow:0 0 0 2px var(--kh-gold),0 12px 26px rgba(15,35,66,.2)}
@@ -1677,11 +1683,9 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
             <div class="khc2"><div><h3>Stay</h3><p>Check-in 12:00 PM &middot; check-out 10:00 AM</p></div>
               <div><h3>House rules</h3><p>Government photo ID for every adult. Wedding proof is mandatory for couples. Strictly no smoking or alcohol on the premises.</p></div>
               <div><h3>Address</h3><p>No 46, Vairams Nagar, Five Falls Road, Courtallam</p></div></div></div></section>
-          <section class="khw-p" data-p="reserve" aria-label="Reserve"><header class="khw-h"><h2>Reserve your stay</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b">
-            <p class="khw-lead">Choose your dates and guests. You'll see the rooms that are free for your dates next, then pay securely.</p>
-            <ul class="khv-list"><li>Check-in 12:00 PM &middot; check-out 10:00 AM</li><li>Rates include tax</li><li>Booking 99622 22415 &middot; Reception 082483 20685</li></ul>
-            <div class="khv-cta"><button type="button" class="kh-btn gold" id="khOpenBook">Choose dates &amp; guests</button></div>
-            <div class="khv-pics"><img src="img/photos/hill-view-window.webp" alt="" loading="lazy"><img src="img/photos/marutham-king-bed.webp" alt="" loading="lazy"><img src="img/photos/suite-living-tv.webp" alt="" loading="lazy"></div></div></section>
+          <section class="khw-p" data-p="reserve" aria-label="Reserve"><header class="khw-h"><h2>Book your stay</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b khw-phonewrap">
+            <div class="kh-phone"><span class="kh-phone-ear" aria-hidden="true"></span><div class="kh-phone-screen"><iframe id="khLiteFrame" title="Book Kutralam Ezhilagam" data-src="lite.html" loading="lazy" allow="microphone; autoplay"></iframe></div></div>
+          </div></section>
           <section class="khw-p" data-p="chat" aria-label="Chat with Shenba"><div class="khw-b khw-chat" id="khChatSlot"></div></section>
         </div>
       </div>
@@ -3877,7 +3881,8 @@ if (location.hash === "#talk") openCall(_fromAlbum);
     });
   });
   $("tsBook").addEventListener("click", function () { closeAll(); });
-  function openBook() { closeAll(); label(); $("tsBook").classList.add("on"); document.body.style.overflow = "hidden"; }
+  /* v10.5: booking now lives in the hero-window phone frame, so this no longer opens a popup */
+  function openBook() { closeAll(); }
   /* reset the frame back to the date picker (used on close and on "Dates") */
   function frameToPicker() {
     var fr = $("tsFrame"); if (fr) { fr.hidden = true; fr.removeAttribute("src"); }
@@ -4030,14 +4035,14 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   function openBook(){ var r=document.getElementById("tsReserve"); if(r&&r.onclick) r.onclick(); }
   function show(p){
     if(busy){ queued=p; return; }
-    if(p===cur){ if(p==="reserve") openBook(); return; }
+    if(p===cur){ return; }
     var front=pane(cur), back=pane(p); if(!front||!back) return; busy=true;
     if(window.scrollY>4) window.scrollTo({top:0,behavior:"smooth"});
     back.classList.add("on"); var bb=back.querySelector(".khw-b"); if(bb&&p!=="chat") bb.scrollTop=0;
     var f=back.querySelector("iframe[data-src]"); if(f){ f.src=f.dataset.src; f.removeAttribute("data-src"); }
     mark(p);
     var done=function(){ front.classList.remove("turning"); front.classList.remove("on"); var sh=front.querySelector(".kh-shade"); if(sh) sh.remove();
-      cur=p; busy=false; if(p==="reserve") setTimeout(openBook,120); if(queued){ var q=queued; queued=null; show(q); } };
+      cur=p; busy=false; if(queued){ var q=queued; queued=null; show(q); } };
     if(reduce){ done(); return; }
     /* v10.3 (Rakesh, 28 Oct): the chosen page drops in from the top of the window like a falling
        screen, covering the page beneath with a soft leading-edge shadow, then its heading, words and
@@ -4075,7 +4080,8 @@ if (location.hash === "#talk") openCall(_fromAlbum);
     chat.showModal=function(){ if(!this.open) HTMLDialogElement.prototype.show.call(this); show("chat"); };
     chat.addEventListener("close",function(){ if(cur==="chat") show("home"); });
   }
-  document.getElementById("khOpenBook").addEventListener("click",openBook);
+  var _khOpen=document.getElementById("khOpenBook"); if(_khOpen) _khOpen.addEventListener("click",openBook);
+  var _tb=document.getElementById("tsBook"); if(_tb) _tb.style.display="none";   /* old booking popup retired; booking lives in the phone frame */
   window.addEventListener("click",function(e){
     var t=e.target.closest("[data-kv],[data-ts='reserve'],[data-ts='rooms'],#tsReserve,#tsMenu a[data-m]"); if(!t) return;
     var v=t.dataset.kv || (t.dataset.ts==="reserve"||t.id==="tsReserve"?"reserve":t.dataset.ts==="rooms"?"rooms":null);
