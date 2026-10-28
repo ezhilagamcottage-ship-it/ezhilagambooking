@@ -984,8 +984,12 @@ html.ts .wrap{display:none!important}
 .ts-burger{width:40px;height:40px;border:0;background:none;cursor:pointer;display:flex;gap:6px;justify-content:center;align-items:center}
 .ts-burger i{width:1.5px;height:30px;background:var(--ts-cream);transition:transform .4s}
 .ts-burger:hover i:first-child{transform:translateX(-3px)} .ts-burger:hover i:last-child{transform:translateX(3px)}
-.ts-wa{writing-mode:vertical-rl;transform:rotate(180deg);color:#fff;text-decoration:none;font:400 13px/1 var(--ts-sans);letter-spacing:.14em;text-transform:uppercase;padding:6px 0}
-.ts-wa:hover{color:var(--ts-cream);opacity:.8}
+/* v11.2: a clear round WhatsApp button, not sideways text that is easy to miss */
+.ts-wa{width:46px;height:46px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;text-decoration:none;box-shadow:0 8px 20px rgba(37,211,102,.42);transition:transform .2s,box-shadow .2s}
+.ts-wa svg{width:26px;height:26px;display:block}
+.ts-wa:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(37,211,102,.55)}
+/* v11.2: top-left menu duplicates the full nav on wide screens */
+@media (min-width:1180px){.ts-burger{display:none}}
 
 /* ── top: logo + actions (always on screen) ── */
 .ts-logo{position:absolute;z-index:40;top:22px;left:calc(var(--ts-rail) + 28px);background:var(--ts-cream);padding:10px 16px;border-radius:2px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
@@ -1276,6 +1280,13 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   .kh-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:5vw;align-items:center}
   .kh-copy{position:relative;min-width:0;z-index:2}
   .kh-eye{margin:0 0 14px;font:500 12px/1 "Jost",var(--ts-sans);letter-spacing:.32em;text-transform:uppercase;color:var(--kh-gold)}
+  .kh-revs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+  .kh-grev{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(243,205,142,.3);font:500 12px/1 "Jost",var(--ts-sans);color:#f6ead6;text-decoration:none;transition:background .2s,border-color .2s}
+  .kh-grev:hover{background:rgba(255,255,255,.1);border-color:rgba(243,205,142,.55)}
+  .kh-grev-g{font:700 11px/1 "Jost",var(--ts-sans);color:#e3ad5f;letter-spacing:.02em}
+  .kh-grev-num{font:700 13px/1 "Jost",var(--ts-sans);color:#f6ead6}
+  .kh-grev-stars{color:#f3cd8e;letter-spacing:1px;font-size:12px}
+  .kh-grev-ct{color:rgba(246,234,214,.7)}
   .kh h1{margin:0;font:400 clamp(46px,5.4vw,82px)/1 "DM Serif Display",var(--ts-serif);color:var(--kh-gold);letter-spacing:.005em;text-transform:none;text-wrap:balance}
   .kh-sub{margin:14px 0 0;font:400 clamp(20px,1.8vw,26px)/1.25 "Jost",var(--ts-sans);color:var(--kh-gold2)}
   .kh-lead{margin:14px 0 0;max-width:46ch;font-size:15px;line-height:1.6;color:rgba(246,234,214,.78)}
@@ -1658,7 +1669,7 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
 <nav class="ts-rail" aria-label="Site">
   <a class="ts-emb" href="#top" aria-label="Kutralam Ezhilagam, back to top"><i></i><i></i><i></i><i></i></a>
   <button type="button" class="ts-burger" id="tsBurger" aria-label="Open menu" aria-expanded="false"><i></i><i></i></button>
-  <a class="ts-wa" href="https://wa.me/916374213184" target="_blank" rel="noopener">WhatsApp</a>
+  <a class="ts-wa" href="https://wa.me/916374213184" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.97L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm4.52 11.99c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29z"/></svg></a>
   <span class="ts-cn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="75" height="22"></span>
 </nav>
 
@@ -1675,10 +1686,15 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
     <div class="kh-grid">
       <div class="kh-copy">
         <p class="kh-eye">Courtallam &middot; Tamil Nadu</p>
+        <div class="kh-revs" aria-label="Guest ratings">
+          <a class="kh-grev" href="https://maps.app.goo.gl/uMu427TCwSHLzAVEA" target="_blank" rel="noopener" aria-label="4.7 stars from 897 guest reviews on Google"><span class="kh-grev-g" aria-hidden="true">G</span><b class="kh-grev-num">4.7</b><span class="kh-grev-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="kh-grev-ct">897 &middot; Google</span></a>
+          <span class="kh-grev" aria-label="4.6 stars from 898 ratings on JustDial"><span class="kh-grev-g" aria-hidden="true">JD</span><b class="kh-grev-num">4.6</b><span class="kh-grev-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="kh-grev-ct">898 &middot; JustDial</span></span>
+          <span class="kh-grev" aria-label="4.4 out of 5 on Goibibo"><span class="kh-grev-g" aria-hidden="true">go</span><b class="kh-grev-num">4.4</b><span class="kh-grev-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="kh-grev-ct">Goibibo</span></span>
+        </div>
         <h1>Live with Nature</h1>
         <p class="kh-sub">A short walk from Courtallam Main Falls</p>
         <p class="kh-lead">Nine rooms, studios and suites for two to fifteen, in Vairams Nagar on Five Falls Road. Wake up to the hills and walk to the falls.</p>
-        <ul class="kh-amen"><li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="6" r="2.6"/><path d="M15 10l-4 7 4 2 1 9"/><path d="M15 10l5 5 4 1"/><path d="M11 17l-3 8"/></svg>Walk to the falls</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 18h22"/><path d="M7 18a9 9 0 0118 0"/><path d="M16 9V7"/><path d="M4 22h24"/></svg>Home food on order</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 13a16 16 0 0122 0"/><path d="M9 17a10 10 0 0114 0"/><path d="M13 21a4 4 0 016 0"/><circle cx="16" cy="25" r="1.2"/></svg>Fast Wi-Fi</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="15" rx="2"/><path d="M12 26h8"/><path d="M14 12l5 2.5-5 2.5z"/></svg>OTT premium</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="8" r="2.6"/><circle cx="22" cy="11" r="2"/><path d="M7 26v-8a4 4 0 018 0v8"/><path d="M19 26v-6a3 3 0 016 0v6"/></svg>Family friendly</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 20h18v4H4z"/><path d="M25 18v6"/><path d="M28 18v6"/><path d="M5 5l22 22"/></svg>Smoke &amp; alcohol free</li></ul>
+        <ul class="kh-amen"><li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="6" r="2.6"/><path d="M15 10l-4 7 4 2 1 9"/><path d="M15 10l5 5 4 1"/><path d="M11 17l-3 8"/></svg>Walk to the falls</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 18h22"/><path d="M7 18a9 9 0 0118 0"/><path d="M16 9V7"/><path d="M4 22h24"/></svg>Home food on order</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 13a16 16 0 0122 0"/><path d="M9 17a10 10 0 0114 0"/><path d="M13 21a4 4 0 016 0"/><circle cx="16" cy="25" r="1.2"/></svg>Fast <span style="white-space:nowrap">Wi-Fi</span></li><li><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="15" rx="2"/><path d="M12 26h8"/><path d="M14 12l5 2.5-5 2.5z"/></svg>OTT premium</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="8" r="2.6"/><circle cx="22" cy="11" r="2"/><path d="M7 26v-8a4 4 0 018 0v8"/><path d="M19 26v-6a3 3 0 016 0v6"/></svg>Family friendly</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 20h18v4H4z"/><path d="M25 18v6"/><path d="M28 18v6"/><path d="M5 5l22 22"/></svg>Smoke &amp; alcohol free</li></ul>
         <div class="kh-line"></div>
         <div class="kh-cta"><div class="kh-row"><button type="button" class="kh-btn gold" data-kv="reserve">Book now</button><a class="kh-btn ghost kh-wab" href="https://wa.me/916374213184?text=Vanakkam%20Shenba!%20I%20would%20like%20to%20book%20at%20Kutralam%20Ezhilagam.%20Please%20help%20me%20in%20Tamil%20or%20English%20and%20send%20the%20payment%20link." target="_blank" rel="noopener" aria-label="WhatsApp Shenba in Tamil or English and get your payment link"><svg class="kh-wab-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.5 15.3L2 22l4.8-1.3A10 10 0 1012 2zm0 2a8 8 0 11-4.1 14.9l-.3-.2-2.8.7.8-2.7-.2-.3A8 8 0 0112 4zm4.3 10.1c-.2-.1-1.3-.6-1.5-.7-.2-.1-.3-.1-.5.1l-.6.8c-.1.1-.2.1-.4 0-.2-.1-.9-.3-1.7-1-.6-.5-1-1.2-1.2-1.4-.1-.2 0-.3.1-.4l.3-.4.2-.3v-.4l-.7-1.6c-.2-.4-.3-.4-.5-.4h-.4c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.3c.1.2 1.6 2.5 3.9 3.4.5.2.9.4 1.2.5.5.2 1 .1 1.3.1.4-.1 1.3-.5 1.5-1 .2-.5.2-1 .1-1-.1-.1-.2-.1-.4-.2z"/></svg>WhatsApp Shenba</a></div>
           <button type="button" class="kh-wa" data-ts="talk" aria-label="Talk with Shenba, our voice assistant, in Tamil or English">
@@ -1706,7 +1722,7 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
               <button type="button" class="khm-play" id="khClipPlay">&#8635; Play the drive again</button></div>
             <p class="khv-big">No 46, Vairams Nagar, Five Falls Road, Courtallam</p>
             <ul class="khv-list"><li>Near the Vairams Nagar arch</li><li>A short walk to Courtallam Main Falls</li><li>Limited parking, first come first served</li></ul>
-            <div class="khv-cta"><a class="kh-btn gold" href="https://maps.app.goo.gl/uMu427TCwSHLzAVEA" target="_blank" rel="noopener">Open in Google Maps</a><button type="button" class="kh-btn line" data-kv="reserve">Reserve</button></div></div></section>
+            <div class="khv-cta"><a class="kh-btn gold" href="https://www.google.com/maps/dir/?api=1&amp;destination=Kutralam%20Ezhilagam%2C%20Vairams%20Nagar%2C%20Five%20Falls%20Road%2C%20Courtallam" target="_blank" rel="noopener">Get directions</a><a class="kh-btn line" href="https://maps.app.goo.gl/uMu427TCwSHLzAVEA" target="_blank" rel="noopener">Open in Google Maps</a><button type="button" class="kh-btn line" data-kv="reserve">Reserve</button></div></div></section>
           <section class="khw-p" data-p="contact" aria-label="Contact"><header class="khw-h"><h2>We're happy to help</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b">
             <div class="khc">
               <div class="khc-c"><small>Booking</small><a href="tel:+919962222415">99622 22415</a><p>Rooms, rates and availability</p></div>

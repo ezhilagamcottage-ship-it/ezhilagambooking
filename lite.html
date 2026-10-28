@@ -86,6 +86,20 @@ html.embed .rangechips{margin-top:7px}
 html.embed .rc{padding:7px 10px}
 html.embed .plan .pq{margin:0}
 html.embed .plan .times.mini{display:none}
+/* v11.2: the red ✕ in the panel header already closes — drop the card's own ✕ so there aren't two */
+html.embed .steps .pclose{display:none}
+/* v11.2: reassurance strip so the dates/guests card doesn't float in empty space on the computer */
+html.embed .planre{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;margin:12px 2px 0;padding-top:12px;border-top:1px solid rgba(15,35,66,.12)}
+html.embed .planre span{display:inline-flex;align-items:center;gap:6px;font:500 11.5px/1.3 var(--sans);color:#4a556b}
+html.embed .planre svg{width:14px;height:14px;color:#1f7a4d;flex:none}
+html.embed .planfrom{display:block;text-align:center;margin:2px 0 8px;font:600 12px/1 var(--sans);color:#9A6B12}
+.planre{display:none}.planfrom{display:none}
+.lowleft{display:inline-flex;align-items:center;gap:5px;color:#b4611e;font-weight:700}
+.lowleft svg{width:14px;height:14px}
+.etact{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;width:100%;max-width:440px;margin:0 auto}
+.etact .btn{flex:1 1 150px;min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.etact .btn svg{width:17px;height:17px;flex:none}
+html.embed .etact .btn{min-height:40px;font-size:13px}
 /* v10.9: in the wide desktop panel, room cards flow in a grid that fills the width
    (image ratios kept), so the list shows more rooms with far less scrolling */
 /* v11.0: non-pick rooms become compact horizontal tiles so the whole list fits with no scroll */
@@ -134,7 +148,9 @@ html.embed .sect{gap:6px}
    whole room list clears the panel without a scrollbar on shorter laptops */
 html.embed .screen:has(.staysum) .stack>.note{display:none}
 html.embed .btn.out[data-small]{width:auto!important;align-self:center;min-height:0;padding:6px 16px;font-size:11.5px;border-radius:999px;margin-top:0}
-html.embed .avcard>.ph{flex-basis:42px;width:42px;height:42px}
+html.embed .avcard>.ph{flex-basis:42px;width:42px;height:42px;position:relative;cursor:pointer}
+/* v11.2: a camera badge so guests see the small thumbnail opens the room's photos */
+html.embed .avcard>.ph::after{content:"";position:absolute;right:2px;bottom:2px;width:15px;height:15px;border-radius:5px;background:rgba(10,24,48,.74) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z'/%3E%3Ccircle cx='12' cy='13' r='4'/%3E%3C/svg%3E") center/10px no-repeat;pointer-events:none}
 html.embed .avcard{padding:3px 9px 3px 4px}
 /* the chosen-room card becomes a compact two-column: gallery beside its details, not a giant photo */
 html.embed .selroom{display:grid;grid-template-columns:minmax(260px,400px) 1fr;align-items:center;gap:4px}
@@ -177,6 +193,22 @@ html.embed .dock{display:none!important}
 html.embed body{margin:0}
 html.embed .app{padding-bottom:0}
 html.embed .ethanks [data-reset]{display:none}
+/* v11.2: keep the confirmation (logo, Shenba, thank-you, receipt, quick actions) on one screen — no scroll */
+html.embed .done.ethanks{gap:7px;padding-top:8px}
+html.embed .ethanks .etlogo{height:26px}
+html.embed .ethanks .etshen{width:58px;height:58px;margin:0}
+html.embed .ethanks .etshen i{width:13px;height:13px;right:2px;bottom:2px}
+html.embed .ethanks h2{font-size:21px;margin:0}
+html.embed .ethanks>p{font-size:12.5px;line-height:1.45;margin:0}
+html.embed .ethanks .rcpt{padding:10px 14px;border-top-width:4px}
+html.embed .ethanks .rcpt header{padding-bottom:7px}
+html.embed .ethanks .rcpt header b{font-size:19px}
+html.embed .ethanks .rcpt .prow{padding:3px 0}
+html.embed .ethanks .rcpt footer{padding-top:6px}
+html.embed .ethanks .etact{margin-top:1px}
+html.embed .donewrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:18px;align-items:center;width:100%}
+html.embed .donehello{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px}
+html.embed .doneside{display:flex;flex-direction:column;gap:10px;min-width:0}
 /* the window already shows a navy "Book your stay" header, so inner step bars become a light sub-header */
 html.embed .bar{background:var(--white);color:var(--maroon);box-shadow:0 1px 0 var(--line);border-radius:0}
 html.embed .bar h1{color:var(--maroon)}
@@ -474,11 +506,11 @@ html[data-nav=done]::view-transition-new(root){animation:vtRiseIn .6s var(--ease
 @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(184,137,46,0)}50%{box-shadow:0 0 0 4px rgba(184,137,46,.25)}}
 .day{position:relative;isolation:isolate}
 .day.in,.day.start,.day.end{background:none!important}
-.day.in::before,.day.start::before,.day.end::before{content:"";position:absolute;inset:3px 0 auto;height:34px;background:rgba(255,255,255,.16);z-index:-1;transform-origin:left}
+.day.in::before,.day.start::before,.day.end::before{content:"";position:absolute;inset:3px 0 auto;height:34px;background:rgba(227,173,95,.32);z-index:-1;transform-origin:left}
 .day.start::before{left:50%}
 .day.end::before{right:50%}
 .day.start.end::before{display:none}
-.day.start span,.day.end span{background:#fff;color:var(--maroon);box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.day.start span,.day.end span{background:linear-gradient(180deg,#f3cd8e,#e3ad5f);color:#0a1830;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 @media (prefers-reduced-motion:no-preference){
   .calcard.enter{animation:dropIn .5s cubic-bezier(.2,.8,.2,1) both}
   .calcard.enter .day,.cal.slide-l .day,.cal.slide-r .day{animation:cellIn .35s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 9ms)}
@@ -1103,16 +1135,18 @@ function planHTML(){const st=S.plan,ready=nights()>0,free=ready?freeRooms():[];
     <div class="pfields"><button class="pf" data-plan="1">${sm(ic.cal)}<span><small>Check-in – out</small>${dLabel}</span></button><button class="pf" data-plan="2">${sm(ic.user)}<span><small>Guests</small>${gLabel}</span></button></div>
     <button class="btn pill" data-plan="1">Reserve Now ${ic.arrow}</button></div>`;
   const steps=`<div class="steps"><button class="stp ${st===1?"on":"done"}" data-plan="1"><i>1</i>Dates</button><span class="sline ${st===2?"on":""}"></span><button class="stp ${st===2?"on":""}" data-plan="2" ${ready?"":"disabled"}><i>2</i>Guests</button><button class="pclose" data-plan="0" aria-label="Close">${ic.close}</button></div>`;
+  const planRe=`<div class="planre"><span>${ic.check} Best price, booked direct</span><span>${ic.check} Free to change before you pay</span><span>${ic.check} Pay-at-desk option</span></div>`;
+  const planFrom=`<p class="planfrom">Rooms from ${inr(Math.min(...ROOMS.map(r=>r.rate)))} / night · taxes included</p>`;
   if(st===1)return `<div class="plan open" id="plan">${steps}<div class="pbody step-in">
-    <p class="pq">When are you coming?</p>${calendarHTML()}
+    <p class="pq">When are you coming?</p>${planFrom}${calendarHTML()}
     <div class="times mini"><div class="t">${ic.clock}Check-in<b>12:00 PM</b></div><div class="arr">${ic.arrow}</div><div class="t">${ic.clock}Check-out<b>10:00 AM</b></div></div>
-    <button class="btn pill" data-plan="2" ${ready?"":"disabled"}>${ready?`Next: Guests ${ic.arrow}`:"Tap check-in, then check-out"}</button></div></div>`;
+    <button class="btn pill" data-plan="2" ${ready?"":"disabled"}>${ready?`Next: Guests ${ic.arrow}`:"Tap check-in, then check-out"}</button>${planRe}</div></div>`;
   return `<div class="plan open" id="plan">${steps}<div class="pbody step-in">
     <button class="datechip num" data-plan="1">${sm(ic.cal)} ${fmtD(S.checkIn)} → ${fmtD(S.checkOut)} · ${nights()} night${nights()>1?"s":""} <u>Change</u></button>
     <p class="pq">How many guests?</p>
     <div class="glist flat">${counter("adults","Adult","13+ years",1,ic.users)}${counter("kids","Children","5–12 years",0,ic.kid)}</div>
     <button class="btn pill" data-find>Show available rooms ${ic.arrow}</button>
-    <p class="hint" style="text-align:center">${beyond()?"Shenba confirms rooms for dates this far ahead.":!BUSY?(AVAIL_ERR?"Could not check rooms just now":"Checking which rooms are free…"):`${free.length} of 9 rooms free on your dates`}</p></div></div>`}
+    <p class="hint" style="text-align:center">${beyond()?"Shenba confirms rooms for dates this far ahead.":!BUSY?(AVAIL_ERR?"Could not check rooms just now":"Checking which rooms are free…"):(free.length<=3?`<b class="lowleft">${ic.clock} Only ${free.length} room${free.length>1?"s":""} left on your dates</b>`:`${free.length} of 9 rooms free on your dates`)}</p>${planRe}</div></div>`}
 V.home=()=>{const prop=[HERO],order=slideOrder();return `
   ${topTabs()}
   <header class="homehead gut"><div><p class="lead2">${sm(ic.pin)} Vairams Nagar, Courtallam</p><h1>Kutralam Ezhilagam</h1></div>${ACCOUNT?`<button class="wb" data-tab="bookings">${avatar(ACCOUNT,34)}<span>Welcome back,<b>${esc(ACCOUNT.given||firstName(ACCOUNT.name))}</b></span></button>`:""}</header>
@@ -1329,17 +1363,21 @@ V.pay=()=>{if(ACCOUNT&&!S.name)S.name=ACCOUNT.name||"";const set=picked(),q=quot
       :`<div class="paynote">${ic.shieldok}<div><b>Pay once, nothing at the desk</b><span>Your full stay is paid now, so check-in takes a minute.</span></div></div>`}
   </section>
   </div>
-  <ul class="trust rise gut" style="--i:3"><li>${sm(ic.lock)} Secure payment by Razorpay · UPI, cards, net banking</li><li>${sm(ic.chat)} Booking voucher on WhatsApp right after payment</li><li>${sm(ic.shield)} Photo ID for every adult at check-in · alcohol &amp; smoke free</li><li>${sm(ic.mic)} Questions first? <button class="link" data-shenba style="padding:0">Talk with Shenba</button></li></ul>`};
+  <ul class="trust rise gut" style="--i:3"><li>${sm(ic.lock)} Secure payment by Razorpay · UPI, cards, net banking</li><li>${sm(ic.chat)} Booking voucher on WhatsApp right after payment</li><li>${sm(ic.shield)} Photo ID for every adult at check-in · alcohol &amp; smoke free</li><li>${sm(ic.chat)} Prefer WhatsApp? <a class="link" href="https://wa.me/${SHENBA_WA}?text=${encodeURIComponent(`Vanakkam Shenba! I'd like to book ${S.pick.join(" + ")||"a room"} at Kutralam Ezhilagam.\nDates: ${fmt(S.checkIn)} – ${fmt(S.checkOut)} (${nights()}N)\nGuests: ${guestLine()}\nPlease help me confirm.`)}" target="_blank" rel="noopener" style="padding:0">Book with Shenba</a></li></ul>`};
 
 V.done=()=>{const b=S.lastReceipt;if(!b)return V.bookings();
   const embed=document.documentElement.classList.contains("embed");
   if(embed)return `<div class="bar gut"><span></span><h1>Thank you</h1><span></span></div>
   <div class="gut stack done ethanks" style="padding-top:18px">
-    <img class="etlogo" src="img/logo-gold.webp" alt="Kutralam Ezhilagam">
-    <div class="etshen"><img src="${SHENBA_IMG}" alt="Shenba"><i></i></div>
-    <h2 style="margin:0">Thank you${b.given?`, ${esc(b.given)}`:""}!</h2>
-    <p class="muted" style="margin:0;max-width:30ch">Thanks for trusting our brand — <b>Kutralam Ezhilagam</b>. ${esc(b.room)} is yours for ${esc(b.dates)}; your voucher is on its way on WhatsApp.</p>
-    ${receiptCard(b,true)}
+    <div class="donewrap">
+      <div class="donehello">
+        <img class="etlogo" src="img/logo-gold.webp" alt="Kutralam Ezhilagam">
+        <div class="etshen"><img src="${SHENBA_IMG}" alt="Shenba"><i></i></div>
+        <h2 style="margin:0">Thank you${b.given?`, ${esc(b.given)}`:""}!</h2>
+        <p class="muted" style="margin:0;max-width:30ch">Thanks for trusting our brand — <b>Kutralam Ezhilagam</b>. ${esc(b.room)} is yours for ${esc(b.dates)}; your voucher is on its way on WhatsApp.</p>
+      </div>
+      <div class="doneside">${receiptCard(b,true)}${doneActions(b)}</div>
+    </div>
     <button class="btn pill" data-tab="home" data-reset>Back to home</button></div>`;
   return `<div class="bar gut"><span></span><h1>Booking confirmed</h1><span></span></div>
   <div class="gut stack done" style="padding-top:22px"><div class="tick pop">${ic.check}</div>
@@ -1347,8 +1385,14 @@ V.done=()=>{const b=S.lastReceipt;if(!b)return V.bookings();
     <p class="muted" style="margin:0;max-width:34ch">${esc(b.room)} is yours for ${esc(b.dates)}. See you in Courtallam.</p>
     ${receiptCard(b,true)}
     <p class="muted" style="margin:0;font-size:13px;max-width:36ch">Your voucher is on its way on WhatsApp to +91 ${esc(b.phone)}.${b.emailed?` A copy of this receipt was emailed to ${esc(b.email)}.`:b.email?` This receipt is saved to ${esc(b.email)}'s bookings.`:""}</p>
+    ${doneActions(b)}
     <div class="copyrow muted">Booking desk <code>${DESK}</code><button class="small-btn" data-copy="${DESK}">Copy</button></div>
     <button class="btn out pill" data-tab="bookings">See all my bookings</button></div>`};
+/* v11.2: quick actions on the confirmation — one-tap call to reception and add-the-stay-to-calendar */
+function doneActions(b){const ymd=d=>d?d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0"):"";
+  const ci=S.checkIn,co=S.checkOut;const gcal=ci&&co?`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Stay at Kutralam Ezhilagam")}&dates=${ymd(ci)}/${ymd(co)}&details=${encodeURIComponent("Booking "+(b.bookingId||b.ref||"")+" · "+(b.room||"")+" · "+(b.guests||"")+". Check-in 12 PM, check-out 10 AM.")}&location=${encodeURIComponent("No 46, Vairams Nagar, Five Falls Road, Courtallam")}`:"";
+  const phone=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>`;
+  return `<div class="etact"><a class="btn out pill" href="tel:+918248320685">${phone} Call reception</a>${gcal?`<a class="btn out pill" href="${gcal}" target="_blank" rel="noopener">${sm(ic.cal)} Add to calendar</a>`:""}</div>`}
 function receiptCard(b,open){return `<article class="rcpt${open?" open":""}"><header><div><span>Booking ID</span><b class="num">${esc(b.bookingId||"Confirming…")}</b></div><span class="pill ${/cancel/i.test(b.status||"")?"grey":b.balance>0?"amber":"green"}">${/cancel/i.test(b.status||"")?"Cancelled":b.balance>0?"Advance paid":"Paid in full"}</span></header>
   <div class="prow">${ic.bed}<span>Room</span><b>${esc(b.room)}</b></div>
   <div class="prow">${ic.cal}<span>Stay</span><b class="num">${esc(b.dates)}</b></div>
@@ -1532,6 +1576,8 @@ function render(){
     const h=$("#phint"),ok=phoneOk();if(h){h.className=ok?"good":v.length===10?"bad":"";h.textContent=!v?"Your booking voucher comes here":v.length<10?`${v.length} of 10 digits`:ok?"✓ We'll send your voucher here":"A mobile number starts with 6, 7, 8 or 9"}refreshPayCta()};
   if(GSI_READY)drawGoogleButtons();else if(document.querySelector(".gbtn"))loadGsi().then(ok=>ok?drawGoogleButtons():render());
   emitCta();
+  /* v11.2: remember dates + guests so a guest who leaves and returns finds them prefilled */
+  try{if(S.checkIn)store.set("plan",{ci:+S.checkIn,co:+(S.checkOut||0),a:S.adults,t:S.teens,k:S.kids});}catch(e){}
 }
 /* ---------- v10.7: hand the primary step button to the desktop frame (outside the iPad) ---------- */
 const IS_EMBED=document.documentElement.classList.contains("embed");
@@ -1648,6 +1694,9 @@ $("#sheet").querySelector("[aria-label=Close]").innerHTML=ic.close;
 $("#sheet a.p").insertAdjacentHTML("afterbegin",ic.mic);$("#waShenba").insertAdjacentHTML("afterbegin",ic.chat);
 $("#shenImg").src=SHENBA_IMG;$("#shenImg2").src=SHENBA_IMG;
 /* inside the desktop iPad: open straight on date selection, then the wizard follows */
+/* v11.2: resume — restore a still-valid saved stay (checkout today or later) so returning guests
+   don't re-enter dates/guests */
+(function(){try{const sp=store.get("plan",null);if(sp&&sp.ci){const end=new Date(sp.co||sp.ci);end.setHours(23,59,59,999);if(end>=today){S.checkIn=new Date(sp.ci);S.checkOut=sp.co?new Date(sp.co):null;if(sp.a!=null)S.adults=sp.a;if(sp.t!=null)S.teens=sp.t;if(sp.k!=null)S.kids=sp.k;S.month=new Date(S.checkIn.getFullYear(),S.checkIn.getMonth(),1);}}}catch(e){}})();
 if(document.documentElement.classList.contains("embed")){S.plan=1}
 render();startCarousel();loadAvail();if(CFG.GOOGLE_CLIENT_ID){loadGsi();refreshSignin()}else GSI_FAILED=true;
 if(location.hash==="#bookings")go("bookings");
