@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://drive.google.com">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Jost:wght@400;500&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 /* Hand-written, inlined on purpose. The Tailwind play CDN compiles in the
    browser: it is explicitly not for production, it costs a round trip before
@@ -107,17 +107,17 @@ dd.big{font-weight:800;color:var(--brand)}
   font-size:12.5px;font-weight:600;margin:0 0 12px}
 
 .pass{background:var(--brand);color:#fff;border-radius:var(--r);padding:20px;margin-bottom:12px}
-.pass .eyebrow{color:#a7f3d0}
+.pass .eyebrow{color:#f3cd8e}
 .pass h2{margin:4px 0 0;font-size:22px;font-weight:800;line-height:1.15}
-.pass .rooms{margin:2px 0 0;font-size:13px;color:#d1fae5}
+.pass .rooms{margin:2px 0 0;font-size:13px;color:#e9d9bb}
 .passgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;
   padding-top:13px;border-top:1px solid rgba(255,255,255,.25);font-size:13px}
 .passgrid span{display:block;font-size:10px;letter-spacing:.09em;
-  text-transform:uppercase;color:#a7f3d0}
+  text-transform:uppercase;color:#f3cd8e}
 .passgrid b{font-size:14px;font-weight:800}
 .bookno{margin-top:14px;background:rgba(255,255,255,.15);border-radius:12px;padding:10px 13px}
 .bookno b{display:block;font-size:19px;font-weight:800;letter-spacing:.03em}
-.paid{margin:13px 0 0;font-size:12px;color:#d1fae5}
+.paid{margin:13px 0 0;font-size:12px;color:#e9d9bb}
 .btn-dark{display:block;border-radius:var(--r);background:var(--ink);color:#fff;
   padding:14px;text-align:center;font-size:14px;font-weight:800;text-decoration:none;margin-bottom:10px}
 .btn-plain{display:block;width:100%;border-radius:var(--r);background:#fff;
@@ -194,12 +194,12 @@ dd.big{font-weight:800;color:var(--brand)}
    card, no corner radius and no background — it sits directly on whatever is
    behind it. Sized by height rather than width, because height is what has to
    agree with the text under it. */
-.mark{display:block;height:52px;width:auto;max-width:100%;margin:0 auto 8px}
-.markxs{display:block;height:26px;width:auto;flex:none;margin:0}
+.mark{display:block;height:40px;width:auto;max-width:100%;margin:0 auto}
+.markxs{display:block;height:22px;width:auto;flex:none;margin:0;padding:7px 11px;background:#0f2342;border-radius:8px;box-sizing:content-box}
 .hero{display:block;width:100%;height:auto;border-radius:var(--r);
   margin:0 0 14px;background:#e7e5e4}
-header{margin-bottom:10px;text-align:center}
-#modal .mark{height:50px;margin:2px auto 12px}
+#app>header{margin:-20px -16px 18px;text-align:center;background:#0f2342;padding:20px 16px 18px}
+#modal .mark{display:block;width:calc(100% + 40px);height:66px;margin:-22px -20px 18px;padding:0;background:#0f2342;object-fit:contain}
 #modal .eyebrow{text-align:center}
 #modal .mtitle{text-align:center}
 /* the count of steps sits directly under the logo, so the eye goes
@@ -322,12 +322,12 @@ header{margin-bottom:10px;text-align:center}
    blue is the gateway. Same height and weight as the UPI button: one is not
    being nudged over the other. */
 .paycard{display:block;width:100%;border:0;border-radius:var(--r);
-  background:linear-gradient(180deg,#0EA5E9,#0284C7);color:#fff;
+  background:var(--ts-gold-lt);color:#0f2342;
   padding:16px;text-align:center;font-size:15px;font-weight:800;
   font-family:inherit;cursor:pointer;margin:0 0 14px;
-  box-shadow:0 2px 10px rgba(2,132,199,.28)}
-.paycard:active{background:#0369A1;box-shadow:none}
-.paycard:disabled{background:#bae6fd;color:#0c4a6e;box-shadow:none}
+  box-shadow:0 2px 10px rgba(176,125,31,.3)}
+.paycard:active{background:#d49a3e;box-shadow:none}
+.paycard:disabled{background:#e8dcc0;color:#8a7a52;box-shadow:none}
 .payrow dt{font-weight:800;color:var(--ink)}
 .payrow dd.big{font-size:20px}
 .sechead.picked{color:var(--brand)}
@@ -343,14 +343,12 @@ header{margin-bottom:10px;text-align:center}
   --vv-gold-dk:#9A7F42;
   --vv-line:#EDE6D8;
 
-  /* pulled from the logo */
-  --vv-cyan:#00A3E0;
-  --vv-green:#00A651;
-  --vv-red:#ED1C24;
+  /* navy + gold, matching the home page */
+  --vv-cyan:#0f2342;
+  --vv-green:#b07d1f;
+  --vv-red:#0f2342;
 
-  --vv-paid:#0F7A3D;      /* darkened from the logo green: #00A651 on cream is
-                          2.4:1 and fails on a phone in daylight. The brand
-                          green stays for rules and dots, never for a value. */
+  --vv-paid:#0f2342;      /* paid values in navy */
   --vv-r:16px;
   --vv-serif:"Cormorant Garamond","Times New Roman",Georgia,serif;
 }
@@ -397,21 +395,22 @@ header{margin-bottom:10px;text-align:center}
 #vcard .v-pad{padding:26px 20px 22px}
 
 /* ── Header ───────────────────────────────────────────────────────────── */
-#vcard .v-hdr{text-align:center}
+#vcard .v-hdr{text-align:center;background:#0f2342;margin:-26px -20px 0;padding:24px 20px 20px}
+#vcard .v-logo{height:40px;width:auto;display:block;margin:0 auto 14px}
 #vcard .v-hdr h1{
   margin:0;font-family:var(--vv-serif);font-weight:700;
   font-size:clamp(26px,7.6vw,32px);line-height:1.1;
-  letter-spacing:.14em;color:var(--vv-gold-dk);
+  letter-spacing:.14em;color:#e3ad5f;
 }
 #vcard .v-hdr h2{
   margin:8px 0 0;font-size:clamp(15px,4.2vw,17px);font-weight:800;
-  letter-spacing:.19em;color:var(--vv-ink);
+  letter-spacing:.19em;color:#f3cd8e;
 }
 #vcard .v-tick{
   display:inline-flex;align-items:center;justify-content:center;gap:7px;
   margin-top:12px;padding:6px 14px;border-radius:99px;
-  background:rgba(15,122,61,.09);border:1px solid rgba(15,122,61,.28);
-  font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--vv-paid);
+  background:rgba(243,205,142,.14);border:1px solid rgba(243,205,142,.42);
+  font-size:12px;font-weight:800;letter-spacing:.06em;color:#f3cd8e;
 }
 #vcard .v-tick svg{width:13px;height:13px}
 
@@ -424,7 +423,7 @@ header{margin-bottom:10px;text-align:center}
 
 /* ── Brand ────────────────────────────────────────────────────────────── */
 #vcard .v-brand{text-align:center}
-#vcard .v-brand img{width:186px;max-width:62%;height:auto;display:block;margin:0 auto}
+#vcard .v-brand img{display:none}
 #vcard .v-brand p{
   margin:10px 0 0;font-size:10.5px;font-weight:700;letter-spacing:.16em;
   text-transform:uppercase;color:var(--vv-gold-dk);
@@ -476,8 +475,8 @@ header{margin-bottom:10px;text-align:center}
 #vcard .v-sm{margin:3px 0 0;font-size:13.5px;color:var(--vv-ink-2)}
 #vcard .v-room{
   display:inline-block;margin:0;padding:3px 10px;border-radius:99px;
-  background:rgba(0,163,224,.10);border:1px solid rgba(0,163,224,.30);
-  font-size:13.5px;font-weight:800;color:#04627F;
+  background:rgba(15,35,66,.08);border:1px solid rgba(15,35,66,.28);
+  font-size:13.5px;font-weight:800;color:#0f2342;
 }
 #vcard .v-addr{
   margin:0;padding:12px 15px 14px;border-top:1px solid var(--vv-line);
@@ -500,8 +499,8 @@ header{margin-bottom:10px;text-align:center}
 #vcard .v-v.v-due{color:#8A5A12}
 #vcard .v-badge{
   display:inline-block;padding:4px 12px;border-radius:99px;font-size:13px;
-  font-weight:800;background:rgba(15,122,61,.10);color:var(--vv-paid);
-  border:1px solid rgba(15,122,61,.30);
+  font-weight:800;background:rgba(197,168,105,.16);color:#0f2342;
+  border:1px solid rgba(197,168,105,.42);
 }
 #vcard .v-badge.v-part{background:rgba(138,90,18,.10);color:#8A5A12;
   border-color:rgba(138,90,18,.32)}
@@ -535,11 +534,11 @@ header{margin-bottom:10px;text-align:center}
 /* ── Footer ───────────────────────────────────────────────────────────── */
 #vcard .v-foot{margin-top:18px;text-align:center}
 #vcard .v-foot .v-terms{margin:0;font-size:11.5px;line-height:1.6;color:var(--vv-ink-3)}
-#vcard .v-foot .v-terms b{color:#9A3412}
+#vcard .v-foot .v-terms b{color:#0f2342}
 #vcard .v-wa{
   display:flex;align-items:center;justify-content:center;gap:10px;
   margin-top:14px;min-height:52px;padding:11px 18px;border-radius:13px;
-  background:#0F7A3D;color:#fff;text-decoration:none;
+  background:#0f2342;color:#f3cd8e;text-decoration:none;
   font-size:15px;font-weight:800;line-height:1.25;
 }
 #vcard .v-wa small{display:block;font-size:13px;font-weight:700;opacity:.9;
@@ -655,41 +654,41 @@ header{margin-bottom:10px;text-align:center}
 
 /* ══ v5.0 booking theme — the same sand, taupe, red and Caslon as the home page.
    Layout and every step are unchanged; only colour, type and edges move. ══ */
-:root{--ink:#544f45;--mute:#7b7466;--line:rgba(84,79,69,.2);--bg:#f1ecde;--card:#fbf6ec;--brand:#93836c;--brand-dk:#7a6b56;--gold:#a62a23;--r:2px;
-  --ts-serif:"Libre Caslon Text","Adobe Caslon Pro",Georgia,"Times New Roman",serif;--ts-red:#a62a23;--ts-sand2:#e8dfd1}
-body{background:var(--bg);color:var(--ink);font-family:"Helvetica Neue",Helvetica,Arial,ui-sans-serif,sans-serif}
-.eyebrow,.stepof,.sechead,.lbl,.railhead,.qrhead,.tag{color:var(--ts-red)!important;font-weight:400!important;letter-spacing:.12em!important;text-transform:uppercase}
-.sechead.picked{color:var(--ts-red)}
-.tag.gold{color:#7a6b56!important}
-h1,.mtitle,.sheetbar h2,.waitcard h2,.opt h3,.pass h2,.vname,.empty b{font-family:var(--ts-serif)!important;font-weight:400!important;letter-spacing:0!important}
+:root{--ink:#22314c;--mute:#6b7488;--line:rgba(15,35,66,.15);--bg:#efe7d6;--card:#fbf6ec;--brand:#0f2342;--brand-dk:#0a1830;--gold:#c0902f;--r:4px;
+  --ts-serif:"DM Serif Display","Libre Caslon Text",Georgia,"Times New Roman",serif;--ts-red:#0f2342;--ts-gold:#b07d1f;--ts-gold-lt:#e3ad5f;--ts-sand2:#efe6d3}
+body{background:var(--bg);color:var(--ink);font-family:"Jost","Helvetica Neue",Helvetica,Arial,ui-sans-serif,sans-serif}
+.eyebrow,.stepof,.sechead,.lbl,.railhead,.qrhead,.tag{color:var(--ts-gold)!important;font-weight:500!important;letter-spacing:.14em!important;text-transform:uppercase}
+.sechead.picked{color:var(--ts-gold)}
+.tag.gold{color:var(--brand)!important}
+h1,.mtitle,.sheetbar h2,.waitcard h2,.opt h3,.pass h2,.vname,.empty b{font-family:var(--ts-serif)!important;font-weight:400!important;letter-spacing:0!important;color:var(--brand)}
 .mtitle{font-size:26px}
 .opt h3{font-size:19px}
-.steps li{border-radius:0;background:transparent;color:var(--mute);border-bottom:1px solid var(--line);font-weight:400;letter-spacing:.12em;text-transform:uppercase}
-.steps li.on{background:transparent;color:var(--ink);border-bottom:2px solid var(--ts-red)}
-.steps li.done{background:transparent;color:var(--brand);border-bottom:2px solid var(--brand)}
-.card,.opt,.qrbox,.waitcard{background:var(--card);border-color:var(--line);border-radius:2px}
-.opt.on{background:#544f45;border-color:#544f45}
-.opt.on .tag{color:#e8c9a8!important}
-.roomrow.on{background:#efe5d3;border-color:var(--brand)}
+.steps li{border-radius:0;background:transparent;color:var(--mute);border-bottom:1px solid var(--line);font-weight:500;letter-spacing:.12em;text-transform:uppercase}
+.steps li.on{background:transparent;color:var(--brand);border-bottom:2px solid var(--ts-gold)}
+.steps li.done{background:transparent;color:var(--ts-gold);border-bottom:2px solid var(--ts-gold)}
+.card,.opt,.qrbox,.waitcard{background:var(--card);border-color:var(--line);border-radius:12px}
+.opt.on{background:var(--brand);border-color:var(--brand)}
+.opt.on .tag{color:var(--ts-gold-lt)!important}
+.roomrow.on{background:#f6edd8;border-color:var(--ts-gold)}
 .roomrow .price,.price{font-family:var(--ts-serif);font-weight:400}
-.rec{background:var(--ts-sand2);color:var(--ts-red);border-radius:0}
-.more,.roomrow.on .more{color:var(--ts-red);font-weight:400;letter-spacing:.06em;text-transform:uppercase;font-size:10.5px}
-dd.big{color:var(--ts-red)}
-input[type=date],input[type=text],input[type=tel],input[type=number],select{border:0;border-bottom:1px solid var(--ink);border-radius:0;background:transparent;padding:10px 2px;font-family:var(--ts-serif);font-weight:400;font-size:18px}
-input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-red)}
-.x{border-radius:2px;background:var(--ts-sand2);color:var(--ink)}
-#next,.mgo,.pay,.sheetfoot button,.btn-dark{border-radius:2px;background:var(--brand);font-weight:400;letter-spacing:.12em;text-transform:uppercase;font-size:13.5px}
+.rec{background:#f1e7d0;color:var(--brand);border-radius:999px}
+.more,.roomrow.on .more{color:var(--ts-gold);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:10.5px}
+dd.big{color:var(--brand)}
+input[type=date],input[type=text],input[type=tel],input[type=number],select{border:0;border-bottom:1px solid rgba(15,35,66,.38);border-radius:0;background:transparent;padding:10px 2px;font-family:var(--ts-serif);font-weight:400;font-size:18px;color:var(--brand)}
+input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-gold)}
+.x{border-radius:8px;background:#efe6d3;color:var(--ink)}
+#next,.mgo,.pay,.sheetfoot button,.btn-dark{border-radius:9px;background:var(--brand);color:var(--ts-gold-lt);font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-size:13.5px}
 #next:hover,.mgo:hover,.pay:hover{background:var(--brand-dk)}
-#next:disabled,.pay.off{background:#d6cdbd}
-.paycard{border-radius:2px;letter-spacing:.12em;text-transform:uppercase;font-weight:400;font-size:13.5px}
-.btn-plain{border-radius:2px;background:var(--card)}
+#next:disabled,.pay.off{background:#c9c3b4;color:#fff}
+.paycard{border-radius:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;font-size:13.5px}
+.btn-plain{border-radius:9px;background:var(--card)}
 #bar,.sheetfoot{background:rgba(251,246,236,.97);border-top-color:var(--line)}
-#back{color:var(--mute);letter-spacing:.1em;text-transform:uppercase;font-weight:400;font-size:12px}
-.pm button{border-radius:0;border-color:var(--ink);background:transparent}
+#back{color:var(--mute);letter-spacing:.1em;text-transform:uppercase;font-weight:500;font-size:12px}
+.pm button{border-radius:8px;border-color:rgba(15,35,66,.45);background:transparent;color:var(--brand)}
 .pm b{font-family:var(--ts-serif);font-weight:400}
 .cnt{border-bottom-color:var(--line)}
-#modal{background:rgba(40,32,22,.45);align-items:flex-start;padding:0}
-#modal .mpanel{max-width:none;border-radius:0;background:var(--ts-sand2);padding:28px 24px 40px;animation:tsDrop .7s cubic-bezier(.77,0,.18,1) both;box-shadow:0 30px 60px rgba(40,32,22,.25)}
+#modal{background:rgba(10,24,48,.5);align-items:flex-start;padding:0}
+#modal .mpanel{max-width:none;border-radius:0;background:var(--card);padding:28px 24px 40px;animation:tsDrop .7s cubic-bezier(.77,0,.18,1) both;box-shadow:0 30px 60px rgba(10,24,48,.3)}
 #modal .mpanel>*{max-width:560px;margin-left:auto;margin-right:auto}
 #modal .mgo{max-width:560px;display:block}
 @keyframes tsDrop{from{transform:translateY(-100%)}to{transform:none}}
@@ -700,21 +699,26 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-red)}
 /* the desktop photo panel in the warm palette */
 @media (min-width:1024px){
   body{background:var(--bg)}
-  .dk-side{background:#3d362e}
-  .dk-side::before{background:linear-gradient(180deg,rgba(61,54,46,.55) 0%,rgba(61,54,46,.1) 30%,rgba(61,54,46,.55) 62%,rgba(45,39,32,.92) 100%)}
-  .dk-logo{border-radius:2px;background:#fbf6ec}
-  .dk-over{color:#e8c9a8} .dk-over::before{background:#e8c9a8}
+  .dk-side{background:#0a1830}
+  .dk-side::before{background:linear-gradient(180deg,rgba(10,20,40,.5) 0%,rgba(10,20,40,.1) 30%,rgba(10,20,40,.5) 62%,rgba(8,16,32,.94) 100%)}
+  .dk-logo{align-self:stretch;border-radius:0;background:#0f2342;box-shadow:none;margin:-34px calc(-1*clamp(28px,3vw,48px)) 30px;padding:22px clamp(28px,3vw,48px)}
+  .dk-logo img{height:46px}
+  .dk-over{color:var(--ts-gold-lt)} .dk-over::before{background:var(--ts-gold-lt)}
   .dk-h{font-family:var(--ts-serif)!important;font-weight:400}
-  .dk-pts li::before{background-color:#93836c}
-  .dk-calls a,.dk-shenba{border-radius:2px}
-  .dk-calls svg{color:#93836c}
+  .dk-h em{color:var(--ts-gold-lt)}
+  .dk-pts li::before{background-color:var(--ts-gold)}
+  .dk-calls a,.dk-shenba{border-radius:12px}
+  .dk-calls svg{color:var(--brand)}
+  .dk-shenba img{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ts-gold-lt)}
+  .dk-rules b{color:var(--ts-gold-lt)}
   .steps li{padding:10px 6px}
   #modal{padding-left:var(--side)}
+  #modal .mark{display:none}
 }
 
 /* v5.2b: the note above the single pay button */
 #bar .paynote{max-width:460px;margin:0 auto 10px;text-align:center;display:grid;gap:2px;font-size:12px;line-height:1.45;color:#7b7466}
-#bar .paynote>b{font-weight:400;letter-spacing:.12em;text-transform:uppercase;font-size:11.5px;color:#a62a23}
+#bar .paynote>b{font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-size:11.5px;color:var(--ts-gold)}
 #bar .paynote span b{color:#544f45;letter-spacing:.03em}
 @media (min-width:1024px){#bar .paynote{max-width:708px} section.step:has(#part){max-width:620px}}
 .wrap{padding-bottom:190px}
@@ -722,9 +726,9 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-red)}
 /* v5.4 floor / no-lift tags */
 .paroom{margin:4px 0 0;font-size:17px;font-weight:400;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 8px}
 .pafl{font:400 11.5px/1.3 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#7b7466}
-.nolift{font:400 11px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:#a62a23;padding:4px 8px;border-radius:2px}
+.nolift{font:500 11px/1 "Jost","Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--brand);padding:4px 8px;border-radius:6px}
 #vcard .v-room{white-space:normal;line-height:1.35}
-.roomrow p b.nl{font-weight:400;color:#a62a23;letter-spacing:.04em}
+.roomrow p b.nl{font-weight:500;color:var(--brand);letter-spacing:.04em}
 
 /* v8.9: chosen rooms on top with a swipe gallery; no-A/C rooms when A/C is ticked */
 .opt .why{color:var(--ts-red,var(--brand));font-weight:600;margin-top:3px}
@@ -747,8 +751,8 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-red)}
 .selroom .sact2{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .selroom .more{border:0;background:none;padding:0;cursor:pointer;font-size:12px;font-weight:600;color:var(--ts-red,var(--brand));letter-spacing:.06em;text-transform:uppercase}
 .selroom .unpick{border:1.5px solid var(--ts-red,var(--ink));background:none;color:var(--ts-red,var(--ink));border-radius:999px;padding:8px 16px;font-weight:600;cursor:pointer}
-.roomrow.noac{cursor:default;opacity:1;background:#f4f7fb}
-.roomrow.noac .noacb{font:600 10px/1 system-ui,sans-serif;color:#2c6fa8;background:#e3eef8;padding:4px 7px;border-radius:999px;margin-left:4px;vertical-align:3px}
+.roomrow.noac{cursor:default;opacity:1;background:#f3ece0}
+.roomrow.noac .noacb{font:600 10px/1 system-ui,sans-serif;color:var(--brand);background:#ece3cf;padding:4px 7px;border-radius:999px;margin-left:4px;vertical-align:3px}
 .roomrow.noac .acmsg{color:var(--ink);margin-top:5px}
 .acswap{margin-left:auto;flex:none;border:0;cursor:pointer;background:var(--ts-red,var(--ink));color:#fff;font-weight:600;font-size:13px;padding:10px 14px;border-radius:999px}
 
@@ -759,11 +763,11 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-red)}
 #cfsheet .cfbox{position:relative;width:min(460px,calc(100% - 20px));margin-top:10px;background:var(--ts-sand2,#fff);color:var(--ink);padding:18px 18px 14px;box-shadow:0 24px 60px rgba(30,15,5,.35);max-height:calc(100dvh - 20px);overflow:auto;animation:cfIn .45s cubic-bezier(.16,1,.3,1) both}
 @keyframes cfIn{from{opacity:0;transform:translateY(-14px)}}
 @media (min-width:900px){#cfsheet{justify-content:flex-start;align-items:center}#cfsheet .cfbox{margin:0 0 0 max(24px,calc(50% - 700px))}}
-#cfsheet .cfhead{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding-bottom:10px;border-bottom:1px solid rgba(0,0,0,.12)}
-#cfsheet .cflogo{height:36px;width:auto}
-#cfsheet h2{margin:0;font:400 22px/1.1 Georgia,"Times New Roman",serif;color:var(--ts-red,#7a1f2b)}
-#cfsheet small{font-size:11px;color:var(--mute)}
-#cfsheet .cfx{width:36px;height:36px;border:0;border-radius:50%;background:rgba(0,0,0,.06);font-size:22px;cursor:pointer;color:var(--ts-red,#7a1f2b)}
+#cfsheet .cfhead{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;margin:-18px -18px 14px;padding:15px 18px;background:#0f2342}
+#cfsheet .cflogo{height:28px;width:auto}
+#cfsheet h2{margin:0;font:400 22px/1.1 "DM Serif Display",Georgia,serif;color:#fff}
+#cfsheet small{font-size:11px;color:rgba(243,205,142,.8)}
+#cfsheet .cfx{width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.14);font-size:22px;cursor:pointer;color:#f3cd8e}
 #cfsheet .cfroom{display:flex;flex-direction:column;gap:6px;margin:12px 0 8px}
 #cfsheet .cfroom div{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:#fff;padding:9px 12px}
 #cfsheet .cfroom b{font:400 19px Georgia,serif}
@@ -787,7 +791,7 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-red)}
 <!-- v4.1 desktop side panel: shown only on screens 1024px and wider -->
 <aside class="dk-side" aria-label="About Kutralam Ezhilagam">
   <img class="dk-bg" src="img/hero.webp" alt="" aria-hidden="true">
-  <a class="dk-logo" href="/"><img src="img/logo-hd.webp" alt="Kutralam Ezhilagam home" width="484" height="163"></a>
+  <a class="dk-logo" href="/"><img src="img/logo-gold.webp" alt="Kutralam Ezhilagam home" width="490" height="174"></a>
   <div>
     <p class="dk-over">Book direct &middot; Courtallam</p>
     <h2 class="dk-h">Nine rooms,<br>a short walk from the <em>Main Falls</em></h2>
@@ -1380,8 +1384,8 @@ function render() {
   app.innerHTML = "";
   app.appendChild($(`
     <header>
-      <img class="mark" src="img/logo.webp" alt="Kutralam Ezhilagam"
-        width="480" height="164" fetchpriority="high">
+      <img class="mark" src="img/logo-gold.webp" alt="Kutralam Ezhilagam"
+        width="490" height="174" fetchpriority="high">
       <p class="sub">Courtallam · nine rooms by the falls</p>
     </header>`));
 
@@ -1678,8 +1682,8 @@ function openModal() {
   const wrap = $(`<div id="modal"><div class="mpanel"></div></div>`);
   const panel = wrap.querySelector(".mpanel");
 
-  panel.appendChild($(`<img class="mark" src="img/logo.webp"
-    alt="Kutralam Ezhilagam" width="480" height="164">`));
+  panel.appendChild($(`<img class="mark" src="img/logo-gold.webp"
+    alt="Kutralam Ezhilagam" width="490" height="174">`));
 
   if (S.modal === 1) {
     panel.appendChild($(`
@@ -1796,7 +1800,7 @@ function openRoom(name) {
 
   panel.appendChild($(`
     <div class="sheetbar">
-      <img class="markxs" src="img/logo.webp" alt="Kutralam Ezhilagam" width="480" height="164">
+      <img class="markxs" src="img/logo-gold.webp" alt="Kutralam Ezhilagam" width="490" height="174">
       <h2>${r.name}</h2>
       <button class="x" aria-label="Close">×</button>
     </div>`));
@@ -2183,7 +2187,7 @@ function payByCard(btn) {
   let el = document.getElementById("cfsheet");
   if (!el) { el = document.createElement("div"); el.id = "cfsheet"; document.body.appendChild(el); }
   el.innerHTML = `<div class="cfbg" data-cfx></div><div class="cfbox" role="dialog" aria-modal="true" aria-labelledby="cfT">
-    <div class="cfhead"><img src="img/logo-hd.webp" alt="Kutralam Ezhilagam" class="cflogo"><div><h2 id="cfT">Confirm your booking</h2>
+    <div class="cfhead"><img src="img/logo-gold.webp" alt="Kutralam Ezhilagam" class="cflogo"><div><h2 id="cfT">Confirm your booking</h2>
       <small>${S.ref ? "Ref " + esc(S.ref) + " · " : ""}voucher on WhatsApp after payment</small></div><button type="button" class="cfx" data-cfx aria-label="Back to edit">&times;</button></div>
     <div class="cfroom">${rooms.map(r => `<div><b>${esc(r.name)}</b><span>${r.type} · ${r.floor} floor · ${S.wantAc && r.ac ? "A/C" : "Non-A/C"}</span></div>`).join("")}</div>
     <div class="cfgrid">${row("Check-in", day(S.checkIn) + "<small>12:00 PM</small>")}${row("Check-out", day(S.checkOut) + "<small>10:00 AM</small>")}
@@ -2469,6 +2473,7 @@ function stepDone(app) {
         <div class="v-pad">
 
           <header class="v-hdr">
+            <img class="v-logo" src="img/logo-gold.webp" alt="Kutralam Ezhilagam">
             <h1>PAYMENT SUCCESSFUL</h1>
             <h2>BOOKING CONFIRMED</h2>
             <p class="v-tick">
