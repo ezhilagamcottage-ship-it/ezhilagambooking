@@ -1104,8 +1104,31 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
 /* ── reservation panel ── */
 #tsBook{position:fixed;inset:0;z-index:120;visibility:hidden;pointer-events:none}
 #tsBook .veil{position:absolute;inset:0;background:rgba(40,32,22,.45);opacity:0;transition:opacity .6s}
-#tsBook .pan{position:absolute;left:var(--ts-rail);right:0;top:0;background:var(--ts-sand2);padding:36px max(24px,env(safe-area-inset-right)) 54px max(24px,env(safe-area-inset-left));
-  transform:translateY(-102%);transition:transform .8s cubic-bezier(.77,0,.18,1);box-shadow:0 30px 60px rgba(40,32,22,.25)}
+#tsBook{display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px}
+/* the booking frame: one navy + gold bordered panel that holds the whole flow */
+#tsBook .pan{position:relative;left:auto;right:auto;top:auto;width:min(960px,94vw);max-height:min(92vh,920px);display:flex;flex-direction:column;overflow:hidden;
+  background:var(--ts-cream);border-radius:16px;border:2px solid #c0902f;box-shadow:0 0 0 1.5px #0f2342,0 40px 80px rgba(10,24,48,.4);
+  opacity:0;transform:translateY(18px) scale(.985);transition:opacity .5s cubic-bezier(.16,1,.3,1),transform .5s cubic-bezier(.16,1,.3,1)}
+#tsBook.on .pan{opacity:1;transform:none}
+.tsfr-head{display:flex;align-items:center;gap:14px;padding:14px 18px;background:#0f2342;flex:none}
+.tsfr-head .tsfr-logo{height:26px;width:auto}
+.tsfr-head h2{margin:0;flex:1;font:400 20px/1.1 "DM Serif Display",var(--ts-serif);color:#fff;letter-spacing:0;text-transform:none}
+.tsfr-back{border:0;background:rgba(255,255,255,.1);color:#f3cd8e;font:600 12px/1 "Jost",var(--ts-sans);letter-spacing:.04em;padding:9px 14px;border-radius:999px;cursor:pointer}
+.tsfr-back:hover{background:rgba(255,255,255,.18)}
+.tsfr-x{width:36px;height:36px;flex:none;border:0;border-radius:50%;background:rgba(255,255,255,.14);color:#f3cd8e;font-size:22px;line-height:1;cursor:pointer}
+.tsfr-x:hover{background:rgba(255,255,255,.24)}
+.tsfr-body{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.ts-pick{padding:clamp(22px,4vw,46px) clamp(20px,4vw,52px) 32px;overflow:auto}
+.tsfr-frame{flex:1;width:100%;border:0;display:block;background:var(--ts-cream)}
+/* navy + gold repaint of the picker inside the frame */
+#tsBook .ts-fields{margin-top:0}
+#tsBook .ts-f .lb{color:#b07d1f}
+#tsBook .ts-dd{border-bottom-color:#0f2342;color:#0f2342}
+#tsBook .ts-f.open .ts-dd{color:#b07d1f}
+#tsBook .ts-pop .opt.sel{color:#0f2342;background:#f1e7d0}
+#tsBook .ts-go .ts-btn{background:#0f2342;color:#e3ad5f;border-radius:999px;min-height:54px;letter-spacing:.12em}
+#tsBook .ts-go .ts-btn:hover{background:#0a1830}
+#tsBook .ts-note{color:#6b7488}
 #tsBook.on{visibility:visible;pointer-events:auto}
 #tsBook.on .veil{opacity:1}
 #tsBook.on .pan{transform:none}
@@ -1189,7 +1212,8 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   .ts-room:nth-child(even){margin-top:0}
   .ts-fg{grid-template-columns:1fr 1fr}
   .ts-foot{padding-bottom:190px}
-  #tsBook .pan{top:0;max-height:100svh;overflow:auto;padding-top:22px}
+  #tsBook{padding:0}
+  #tsBook .pan{width:100%;max-height:100svh;height:100svh;border-radius:0;border:0;box-shadow:none}
   .ts-fields{grid-template-columns:1fr 1fr;gap:26px 22px;margin-top:26px}
   .ts-close{margin-left:0}
   .ts-dd{font-size:22px}
@@ -1733,7 +1757,14 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
 <div id="tsBook" role="dialog" aria-modal="true" aria-label="Reserve a room">
   <div class="veil" data-close></div>
   <div class="pan">
-    <button type="button" class="ts-close ts-cap" data-close>Close</button>
+    <div class="tsfr-head">
+      <img src="img/logo-gold.webp" alt="Kutralam Ezhilagam" class="tsfr-logo">
+      <h2 id="tsfrTitle">Reserve your stay</h2>
+      <button type="button" class="tsfr-back" id="tsfrBack" hidden>&larr; Dates</button>
+      <button type="button" class="tsfr-x" data-close aria-label="Close">&times;</button>
+    </div>
+    <div class="tsfr-body">
+      <div class="ts-pick" id="tsPick">
     <div class="ts-fields">
       <div class="ts-f" data-f="ci"><span class="lb ts-cap">Arrival</span><span class="age"></span><button type="button" class="ts-dd"><span></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 5.5l6 6 6-6"/></svg></button><div class="ts-pop"></div></div>
       <div class="ts-f" data-f="co"><span class="lb ts-cap">Departure</span><span class="age"></span><button type="button" class="ts-dd"><span></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 5.5l6 6 6-6"/></svg></button><div class="ts-pop"></div></div>
@@ -1742,6 +1773,9 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
     </div>
     <div class="ts-go"><button type="button" class="ts-btn" id="tsCheck">Check rates</button></div>
     <p class="ts-note">You'll see the rooms free for your dates next, then pay a small advance by UPI or card.</p>
+      </div>
+      <iframe class="tsfr-frame" id="tsFrame" title="Your booking" hidden></iframe>
+    </div>
   </div>
 </div>
 
@@ -3842,13 +3876,32 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   });
   $("tsBook").addEventListener("click", function () { closeAll(); });
   function openBook() { closeAll(); label(); $("tsBook").classList.add("on"); document.body.style.overflow = "hidden"; }
-  function closeBook() { closeAll(); $("tsBook").classList.remove("on"); document.body.style.overflow = ""; }
+  /* reset the frame back to the date picker (used on close and on "Dates") */
+  function frameToPicker() {
+    var fr = $("tsFrame"); if (fr) { fr.hidden = true; fr.removeAttribute("src"); }
+    if ($("tsPick")) $("tsPick").hidden = false;
+    if ($("tsfrTitle")) $("tsfrTitle").textContent = "Reserve your stay";
+    if ($("tsfrBack")) $("tsfrBack").hidden = true;
+  }
+  function closeBook() { closeAll(); $("tsBook").classList.remove("on"); document.body.style.overflow = ""; frameToPicker(); }
   document.querySelectorAll("#tsBook [data-close]").forEach(function (b) { b.onclick = closeBook; });
   addEventListener("keydown", function (e) { if (e.key === "Escape") { closeBook(); menu(false); } });
+  /* "Check rates" loads the whole booking wizard INTO the frame instead of
+     navigating away, so dates -> rooms -> details -> pay all happen in one frame. */
   $("tsCheck").onclick = function () {
     var page = (document.getElementById("bookBtn") || {}).getAttribute ? document.getElementById("bookBtn").getAttribute("href") : "book.html";
-    location.href = (page || "book.html") + "?ci=" + B.ci + "&co=" + B.co + "&ad=" + B.ad + "&ch=" + B.ch;
+    var url = (page || "book.html") + "?ci=" + B.ci + "&co=" + B.co + "&ad=" + B.ad + "&ch=" + B.ch;
+    var fr = $("tsFrame");
+    if (fr) {
+      fr.src = url; fr.hidden = false;
+      if ($("tsPick")) $("tsPick").hidden = true;
+      if ($("tsfrTitle")) $("tsfrTitle").textContent = "Your booking";
+      if ($("tsfrBack")) $("tsfrBack").hidden = false;
+    } else {
+      location.href = url;   /* fallback: if the frame is missing, navigate as before */
+    }
   };
+  if ($("tsfrBack")) $("tsfrBack").onclick = frameToPicker;
   $("tsReserve").onclick = openBook;
   /* the hotel logo takes the job of the old bar icon: back to the top of the page */
   $("tsLogo").addEventListener("click", function () { menu(false); window.scrollTo({ top: 0, behavior: "smooth" }); });
