@@ -740,6 +740,38 @@ body.intro-on .app,body.intro-on .dock{opacity:0}
 .selroom .sact2{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .selroom .sact2 .det{font-size:12px;font-weight:600;color:var(--maroon);display:flex;align-items:center;gap:2px}
 
+/* v10.9: room Photos & details popup */
+.rsheet{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:16px}
+.rsheet[hidden]{display:none}
+.rsbg{position:absolute;inset:0;background:rgba(6,14,28,.55)}
+.rsbox{position:relative;z-index:1;width:min(880px,100%);max-height:100%;background:var(--card);border-radius:var(--r-xl);box-shadow:0 30px 80px rgba(6,14,28,.55);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+@media (prefers-reduced-motion:no-preference){.rsbox{animation:rsIn .34s cubic-bezier(.2,.8,.2,1)}}
+@keyframes rsIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.rsL{position:relative;background:var(--maroon-soft);min-height:0}
+.rsL .gw{position:relative;height:100%;margin:0}
+.rsL .gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;height:100%}
+.rsL .gal::-webkit-scrollbar{display:none}
+.rsL .gal img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:center;scroll-snap-stop:always}
+.rsL .gcount{position:absolute;right:12px;top:12px;background:rgba(6,14,28,.6);color:#fff;font-size:12px;padding:4px 10px;border-radius:999px}
+.rsL .gnav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.94);display:grid;place-items:center;box-shadow:var(--shadow-sm);color:var(--maroon)}
+.rsL .gnav svg{width:18px;height:18px}
+.rsL .gnav.l{left:10px}.rsL .gnav.r{right:10px}.rsL .gnav.r svg{transform:rotate(180deg)}
+.rsfull{position:absolute;right:12px;bottom:12px;width:40px;height:40px;border-radius:12px;background:rgba(6,14,28,.62);color:#fff;display:grid;place-items:center}
+.rsfull svg{width:20px;height:20px}
+.rsR{position:relative;display:flex;flex-direction:column;min-height:0}
+.rsx{position:absolute;right:12px;top:12px;z-index:2;width:36px;height:36px;border-radius:50%;background:var(--maroon-soft);color:var(--maroon);display:grid;place-items:center}
+.rsinfo{overflow:auto;padding:22px 24px 10px;display:flex;flex-direction:column;gap:12px}
+.rsinfo h2{font:400 26px/1.1 var(--serif);color:var(--maroon)}
+.rsinfo .rshd .subline{margin-top:4px}
+.rsprice b{font-size:22px}
+.rsinfo .facs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rsnote{font-size:12px;line-height:1.5}
+.rsfoot{flex:none;padding:14px 24px 16px;border-top:1px solid var(--line)}
+.rsfoot .btn{width:100%}
+.rsbox.full{grid-template-columns:1fr}
+.rsbox.full .rsR{display:none}
+@media (max-width:720px){.rsbox{grid-template-columns:1fr;grid-template-rows:minmax(0,40%) 1fr}}
+
 /* v9.1: final confirmation before Razorpay */
 .cfsheet{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-start;justify-content:center}
 .cfsheet[hidden]{display:none}
@@ -1268,6 +1300,30 @@ function openConfirm(){let el=$("#cfsheet");if(!el){el=document.createElement("d
     <p class="cfnote">UPI · cards · net banking · secured by Razorpay. Photo ID for every adult at check-in.</p></div>`;
   el.hidden=false;document.body.style.overflow="hidden";payPrewarm()}
 function closeConfirm(){const el=$("#cfsheet");if(el){el.hidden=true;document.body.style.overflow=""}}
+/* ---------- v10.9: room Photos & details as an in-panel popup (no full-page nav), with in-panel fullscreen ---------- */
+function roomSheetHTML(r){const n=Math.max(nights(),1),on=S.pick.includes(r.name),ac=acOn(r),noac=S.wantAc&&r.noAc;
+  const facs=[[r.noAc?ic.falls:ic.snow,r.noAc?"Near the falls":"A/C option"],[ic.wifi,"Fast Wi-Fi"],[ic.bolt,"24hr power"],[ic.car,"Parking"]];
+  return `<div class="rsbg" data-rsclose></div><div class="rsbox" role="dialog" aria-modal="true" aria-label="${esc(r.name)} room">
+    <div class="rsL"><div class="gw"><div class="gal" onscroll="galN(this)">${r.photos.map((ph,k)=>`<img src="${ph}" alt="${esc(r.name)} photo ${k+1}" ${k?'loading="lazy"':""}>`).join("")}</div>
+      <span class="gcount num">1 / ${r.photos.length}</span>
+      ${r.photos.length>1?`<button class="gnav l" data-gal="-1" aria-label="Previous photo">${ic.back}</button><button class="gnav r" data-gal="1" aria-label="Next photo">${ic.back}</button>`:""}
+      <button class="rsfull" data-rsfull aria-label="Fullscreen photo">${ic.expand}</button></div></div>
+    <div class="rsR"><button class="rsx" data-rsclose aria-label="Close">${ic.close}</button>
+      <div class="rsinfo">
+        <div class="rshd"><h2>${r.name}</h2><div class="subline">${ic.pin} ${r.cat==="suite"?"Luxury suite":"Budget studio"} · Vairams Nagar, Courtallam</div></div>
+        <div class="stayprice num rsprice"><b>${inr(stayCost(r))}</b><small>${n} night${n>1?"s":""} · ${inr(Math.round(stayCost(r)/n))}/night${ac?" · A/C":r.noAc?" · no A/C":""}</small></div>
+        <p class="desc">${esc(r.blurb)} A short walk to Courtallam Main Falls.</p>
+        <div class="facs">${facs.map(([i,l])=>`<div class="fac"><span class="bub">${i}</span>${l}</div>`).join("")}</div>
+        <div class="kv num"><div><span>Sleeps</span><b>Up to ${r.max}</b></div><div><span>Floor</span><b>${r.floor}${r.nolift?" · no lift":""}</b></div><div><span>Beds</span><b>${esc(r.bed)}</b></div><div><span>A/C</span><b>${r.noAc?"Not available":"+"+inr(acAdd(r))+"/night"}</b></div></div>
+        <p class="rsnote muted">Check-in 12:00 PM · Check-out 10:00 AM · Photo ID for every adult · 50% advance reserves the room.</p>
+      </div>
+      <div class="rsfoot">${noac?`<button class="btn" disabled aria-disabled="true">No A/C in this room</button>`:`<button class="btn${on?" out":""}" data-pick="${r.name}" data-rspick>${on?"Remove from stay":"Select this room"}</button>`}</div>
+    </div></div>`}
+function openRoomSheet(id){const r=ROOMS.find(x=>String(x.id)===String(id));if(!r)return;S.roomId=id;let el=$("#rsheet");
+  if(!el){el=document.createElement("div");el.id="rsheet";el.className="rsheet";document.body.appendChild(el)}
+  el.innerHTML=roomSheetHTML(r);el.hidden=false;document.body.style.overflow="hidden";
+  requestAnimationFrame(()=>{const g=el.querySelector(".gal");if(g)window.galN(g)})}
+function closeRoomSheet(){const el=$("#rsheet");if(el){el.hidden=true;el.innerHTML="";document.body.style.overflow=""}}
 async function startPayment(){const why=readyToPay();
   if(why){toast(why);if(!ACCOUNT&&!GSI_FAILED){openSignin("pay")}else if(/name/.test(why))$("#gname")?.focus();else $("#gphone")?.focus();return}
   if(S.paying)return;
@@ -1404,7 +1460,9 @@ function toast(t){const d=document.createElement("div");d.className="toast";d.te
 const dropBusy=()=>{S.pick=S.pick.filter(n=>{const r=byName(n);return r&&!busyOn(r)})};
 
 document.addEventListener("click",e=>{
-  const t=e.target.closest("button,[data-room]");if(!t)return;const d=t.dataset;
+  const t=e.target.closest("button,[data-room],[data-rsclose]");if(!t)return;const d=t.dataset;
+  if(d.rsclose!==undefined){closeRoomSheet();return}
+  if(d.rsfull!==undefined){const bx=t.closest(".rsbox");if(bx)bx.classList.toggle("full");return}
   if(d.reset!==undefined){S.plan=0;S.pick=[];S.lastReceipt=null;S.want=null;S.screen="home";S.tab="home";HIST.length=0;go("home",false);return}
   if(d.fav){e.stopPropagation();const i=S.favs.indexOf(d.fav);i>-1?S.favs.splice(i,1):S.favs.push(d.fav);store.set("favs",S.favs);toast(i>-1?"Removed from favorites":"Saved to favorites");render();return}
   if(d.tab){go(d.tab);return}
@@ -1420,8 +1478,9 @@ document.addEventListener("click",e=>{
     $("[data-find]")?.click();return}
   if(d.find!==undefined){dropBusy();S.showSmall=false;if(S.want){const w=byName(S.want);if(w&&!busyOn(w)&&!S.pick.includes(w.name)&&capOf(picked())<pax())S.pick.push(w.name);S.want=null}go("rooms");return}
   if(d.gal){const g=t.closest(".gw").querySelector(".gal");g.scrollBy({left:g.clientWidth*(+d.gal),behavior:"smooth"});return}
-  if(d.pick){const i=S.pick.indexOf(d.pick),add=i<0;add?S.pick.push(d.pick):S.pick.splice(i,1);render();
-    if(add)requestAnimationFrame(()=>{const y=$("#yoursel");if(y)window.scrollTo({top:y.getBoundingClientRect().top+scrollY-96,behavior:"smooth"})});return}
+  if(d.pick){const fromSheet=d.rspick!==undefined;const i=S.pick.indexOf(d.pick),add=i<0;add?S.pick.push(d.pick):S.pick.splice(i,1);
+    if(fromSheet)closeRoomSheet();render();toast(add?"Room added to your stay":"Room removed");
+    if(add&&!fromSheet)requestAnimationFrame(()=>{const y=$("#yoursel");if(y)window.scrollTo({top:y.getBoundingClientRect().top+scrollY-96,behavior:"smooth"})});return}
   if(d.pkg){S.pick=d.pkg.split(",");render();toast(S.pick.length>1?"Rooms selected":"Room selected");requestAnimationFrame(()=>{const y=$("#yoursel");if(y)window.scrollTo({top:y.getBoundingClientRect().top+scrollY-96,behavior:"smooth"})});return}
   if(d.retry!==undefined){AVAIL_ERR=false;render();loadAvail();return}
   if(d.small!==undefined){S.showSmall=true;render();return}
@@ -1440,7 +1499,7 @@ document.addEventListener("click",e=>{
     if(!S.pick.includes(r.name)){if(capOf(picked())>=pax())S.pick=[r.name];else S.pick.push(r.name)}
     if(capOf(picked())>=pax())go("pay");else{toast(`Add a room for ${pax()-capOf(picked())} more guests`);go("rooms")}return}
   if(d.cat){S.cat=d.cat;render();return}
-  if(d.room){S.roomId=d.room;S.pi=null;NAV_SRC=photoOf(t);go("room");return}
+  if(d.room){if(IS_EMBED){openRoomSheet(d.room);return}S.roomId=d.room;S.pi=null;NAV_SRC=photoOf(t);go("room");return}
   if(d.mon){S.anim=+d.mon>0?"slide-l":"slide-r";S.month=new Date(S.month.getFullYear(),S.month.getMonth()+ +d.mon,1);render();return}
   if(d.day){const dt=new Date(+d.day);if(!S.checkIn||S.checkOut||dt<=S.checkIn){S.checkIn=dt;S.checkOut=null;S.anim="sweep"}else{S.checkOut=dt;S.anim="sweep";if(S.screen==="home"&&S.plan===1){render();setTimeout(()=>{if(S.plan===1&&S.checkOut){S.plan=2;render()}},900);return}}render();return}
   if(d.step){const k=d.step,min=k==="adults"?1:0;S[k]=Math.max(min,Math.min(30,S[k]+ +d.d));render();return}
