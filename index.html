@@ -1515,6 +1515,10 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   html.kh-booking .kh{padding-bottom:32px}
   html.kh-booking .kh-pic.khw{height:calc(100vh - 172px);max-height:900px}
   html.kh-booking .khw-in{inset:6px}
+  /* v10.9: on the data-heavy steps (rooms / review / pay) the hero copy yields and the panel widens
+     leftward for the column layouts; the dates/guests picker keeps its comfortable narrower width */
+  html.kh-booking.kh-wide .kh-copy{display:none}
+  html.kh-booking.kh-wide .kh-grid{grid-template-columns:auto minmax(0,min(66vw,1180px))}
   .khw-p[data-p="reserve"] .khw-b{overflow:hidden;padding:0}
   .khw-p[data-p="reserve"] .khw-h{padding-block:9px 8px}
   .khw-p[data-p="reserve"] .khw-h h2{font-size:21px}
@@ -4119,7 +4123,8 @@ if (location.hash === "#talk") openCall(_fromAlbum);
   (function(){ var frame=document.getElementById("khLiteFrame"), btn=document.getElementById("khPadBtn"), lbl=document.getElementById("khPadLbl");
     if(!frame||!btn||!lbl) return;
     window.addEventListener("message",function(e){ var d=e.data; if(!d||d.ke!=="cta") return;
-      if(typeof d.label==="string"&&d.label) lbl.textContent=d.label; btn.disabled = d.enabled===false; });
+      if(typeof d.label==="string"&&d.label) lbl.textContent=d.label; btn.disabled = d.enabled===false;
+      if(typeof d.wide==="boolean") document.documentElement.classList.toggle("kh-wide", d.wide); });
     btn.addEventListener("click",function(){ try{ frame.contentWindow.postMessage({ke:"primary"},"*"); }catch(_){} });
     frame.addEventListener("load",function(){ try{ frame.contentWindow.postMessage({ke:"sync"},"*"); }catch(_){} });
   })();

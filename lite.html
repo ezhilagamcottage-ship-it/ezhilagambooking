@@ -38,8 +38,11 @@ img{display:block;max-width:100%}
 .num{font-variant-numeric:tabular-nums}
 .muted{color:var(--muted)}
 .app{max-width:480px;margin:0 auto;min-height:100%;padding-bottom:calc(100px + env(safe-area-inset-bottom,0px));background:var(--bg)}
-/* v10.7: shown edge-to-edge inside the desktop booking panel — fill the whole width */
-html.embed .app,html.embed .dock .in,html.embed .sibox,html.embed .cfbox{max-width:760px}
+/* v10.9: fill the wide desktop booking panel; the date/guest picker stays a readable width */
+html.embed .app{max-width:1000px}
+html.embed .dock .in,html.embed .sibox,html.embed .cfbox{max-width:760px}
+html.embed .plan{max-width:560px;margin-inline:auto}
+html.embed .app:has(.plan){display:flex;flex-direction:column;justify-content:center}
 /* Talk with Shenba lives on the desktop hero (to the left), so it is hidden inside the iPad */
 html.embed .fab{display:none!important}
 html.embed .appbar{grid-template-columns:1fr}
@@ -65,6 +68,11 @@ html.embed .rangechips{margin-top:7px}
 html.embed .rc{padding:7px 10px}
 html.embed .plan .pq{margin:0}
 html.embed .plan .times.mini{display:none}
+/* v10.9: in the wide desktop panel, room cards flow in a grid that fills the width
+   (image ratios kept), so the list shows more rooms with far less scrolling */
+html.embed .sect:has(.avcard){display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:12px;align-items:start}
+html.embed .sect:has(.avcard) .bandhead{grid-column:1/-1;margin-top:0}
+html.embed .picks{grid-template-columns:repeat(auto-fill,minmax(248px,1fr))}
 /* v10.8: dates/guests step fits with no internal scroll — the step button is on the frame bar,
    so the in-view step CTAs are hidden and the guest rows are compacted */
 html.embed .plan .btn.pill{display:none}
@@ -1352,7 +1360,7 @@ function primaryCtaInfo(){const s=S.screen;
     if(S.plan===1)return{label:nights()?"Next: Guests":"Pick your dates to continue",enabled:!!nights(),sel:"#dockin [data-homeres]"};
     return{label:"Reserve now",enabled:true,sel:"#dockin [data-homeres]"};}
   return{label:"Reserve now",enabled:true,sel:"#dockin [data-homeres]"};}
-function emitCta(){if(!IS_EMBED)return;try{const i=primaryCtaInfo();parent.postMessage({ke:"cta",label:i.label,enabled:i.enabled},"*")}catch(e){}}
+function emitCta(){if(!IS_EMBED)return;try{const i=primaryCtaInfo();const wide=["rooms","room","pay","done"].includes(S.screen);parent.postMessage({ke:"cta",label:i.label,enabled:i.enabled,wide:wide},"*")}catch(e){}}
 addEventListener("message",function(e){const d=e&&e.data;if(!d)return;
   if(d.ke==="sync"){emitCta();return;}
   if(d.ke==="primary"){const i=primaryCtaInfo();if(!i||i.enabled===false)return;const b=document.querySelector(i.sel);if(b)b.click();}});
