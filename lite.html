@@ -1482,7 +1482,7 @@ function toast(t){const d=document.createElement("div");d.className="toast";d.te
 const dropBusy=()=>{S.pick=S.pick.filter(n=>{const r=byName(n);return r&&!busyOn(r)})};
 
 document.addEventListener("click",e=>{
-  const t=e.target.closest("button,[data-room],[data-rsclose]");if(!t)return;const d=t.dataset;
+  const t=e.target.closest("button,[data-room],[data-rsclose],[data-cfclose]");if(!t)return;const d=t.dataset;
   if(d.rsclose!==undefined){closeRoomSheet();return}
   if(d.rsfull!==undefined){const bx=t.closest(".rsbox");if(bx)bx.classList.toggle("full");return}
   if(d.reset!==undefined){S.plan=0;S.pick=[];S.lastReceipt=null;S.want=null;S.screen="home";S.tab="home";HIST.length=0;go("home",false);return}
