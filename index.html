@@ -1508,6 +1508,15 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   .khw-p .kh-drop{position:absolute;left:0;right:0;bottom:-46px;height:46px;z-index:9;pointer-events:none;background:linear-gradient(to bottom,rgba(15,35,66,.34),rgba(15,35,66,0))}
   .khw-h{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px 12px 22px;background:linear-gradient(180deg,#173563,#0f2342);box-shadow:0 1px 0 rgba(227,173,95,.55)}
   .khw-h h2{margin:0;font:400 24px/1.15 "DM Serif Display",var(--ts-serif);color:#f3cd8e}
+  /* v11.0: the Room/Details/Pay progress rides the navy header (fixed above the content), not the scroll */
+  .kh-steps{display:flex;align-items:center;gap:8px;margin:0 auto;padding:0;list-style:none}
+  .kh-steps li{display:flex;align-items:center;gap:7px;font:600 13px/1 "Jost",var(--ts-sans);letter-spacing:.04em;color:rgba(243,205,142,.5);white-space:nowrap}
+  .kh-steps li>span{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;border:1.5px solid rgba(243,205,142,.4)}
+  .kh-steps li.on{color:#f3cd8e}
+  .kh-steps li.on>span{background:#f3cd8e;color:#0a1830;border-color:#f3cd8e}
+  .kh-steps li.done{color:#e3ad5f}
+  .kh-steps li.done>span{background:rgba(227,173,95,.22);border-color:rgba(227,173,95,.5);color:#f3cd8e}
+  .kh-steps li:not(:last-child)::after{content:"";width:24px;height:1.5px;background:rgba(243,205,142,.3);margin-left:2px}
   .khw-x{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;background:rgba(255,255,255,.1);color:#f3cd8e;font-size:22px;line-height:1}
   .khw-x:hover{background:rgba(255,255,255,.2)}
   /* v10.7: the booking site fills the whole panel inside the window's single border — no inner device
@@ -1707,7 +1716,7 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
             <div class="khc2"><div><h3>Stay</h3><p>Check-in 12:00 PM &middot; check-out 10:00 AM</p></div>
               <div><h3>House rules</h3><p>Government photo ID for every adult. Wedding proof is mandatory for couples. Strictly no smoking or alcohol on the premises.</p></div>
               <div><h3>Address</h3><p>No 46, Vairams Nagar, Five Falls Road, Courtallam</p></div></div></div></section>
-          <section class="khw-p" data-p="reserve" aria-label="Reserve"><header class="khw-h"><h2>Book your stay</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b khw-phonewrap">
+          <section class="khw-p" data-p="reserve" aria-label="Reserve"><header class="khw-h"><h2>Book your stay</h2><ol class="kh-steps" id="khSteps" hidden aria-label="Booking progress"><li class="done"><span>&#10003;</span>Room</li><li class="on"><span>2</span>Details</li><li><span>3</span>Pay</li></ol><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b khw-phonewrap">
             <div class="kh-stage"><iframe id="khLiteFrame" title="Book Kutralam Ezhilagam" data-src="lite.html#book" loading="lazy" allow="microphone; autoplay"></iframe></div>
             <div class="kh-navbar"><button type="button" class="kh-padcta" id="khPadBtn" disabled><span id="khPadLbl">Reserve now</span></button></div>
           </div></section>
@@ -4129,7 +4138,8 @@ if (location.hash === "#talk") openCall(_fromAlbum);
       if(d.ke==="bar"){ if(navbar) navbar.style.display = d.hidden ? "none" : ""; return; }
       if(d.ke!=="cta") return;
       if(typeof d.label==="string"&&d.label) lbl.textContent=d.label; btn.disabled = d.enabled===false;
-      if(typeof d.wide==="boolean") document.documentElement.classList.toggle("kh-wide", d.wide); });
+      if(typeof d.wide==="boolean") document.documentElement.classList.toggle("kh-wide", d.wide);
+      if(typeof d.review==="boolean"){ var ks=document.getElementById("khSteps"); if(ks) ks.hidden=!d.review; } });
     btn.addEventListener("click",function(){ try{ frame.contentWindow.postMessage({ke:"primary"},"*"); }catch(_){} });
     frame.addEventListener("load",function(){ try{ frame.contentWindow.postMessage({ke:"sync"},"*"); }catch(_){} });
   })();

@@ -1206,7 +1206,6 @@ function readyToPay(){if(!picked().length||!nights())return"Pick your dates and 
 V.pay=()=>{if(ACCOUNT&&!S.name)S.name=ACCOUNT.name||"";const set=picked(),q=quote(set),t=terms(q),r=set[0],n=q.n,ac=S.wantAc&&set.some(x=>!x.noAc);
   const pd=phoneDigits(),pmsg=!pd?"Your booking voucher comes here":pd.length<10?`${pd.length} of 10 digits`:phoneOk()?"✓ We'll send your voucher here":"A mobile number starts with 6, 7, 8 or 9";
   return `<div class="bar gut"><button data-back aria-label="Back to rooms">${ic.back}</button><h1>Review &amp; pay</h1><span></span></div>
-  <ol class="psteps paysteps gut" aria-label="Progress"><li class="done">${sm(ic.check)} Room</li><li class="on"><i>2</i> Details</li><li><i>3</i> Pay</li></ol>
   <div class="gut paywrap">
   <section class="sumcard rise"><div class="sumtop"><span class="roomno num">${set.length>1?set.length:r.no}</span><div><b>${set.map(x=>x.name).join(" + ")}</b><small class="num">${set.length>1?`${set.length} rooms · sleeps ${capOf(set)}`:catName(r)} · ${ac?"A/C":"Non-A/C"}</small></div>${img(r)}</div>
     <div class="prow">${ic.cal}<span>Check-in</span><b class="num">${fmtD(S.checkIn)} · 12 PM</b></div>
@@ -1443,7 +1442,7 @@ function primaryCtaInfo(){const s=S.screen;
     if(S.plan===1)return{label:nights()?"Next: Guests":"Pick your dates to continue",enabled:!!nights(),sel:"#dockin [data-homeres]"};
     return{label:"Reserve now",enabled:true,sel:"#dockin [data-homeres]"};}
   return{label:"Reserve now",enabled:true,sel:"#dockin [data-homeres]"};}
-function emitCta(){if(!IS_EMBED)return;try{const i=primaryCtaInfo();const wide=["rooms","room","pay","done"].includes(S.screen);parent.postMessage({ke:"cta",label:i.label,enabled:i.enabled,wide:wide},"*")}catch(e){}}
+function emitCta(){if(!IS_EMBED)return;try{const i=primaryCtaInfo();const wide=["rooms","room","pay","done"].includes(S.screen);parent.postMessage({ke:"cta",label:i.label,enabled:i.enabled,wide:wide,review:S.screen==="pay"},"*")}catch(e){}}
 function setBar(hidden){if(!IS_EMBED)return;try{parent.postMessage({ke:"bar",hidden:!!hidden},"*")}catch(e){}}
 addEventListener("message",function(e){const d=e&&e.data;if(!d)return;
   if(d.ke==="sync"){emitCta();return;}
