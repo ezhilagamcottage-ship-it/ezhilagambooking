@@ -73,6 +73,10 @@ html.embed .plan .times.mini{display:none}
 html.embed .sect:has(.avcard){display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:12px;align-items:start}
 html.embed .sect:has(.avcard) .bandhead{grid-column:1/-1;margin-top:0}
 html.embed .picks{grid-template-columns:repeat(auto-fill,minmax(248px,1fr))}
+/* the chosen-room card becomes a compact two-column: gallery beside its details, not a giant photo */
+html.embed .selroom{display:grid;grid-template-columns:minmax(260px,400px) 1fr;align-items:center;gap:4px}
+html.embed .selroom .gw{margin:12px}
+html.embed .selroom .sbody{padding:16px 20px}
 /* v10.8: dates/guests step fits with no internal scroll — the step button is on the frame bar,
    so the in-view step CTAs are hidden and the guest rows are compacted */
 html.embed .plan .btn.pill{display:none}
@@ -1017,7 +1021,9 @@ const selCard=r=>{const n=Math.max(nights(),1);return `<article class="selroom r
   <div class="sbody"><div class="srow2"><div><h4>${r.name} <span class="seltag">${ic.check} Selected</span></h4><div class="spec">${ic.users} Sleeps ${r.max} · ${r.floor} floor${acOn(r)?" · A/C":r.noAc?" · no A/C":""}</div></div>
     <div class="stayprice num"><b>${inr(stayCost(r))}</b><small>${n} night${n>1?"s":""} · ${inr(Math.round(stayCost(r)/n))}/night</small></div></div>
     <div class="sact2"><button class="det" data-room="${r.id}">Photos &amp; details ${sm(ic.right)}</button><button class="sel" data-pick="${r.name}" aria-pressed="true">Remove</button></div></div></article>`};
-window.galN=g=>{const k=Math.round(g.scrollLeft/g.clientWidth),t=g.parentElement.querySelector(".gcount");if(t)t.textContent=`${k+1} / ${g.children.length}`};
+window.galN=g=>{const gw=g.closest(".gw")||g.parentElement,k=Math.round(g.scrollLeft/g.clientWidth),t=gw.querySelector(".gcount");if(t)t.textContent=`${k+1} / ${g.children.length}`;
+  const atStart=g.scrollLeft<=2,atEnd=g.scrollLeft>=g.scrollWidth-g.clientWidth-2,l=gw.querySelector(".gnav.l"),r=gw.querySelector(".gnav.r");
+  if(l)l.style.visibility=atStart?"hidden":"visible";if(r)r.style.visibility=atEnd?"hidden":"visible"};
 const avCard=(r,i,tight)=>{const on=S.pick.includes(r.name),n=Math.max(nights(),1);return `<div class="avcard rise${on?" on":""}${S.wantAc&&r.noAc?" noac":""}" style="--i:${i}" data-card="${r.name}">
   ${S.pick.length?"":`<button class="ph" data-room="${r.id}" aria-label="Photos and details of ${r.name}"><img src="${r.ph}" alt="${esc(r.name)} room" loading="lazy">
     ${tight?`<span class="fit">${ic.star} Best fit</span>`:""}<span class="pcount">${r.photos.length} photos</span></button>`}
@@ -1337,7 +1343,7 @@ function dock(){const s=S.screen;
 function render(){
   $("#view").innerHTML=`<div class="screen${S.enter?" in-"+S.enter:""}">${V[S.screen]()}<div class="byline"><span class="by-pill" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="68" height="20"></span></div></div>`;
   $("#dockin").innerHTML=dock();S.anim="";S.enter="";bindCarousel();
-  requestAnimationFrame(()=>document.documentElement.style.setProperty("--dockh",$("#dock").offsetHeight+"px"));
+  requestAnimationFrame(()=>{document.documentElement.style.setProperty("--dockh",$("#dock").offsetHeight+"px");document.querySelectorAll(".gal").forEach(g=>window.galN(g))});
   renderShenba();payPrewarm();
   const q=$("#q");if(q){q.oninput=e=>{S.q=e.target.value;const box=$("#results");if(box)box.innerHTML=filtered().map(resultCard).join("")||'<div class="empty"><b>No rooms match</b>Try another word or category.</div>'};
     if(S.screen==="search"){q.focus();q.setSelectionRange(q.value.length,q.value.length)}}
