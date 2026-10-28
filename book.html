@@ -807,6 +807,28 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-gold)}
 #cfsheet .cfpay:active{transform:scale(.98)}
 #cfsheet .cfpay:disabled{opacity:.7}
 #cfsheet .cfnote{margin:8px 0 0;font-size:11px;color:var(--mute);text-align:center}
+/* v10.2: inline checkout on the Pay step — summary left, Razorpay right, one place */
+.payside{display:none;flex-direction:column;background:#0f2342;border-radius:12px;padding:14px}
+.payside .pshead{display:flex;align-items:center;gap:10px;padding:2px 2px 12px}
+.payside .pshead img{height:24px;width:auto}
+.payside .pshead span{color:#f3cd8e;font:600 11px/1 "Jost",sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.payside .cfembed{position:relative;flex:1;min-height:560px;background:#fbf6ec;border-radius:8px;overflow:hidden}
+.payside .cfembed iframe{width:100%!important;height:100%!important;border:0;display:block}
+.payside .psstart{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:9px;padding:28px}
+.payside .pslock{font-size:30px;line-height:1}
+.payside .psamt{margin:0;font:400 22px/1.1 "DM Serif Display",Georgia,serif;color:#0f2342}
+.payside .psamt b{font-weight:400}
+.payside .pssub{margin:0;font-size:12.5px;line-height:1.4;color:#6b7488;max-width:260px}
+.payside .paybtn{margin-top:8px;border:0;cursor:pointer;background:#e3ad5f;color:#0f2342;font:600 14px/1 "Jost",sans-serif;letter-spacing:.04em;padding:15px 24px;border-radius:999px;transition:transform .14s cubic-bezier(.22,1,.36,1)}
+.payside .paybtn:hover{background:#f3cd8e}
+.payside .paybtn:active{transform:scale(.98)}
+.payside .paybtn:disabled{opacity:.7;cursor:default}
+.payside .psfine{margin:4px 0 0;font-size:11px;line-height:1.4;color:#8a93a6;max-width:250px}
+@media (min-width:900px){
+  section.step:has(#payside){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:22px;align-items:start}
+  section.step:has(#payside)>.card:first-child{grid-column:1;position:sticky;top:24px}
+  section.step:has(#payside)>#payside{grid-column:2;display:flex}
+}
 </style>
 </head>
 <body>
@@ -2301,8 +2323,16 @@ function loadRzp() {
 /* v9.1 (Rakesh, 27 Oct 22:02): a final "Confirm your booking" card with everything the booking voucher will
    say, and the Razorpay button under it. On a computer it sits on the left so it stays in view beside
    Razorpay's window; on a phone it sits at the top, above Razorpay's sheet. */
+/* v10.2: on a computer the checkout loads inline in the Pay step's right column
+   (next to the stay summary) instead of a popup, so the guest's eye never leaves
+   the page. On a phone the confirm sheet + Razorpay's own sheet are kept. */
+function inlinePayOn() { try { return window.matchMedia("(min-width:900px)").matches; } catch (e) { return false; } }
 function payByCard(btn) {
   if (S.paying) return;
+  if (inlinePayOn() && document.getElementById("rzpembed")) {
+    const ps = document.getElementById("psPay");
+    return payByCardNow(ps || btn, "#rzpembed");
+  }
   const nights = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
   const rooms = S.pick.map(n => ROOMS.find(r => r.name === n)).filter(Boolean);
   const kids = Number(S.children) || 0, ad = Number(S.adults) || 0;
@@ -2329,13 +2359,16 @@ function payByCard(btn) {
   try { bookPrewarm(); } catch (e) {}
 }
 function closeCf() { const el = document.getElementById("cfsheet"); if (el) el.hidden = true; }
-async function payByCardNow(btn) {
+async function payByCardNow(btn, embedSel) {
   if (S.paying) return;
   S.paying = true;
+  const embedEl = embedSel ? document.querySelector(embedSel) : null;
   const was = btn.textContent;
   btn.disabled = true; btn.textContent = "Opening secure checkout…";
   const done = (msg) => {
     S.paying = false; btn.disabled = false; btn.textContent = was;
+    /* an inline checkout that could not start puts its invitation panel back */
+    if (embedEl) { const ph = document.getElementById("psStart"); if (ph) ph.style.display = ""; embedEl.classList.remove("mounted"); }
     if (msg) fail(msg);
   };
 
@@ -2369,7 +2402,11 @@ async function payByCardNow(btn) {
        keeps UPI off the gateway. */
     method: { card: true, netbanking: true, upi: true, wallet: false,
               emi: false, paylater: false, cardless_emi: false },
-    theme: { color: "#0f766e" },
+    /* navy to match the desktop theme instead of Razorpay's default teal */
+    theme: { color: "#0f2342" },
+    /* parent makes Razorpay render inside our container rather than as a popup;
+       an older checkout that ignores it simply falls back to the popup (still navy) */
+    ...(embedEl ? { parent: embedSel } : {}),
     modal: { ondismiss: () => done("") },
     handler: (r) => { finishCard(r, btn, was); }
   });
@@ -2380,6 +2417,9 @@ async function payByCardNow(btn) {
     });
   } catch (e) {}
   rz.open();
+  /* reveal the inline checkout: hide the invitation panel so Razorpay's iframe
+     fills the container next to the stay summary */
+  if (embedEl) { const ph = document.getElementById("psStart") || document.getElementById("cfPh"); if (ph) ph.style.display = "none"; embedEl.classList.add("mounted"); btn.textContent = was; btn.disabled = false; }
 }
 
 /* Razorpay hands the browser three values. The browser is not trusted with
@@ -2420,6 +2460,9 @@ async function finishCard(r, btn, was) {
 
 /* ── step 3 ───────────────────────────────────────────────────────────── */
 function stepPay(app) {
+  /* fresh entry to the pay screen: never inherit a stale "paying" lock, so the
+     inline checkout can be (re)started after the amount is changed */
+  S.paying = false;
   const nights = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
   const ref = "EZ" + Date.now().toString(36).toUpperCase().slice(-6);
   S.ref = S.ref || ref;
@@ -2449,7 +2492,18 @@ function stepPay(app) {
         <span style="font-size:13px;font-weight:600">Pay ${CFG.ADVANCE_PC}% now, balance before check-in</span>
       </label>
     </div>
-
+    ${inlinePayOn() ? `<aside class="payside" id="payside" aria-label="Secure payment">
+      <div class="pshead"><img src="img/logo-gold.webp" alt="Kutralam Ezhilagam"><span>Secure checkout</span></div>
+      <div class="cfembed" id="rzpembed">
+        <div class="psstart" id="psStart">
+          <div class="pslock" aria-hidden="true">&#128274;</div>
+          <p class="psamt">Pay <b>${inr(amt)}</b> now</p>
+          <p class="pssub">UPI · GPay · PhonePe · Paytm · debit / credit card · net banking</p>
+          <button type="button" class="paybtn" id="psPay">Pay ${inr(amt)} securely</button>
+          <p class="psfine">Opens right here · secured by Razorpay · your card details never touch our server</p>
+        </div>
+      </div>
+    </aside>` : ""}
     </section>`));
 
   /* The footer button is drawn by foot(), not by this section, so changing
@@ -2476,6 +2530,8 @@ function stepPay(app) {
   });
   const card = app.querySelector("#paycard");
   if (card) card.onclick = () => payByCard(card);
+  const ps = app.querySelector("#psPay");
+  if (ps) ps.onclick = () => payByCardNow(ps, "#rzpembed");   /* mount the checkout inline, in place */
   /* Re-drawn on every render while it is open. A code showing the previous
      amount is the worst kind of wrong, because it scans. */
   if (S.qrOpen && app.querySelector("#qr")) drawQr();
@@ -3799,18 +3855,22 @@ function foot() {
     4: "Book another stay"
   }[S.step];
   const ready = { 1: S.pick.length > 0, 2: true, 3: !S.paying, 4: true }[S.step];
+  /* On a computer the Pay step carries its own checkout in the right column, so
+     the footer drops its pay button there (keeping only Back) — no second CTA to
+     look for. Everywhere else, and on phones, the one footer pay button stays. */
+  const desktopPay = S.step === 3 && inlinePayOn();
   /* v5.2b (Rakesh, 25 Oct): one pay button only — this one — with the
      reference and how to pay shown right above it. */
-  const payNote = S.step === 3 ? `<div class="paynote"><b>Pay securely with Razorpay</b>
+  const payNote = (S.step === 3 && !desktopPay) ? `<div class="paynote"><b>Pay securely with Razorpay</b>
       <span>UPI (GPay, PhonePe, Paytm) · debit / credit card · net banking</span>
       <span>Reference <b>${S.ref}</b> · the room is held the moment the payment is confirmed</span></div>` : "";
   bar.innerHTML = `${payNote}<div class="in">
     ${S.step > 1 && S.step < 4 ? `<button id="back">Back</button>` : ""}
-    <button id="next" ${ready ? "" : "disabled"}>${label}</button></div>`;
+    ${desktopPay ? "" : `<button id="next" ${ready ? "" : "disabled"}>${label}</button>`}</div>`;
   bar.style.display = S.modal ? "none" : "";
   if (!bar.isConnected) document.body.appendChild(bar);
   const bk = bar.querySelector("#back"); if (bk) bk.onclick = () => { S.step--; S.error=""; render(); };
-  bar.querySelector("#next").onclick = advanceStep;
+  const nx = bar.querySelector("#next"); if (nx) nx.onclick = advanceStep;
 }
 
 async function advanceStep() {
