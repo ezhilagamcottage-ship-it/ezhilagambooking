@@ -991,8 +991,9 @@ html.ts .wrap{display:none!important}
 .ts-logo{position:absolute;z-index:40;top:22px;left:calc(var(--ts-rail) + 28px);background:var(--ts-cream);padding:10px 16px;border-radius:2px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
 .ts-logo .logo-wrap{width:210px}
 .ts-logo .logo{display:block;width:100%;height:auto}
-/* v7.4 (Rakesh, 27 Oct 12:43): on a computer the Powered by Duphora pill sits beside the hotel's logo plate */
-.ts-dcn{position:absolute;left:calc(100% + 14px);bottom:0;display:inline-flex;align-items:center;gap:9px;padding:6px 6px 6px 15px;
+/* v10.9: the Powered by Duphora pill sits BELOW the hotel's logo plate (was to its right, where it
+   overlapped the "Live with Nature" heading) */
+.ts-dcn{position:absolute;left:2px;top:calc(100% + 12px);display:inline-flex;align-items:center;gap:9px;padding:6px 6px 6px 15px;
   border-radius:999px;background:rgba(255,255,255,.97);border:1px solid rgba(214,220,231,.9);box-shadow:0 10px 30px rgba(0,0,0,.18);white-space:nowrap;pointer-events:none}
 .ts-dcn small{font:400 9.5px/1.2 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6b7690}
 .ts-dcn img{height:26px;width:auto;display:block}
@@ -1289,11 +1290,12 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   .kh-btn.gold{background:linear-gradient(180deg,var(--kh-gold2),var(--kh-gold));color:var(--kh-deep);box-shadow:0 10px 26px rgba(0,0,0,.3)}
   .kh-btn.ghost{background:transparent;color:var(--kh-gold2);box-shadow:inset 0 0 0 1.5px var(--kh-gold)}
   /* demoted WhatsApp-Shenba button sits in the row: small WhatsApp glyph in gold */
-  .kh-wab{text-decoration:none}
+  .kh-btn.kh-wab{background:#22A55B;color:#fff;box-shadow:0 10px 24px rgba(34,165,91,.32);text-decoration:none}
+  .kh-btn.kh-wab:hover{background:#1f9552}
   .kh-wab-ic{flex:none;width:18px;height:18px}
   /* highlighted Talk-with-Shenba button: round head with a glowing ring and a glowing label */
   .kh-wa{width:100%;display:inline-flex;align-items:center;gap:14px;margin-top:2px;padding:9px 18px 9px 9px;border:0;border-radius:999px;text-align:left;text-decoration:none;cursor:pointer;color:inherit;font-family:inherit;position:relative;overflow:hidden;
-    background:linear-gradient(100deg,rgba(227,173,95,.24),rgba(227,173,95,.05) 90%);box-shadow:inset 0 0 0 1.5px rgba(243,205,142,.6),0 12px 30px rgba(0,0,0,.32)}
+    background:linear-gradient(100deg,rgba(9,21,42,.72),rgba(9,21,42,.42) 90%);box-shadow:inset 0 0 0 1.5px rgba(243,205,142,.55),0 12px 30px rgba(0,0,0,.4)}
   .kh-wa::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120px 60px at 18% 50%,rgba(243,205,142,.22),transparent 70%);pointer-events:none;animation:khWaSheen 2.6s ease-in-out infinite}
   .kh-wa:hover{transform:translateY(-1px)}
   .kh-wa-ava{flex:none;width:54px;height:54px;border-radius:50%;overflow:hidden;position:relative;box-shadow:0 0 0 2px var(--kh-gold);animation:khWaRing 2.6s ease-in-out infinite}
@@ -1526,9 +1528,9 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   .kh-stage{flex:1;min-height:0;position:relative;overflow:hidden}
   .kh-stage iframe{width:100%;height:100%;border:0;display:block}
   .kh-navbar{flex:none;display:flex;align-items:center;justify-content:center;gap:12px;padding:9px 22px calc(11px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,#0f2342,#0a1830);box-shadow:0 -1px 0 rgba(227,173,95,.5)}
-  .kh-cta{min-width:min(460px,86%);min-height:46px;padding:0 30px;border:0;border-radius:999px;cursor:pointer;background:linear-gradient(180deg,#f3cd8e,#e3ad5f);color:#0a1830;font:600 16px/1.15 "Jost",var(--ts-sans);letter-spacing:.04em;box-shadow:0 12px 28px rgba(10,24,48,.45);display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:transform .18s,box-shadow .18s,opacity .2s}
-  .kh-cta:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 16px 36px rgba(10,24,48,.5)}
-  .kh-cta:disabled{opacity:.42;cursor:default;box-shadow:none}
+  .kh-padcta{min-width:min(460px,86%);min-height:46px;padding:0 30px;border:0;border-radius:999px;cursor:pointer;background:linear-gradient(180deg,#f3cd8e,#e3ad5f);color:#0a1830;font:600 16px/1.15 "Jost",var(--ts-sans);letter-spacing:.04em;box-shadow:0 12px 28px rgba(10,24,48,.45);display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:transform .18s,box-shadow .18s,opacity .2s}
+  .kh-padcta:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 16px 36px rgba(10,24,48,.5)}
+  .kh-padcta:disabled{opacity:.42;cursor:default;box-shadow:none}
   .khw-b{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:18px 22px 22px}
   .khw-lead{margin:0 0 14px;font:400 14.5px/1.55 "Jost",var(--ts-sans);color:#4a556b}
   .khw .khv-map{aspect-ratio:16/10;border-radius:14px;box-shadow:0 0 0 2px var(--kh-gold),0 12px 26px rgba(15,35,66,.2)}
@@ -1707,7 +1709,7 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
               <div><h3>Address</h3><p>No 46, Vairams Nagar, Five Falls Road, Courtallam</p></div></div></div></section>
           <section class="khw-p" data-p="reserve" aria-label="Reserve"><header class="khw-h"><h2>Book your stay</h2><button type="button" class="khw-x" data-kv="home" aria-label="Back to the photos">&times;</button></header><div class="khw-b khw-phonewrap">
             <div class="kh-stage"><iframe id="khLiteFrame" title="Book Kutralam Ezhilagam" data-src="lite.html#book" loading="lazy" allow="microphone; autoplay"></iframe></div>
-            <div class="kh-navbar"><button type="button" class="kh-cta" id="khPadBtn" disabled><span id="khPadLbl">Reserve now</span></button></div>
+            <div class="kh-navbar"><button type="button" class="kh-padcta" id="khPadBtn" disabled><span id="khPadLbl">Reserve now</span></button></div>
           </div></section>
           <section class="khw-p" data-p="chat" aria-label="Chat with Shenba"><div class="khw-b khw-chat" id="khChatSlot"></div></section>
         </div>
