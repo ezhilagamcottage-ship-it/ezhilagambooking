@@ -44,6 +44,15 @@ html.embed .app,html.embed .dock .in,html.embed .sibox,html.embed .cfbox{max-wid
 html.embed .fab{display:none!important}
 html.embed .appbar{grid-template-columns:1fr}
 html.embed .appbar .ab.shen{display:none}
+/* inside the iPad the home is a compact booking screen — the marketing blocks are dropped so
+   the dates/guests fit in one view without scrolling (the desktop hero already shows all this) */
+html.embed .hero2{aspect-ratio:auto;height:116px}
+html.embed .intro,html.embed .hl,html.embed .roomsband,html.embed .lfoot{display:none}
+/* while the dates/guests picker is open, drop the banner + title so it fits with little scrolling */
+html.embed .app:has(.plan) .hero2,html.embed .app:has(.plan) .homehead{display:none}
+html.embed .app:has(.plan) .toptabs{margin-bottom:4px}
+html.embed .plan{padding:16px 14px;gap:10px}
+html.embed .day{height:40px}
 .gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .stack{display:flex;flex-direction:column;gap:18px}
 svg.i{width:22px;height:22px;flex:none}

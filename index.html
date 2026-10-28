@@ -1252,6 +1252,10 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   html.ts .ts-wa{color:var(--kh-gold2)}
   html.ts .ts-hero{height:auto;min-height:max(100vh,640px);background:radial-gradient(120% 90% at 30% 20%,var(--kh-navy2) 0%,var(--kh-navy) 55%,var(--kh-deep) 100%)}
   html.ts .ts-hero>*:not(.ts-logo):not(.kh){display:none!important}
+  /* v10.6: the home is one app screen — no page scroll; the sections below the hero are dropped */
+  html.ts,html.ts body{height:100svh!important;overflow:hidden!important}
+  html.ts .ts-main,html.ts .ts-foot{display:none!important}
+  html.ts .ts-hero{height:100svh;min-height:0}
   html.ts .ts-logo{border-radius:14px;padding:10px 16px;background:#fff;box-shadow:0 0 0 1px rgba(227,173,95,.55),0 12px 30px rgba(0,0,0,.35)}
   html.ts .ts-act{top:26px;transition:opacity .35s,transform .35s}
   html.kh-top .ts-act{opacity:0;transform:translateY(-12px);pointer-events:none}
@@ -1501,9 +1505,9 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   .khw-h h2{margin:0;font:400 24px/1.15 "DM Serif Display",var(--ts-serif);color:#f3cd8e}
   .khw-x{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;background:rgba(255,255,255,.1);color:#f3cd8e;font-size:22px;line-height:1}
   .khw-x:hover{background:rgba(255,255,255,.2)}
-  /* the mobile booking site shown inside an iPad that fills the whole window — no side borders */
-  .khw-phonewrap{display:flex;padding:0}
-  .kh-pad{position:relative;flex:1;width:100%;background:#0a1830;border-radius:22px;padding:12px;box-shadow:0 0 0 2px #c0902f,0 18px 44px rgba(10,24,48,.45)}
+  /* the mobile booking site shown inside a portrait iPad — tall, so the booking fits in one view */
+  .khw-phonewrap{display:flex;align-items:center;justify-content:center;padding:0}
+  .kh-pad{position:relative;height:100%;width:auto;aspect-ratio:3/4.25;max-width:100%;background:#0a1830;border-radius:26px;padding:13px;box-shadow:0 0 0 2px #c0902f,0 18px 44px rgba(10,24,48,.45)}
   .kh-pad-cam{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:#2a3850;box-shadow:0 0 0 1px rgba(227,173,95,.35)}
   .kh-pad-screen{width:100%;height:100%;border-radius:13px;overflow:hidden;background:#fff;position:relative}
   .kh-pad-screen iframe{width:100%;height:100%;border:0;display:block}
