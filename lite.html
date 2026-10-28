@@ -38,6 +38,8 @@ img{display:block;max-width:100%}
 .num{font-variant-numeric:tabular-nums}
 .muted{color:var(--muted)}
 .app{max-width:480px;margin:0 auto;min-height:100%;padding-bottom:calc(100px + env(safe-area-inset-bottom,0px));background:var(--bg)}
+/* v10.5: when shown inside the desktop iPad frame, fill the wider screen (no side borders) */
+html.embed .app,html.embed .dock .in,html.embed .sibox,html.embed .cfbox{max-width:620px}
 .gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .stack{display:flex;flex-direction:column;gap:18px}
 svg.i{width:22px;height:22px;flex:none}
@@ -696,6 +698,7 @@ body.intro-on .app,body.intro-on .dock{opacity:0}
 </style>
 </head>
 <body class="intro-on">
+<script>try{if(window.self!==window.top)document.documentElement.classList.add("embed")}catch(e){document.documentElement.classList.add("embed")}</script>
 <div id="intro" aria-hidden="true"><video id="introV" muted playsinline preload="auto" poster="img/logo-intro.jpg"><source src="img/logo-intro.mp4" type="video/mp4"></video><span class="tl"></span><span class="tc">Courtallam &middot; Live with Nature</span><span class="cn" aria-label="Powered by Duphora"><small>Powered by</small><img src="img/duphora.webp" alt="Duphora" width="102" height="30"></span><button type="button" id="introSkip">Skip</button></div>
 
 <div class="app" id="app"><div id="view"></div></div>
