@@ -1259,6 +1259,22 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   .kh-btn:hover{transform:translateY(-1px)}
   .kh-btn.gold{background:linear-gradient(180deg,var(--kh-gold2),var(--kh-gold));color:var(--kh-deep);box-shadow:0 10px 26px rgba(0,0,0,.3)}
   .kh-btn.ghost{background:transparent;color:var(--kh-gold2);box-shadow:inset 0 0 0 1.5px var(--kh-gold)}
+  /* highlighted WhatsApp-with-Shenba button: round head with a glowing ring and a glowing label */
+  .kh-wa{flex-basis:100%;display:inline-flex;align-items:center;gap:14px;margin-top:6px;padding:9px 18px 9px 9px;border-radius:999px;text-decoration:none;position:relative;overflow:hidden;
+    background:linear-gradient(100deg,rgba(227,173,95,.18),rgba(37,211,102,.14) 85%);box-shadow:inset 0 0 0 1.5px rgba(243,205,142,.55),0 12px 30px rgba(0,0,0,.32)}
+  .kh-wa::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120px 60px at 18% 50%,rgba(243,205,142,.22),transparent 70%);pointer-events:none;animation:khWaSheen 2.6s ease-in-out infinite}
+  .kh-wa:hover{transform:translateY(-1px)}
+  .kh-wa-ava{flex:none;width:54px;height:54px;border-radius:50%;overflow:hidden;position:relative;box-shadow:0 0 0 2px var(--kh-gold);animation:khWaRing 2.6s ease-in-out infinite}
+  .kh-wa-ava img{width:100%;height:100%;object-fit:cover;object-position:50% 18%;display:block}
+  .kh-wa-ava i{position:absolute;right:1px;bottom:1px;width:13px;height:13px;border-radius:50%;background:#25d366;box-shadow:0 0 0 2px #0f2342}
+  .kh-wa-tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .kh-wa-tx b{font:600 15px/1.15 "Jost",var(--ts-sans);letter-spacing:.03em;color:var(--kh-gold2);text-shadow:0 0 10px rgba(243,205,142,.55);animation:khWaText 2.6s ease-in-out infinite}
+  .kh-wa-tx small{font:400 12px/1.25 "Jost",var(--ts-sans);letter-spacing:.01em;text-transform:none;color:rgba(251,246,236,.82)}
+  .kh-wa-ic{flex:none;margin-left:auto;width:28px;height:28px;color:#25d366;filter:drop-shadow(0 0 6px rgba(37,211,102,.5))}
+  @keyframes khWaText{0%,100%{text-shadow:0 0 8px rgba(243,205,142,.4)}50%{text-shadow:0 0 18px rgba(243,205,142,.9)}}
+  @keyframes khWaRing{0%,100%{box-shadow:0 0 0 2px var(--kh-gold),0 0 12px rgba(243,205,142,.4)}50%{box-shadow:0 0 0 2px var(--kh-gold2),0 0 22px rgba(243,205,142,.85)}}
+  @keyframes khWaSheen{0%,100%{opacity:.6}50%{opacity:1}}
+  @media (prefers-reduced-motion:reduce){ .kh-wa::after,.kh-wa-ava,.kh-wa-tx b{animation:none} }
   .kh-btn:focus-visible{outline:2px solid var(--kh-gold2);outline-offset:3px}
   .kh-addr{margin:22px 0 0;font:500 11.5px/1.6 "Jost",var(--ts-sans);letter-spacing:.14em;text-transform:uppercase;color:rgba(246,234,214,.7)}
   .kh-addr b{color:var(--kh-gold2);font-weight:500}
@@ -1595,7 +1611,12 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
         <p class="kh-lead">Nine rooms, studios and suites for two to fifteen, in Vairams Nagar on Five Falls Road. Wake up to the hills and walk to the falls.</p>
         <ul class="kh-amen"><li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="6" r="2.6"/><path d="M15 10l-4 7 4 2 1 9"/><path d="M15 10l5 5 4 1"/><path d="M11 17l-3 8"/></svg>Walk to the falls</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 18h22"/><path d="M7 18a9 9 0 0118 0"/><path d="M16 9V7"/><path d="M4 22h24"/></svg>Home food on order</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 13a16 16 0 0122 0"/><path d="M9 17a10 10 0 0114 0"/><path d="M13 21a4 4 0 016 0"/><circle cx="16" cy="25" r="1.2"/></svg>Fast Wi-Fi</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="15" rx="2"/><path d="M12 26h8"/><path d="M14 12l5 2.5-5 2.5z"/></svg>OTT premium</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="8" r="2.6"/><circle cx="22" cy="11" r="2"/><path d="M7 26v-8a4 4 0 018 0v8"/><path d="M19 26v-6a3 3 0 016 0v6"/></svg>Family friendly</li><li><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 20h18v4H4z"/><path d="M25 18v6"/><path d="M28 18v6"/><path d="M5 5l22 22"/></svg>Smoke &amp; alcohol free</li></ul>
         <div class="kh-line"></div>
-        <div class="kh-cta"><button type="button" class="kh-btn gold" data-kv="reserve">Book now</button><button type="button" class="kh-btn ghost" data-ts="talk">Talk with Shenba</button></div>
+        <div class="kh-cta"><button type="button" class="kh-btn gold" data-kv="reserve">Book now</button><button type="button" class="kh-btn ghost" data-ts="talk">Talk with Shenba</button>
+          <a class="kh-wa" href="https://wa.me/916374213184?text=Vanakkam%20Shenba!%20I%20would%20like%20to%20book%20at%20Kutralam%20Ezhilagam.%20Please%20help%20me%20in%20Tamil%20or%20English%20and%20send%20the%20payment%20link." target="_blank" rel="noopener" aria-label="WhatsApp with Shenba, talk in Tamil or English and get your payment link">
+            <span class="kh-wa-ava" aria-hidden="true"><img src="img/shenba.webp" alt="" width="200" height="200"><i></i></span>
+            <span class="kh-wa-tx"><b>WhatsApp with Shenba</b><small>Talk in Tamil or English &middot; get your payment link</small></span>
+            <svg class="kh-wa-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.5 15.3L2 22l4.8-1.3A10 10 0 1012 2zm0 2a8 8 0 11-4.1 14.9l-.3-.2-2.8.7.8-2.7-.2-.3A8 8 0 0112 4zm4.3 10.1c-.2-.1-1.3-.6-1.5-.7-.2-.1-.3-.1-.5.1l-.6.8c-.1.1-.2.1-.4 0-.2-.1-.9-.3-1.7-1-.6-.5-1-1.2-1.2-1.4-.1-.2 0-.3.1-.4l.3-.4.2-.3v-.4l-.7-1.6c-.2-.4-.3-.4-.5-.4h-.4c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.3c.1.2 1.6 2.5 3.9 3.4.5.2.9.4 1.2.5.5.2 1 .1 1.3.1.4-.1 1.3-.5 1.5-1 .2-.5.2-1 .1-1-.1-.1-.2-.1-.4-.2z"/></svg>
+          </a></div>
         <p class="kh-addr">No 46, Vairams Nagar, Five Falls Road, Courtallam<br>Booking <b>99622 22415</b> &middot; Reception <b>82483 20685</b></p>
         <svg class="kh-leaf l3" viewBox="0 0 120 160" aria-hidden="true"><path d="M60 158C58 120 56 80 62 6"/><path d="M60 128c-18-4-30-16-34-34 18 2 30 14 34 34z"/><path d="M60 128c16-6 26-18 28-36-16 4-26 16-28 36z"/><path d="M59 92c-16-6-24-18-26-34 16 4 24 16 26 34z"/><path d="M60 92c14-6 22-18 22-34-14 6-22 18-22 34z"/><path d="M60 56c-12-6-18-16-18-30 12 6 18 16 18 30z"/><path d="M61 56c10-6 16-16 15-28-10 6-15 16-15 28z"/><circle cx="62" cy="6" r="3"/></svg>
       </div>
