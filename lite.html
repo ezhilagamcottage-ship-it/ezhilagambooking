@@ -51,8 +51,20 @@ html.embed .intro,html.embed .hl,html.embed .roomsband,html.embed .lfoot{display
 /* while the dates/guests picker is open, drop the banner + title so it fits with little scrolling */
 html.embed .app:has(.plan) .hero2,html.embed .app:has(.plan) .homehead{display:none}
 html.embed .app:has(.plan) .toptabs{display:none}
-html.embed .plan{padding:14px 14px;gap:9px}
-html.embed .day{height:40px}
+html.embed .plan{padding:9px 14px 3px;gap:7px}
+html.embed .day{height:24px}
+/* v10.8: compact the calendar so the whole month + the check-in/out cards sit clear of the bar,
+   with no scroll; the 12PM/10AM times row (shown again at review) is dropped here to make room */
+html.embed .calcard{padding:10px 12px 9px}
+html.embed .calhead h3{font-size:17px}
+html.embed .calhead button{width:30px;height:30px}
+html.embed .cal{margin-top:5px}
+html.embed .day span{width:24px;height:24px}
+html.embed .day{font-size:13.5px}
+html.embed .rangechips{margin-top:7px}
+html.embed .rc{padding:7px 10px}
+html.embed .plan .pq{margin:0}
+html.embed .plan .times.mini{display:none}
 /* v10.8: dates/guests step fits with no internal scroll — the step button is on the frame bar,
    so the in-view step CTAs are hidden and the guest rows are compacted */
 html.embed .plan .btn.pill{display:none}
@@ -65,10 +77,8 @@ html.embed .glist.flat .g .av svg{width:19px;height:19px}
 html.embed .glist.flat .stepper{gap:12px}
 html.embed .glist.flat .stepper button{width:30px;height:30px;font-size:18px}
 html.embed .plan .hint{margin:3px 0 0}
-html.embed .times.mini{padding-block:6px}
 html.embed .byline{display:none}
 html.embed .toptabs{padding-block:7px}
-html.embed .plan{padding-top:10px}
 html.embed .steps{gap:6px}
 html.embed .steps .stp{font-size:12.5px}
 html.embed .steps .stp i{width:22px;height:22px;font-size:11px}
