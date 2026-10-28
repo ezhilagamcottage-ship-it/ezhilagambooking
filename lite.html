@@ -50,13 +50,33 @@ html.embed .hero2{aspect-ratio:auto;height:116px}
 html.embed .intro,html.embed .hl,html.embed .roomsband,html.embed .lfoot{display:none}
 /* while the dates/guests picker is open, drop the banner + title so it fits with little scrolling */
 html.embed .app:has(.plan) .hero2,html.embed .app:has(.plan) .homehead{display:none}
-html.embed .app:has(.plan) .toptabs{margin-bottom:4px}
-html.embed .plan{padding:16px 14px;gap:10px}
+html.embed .app:has(.plan) .toptabs{display:none}
+html.embed .plan{padding:14px 14px;gap:9px}
 html.embed .day{height:40px}
+/* v10.8: dates/guests step fits with no internal scroll — the step button is on the frame bar,
+   so the in-view step CTAs are hidden and the guest rows are compacted */
+html.embed .plan .btn.pill{display:none}
+html.embed .pbody{gap:9px}
+html.embed .pq{font-size:18px}
+html.embed .datechip{padding:7px 12px;font-size:12.5px}
+html.embed .glist.flat .g{grid-template-columns:36px 1fr auto;gap:10px;padding-block:6px}
+html.embed .glist.flat .g .av{width:36px;height:36px}
+html.embed .glist.flat .g .av svg{width:19px;height:19px}
+html.embed .glist.flat .stepper{gap:12px}
+html.embed .glist.flat .stepper button{width:30px;height:30px;font-size:18px}
+html.embed .plan .hint{margin:3px 0 0}
+html.embed .times.mini{padding-block:6px}
+html.embed .byline{display:none}
+html.embed .toptabs{padding-block:7px}
+html.embed .plan{padding-top:10px}
+html.embed .steps{gap:6px}
+html.embed .steps .stp{font-size:12.5px}
+html.embed .steps .stp i{width:22px;height:22px;font-size:11px}
 /* v10.7: the step button now lives on the desktop frame BELOW the iPad (outside the device),
    so the in-device dock and the thank-you's own home button are hidden to avoid a duplicate */
 html.embed .dock{display:none!important}
-html.embed .app{padding-bottom:18px}
+html.embed body{margin:0}
+html.embed .app{padding-bottom:0}
 html.embed .ethanks [data-reset]{display:none}
 /* the window already shows a navy "Book your stay" header, so inner step bars become a light sub-header */
 html.embed .bar{background:var(--white);color:var(--maroon);box-shadow:0 1px 0 var(--line);border-radius:0}
