@@ -1347,6 +1347,11 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   #khFab span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1}
   #khFab b{font:600 21px/1.1 "Jost",var(--ts-sans);letter-spacing:.06em;text-transform:uppercase}
   #khFab small{font:500 13px/1.2 "Jost",var(--ts-sans);opacity:.8;margin-top:3px}
+  /* while the booking iPad is open, the Reserve fob shrinks to a small pill instead of hiding */
+  html.kh-booking #khFab{padding:12px 16px;gap:9px;animation:none;transform:scale(.82);transform-origin:bottom right}
+  html.kh-booking #khFab b{font-size:15px}
+  html.kh-booking #khFab small{display:none}
+  html.kh-booking #khFab svg{width:26px;height:26px}
   @keyframes khShine{0%,62%{left:-60%}100%{left:130%}}
   @keyframes khFabPulse{0%,100%{box-shadow:0 0 0 3px rgba(255,255,255,.85),0 14px 34px rgba(10,24,48,.38)}50%{box-shadow:0 0 0 3px rgba(255,255,255,.85),0 0 0 12px rgba(227,173,95,.22),0 14px 34px rgba(10,24,48,.38)}}
   html.kh-top #khFab{bottom:max(28px,env(safe-area-inset-bottom))}
@@ -4042,6 +4047,7 @@ if (location.hash === "#talk") openCall(_fromAlbum);
     if(p===cur){ return; }
     var front=pane(cur), back=pane(p); if(!front||!back) return; busy=true;
     if(window.scrollY>4) window.scrollTo({top:0,behavior:"smooth"});
+    document.documentElement.classList.toggle("kh-booking", p==="reserve");   /* shrink the Reserve fob while the iPad is open */
     back.classList.add("on"); var bb=back.querySelector(".khw-b"); if(bb&&p!=="chat") bb.scrollTop=0;
     var f=back.querySelector("iframe[data-src]"); if(f){ f.src=f.dataset.src; f.removeAttribute("data-src"); }
     mark(p);

@@ -53,6 +53,14 @@ html.embed .app:has(.plan) .hero2,html.embed .app:has(.plan) .homehead{display:n
 html.embed .app:has(.plan) .toptabs{margin-bottom:4px}
 html.embed .plan{padding:16px 14px;gap:10px}
 html.embed .day{height:40px}
+/* the Shenba thank-you shown in the iPad after a booking is confirmed */
+.ethanks{align-items:center;text-align:center;padding-top:14px}
+.ethanks .etlogo{height:34px;width:auto;object-fit:contain}
+.ethanks .etshen{position:relative;width:92px;height:92px;border-radius:50%;overflow:visible;box-shadow:0 0 0 3px var(--gold,#c0902f);margin:4px 0 2px}
+.ethanks .etshen img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 20%}
+.ethanks .etshen i{position:absolute;right:4px;bottom:4px;width:16px;height:16px;border-radius:50%;background:#22A55B;border:2px solid var(--white,#fff)}
+.ethanks h2{font-family:var(--serif);color:var(--maroon)}
+.ethanks .rcpt{width:100%}
 .gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .stack{display:flex;flex-direction:column;gap:18px}
 svg.i{width:22px;height:22px;flex:none}
@@ -1131,6 +1139,15 @@ V.pay=()=>{if(ACCOUNT&&!S.name)S.name=ACCOUNT.name||"";const set=picked(),q=quot
   </div>`};
 
 V.done=()=>{const b=S.lastReceipt;if(!b)return V.bookings();
+  const embed=document.documentElement.classList.contains("embed");
+  if(embed)return `<div class="bar gut"><span></span><h1>Thank you</h1><span></span></div>
+  <div class="gut stack done ethanks" style="padding-top:18px">
+    <img class="etlogo" src="img/logo-gold.webp" alt="Kutralam Ezhilagam">
+    <div class="etshen"><img src="${SHENBA_IMG}" alt="Shenba"><i></i></div>
+    <h2 style="margin:0">Thank you${b.given?`, ${esc(b.given)}`:""}!</h2>
+    <p class="muted" style="margin:0;max-width:30ch">Thanks for trusting our brand — <b>Kutralam Ezhilagam</b>. ${esc(b.room)} is yours for ${esc(b.dates)}; your voucher is on its way on WhatsApp.</p>
+    ${receiptCard(b,true)}
+    <button class="btn pill" data-tab="home" data-reset>Back to home</button></div>`;
   return `<div class="bar gut"><span></span><h1>Booking confirmed</h1><span></span></div>
   <div class="gut stack done" style="padding-top:22px"><div class="tick pop">${ic.check}</div>
     <h2>You're booked${b.given?`, ${esc(b.given)}`:""}!</h2>
@@ -1317,6 +1334,7 @@ const dropBusy=()=>{S.pick=S.pick.filter(n=>{const r=byName(n);return r&&!busyOn
 
 document.addEventListener("click",e=>{
   const t=e.target.closest("button,[data-room]");if(!t)return;const d=t.dataset;
+  if(d.reset!==undefined){S.plan=0;S.pick=[];S.lastReceipt=null;S.want=null;S.screen="home";S.tab="home";HIST.length=0;go("home",false);return}
   if(d.fav){e.stopPropagation();const i=S.favs.indexOf(d.fav);i>-1?S.favs.splice(i,1):S.favs.push(d.fav);store.set("favs",S.favs);toast(i>-1?"Removed from favorites":"Saved to favorites");render();return}
   if(d.tab){go(d.tab);return}
   if(d.back!==undefined){go(HIST.pop()||S.tab,false);return}
@@ -1367,6 +1385,8 @@ document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.tar
 $("#sheet").querySelector("[aria-label=Close]").innerHTML=ic.close;
 $("#sheet a.p").insertAdjacentHTML("afterbegin",ic.mic);$("#waShenba").insertAdjacentHTML("afterbegin",ic.chat);
 $("#shenImg").src=SHENBA_IMG;$("#shenImg2").src=SHENBA_IMG;
+/* inside the desktop iPad: open straight on date selection, then the wizard follows */
+if(document.documentElement.classList.contains("embed")){S.plan=1}
 render();startCarousel();loadAvail();if(CFG.GOOGLE_CLIENT_ID){loadGsi();refreshSignin()}else GSI_FAILED=true;
 if(location.hash==="#bookings")go("bookings");
 /* Logo intro: once per visit, never on a deep link, skipped for reduced motion. Same rhythm as index.html:
