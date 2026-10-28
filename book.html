@@ -627,6 +627,8 @@ dd.big{font-weight:800;color:var(--brand)}
   .roomrow:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(28,25,23,.1);border-color:#d6d3d1}
   .roomrow .rthumb{width:72px;height:72px;border-radius:12px;object-fit:cover;flex:none;background:#e7e5e4}
   #rooms>.award{max-width:420px;justify-self:center;margin-top:14px!important}
+  /* step 2 sign-in card keeps its own full width above the two-column form */
+  section.step>.gcard{max-width:none}
   /* step 2: the form in two columns (v6.3: no street address - it is on the photo ID checked at the desk) */
   section.step>.card.stack:has(input[data-f="name"]){display:grid;grid-template-columns:1fr 1fr;gap:16px 18px}
   section.step>.card.stack:has(input[data-f="name"])>*{margin:0}
@@ -667,6 +669,26 @@ h1,.mtitle,.sheetbar h2,.waitcard h2,.opt h3,.pass h2,.vname,.empty b{font-famil
 .steps li.on{background:transparent;color:var(--brand);border-bottom:2px solid var(--ts-gold)}
 .steps li.done{background:transparent;color:var(--ts-gold);border-bottom:2px solid var(--ts-gold)}
 .card,.opt,.qrbox,.waitcard{background:var(--card);border-color:var(--line);border-radius:12px}
+/* Sign in with Google — a navy card on the Details step, gold logo, the one place
+   a guest ties the stay to their account. Flat navy, no chrome; the only shadow is
+   the ring around the avatar, matching the heads used elsewhere on the site. */
+.gcard{background:var(--brand);border:0;border-radius:14px;padding:18px 18px 16px;margin:0 0 16px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.gcard-slim{padding:14px 16px;border-radius:12px;background:#15294a}
+.gclogo{height:30px;width:auto;object-fit:contain;display:block}
+.gcard h3{margin:0;font-family:var(--ts-serif);font-weight:400;font-size:21px;line-height:1.15;color:#fff;letter-spacing:0}
+.gctx{display:flex;flex-direction:column;gap:5px}
+.gcard p{margin:0;font-size:14px;line-height:1.5;color:rgba(251,246,236,.84)}
+.gcard .glink{background:none;border:0;padding:2px 0;color:var(--ts-gold-lt);font-family:"Jost",sans-serif;font-weight:600;font-size:13px;letter-spacing:.02em;text-transform:none;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.gcard .glink:hover{color:#f3cd8e}
+.gbtn{min-height:44px;color-scheme:light}
+.gme{display:flex;align-items:center;gap:12px;width:100%}
+.gav{flex:none;width:46px;height:46px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px var(--ts-gold-lt)}
+.gav-i{display:flex;align-items:center;justify-content:center;background:#15294a;color:var(--ts-gold-lt);font-family:var(--ts-serif);font-size:22px}
+.gmetx{min-width:0}
+.gme b{display:block;font-family:"Jost",sans-serif;font-weight:600;font-size:15px;line-height:1.2;color:#fff;letter-spacing:0;text-transform:none}
+.gme small{display:block;font-size:12.5px;line-height:1.35;color:rgba(251,246,236,.78);margin-top:2px}
+.gme .glink{margin-left:auto;flex:none;align-self:flex-start}
+.gstays{display:inline-block;margin-top:5px;font-size:12.5px;font-weight:600;color:var(--ts-gold-lt)}
 .opt.on{background:var(--brand);border-color:var(--brand)}
 .opt.on .tag{color:var(--ts-gold-lt)!important}
 .roomrow.on{background:#f6edd8;border-color:var(--ts-gold)}
@@ -825,6 +847,9 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-gold)}
 <script>
 const CFG = {
   SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwUVyNn9AIKvCpF2SQRsTqyepZgqwhOIeWCJt25YT5wyC3pp0fWayuTSDTvlwmD24Ww/exec",
+  /* Sign in with Google — same OAuth web client as the lite site, so a guest who
+     signed in on the phone is the same account here and both pages read one history. */
+  GOOGLE_CLIENT_ID: "911129142093-jjpir1mtsg3mj2jtoq1qatdjjbicqc77.apps.googleusercontent.com",
   /* WHERE THE MONEY LANDS.
      First in the list is the one the guest gets by default. Rakesh,
      7 Sep 2026: "have both but prefer having HDFC since gpay does not
@@ -1312,6 +1337,64 @@ const S = {
     }
   } catch (e) {}
 })();
+
+/* ── Guest account (Sign in with Google) ──────────────────────────────────
+   Google's button hands back a signed ID token. We read the name, email and
+   photo from it to fill the form, and keep the token so every booking is tied
+   to the guest's Google account — that is what lets "your past stays" follow
+   them to any device. Nothing here blocks booking: if Google is slow or the
+   guest would rather not, they continue as a guest exactly as before. The
+   OAuth client is shared with the lite site, so one history spans both. */
+const ACC = {
+  k: "ez_acc",
+  get() { try { return JSON.parse(localStorage.getItem(this.k) || "null"); } catch (e) { return null; } },
+  set(a) { try { localStorage.setItem(this.k, JSON.stringify(a)); } catch (e) {} },
+  clear() { try { localStorage.removeItem(this.k); } catch (e) {} }
+};
+function jwtBody(t) { try { return JSON.parse(decodeURIComponent(atob((String(t).split(".")[1] || "").replace(/-/g, "+").replace(/_/g, "/")).split("").map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join(""))); } catch (e) { return null; } }
+let ACCOUNT = ACC.get(), GSI_READY = false, GSI_FAILED = false, PAST_STAYS = null, NOACC = false;
+function onGoogle(resp) {
+  const p = jwtBody(resp && resp.credential);
+  if (!p || !p.email) return;
+  ACCOUNT = { name: p.name || "", email: p.email, photo: p.picture || "", token: resp.credential, at: Date.now() };
+  ACC.set(ACCOUNT);
+  if (!S.guest.name && ACCOUNT.name) S.guest.name = ACCOUNT.name.slice(0, 60);  /* fill the name they just confirmed to Google */
+  syncReceipts();
+  render();
+}
+function loadGsi() {
+  if (!CFG.GOOGLE_CLIENT_ID) { GSI_FAILED = true; return Promise.resolve(false); }
+  if (loadGsi._p) return loadGsi._p;
+  loadGsi._p = new Promise((res) => {
+    const t = setTimeout(() => { GSI_FAILED = true; res(false); }, 9000);
+    const s = document.createElement("script"); s.src = "https://accounts.google.com/gsi/client"; s.async = true;
+    s.onload = () => { clearTimeout(t); try { google.accounts.id.initialize({ client_id: CFG.GOOGLE_CLIENT_ID, callback: onGoogle, auto_select: true, itp_support: true, context: "signin", ux_mode: "popup" }); GSI_READY = true; res(true); } catch (e) { GSI_FAILED = true; res(false); } };
+    s.onerror = () => { clearTimeout(t); GSI_FAILED = true; res(false); }; document.head.appendChild(s);
+  });
+  return loadGsi._p;
+}
+function drawGoogleButtons() {
+  if (!GSI_READY) return;
+  document.querySelectorAll(".gbtn:not([data-drawn])").forEach((el) => { el.dataset.drawn = "1";
+    try { google.accounts.id.renderButton(el, { type: "standard", theme: "outline", size: "large", shape: "pill", text: el.dataset.text || "continue_with", logo_alignment: "left", width: Math.min(360, el.offsetWidth || 320) }); } catch (e) {} });
+}
+function ensureGsi() {
+  if (!CFG.GOOGLE_CLIENT_ID) { GSI_FAILED = true; return; }
+  if (GSI_READY) { drawGoogleButtons(); return; }
+  loadGsi().then((ok) => { ok ? drawGoogleButtons() : render(); });
+}
+/* Every stay booked under this Google account, from any device. Prime verifies
+   the token before it answers, so one guest never sees another's history. */
+async function syncReceipts() {
+  if (!ACCOUNT) return;
+  try {
+    const d = await post({ action: "guestReceipts", googleToken: ACCOUNT.token });
+    if (d && Array.isArray(d.receipts)) PAST_STAYS = d.receipts.length;
+    else if (d && typeof d.count === "number") PAST_STAYS = d.count;
+    render();
+  } catch (e) {}
+}
+function signOut() { try { google.accounts.id.disableAutoSelect(); } catch (e) {} ACCOUNT = null; PAST_STAYS = null; ACC.clear(); render(); }
 
 /* ── availability ─────────────────────────────────────────────────────── */
 function nightsOf() {
@@ -1970,6 +2053,7 @@ function phoneHint(box) {
 function stepGuest(app) {
   const f = S.guest;
   const box = $(`<section class="step">
+    ${acccard()}
     <div class="card stack">
       ${[["name","Full name","text","As on your ID"],
          ["phone","WhatsApp number","tel","10 digits"],
@@ -1999,10 +2083,51 @@ function stepGuest(app) {
     if (k === "pin") { v = v.replace(/\D/g, "").slice(0, 6); e.target.value = v; }
     S.guest[k] = v;
   });
+  const gc = box.querySelector(".gcard");
+  if (gc) {
+    const no = gc.querySelector("[data-noacc]"); if (no) no.onclick = () => { NOACC = true; render(); };
+    const so = gc.querySelector("[data-signout]"); if (so) so.onclick = () => signOut();
+    const ug = gc.querySelector("[data-useacc]"); if (ug) ug.onclick = () => { NOACC = false; render(); };
+  }
   app.appendChild(box);
   phoneHint(box);
   cityAssist(box);
+  if (!ACCOUNT && !NOACC && !GSI_FAILED) ensureGsi();   /* draw Google's button once the card is in the page */
 }
+
+/* The sign-in card that opens the Details step. Signed in, it shows who you are
+   and that the stay will be kept; signed out, it offers Google and a plain
+   "continue as guest" so nobody is ever stopped from booking. */
+function acccard() {
+  if (ACCOUNT) {
+    const stays = PAST_STAYS > 0
+      ? `<span class="gstays">${PAST_STAYS} past ${PAST_STAYS === 1 ? "stay" : "stays"} with us</span>` : "";
+    const av = ACCOUNT.photo
+      ? `<img class="gav" src="${ACCOUNT.photo}" alt="" referrerpolicy="no-referrer">`
+      : `<span class="gav gav-i">${(ACCOUNT.name || ACCOUNT.email || "?").trim().charAt(0).toUpperCase()}</span>`;
+    return `<div class="gcard" data-signed>
+      <img src="img/logo-gold.webp" alt="Kutralam Ezhilagam" class="gclogo">
+      <div class="gme">${av}
+        <div class="gmetx"><b>${esc(ACCOUNT.name || "Signed in")}</b>
+          <small>${esc(ACCOUNT.email)} · this stay is saved to your history</small>${stays}</div>
+        <button type="button" class="glink" data-signout>Sign out</button></div>
+    </div>`;
+  }
+  if (GSI_FAILED) return "";   /* Google unreachable: no empty card, the form alone still books */
+  if (NOACC) {
+    return `<div class="gcard gcard-slim">
+      <p>Booking as a guest — your voucher comes on WhatsApp. <button type="button" class="glink" data-useacc>Sign in with Google</button> to keep this stay in your history.</p>
+    </div>`;
+  }
+  return `<div class="gcard">
+    <img src="img/logo-gold.webp" alt="Kutralam Ezhilagam" class="gclogo">
+    <div class="gctx"><h3>Save this booking to your history</h3>
+      <p>Sign in with Google — we'll fill in your name and keep every stay you book in one place, on any device.</p></div>
+    <div class="gbtn" data-text="continue_with"></div>
+    <button type="button" class="glink" data-noacc>Continue as guest</button>
+  </div>`;
+}
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 
 
 /* ── Paying ───────────────────────────────────────────────────────────────
@@ -3716,6 +3841,10 @@ async function holdRoom(extra, settleState) {
         action: "webBooking",
         name: S.guest.name.trim(),
         phone: S.guest.phone,
+        /* Tie the stay to the Google account when signed in, so it shows up in
+           the guest's history on any device. Empty when booking as a guest. */
+        email: ACCOUNT ? ACCOUNT.email : "",
+        googleToken: ACCOUNT ? ACCOUNT.token : "",
         city: S.guest.city,
         pin: S.guest.pin,
         room: S.pick.join(","),
@@ -3771,6 +3900,9 @@ function fail(msg) {
 const _render = render;
 render = function () { _render(); foot(); };
 render();
+/* Warm Google early so the button is ready the moment the guest reaches Details;
+   if they signed in before, pull their stay history now so the card can show it. */
+if (CFG.GOOGLE_CLIENT_ID) { loadGsi(); if (ACCOUNT) syncReceipts(); } else { GSI_FAILED = true; }
 /* v7.0: coming from the lite site with everything filled in, open the secure checkout at once */
 if (S.fromLite) { S.fromLite = false; setTimeout(function () { var b = document.querySelector("#next"); if (b && S.step === 3) payByCard(b); }, 600); }
 </script>
