@@ -45,6 +45,17 @@ html.embed .plan{max-width:560px;margin-inline:auto}
 html.embed .app:has(.plan){display:flex;flex-direction:column;justify-content:center}
 /* review step: two columns (summary + guest form | price + trust) with the progress as a chrome row */
 html.embed .paywrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+/* compact the price options + trust so the review fits on shorter windows */
+html.embed .card.stack{gap:9px!important}
+html.embed .lines{gap:6px}
+html.embed .lines .tot{padding-top:7px}
+html.embed .lines .tot b{font-size:23px}
+html.embed .opts2{gap:7px}
+html.embed .payopt{padding:8px 12px}
+html.embed .payopt strong{font-size:18px}
+html.embed .balnote,html.embed .paynote{padding:7px 10px}
+html.embed .trust{gap:3px;padding-top:1px}
+html.embed .screen:has(.paywrap) .stack{padding-top:10px!important}
 html.embed .paysteps{padding-block:12px 0;max-width:460px;margin-inline:auto}
 /* Talk with Shenba lives on the desktop hero (to the left), so it is hidden inside the iPad */
 html.embed .fab{display:none!important}
@@ -73,9 +84,54 @@ html.embed .plan .pq{margin:0}
 html.embed .plan .times.mini{display:none}
 /* v10.9: in the wide desktop panel, room cards flow in a grid that fills the width
    (image ratios kept), so the list shows more rooms with far less scrolling */
-html.embed .sect:has(.avcard){display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:12px;align-items:start}
-html.embed .sect:has(.avcard) .bandhead{grid-column:1/-1;margin-top:0}
-html.embed .picks{grid-template-columns:repeat(auto-fill,minmax(248px,1fr))}
+/* v11.0: non-pick rooms become compact horizontal tiles so the whole list fits with no scroll */
+html.embed .sect:has(.avcard){display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:8px;align-items:start}
+html.embed .sect:has(.avcard) .bandhead{grid-column:1/-1;margin:2px 0 0}
+html.embed .bandhead{margin-top:0;gap:8px}
+html.embed .bandhead .ico{width:24px;height:24px}
+html.embed .bandhead .ico svg{width:14px;height:14px}
+html.embed .bandhead h3{font-size:15px}
+html.embed .bandhead small{display:none}
+html.embed .avcard .avbody .stayprice b{font-size:13.5px}
+html.embed .avcard .avbody h4{font-size:13.5px;line-height:1.1}
+html.embed .avcard .avbody .spec{font-size:9.5px;line-height:1.15}
+html.embed .avcard .avbody .rectag{display:inline-flex;align-items:center;gap:3px;font:700 9px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:#9A6B12;background:#FBF3E2;border:1px solid rgba(154,107,18,.28);padding:2px 6px;border-radius:999px;margin-bottom:2px;align-self:flex-start}
+html.embed .avcard .avbody .rectag svg{width:10px;height:10px}
+html.embed .avcard{display:flex;align-items:center;gap:10px;padding:6px 10px 6px 6px;flex-wrap:wrap;border-width:1.5px}
+html.embed .avcard>.ph{flex:0 0 50px;width:50px;height:50px;aspect-ratio:1;margin:0;border-radius:9px}
+html.embed .avcard>.ph .pcount,html.embed .avcard>.ph .fit{display:none}
+html.embed .avcard .avbody{flex:1 1 110px;padding:0;display:flex;flex-direction:column;gap:0;align-items:flex-start;min-width:0}
+html.embed .avcard .avbody h4{font-size:14px}
+html.embed .avcard .avbody .stayprice{display:flex;flex-direction:row;align-items:baseline;gap:6px;margin:0}
+html.embed .avcard .avbody .stayprice b{font-size:14px}
+html.embed .avcard .avbody .stayprice small{display:none}
+html.embed .avcard .avbody .spec{font-size:10px;margin-top:1px}
+html.embed .avcard .avfoot{flex:0 0 auto;border:0;margin:0;padding:0;display:block}
+html.embed .avcard .avfoot .det{display:none}
+html.embed .avcard .avfoot .sel{padding:6px 13px;font-size:12px}
+html.embed .avcard .acnote{flex:1 1 100%;margin:3px 0 0}
+html.embed .picks{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+html.embed .pick{padding:9px 13px;gap:1px}
+html.embed .pick h4{font-size:15px;margin:1px 0}
+html.embed .pick .why{display:none}
+html.embed .pick .k{font-size:9.5px}
+html.embed .pick small{font-size:10.5px}
+html.embed .pick strong{font-size:15px}
+html.embed .staysum{padding:4px 10px 4px 14px}
+html.embed .staysum button{width:29px;height:29px}
+html.embed .staysum b{font-size:12.5px}
+html.embed .staysum span{font-size:9px}
+html.embed .toggle button{padding:4px 0;font-size:12.5px}
+/* rooms: hide the redundant step bar (summary has the edit, header gives context) + tighten */
+html.embed .screen:has(.staysum) .bar{display:none}
+html.embed .screen:has(.staysum) .stack{gap:4px;padding-top:9px!important}
+html.embed .sect{gap:6px}
+/* the trailing availability note and the "combine smaller rooms" affordance stay, but compact, so the
+   whole room list clears the panel without a scrollbar on shorter laptops */
+html.embed .screen:has(.staysum) .stack>.note{display:none}
+html.embed .btn.out[data-small]{width:auto!important;align-self:center;min-height:0;padding:6px 16px;font-size:11.5px;border-radius:999px;margin-top:0}
+html.embed .avcard>.ph{flex-basis:42px;width:42px;height:42px}
+html.embed .avcard{padding:3px 9px 3px 4px}
 /* the chosen-room card becomes a compact two-column: gallery beside its details, not a giant photo */
 html.embed .selroom{display:grid;grid-template-columns:minmax(260px,400px) 1fr;align-items:center;gap:4px}
 html.embed .selroom .gw{margin:12px}
@@ -791,6 +847,19 @@ html.embed .cfsheet{align-items:center}
 html.embed .cfbox{max-width:780px;margin-top:0}
 html.embed .cfbody2{display:grid;grid-template-columns:1.05fr 1fr;gap:20px;align-items:start}
 html.embed .cfR{justify-content:flex-start}
+/* keep the confirm popup within the panel with no scroll on shorter windows */
+html.embed .cfhead{padding:11px 16px;margin:-16px -16px 8px}
+html.embed .cfbody2{gap:18px}
+html.embed .cfL{gap:9px}
+html.embed .cfR{gap:8px}
+html.embed .cfroom{margin:4px 0 2px}
+html.embed .cfR .field{gap:4px}
+html.embed .cfR .field input,html.embed .cfR .phonein input{padding-block:9px}
+html.embed .cfmoney{margin-top:2px}
+html.embed .cfmoney .cfr{padding:3px 0}
+html.embed .cfpay{margin-top:6px;min-height:46px}
+html.embed .cfmoney .cfr.now b{font-size:20px}
+html.embed .cfnote{margin:5px 0 0}
 .cfhead{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;margin:-16px -16px 14px;padding:16px;background:#0f2342;border-radius:var(--r-xl) var(--r-xl) 0 0}
 .cflogo{height:30px;width:auto}
 .cfhead h2{font:400 20px/1.1 var(--serif);color:#fff}
@@ -1069,10 +1138,10 @@ const selCard=r=>{const n=Math.max(nights(),1);return `<article class="selroom r
 window.galN=g=>{const gw=g.closest(".gw")||g.parentElement,k=Math.round(g.scrollLeft/g.clientWidth),t=gw.querySelector(".gcount");if(t)t.textContent=`${k+1} / ${g.children.length}`;
   const atStart=g.scrollLeft<=2,atEnd=g.scrollLeft>=g.scrollWidth-g.clientWidth-2,l=gw.querySelector(".gnav.l"),r=gw.querySelector(".gnav.r");
   if(l)l.style.visibility=atStart?"hidden":"visible";if(r)r.style.visibility=atEnd?"hidden":"visible"};
-const avCard=(r,i,tight)=>{const on=S.pick.includes(r.name),n=Math.max(nights(),1);return `<div class="avcard rise${on?" on":""}${S.wantAc&&r.noAc?" noac":""}" style="--i:${i}" data-card="${r.name}">
+const avCard=(r,i,tight,rec)=>{const on=S.pick.includes(r.name),n=Math.max(nights(),1);return `<div class="avcard rise${on?" on":""}${S.wantAc&&r.noAc?" noac":""}" style="--i:${i}" data-card="${r.name}">
   ${S.pick.length?"":`<button class="ph" data-room="${r.id}" aria-label="Photos and details of ${r.name}"><img src="${r.ph}" alt="${esc(r.name)} room" loading="lazy">
     ${tight?`<span class="fit">${ic.star} Best fit</span>`:""}<span class="pcount">${r.photos.length} photos</span></button>`}
-  <div class="avbody"><h4>${r.name}</h4>
+  <div class="avbody">${rec?`<span class="rectag">${ic.star} ${rec}</span>`:""}<h4>${r.name}</h4>
     <div class="stayprice num"><b>${inr(stayCost(r))}</b><small>${n} night${n>1?"s":""} · ${inr(Math.round(stayCost(r)/n))}/night</small></div>
     <div class="spec">${ic.users} Sleeps ${r.max} · ${r.floor} floor${r.nolift?" · no lift":""}${acOn(r)?" · A/C":r.noAc?" · no A/C":""}</div></div>
   ${S.wantAc&&r.noAc?acNote(r,"list"):""}
@@ -1091,16 +1160,22 @@ V.rooms=()=>{if(!BUSY)return `<div class="bar gut"><button data-tab="home" aria-
   const sel=picked(), notSel=r=>!S.pick.includes(r.name);
   const studios=shown.filter(r=>r.cat==="studio"&&notSel(r)).sort(srt),suites=shown.filter(r=>r.cat==="suite"&&notSel(r)).sort(srt);
   let i=1;const sameSet=pk.budget&&pk.luxury&&pk.budget.map(r=>r.name).join()===pk.luxury.map(r=>r.name).join();
+  /* v11.0: when a single room already sleeps the group, the "picks" cards just echo rooms shown in the
+     bands below — on the embedded panel we drop that whole block (saves a full scroll) and instead badge
+     the recommended budget / roomiest rooms inline so the guidance isn't lost. */
+  const picksRedundant=IS_EMBED&&tight&&pk.budget&&pk.budget.length===1&&(!pk.luxury||pk.luxury.length===1);
+  const recBudget=picksRedundant&&pk.budget?pk.budget[0].name:null;
+  const recLux=picksRedundant&&pk.luxury&&!sameSet?pk.luxury[0].name:null;
   return `<div class="bar gut"><button data-tab="home" aria-label="Change dates">${ic.back}</button><h1>Available Rooms</h1><span></span></div>
   <div class="gut stack" style="padding-top:16px">
     <div class="staysum num"><div><span>Check-in</span><b>${fmt(S.checkIn)}</b></div><div><span>Check-out</span><b>${fmt(S.checkOut)}</b></div><div><span>Guests</span><b>${p} · ${nights()}N</b></div><button data-tab="home" aria-label="Edit dates and guests">${ic.edit}</button></div>
     <div class="toggle" role="group" aria-label="Cooling"><button data-wantac="0" aria-pressed="${!S.wantAc}">Non-A/C</button><button data-wantac="1" aria-pressed="${S.wantAc}">With A/C</button></div>
     ${sel.length?`<section class="sect" id="yoursel"><div class="sh"><h3>Your room${sel.length>1?"s":""}</h3><span>${sel.length} selected · sleeps ${capOf(sel)} of ${p}</span></div>${sel.map(selCard).join("")}</section>`:""}
     ${!free.length?`<div class="empty"><div class="tick">${ic.cal}</div><b>Fully booked on these dates</b>Try other dates, or ask Shenba to put you on the waitlist.</div>`:`
-    ${pk.budget?`<section class="sect"><div class="sh"><h3>Our picks for ${p} guest${p>1?"s":""}</h3></div><div class="picks">${pickCard("budget",pk.budget)}${pk.luxury&&!sameSet?pickCard("lux",pk.luxury):`<div class="pick" style="justify-content:center;text-align:center"><small>This is also our roomiest choice for your group.</small></div>`}</div></section>`:""}
+    ${pk.budget&&!picksRedundant?`<section class="sect"><div class="sh"><h3>Our picks for ${p} guest${p>1?"s":""}</h3></div><div class="picks">${pickCard("budget",pk.budget)}${pk.luxury&&!sameSet?pickCard("lux",pk.luxury):`<div class="pick" style="justify-content:center;text-align:center"><small>This is also our roomiest choice for your group.</small></div>`}</div></section>`:""}
     ${!tight?`<p class="warn">No single room sleeps ${p}. Select two or more rooms below, or tap a pick above.</p>`:""}
-    ${studios.length?`<section class="sect"><div class="bandhead"><span class="ico">${sm(ic.bed)}</span><div><h3>Budget</h3><small>Studio Rooms · from ${inr(Math.min(...studios.map(r=>r.rate)))} a night</small></div></div>${studios.map(r=>avCard(r,i++,tight&&tight.name===r.name)).join("")}</section>`:""}
-    ${suites.length?`<section class="sect"><div class="bandhead lux"><span class="ico">${sm(ic.crown)}</span><div><h3>Luxury</h3><small>Premium Family Suites · from ${inr(Math.min(...suites.map(r=>r.rate)))} a night</small></div></div>${suites.map(r=>avCard(r,i++,tight&&tight.name===r.name)).join("")}</section>`:""}`}
+    ${studios.length?`<section class="sect"><div class="bandhead"><span class="ico">${sm(ic.bed)}</span><div><h3>Budget</h3><small>Studio Rooms · from ${inr(Math.min(...studios.map(r=>r.rate)))} a night</small></div></div>${studios.map(r=>avCard(r,i++,tight&&tight.name===r.name,r.name===recBudget?"Best value":"")).join("")}</section>`:""}
+    ${suites.length?`<section class="sect"><div class="bandhead lux"><span class="ico">${sm(ic.crown)}</span><div><h3>Luxury</h3><small>Premium Family Suites · from ${inr(Math.min(...suites.map(r=>r.rate)))} a night</small></div></div>${suites.map(r=>avCard(r,i++,tight&&tight.name===r.name,r.name===recLux?"Roomiest":"")).join("")}</section>`:""}`}
     ${small.length?(S.showSmall?`<section class="sect"><div class="bandhead"><span class="ico">${sm(ic.users)}</span><div><h3>Smaller rooms</h3><small>Sleep fewer than ${p} · combine two or more</small></div></div>${small.filter(notSel).sort(srt).map(r=>avCard(r,i++,false)).join("")}</section>`
       :`<button class="btn out" data-small style="width:100%">Show ${small.length} smaller room${small.length>1?"s":""} to combine</button>`):""}
     ${booked.length?`<div class="booked"><b style="color:var(--ink)">Booked on your dates:</b>${booked.map(r=>`<span>${r.name}</span>`).join("")}</div>`:""}
@@ -1314,12 +1389,12 @@ function openConfirm(){let el=$("#cfsheet");if(!el){el=document.createElement("d
     <button class="btn pill cfpay" id="cfPay" data-payrz>${ic.lock} Pay ${inr(t.now)} with Razorpay</button>
     <p class="cfnote">UPI · cards · net banking · secured by Razorpay. Photo ID for every adult at check-in.</p>
     </div></div></div>`;
-  el.hidden=false;document.body.style.overflow="hidden";setBar(true);
+  el.hidden=false;document.body.style.overflow="hidden";setBar(true);emitCta();
   const nm=el.querySelector("#gname");if(nm)nm.oninput=e=>{S.name=e.target.value;refreshPayCta()};
   const ph=el.querySelector("#gphone");if(ph)ph.oninput=e=>{const v=cleanPhone(e.target.value);if(e.target.value!==v)e.target.value=v;S.phone=v;const h=el.querySelector("#phint"),ok=phoneOk();if(h){h.className=ok?"good":v.length===10?"bad":"";h.textContent=!v?"Your booking voucher comes here":v.length<10?`${v.length} of 10 digits`:ok?"✓ We'll send your voucher here":"A mobile number starts with 6, 7, 8 or 9"}refreshPayCta()};
   if(GSI_READY)drawGoogleButtons();else if(el.querySelector(".gbtn"))loadGsi().then(ok=>{if(ok)drawGoogleButtons()});
   payPrewarm()}
-function closeConfirm(){const el=$("#cfsheet");if(el){el.hidden=true;document.body.style.overflow=""}setBar(false)}
+function closeConfirm(){const el=$("#cfsheet");if(el){el.hidden=true;document.body.style.overflow=""}setBar(false);emitCta()}
 /* ---------- v10.9: room Photos & details as an in-panel popup (no full-page nav), with in-panel fullscreen ---------- */
 function roomSheetHTML(r){const n=Math.max(nights(),1),on=S.pick.includes(r.name),ac=acOn(r),noac=S.wantAc&&r.noAc;
   const facs=[[r.noAc?ic.falls:ic.snow,r.noAc?"Near the falls":"A/C option"],[ic.wifi,"Fast Wi-Fi"],[ic.bolt,"24hr power"],[ic.car,"Parking"]];
@@ -1442,7 +1517,13 @@ function primaryCtaInfo(){const s=S.screen;
     if(S.plan===1)return{label:nights()?"Next: Guests":"Pick your dates to continue",enabled:!!nights(),sel:"#dockin [data-homeres]"};
     return{label:"Reserve now",enabled:true,sel:"#dockin [data-homeres]"};}
   return{label:"Reserve now",enabled:true,sel:"#dockin [data-homeres]"};}
-function emitCta(){if(!IS_EMBED)return;try{const i=primaryCtaInfo();const wide=["rooms","room","pay","done"].includes(S.screen);parent.postMessage({ke:"cta",label:i.label,enabled:i.enabled,wide:wide,review:S.screen==="pay"},"*")}catch(e){}}
+function emitCta(){if(!IS_EMBED)return;try{const i=primaryCtaInfo();const wide=["rooms","room","pay","done"].includes(S.screen);
+  const cf=document.getElementById("cfsheet");const cfOpen=cf&&!cf.hidden;
+  /* v11.0: the fixed header stepper follows the real step — Room on the list, Details on review, Pay in
+     the confirm popup; hidden on the date/guest steps and the final confirmation. */
+  const showSteps=S.screen==="rooms"||S.screen==="room"||S.screen==="pay";
+  let step=S.screen==="pay"?1:0;if(cfOpen)step=2;
+  parent.postMessage({ke:"cta",label:i.label,enabled:i.enabled,wide:wide,review:showSteps,step:step},"*")}catch(e){}}
 function setBar(hidden){if(!IS_EMBED)return;try{parent.postMessage({ke:"bar",hidden:!!hidden},"*")}catch(e){}}
 addEventListener("message",function(e){const d=e&&e.data;if(!d)return;
   if(d.ke==="sync"){emitCta();return;}

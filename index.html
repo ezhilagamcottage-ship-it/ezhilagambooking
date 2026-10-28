@@ -991,9 +991,9 @@ html.ts .wrap{display:none!important}
 .ts-logo{position:absolute;z-index:40;top:22px;left:calc(var(--ts-rail) + 28px);background:var(--ts-cream);padding:10px 16px;border-radius:2px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
 .ts-logo .logo-wrap{width:210px}
 .ts-logo .logo{display:block;width:100%;height:auto}
-/* v10.9: the Powered by Duphora pill sits BELOW the hotel's logo plate (was to its right, where it
-   overlapped the "Live with Nature" heading) */
-.ts-dcn{position:absolute;left:2px;top:calc(100% + 12px);display:inline-flex;align-items:center;gap:9px;padding:6px 6px 6px 15px;
+/* v11.0: the Powered by Duphora pill sits in the empty gap to the right of the logo, vertically
+   centred on it (clear of the heading below and the Shenba image) */
+.ts-dcn{position:absolute;left:calc(100% + 18px);top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;gap:9px;padding:6px 6px 6px 15px;
   border-radius:999px;background:rgba(255,255,255,.97);border:1px solid rgba(214,220,231,.9);box-shadow:0 10px 30px rgba(0,0,0,.18);white-space:nowrap;pointer-events:none}
 .ts-dcn small{font:400 9.5px/1.2 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6b7690}
 .ts-dcn img{height:26px;width:auto;display:block}
@@ -1517,14 +1517,14 @@ html.ts .ts-badges .gbadge{width:92px;height:118px;aspect-ratio:auto;border:0;bo
   .kh-steps li.done{color:#e3ad5f}
   .kh-steps li.done>span{background:rgba(227,173,95,.22);border-color:rgba(227,173,95,.5);color:#f3cd8e}
   .kh-steps li:not(:last-child)::after{content:"";width:24px;height:1.5px;background:rgba(243,205,142,.3);margin-left:2px}
-  .khw-x{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;background:rgba(255,255,255,.1);color:#f3cd8e;font-size:22px;line-height:1}
-  .khw-x:hover{background:rgba(255,255,255,.2)}
+  .khw-x{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;background:#d6453f;color:#fff;font-size:22px;line-height:1;box-shadow:0 2px 10px rgba(214,69,63,.45)}
+  .khw-x:hover{background:#c23b35}
   /* v10.7: the booking site fills the whole panel inside the window's single border — no inner device
      frame — with the step button on the bar below (outside the booking screen) */
   /* v10.8: while booking is open, let the window take more height (reclaim its lower margin) so the
      dates/guests step fits with no internal scroll on shorter laptops too */
   html.kh-booking .kh{padding-bottom:32px}
-  html.kh-booking .kh-pic.khw{height:calc(100vh - 172px);max-height:900px}
+  html.kh-booking .kh-pic.khw{height:calc(100vh - 142px);max-height:918px}
   html.kh-booking .khw-in{inset:6px}
   /* v10.9: on the data-heavy steps (rooms / review / pay) the hero copy yields and the panel widens
      leftward for the column layouts; the dates/guests picker keeps its comfortable narrower width */
@@ -4139,7 +4139,8 @@ if (location.hash === "#talk") openCall(_fromAlbum);
       if(d.ke!=="cta") return;
       if(typeof d.label==="string"&&d.label) lbl.textContent=d.label; btn.disabled = d.enabled===false;
       if(typeof d.wide==="boolean") document.documentElement.classList.toggle("kh-wide", d.wide);
-      if(typeof d.review==="boolean"){ var ks=document.getElementById("khSteps"); if(ks) ks.hidden=!d.review; } });
+      if(typeof d.review==="boolean"){ var ks=document.getElementById("khSteps"); if(ks){ ks.hidden=!d.review;
+        if(typeof d.step==="number"){ var lis=ks.querySelectorAll("li"); for(var si=0;si<lis.length;si++){ var done=si<d.step; lis[si].classList.toggle("on",si===d.step); lis[si].classList.toggle("done",done); var sp=lis[si].querySelector("span"); if(sp) sp.innerHTML = done ? "&#10003;" : String(si+1); } } } } });
     btn.addEventListener("click",function(){ try{ frame.contentWindow.postMessage({ke:"primary"},"*"); }catch(_){} });
     frame.addEventListener("load",function(){ try{ frame.contentWindow.postMessage({ke:"sync"},"*"); }catch(_){} });
   })();
