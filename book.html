@@ -821,8 +821,14 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-gold)}
 .pfsum{padding:20px 22px 0}
 .pfpay{padding:14px 22px 0}
 .pfpay .cfembed{position:relative}
-.pfpay .cfembed.mounted{min-height:540px}            /* only reserve height once Razorpay is actually in */
-.pfpay .cfembed.mounted iframe{width:100%!important;min-height:540px!important;border:0;display:block}
+.pfpay .cfembed.mounted{height:min(460px,calc(100dvh - 300px));min-height:300px}   /* fits the frame; Razorpay scrolls inside, the page does not */
+.pfpay .cfembed.mounted iframe{width:100%!important;height:100%!important;border:0;display:block}
+/* embedded inside the home-page hero frame: no own header or side panel, tight chrome */
+html.embed .dk-side{display:none}
+html.embed #app>header{display:none!important}
+html.embed #app{padding-top:12px}
+html.embed .stepof{display:none}
+html.embed .steps{margin-top:2px}
 .pfpay .psstart{display:flex;flex-direction:column;gap:9px;align-items:stretch;text-align:center}
 .pfpay .paybtn{width:100%;border:0;cursor:pointer;background:#0f2342;color:#e3ad5f;font:600 15px/1 "Jost",sans-serif;letter-spacing:.04em;padding:16px 24px;border-radius:999px;transition:transform .14s cubic-bezier(.22,1,.36,1),background .2s}
 .pfpay .paybtn:hover{background:#0a1830}
@@ -836,6 +842,11 @@ input:focus,select:focus{outline:0;border-bottom:2px solid var(--ts-gold)}
 </style>
 </head>
 <body>
+<script>/* v10.4: when this wizard runs inside the home-page booking frame, drop its own
+   page chrome so it feels native to the hero block, not a separate window. */
+try { if (window.self !== window.top) document.documentElement.classList.add("embed"); }
+catch (e) { document.documentElement.classList.add("embed"); }
+if (/[?&]embed=1/.test(location.search)) document.documentElement.classList.add("embed");</script>
 <!-- v4.1 desktop side panel: shown only on screens 1024px and wider -->
 <aside class="dk-side" aria-label="About Kutralam Ezhilagam">
   <img class="dk-bg" src="img/hero.webp" alt="" aria-hidden="true">
@@ -2372,7 +2383,7 @@ async function payByCardNow(btn, embedSel) {
   const done = (msg) => {
     S.paying = false; btn.disabled = false; btn.textContent = was;
     /* an inline checkout that could not start puts its invitation panel back */
-    if (embedEl) { const ph = document.getElementById("psStart"); if (ph) ph.style.display = ""; embedEl.classList.remove("mounted"); }
+    if (embedEl) { const ph = document.getElementById("psStart"); if (ph) ph.style.display = ""; embedEl.classList.remove("mounted"); if (btn) btn.style.display = ""; }
     if (msg) fail(msg);
   };
 
@@ -2423,7 +2434,7 @@ async function payByCardNow(btn, embedSel) {
   rz.open();
   /* reveal the inline checkout: hide the invitation panel so Razorpay's iframe
      fills the container next to the stay summary */
-  if (embedEl) { const ph = document.getElementById("psStart") || document.getElementById("cfPh"); if (ph) ph.style.display = "none"; embedEl.classList.add("mounted"); btn.textContent = was; btn.disabled = false; }
+  if (embedEl) { const ph = document.getElementById("psStart") || document.getElementById("cfPh"); if (ph) ph.style.display = "none"; embedEl.classList.add("mounted"); btn.textContent = was; btn.disabled = false; btn.style.display = "none"; }
 }
 
 /* Razorpay hands the browser three values. The browser is not trusted with
@@ -2497,8 +2508,7 @@ function stepPay(app) {
 
   const checkoutInner = `<div class="cfembed" id="rzpembed">
         <div class="psstart" id="psStart">
-          <button type="button" class="paybtn" id="psPay">&#128274; Pay ${inr(amt)} securely</button>
-          <p class="psfine">UPI · GPay · PhonePe · Paytm · debit / credit card · net banking · secured by Razorpay</p>
+          <p class="psfine">&#128274; Tap <b>Pay ${inr(amt)} securely</b> below — UPI, GPay, card &amp; net-banking open right here, no scrolling.</p>
         </div>
       </div>`;
 
@@ -3868,18 +3878,13 @@ function foot() {
     4: "Book another stay"
   }[S.step];
   const ready = { 1: S.pick.length > 0, 2: true, 3: !S.paying, 4: true }[S.step];
-  /* On a computer the Pay step carries its own checkout in the right column, so
-     the footer drops its pay button there (keeping only Back) — no second CTA to
-     look for. Everywhere else, and on phones, the one footer pay button stays. */
-  const desktopPay = S.step === 3 && inlinePayOn();
-  /* v5.2b (Rakesh, 25 Oct): one pay button only — this one — with the
-     reference and how to pay shown right above it. */
-  const payNote = (S.step === 3 && !desktopPay) ? `<div class="paynote"><b>Pay securely with Razorpay</b>
-      <span>UPI (GPay, PhonePe, Paytm) · debit / credit card · net banking</span>
+  /* v10.4: the primary action lives in this one fixed footer on every step, in the
+     same spot, so the guest barely moves the mouse across rooms -> pay -> done. */
+  const payNote = S.step === 3 ? `<div class="paynote"><b>Pay securely with Razorpay</b>
       <span>Reference <b>${S.ref}</b> · the room is held the moment the payment is confirmed</span></div>` : "";
   bar.innerHTML = `${payNote}<div class="in">
     ${S.step > 1 && S.step < 4 ? `<button id="back">Back</button>` : ""}
-    ${desktopPay ? "" : `<button id="next" ${ready ? "" : "disabled"}>${label}</button>`}</div>`;
+    <button id="next" ${ready ? "" : "disabled"}>${label}</button></div>`;
   bar.style.display = S.modal ? "none" : "";
   if (!bar.isConnected) document.body.appendChild(bar);
   const bk = bar.querySelector("#back"); if (bk) bk.onclick = () => { S.step--; S.error=""; render(); };
