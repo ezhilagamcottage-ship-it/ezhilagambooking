@@ -40,6 +40,10 @@ img{display:block;max-width:100%}
 .app{max-width:480px;margin:0 auto;min-height:100%;padding-bottom:calc(100px + env(safe-area-inset-bottom,0px));background:var(--bg)}
 /* v10.5: when shown inside the desktop iPad frame, fill the wider screen (no side borders) */
 html.embed .app,html.embed .dock .in,html.embed .sibox,html.embed .cfbox{max-width:620px}
+/* Talk with Shenba lives on the desktop hero (to the left), so it is hidden inside the iPad */
+html.embed .fab{display:none!important}
+html.embed .appbar{grid-template-columns:1fr}
+html.embed .appbar .ab.shen{display:none}
 .gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .stack{display:flex;flex-direction:column;gap:18px}
 svg.i{width:22px;height:22px;flex:none}
