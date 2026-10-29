@@ -103,7 +103,7 @@ html.embed .etact .btn{min-height:40px;font-size:13px}
 /* v10.9: in the wide desktop panel, room cards flow in a grid that fills the width
    (image ratios kept), so the list shows more rooms with far less scrolling */
 /* v11.0: non-pick rooms become compact horizontal tiles so the whole list fits with no scroll */
-html.embed .sect:has(.avcard){display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:8px;align-items:start}
+html.embed .sect:has(.avcard){display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:9px;align-items:start}
 html.embed .sect:has(.avcard) .bandhead{grid-column:1/-1;margin:2px 0 0}
 html.embed .bandhead{margin-top:0;gap:8px}
 html.embed .bandhead .ico{width:24px;height:24px}
@@ -128,6 +128,23 @@ html.embed .avcard .avfoot{flex:0 0 auto;border:0;margin:0;padding:0;display:blo
 html.embed .avcard .avfoot .det{display:none}
 html.embed .avcard .avfoot .sel{padding:6px 13px;font-size:12px}
 html.embed .avcard .acnote{flex:1 1 100%;margin:3px 0 0}
+/* v11.3: photo-forward postcard tile (room list) — picture on top, bold nightly price, inline Select */
+html.embed .avcard.pc{display:flex;flex-direction:column;align-items:stretch;gap:0;padding:0;flex-wrap:nowrap;border:0;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 6px 16px rgba(15,35,66,.1)}
+html.embed .avcard.pc.on{box-shadow:0 0 0 2px #0f2342,0 6px 16px rgba(15,35,66,.16)}
+html.embed .avcard.pc>.ph{flex:none;width:100%;height:72px;aspect-ratio:auto;margin:0;border-radius:0;display:block;position:relative;overflow:hidden;cursor:pointer}
+html.embed .avcard.pc>.ph img{width:100%;height:100%;object-fit:cover;display:block}
+html.embed .avcard.pc .rectag{position:absolute;top:7px;left:7px;margin:0;z-index:1;font:700 9px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:#4a2e07;background:#f3cd8e;border:0;padding:4px 7px;border-radius:6px}
+html.embed .avcard.pc .rectag svg{width:10px;height:10px}
+html.embed .avcard.pc .cap{padding:6px 10px 7px;display:grid;grid-template-columns:1fr auto;gap:0 8px;align-items:center}
+html.embed .avcard.pc .cap h4{grid-column:1;grid-row:1;margin:0;font:400 16px/1 var(--serif);color:#0f2342}
+html.embed .avcard.pc .cap .pr{grid-column:2;grid-row:1;text-align:right;white-space:nowrap}
+html.embed .avcard.pc .pr b{font:700 15px/1 var(--sans);color:#0f2342}
+html.embed .avcard.pc .pr span{font-size:9px;color:#6b7890}
+html.embed .avcard.pc .spec{grid-column:1;grid-row:2;font-size:10px;line-height:1.2;color:#6b7890;margin-top:2px;display:flex;align-items:center;gap:3px;min-width:0}
+html.embed .avcard.pc .spec svg{width:11px;height:11px;flex:none}
+html.embed .avcard.pc .sel{grid-column:2;grid-row:2;margin-top:2px;min-width:0;height:28px;padding:0 14px;border:0;border-radius:7px;background:#0f2342;color:#f3cd8e;font:600 11.5px/1 var(--sans);cursor:pointer;white-space:nowrap}
+html.embed .avcard.pc .sel:disabled{background:#e7ded0;color:#9aa3b2;cursor:default}
+html.embed .avcard.pc.on .sel{background:#0a1830}
 html.embed .picks{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
 html.embed .pick{padding:9px 13px;gap:1px}
 html.embed .pick h4{font-size:15px;margin:1px 0}
@@ -148,6 +165,9 @@ html.embed .sect{gap:6px}
    whole room list clears the panel without a scrollbar on shorter laptops */
 html.embed .screen:has(.staysum) .stack>.note{display:none}
 html.embed .btn.out[data-small]{width:auto!important;align-self:center;min-height:0;padding:6px 16px;font-size:11.5px;border-radius:999px;margin-top:0}
+/* v11.3: on the photo-forward list the optional "combine smaller rooms" link is dropped so the picture
+   tiles clear the panel with no scrollbar (a single room already fits the group) */
+html.embed .screen:has(.avcard.pc) .btn.out[data-small]{display:none}
 html.embed .avcard>.ph{flex-basis:42px;width:42px;height:42px;position:relative;cursor:pointer}
 /* v11.2: a camera badge so guests see the small thumbnail opens the room's photos */
 html.embed .avcard>.ph::after{content:"";position:absolute;right:2px;bottom:2px;width:15px;height:15px;border-radius:5px;background:rgba(10,24,48,.74) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z'/%3E%3Ccircle cx='12' cy='13' r='4'/%3E%3C/svg%3E") center/10px no-repeat;pointer-events:none}
@@ -1190,7 +1210,17 @@ const selCard=r=>{const n=Math.max(nights(),1);return `<article class="selroom r
 window.galN=g=>{const gw=g.closest(".gw")||g.parentElement,k=Math.round(g.scrollLeft/g.clientWidth),t=gw.querySelector(".gcount");if(t)t.textContent=`${k+1} / ${g.children.length}`;
   const atStart=g.scrollLeft<=2,atEnd=g.scrollLeft>=g.scrollWidth-g.clientWidth-2,l=gw.querySelector(".gnav.l"),r=gw.querySelector(".gnav.r");
   if(l)l.style.visibility=atStart?"hidden":"visible";if(r)r.style.visibility=atEnd?"hidden":"visible"};
-const avCard=(r,i,tight,rec)=>{const on=S.pick.includes(r.name),n=Math.max(nights(),1);return `<div class="avcard rise${on?" on":""}${S.wantAc&&r.noAc?" noac":""}" style="--i:${i}" data-card="${r.name}">
+const avCard=(r,i,tight,rec)=>{const on=S.pick.includes(r.name),n=Math.max(nights(),1),noac=S.wantAc&&r.noAc;
+  /* v11.3: photo-forward "postcard" tile for the embedded panel's room list — big picture, bold
+     nightly price, inline Select; the phone layout and the selected-room "other rooms" view keep the
+     compact row below. */
+  if(IS_EMBED&&!S.pick.length){const nightly=inr(Math.round(stayCost(r)/n));
+    return `<article class="avcard pc rise${on?" on":""}${noac?" noac":""}" style="--i:${i}" data-card="${r.name}">
+      <button class="ph" data-room="${r.id}" aria-label="Photos and details of ${r.name}"><img src="${r.ph}" alt="${esc(r.name)} room" loading="lazy">${rec?`<span class="rectag">${ic.star} ${rec}</span>`:tight?`<span class="rectag">${ic.star} Best fit</span>`:""}</button>
+      <div class="cap"><h4>${r.name}</h4><div class="pr num"><b>${nightly}</b><span>/night</span></div>
+        <div class="spec">${ic.users} Sleeps ${r.max} · ${r.floor}${acOn(r)?" · A/C":r.noAc?" · no A/C":""}</div>
+        ${noac?`<button class="sel" disabled aria-disabled="true">No A/C</button>`:`<button class="sel" data-pick="${r.name}" aria-pressed="${on}">${on?"Selected":"Select"}</button>`}</div></article>`;}
+  return `<div class="avcard rise${on?" on":""}${noac?" noac":""}" style="--i:${i}" data-card="${r.name}">
   ${S.pick.length?"":`<button class="ph" data-room="${r.id}" aria-label="Photos and details of ${r.name}"><img src="${r.ph}" alt="${esc(r.name)} room" loading="lazy">
     ${tight?`<span class="fit">${ic.star} Best fit</span>`:""}<span class="pcount">${r.photos.length} photos</span></button>`}
   <div class="avbody">${rec?`<span class="rectag">${ic.star} ${rec}</span>`:""}<h4>${r.name}</h4>
