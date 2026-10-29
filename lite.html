@@ -145,6 +145,8 @@ html.embed .avcard.pc .spec svg{width:11px;height:11px;flex:none}
 html.embed .avcard.pc .sel{grid-column:2;grid-row:2;margin-top:2px;min-width:0;height:28px;padding:0 14px;border:0;border-radius:7px;background:#0f2342;color:#f3cd8e;font:600 11.5px/1 var(--sans);cursor:pointer;white-space:nowrap}
 html.embed .avcard.pc .sel:disabled{background:#e7ded0;color:#9aa3b2;cursor:default}
 html.embed .avcard.pc.on .sel{background:#0a1830}
+/* v12.0: on the postcard the photo IS the select target (not a photos/details link), so drop the camera badge */
+html.embed .avcard.pc>.ph::after{content:none}
 html.embed .picks{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
 html.embed .pick{padding:9px 13px;gap:1px}
 html.embed .pick h4{font-size:15px;margin:1px 0}
@@ -1237,7 +1239,7 @@ const avCard=(r,i,tight,rec)=>{const on=S.pick.includes(r.name),n=Math.max(night
      compact row below. */
   if(IS_EMBED&&!S.pick.length){const nightly=inr(Math.round(stayCost(r)/n));
     return `<article class="avcard pc rise${on?" on":""}${noac?" noac":""}" style="--i:${i}" data-card="${r.name}">
-      <button class="ph" data-room="${r.id}" aria-label="Photos and details of ${r.name}"><img src="${r.ph}" alt="${esc(r.name)} room" loading="lazy">${rec?`<span class="rectag">${ic.star} ${rec}</span>`:tight?`<span class="rectag">${ic.star} Best fit</span>`:""}</button>
+      <button class="ph" data-pick="${r.name}" aria-pressed="${on}" aria-label="Select ${r.name}"><img src="${r.ph}" alt="${esc(r.name)} room" loading="lazy">${rec?`<span class="rectag">${ic.star} ${rec}</span>`:tight?`<span class="rectag">${ic.star} Best fit</span>`:""}</button>
       <div class="cap"><h4>${r.name}</h4><div class="pr num"><b>${nightly}</b><span>/night</span></div>
         <div class="spec">${ic.users} Sleeps ${r.max} · ${r.floor}${acOn(r)?" · A/C":r.noAc?" · no A/C":""}</div>
         ${noac?`<button class="sel" disabled aria-disabled="true">No A/C</button>`:`<button class="sel" data-pick="${r.name}" aria-pressed="${on}">${on?"Selected":"Select"}</button>`}</div></article>`;}
