@@ -788,6 +788,12 @@ html[data-nav=done]::view-transition-new(root){animation:vtRiseIn .6s var(--ease
 .wb b{display:block;font-size:13px;color:var(--ink)}
 .homehead{display:flex;justify-content:space-between;align-items:center;gap:10px}
 /* v11.5 brand band: gold logo on a full-width navy header with a thick gold bar */
+.appbar.solo{grid-template-columns:1fr}
+.fab.side{bottom:auto;top:50%;left:-16px;right:auto;padding:0 0 0 14px;border-radius:0 999px 999px 0;transition:top .25s var(--ease-out,ease)}
+@media (min-width:512px){.fab.side{left:calc(50% - 240px - 16px)}}
+.fab.side .lbl{display:none}
+.fab.side .face{width:44px;height:44px}
+body:has(#cfsheet:not([hidden])) .fab,body:has(#sheet:not([hidden])) .fab.side{display:none}
 .homehead.brandband{background:var(--maroon-deep);padding-block:20px 18px;border-bottom:6px solid var(--maroon-hi);margin-bottom:4px}
 .brandband h1{line-height:0}
 .brandband .bblogo{height:58px;width:auto}
@@ -1608,7 +1614,8 @@ function dock(){const s=S.screen;
      active and shows the next action. (Dates step gates on nights(); guests is always valid.) */
   const resReady=!(s==="home"&&S.plan===1&&!nights());
   const resLabel=(s==="home"&&S.plan===2)?"Show available rooms":(s==="home"&&S.plan===1)?(nights()?"Next: Guests":S.checkIn?"Select check-out date":"Select dates"):"Reserve Now";
-  const appbar=`<nav class="appbar" aria-label="Quick actions"><button class="ab shen" data-shenba aria-expanded="${S.shenba}"><span class="abf"><img src="${SHENBA_IMG}" alt=""></span><span>Talk with Shenba</span></button>
+  const started=s==="home"&&S.plan>0;
+  const appbar=`<nav class="appbar${started?" solo":""}" aria-label="Quick actions">${started?"":`<button class="ab shen" data-shenba aria-expanded="${S.shenba}"><span class="abf"><img src="${SHENBA_IMG}" alt=""></span><span>Talk with Shenba</span></button>`}
     <button class="ab res" data-homeres ${resReady?"":"disabled"}><span class="abi">${ic.cal}</span><span>${resLabel}</span></button></nav>`;
   if(TABS.includes(s)||s==="done")return appbar;
   if(s==="room")return `<div class="twobtn"><button class="btn" data-reserve>Reserve Now ${ic.arrow}</button><button class="btn out" data-view>View Room</button></div>`;
@@ -1665,7 +1672,21 @@ function shenbaMsg(){const bits=[];
   if(S.checkIn&&S.checkOut)bits.push(`Dates: ${fmt(S.checkIn)} – ${fmt(S.checkOut)}`);
   bits.push(`Guests: ${S.adults} adult${S.adults>1?"s":""}${S.teens?", "+S.teens+" teen":""}${S.kids?", "+S.kids+" child":""}`);
   return `Vanakkam Shenba! I'm looking at Kutralam Ezhilagam.\n${bits.join("\n")}`}
-function renderShenba(){const onBar=TABS.includes(S.screen)||S.screen==="done";$("#fab").hidden=onBar||S.screen==="pay";document.querySelectorAll("[data-shenba].ab").forEach(b=>b.setAttribute("aria-expanded",S.shenba));$("#sheet").classList.toggle("fromBar",onBar);$("#fab").setAttribute("aria-expanded",S.shenba);$("#sheet").hidden=!S.shenba;
+/* v11.8: during a reservation Shenba floats at the left middle as a small face, and slides up or down to the
+   nearest spot where she covers no button, date or field (checked live on render, scroll and resize). */
+let fabRaf=0;
+function placeFab(){const f=$("#fab");if(!f||f.hidden||!f.classList.contains("side")){if(f)f.style.top="";return}
+  const H=innerHeight,dock=$("#dock")?$("#dock").offsetHeight:0,sz=46,lo=90,hi=H-dock-sz-12,mid=Math.round((H-dock)/2-sz/2);
+  const fr=f.querySelector(".face").getBoundingClientRect(),xs=[Math.max(1,fr.left+2),fr.left+fr.width/2,fr.right+4];
+  const busy=y=>{for(const yy of [y+4,y+sz/2,y+sz-4])for(const x of xs){const els=document.elementsFromPoint(x,yy);
+      for(const e of els){if(e===f||f.contains(e))continue;if(e.closest('button,a,input,select,textarea,label,[role=button],[data-day],.rangechips,.times')||getComputedStyle(e).cursor==="pointer")return true;if(e.closest('.app'))break}}return false};
+  f.style.visibility="hidden";let best=mid;
+  for(let d=0;d<=H;d+=8){const up=mid-d,dn=mid+d;if(up>=lo&&!busy(up)){best=up;break}if(dn<=hi&&!busy(dn)){best=dn;break}if(up<lo&&dn>hi)break}
+  f.style.top=Math.max(lo,Math.min(hi,best))+"px";f.style.visibility=""}
+const fabQ=()=>{cancelAnimationFrame(fabRaf);fabRaf=requestAnimationFrame(placeFab)};
+addEventListener("scroll",fabQ,{passive:true});addEventListener("resize",fabQ);
+function inReservation(){return (S.screen==="home"&&S.plan>0)||["rooms","room","pay"].includes(S.screen)}
+function renderShenba(){const onBar=(TABS.includes(S.screen)&&!inReservation())||S.screen==="done";$("#fab").hidden=onBar;$("#fab").classList.toggle("side",inReservation());placeFab();setTimeout(fabQ,450);setTimeout(fabQ,1100);document.querySelectorAll("[data-shenba].ab").forEach(b=>b.setAttribute("aria-expanded",S.shenba));$("#sheet").classList.toggle("fromBar",onBar);$("#fab").setAttribute("aria-expanded",S.shenba);$("#sheet").hidden=!S.shenba;
   $("#waShenba").href=`https://wa.me/${SHENBA_WA}?text=${encodeURIComponent(shenbaMsg())}`}
 const SCROLLS={};
 const RM=matchMedia("(prefers-reduced-motion: reduce)");
