@@ -7,6 +7,13 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v12.1 — 29 Oct 2026
+
+**WhatsApp room cards** (Rakesh): every room now has a card picture for WhatsApp (`img/cards/<room>.jpg`, made by
+`tools/make-room-cards.py`): the room photo with a navy band, room name, one line and a gold RESERVE NOW button printed
+on it. Under each picture the message carries the tappable link **book?room=<room>**: the booking page opens with that
+room chosen as soon as the guest picks dates (or a short "booked on these dates" note and the free rooms).
+
 ## v9.3 — 28 Oct 2026
 
 **Computer opening** (Rakesh): a tad faster (logo at 1.4x, shorter hold, quicker glide) and "Enter with sound" now plays the morning forest sound (birds, insects, distant waterfall) instead of the breeze and chimes.

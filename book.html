@@ -1353,6 +1353,10 @@ const S = {
   try {
     var q = new URLSearchParams(location.search), ok = function (x) { return /^\d{4}-\d{2}-\d{2}$/.test(x || ""); };
     var ci = q.get("ci"), co = q.get("co");
+    /* v12.1 (Rakesh, 29 Oct): "Reserve now" on a room card sent on WhatsApp opens book?room=mavval - the guest picks dates
+       as usual and that room is chosen for them if it is free (else the free rooms show with a short note). */
+    var want = String(q.get("room") || "").toLowerCase();
+    ROOMS.forEach(function (r) { if (r.name.toLowerCase() === want) S.want = r.name; });
     if (ok(ci) && ok(co) && ci >= S.checkIn && co > ci) {
       S.checkIn = ci; S.checkOut = co;
       var ad = parseInt(q.get("ad"), 10), ch = parseInt(q.get("ch"), 10);
@@ -1616,6 +1620,13 @@ function drawRooms(list) {
   if (!S.busy) return;
   const nights = Math.max(1, nightsBetween(S.checkIn, S.checkOut));
   const free = freeRooms();
+  if (S.want && !S.modal && !S.wantTried) {   /* v12.1: room asked for from a WhatsApp card */
+    S.wantTried = true;
+    const w = free.find((r) => r.name === S.want);
+    if (w) { if (!S.pick.includes(w.name)) S.pick = S.pick.concat(w.name); S.wantNote = ""; setTimeout(render, 0); }
+    else S.wantNote = S.want + " is booked on these dates. These rooms are free:";
+  }
+  if (S.wantNote) list.appendChild($(`<p class="note" style="margin:0 0 10px;font-weight:600">${esc(S.wantNote)}</p>`));
   if (!free.length) {
     list.appendChild($(`<div class="card empty">
       <b>Nothing free for those nights</b>
@@ -1832,11 +1843,11 @@ function openModal() {
       S.checkOut = addDays(S.checkIn, 1);
       const co = panel.querySelector("#m-co");
       co.value = S.checkOut; co.min = addDays(S.checkIn, 1);
-      S.pick = []; nightsLine();
+      S.pick = []; S.wantTried = false; S.wantNote = ""; nightsLine();
     };
     panel.querySelector("#m-co").onchange = (e) => {
       S.checkOut = e.target.value <= S.checkIn ? addDays(S.checkIn, 1) : e.target.value;
-      e.target.value = S.checkOut; S.pick = []; nightsLine();
+      e.target.value = S.checkOut; S.pick = []; S.wantTried = false; S.wantNote = ""; nightsLine();
     };
     nightsLine();
 
@@ -1870,7 +1881,7 @@ function openModal() {
       const lo = k === "adults" ? 1 : 0;
       S[k] = Math.max(lo, Math.min(k === "adults" ? 40 : 20, Number(S[k]) + Number(d)));
       panel.querySelector("#n-" + k).textContent = S[k];
-      S.pick = []; capLine();
+      S.pick = []; S.wantTried = false; S.wantNote = ""; capLine();
     });
     capLine();
 
