@@ -1162,25 +1162,25 @@ const slideHTML=(r,i)=>`<article class="slide${i===S.slide?" on":""}" aria-hidde
   <div class="sph"><img src="${r.ph}" alt="${esc(r.name)} room" ${i>1?'loading="lazy"':""}><span class="badge ${r.cat==="suite"?"lux":""}">${r.cat==="suite"?"Luxury":"Budget"}</span></div>
   <div class="stext"><div class="srow"><h4>${r.name}</h4><div class="sprice num">${inr(r.rate)}<small>/night</small></div></div>
     <p>${esc(r.blurb)}</p><div class="sfeat">${feats(r).map(f=>`<span>${f}</span>`).join("")}</div>
-    <div class="sact"><button class="det" data-room="${r.id}">View room ${sm(ic.right)}</button><button class="btn mini" data-plan="1" data-want="${r.name}">Reserve Now</button></div></div></article>`;
+    <div class="sact"><button class="det" data-room="${r.id}">View room ${sm(ic.right)}</button>${S.plan?"":`<button class="btn mini" data-plan="1" data-want="${r.name}">Reserve Now</button>`}</div></div></article>`;
+function findRooms(){dropBusy();S.showSmall=false;if(S.want){const w=byName(S.want);if(w&&!busyOn(w)&&!S.pick.includes(w.name)&&capOf(picked())<pax())S.pick.push(w.name);S.want=null}go("rooms")}
 function planHTML(){const st=S.plan,ready=nights()>0,free=ready?freeRooms():[];
   const dLabel=ready?`${fmt(S.checkIn)} – ${fmt(S.checkOut)} · ${nights()}N`:"Set your dates";
   const gLabel=`${pax()} guest${pax()>1?"s":""}`;
   if(!st)return `<div class="plan" id="plan"><h2>Plan your stay<br>in Courtallam</h2>
     <div class="pfields"><button class="pf" data-plan="1">${sm(ic.cal)}<span><small>Check-in – out</small>${dLabel}</span></button><button class="pf" data-plan="2">${sm(ic.user)}<span><small>Guests</small>${gLabel}</span></button></div>
-    <button class="btn pill" data-plan="1">Reserve Now ${ic.arrow}</button></div>`;
+    </div>`;
   const steps=`<div class="steps"><button class="stp ${st===1?"on":"done"}" data-plan="1"><i>1</i>Dates</button><span class="sline ${st===2?"on":""}"></span><button class="stp ${st===2?"on":""}" data-plan="2" ${ready?"":"disabled"}><i>2</i>Guests</button><button class="pclose" data-plan="0" aria-label="Close">${ic.close}</button></div>`;
-  const planRe=`<div class="planre"><span>${ic.check} Best price, booked direct</span><span>${ic.check} Free to change before you pay</span><span>${ic.check} Pay-at-desk option</span></div>`;
+  const planRe=`<div class="planre"><span>${ic.check} Best price, booked direct</span><span>${ic.check} Free to change before you pay</span><span>${ic.check} Pay 60% now, rest before check-in</span></div>`;
   const planFrom=`<p class="planfrom">Rooms from ${inr(Math.min(...ROOMS.map(r=>r.rate)))} / night · taxes included</p>`;
   if(st===1)return `<div class="plan open" id="plan">${steps}<div class="pbody step-in">
     <p class="pq">When are you coming?</p>${planFrom}${calendarHTML()}
     <div class="times mini"><div class="t">${ic.clock}Check-in<b>12:00 PM</b></div><div class="arr">${ic.arrow}</div><div class="t">${ic.clock}Check-out<b>10:00 AM</b></div></div>
-    <button class="btn pill" data-plan="2" ${ready?"":"disabled"}>${ready?`Next: Guests ${ic.arrow}`:"Tap check-in, then check-out"}</button>${planRe}</div></div>`;
+    ${planRe}</div></div>`;
   return `<div class="plan open" id="plan">${steps}<div class="pbody step-in">
     <button class="datechip num" data-plan="1">${sm(ic.cal)} ${fmtD(S.checkIn)} → ${fmtD(S.checkOut)} · ${nights()} night${nights()>1?"s":""} <u>Change</u></button>
     <p class="pq">How many guests?</p>
     <div class="glist flat">${counter("adults","Adult","13+ years",1,ic.users)}${counter("kids","Children","5–12 years",0,ic.kid)}</div>
-    <button class="btn pill" data-find>Show available rooms ${ic.arrow}</button>
     <p class="hint" style="text-align:center">${beyond()?"Shenba confirms rooms for dates this far ahead.":!BUSY?(AVAIL_ERR?"Could not check rooms just now":"Checking which rooms are free…"):(free.length<=3?`<b class="lowleft">${ic.clock} Only ${free.length} room${free.length>1?"s":""} left on your dates</b>`:`${free.length} of 9 rooms free on your dates`)}</p>${planRe}</div></div>`}
 V.home=()=>{const prop=[HERO],order=slideOrder();return `
   <header class="homehead brandband gut"><div><h1><img class="bblogo" src="img/logo-gold.webp" width="490" height="174" alt="Kutralam Ezhilagam"></h1><p class="lead2">${sm(ic.pin)} Vairams Nagar, Courtallam</p></div>${ACCOUNT?`<button class="wb" data-tab="bookings">${avatar(ACCOUNT,34)}<span>Welcome back,<b>${esc(ACCOUNT.given||firstName(ACCOUNT.name))}</b></span></button>`:""}</header>
@@ -1381,6 +1381,10 @@ const guestLine=()=>`${S.adults} adult${S.adults>1?"s":""}${S.teens?`, ${S.teens
 const cleanPhone=v=>{v=String(v||"").replace(/\D/g,"");return v.length>10?v.slice(-10):v};
 const phoneDigits=()=>cleanPhone(S.phone);
 const phoneOk=()=>/^[6-9]\d{9}$/.test(phoneDigits());
+/* v11.7: the Review & pay button only opens the Confirm & pay sheet, where name, WhatsApp and Google
+   sign-in are taken - so it is not greyed for those; only for a missing room or dates. */
+const PAY_NEXT="Next: your name and WhatsApp number, then Razorpay";
+function payStepWhy(){return(!picked().length||!nights())?"Pick your dates and room":""}
 function readyToPay(){if(!picked().length||!nights())return"Pick your dates and room";
   if(!ACCOUNT&&!GSI_FAILED&&!S.noGoogle)return"Sign in with Google to continue";
   if(String(S.name||"").trim().length<3)return"Add the name the room is under";
@@ -1574,7 +1578,7 @@ async function finishPayment(resp,ctx){setBusy("Confirming your booking…");
     payRef:"…"+String(resp.razorpay_payment_id||"").slice(-6),paidOn:new Date().toLocaleString("en-IN",{day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"}),
     name:S.name.trim(),given:ACCOUNT?ACCOUNT.given:firstName(S.name),email:ACCOUNT?ACCOUNT.email:"",phone:digits,emailed:!!v.emailed};
   saveReceipt(rec);S.lastReceipt=rec;S.paying="";S.orderAmt=0;S.ref=null;S.pick=[];closeConfirm();go("done")}
-function payProblem(msg,resp){S.problem={msg,pay:resp&&resp.razorpay_payment_id};render();window.scrollTo({top:0,behavior:"smooth"})}
+function payProblem(msg,resp){S.problem={msg,pay:resp&&resp.razorpay_payment_id};closeConfirm();render();toast(msg);window.scrollTo({top:0,behavior:"smooth"})}  /* v11.7: close the Confirm & pay sheet so the "don't pay again" note is seen, not hidden behind a live Pay button */
 
 /* ---------- Sign-in sheet (between "Review & pay" on the rooms list and the pay page) ---------- */
 function openSignin(next){if(ACCOUNT||GSI_FAILED||S.noGoogle){if(next)go(next);return}S.signin=true;S.afterSignin=next||null;renderSignin();
@@ -1603,7 +1607,7 @@ function dock(){const s=S.screen;
      greyed with a "what to do" prompt until the current step's selection is made, then it turns
      active and shows the next action. (Dates step gates on nights(); guests is always valid.) */
   const resReady=!(s==="home"&&S.plan===1&&!nights());
-  const resLabel=(s==="home"&&S.plan===2)?"Show rooms":(s==="home"&&S.plan===1)?(nights()?"Next: Guests":"Pick your dates"):"Reserve Now";
+  const resLabel=(s==="home"&&S.plan===2)?"Show available rooms":(s==="home"&&S.plan===1)?(nights()?"Next: Guests":S.checkIn?"Select check-out date":"Select dates"):"Reserve Now";
   const appbar=`<nav class="appbar" aria-label="Quick actions"><button class="ab shen" data-shenba aria-expanded="${S.shenba}"><span class="abf"><img src="${SHENBA_IMG}" alt=""></span><span>Talk with Shenba</span></button>
     <button class="ab res" data-homeres ${resReady?"":"disabled"}><span class="abi">${ic.cal}</span><span>${resLabel}</span></button></nav>`;
   if(TABS.includes(s)||s==="done")return appbar;
@@ -1611,7 +1615,9 @@ function dock(){const s=S.screen;
   if(s==="rooms"){const set=picked(),cap=capOf(set),p=pax(),ok=set.length&&cap>=p,q=quote(set),w=Math.min(100,Math.round(cap/p*100));
     return `<div class="paybar"><div class="n num"><b class="small">${set.length?set.length+" room"+(set.length>1?"s":""):"No room yet"}</b><small>Sleeps ${cap} of ${p}</small><div class="capbar"><i class="${ok?"ok":""}" style="width:${w}%"></i></div></div>
       <button class="btn" data-goto-pay ${ok?"":"disabled"}>${ok?"Review & pay":set.length?"Add a room":"Select a room"}<small class="num">${ok?inr(q.total):set.length?`for ${p-cap} more`:"to continue"}</small></button></div>`}
-  if(s==="pay"){const why=readyToPay();return `${S.problem?`<p class="probl">${esc(S.problem.msg)}</p>`:""}<button class="btn pill paycta${why?" soft":""}" id="payBtn" data-confirm>${S.paying?`<span class="spin light"></span> ${S.paying}`:payLabel()}</button><p class="under">${why?esc(why):"You'll see the amount again on Razorpay before you pay"}</p>`}
+  if(s==="pay"&&S.problem&&S.problem.pay){const wa=`https://wa.me/${SHENBA_WA}?text=${encodeURIComponent(`Vanakkam! I paid on the website but the booking did not confirm. Razorpay payment ${S.problem.pay}, ref ${S.ref||""}.`)}`;
+    return `<p class="probl">${esc(S.problem.msg)}</p><a class="btn pill paycta" href="${wa}" target="_blank" rel="noopener">Message us about this payment</a><p class="under num">Payment ${esc(S.problem.pay)} · desk ${DESK}</p>`}
+  if(s==="pay"){const why=payStepWhy();return `${S.problem?`<p class="probl">${esc(S.problem.msg)}</p>`:""}<button class="btn pill paycta${why?" soft":""}" id="payBtn" data-confirm>${S.paying?`<span class="spin light"></span> ${S.paying}`:payLabel()}</button><p class="under">${why?esc(why):PAY_NEXT}</p>`}
   return ""}
 
 function render(){
@@ -1639,7 +1645,7 @@ function primaryCtaInfo(){const s=S.screen;
   if(s==="pay"){return{label:`Review & pay · ${inr(terms(quote()).now)}`,enabled:true,sel:"#dockin #payBtn"};}
   if(s==="home"){
     if(S.plan===2)return{label:"Show available rooms",enabled:!!nights(),sel:"#dockin [data-homeres]"};
-    if(S.plan===1)return{label:nights()?"Next: Guests":"Pick your dates to continue",enabled:!!nights(),sel:"#dockin [data-homeres]"};
+    if(S.plan===1)return{label:nights()?"Next: Guests":S.checkIn?"Select check-out date":"Select dates",enabled:!!nights(),sel:"#dockin [data-homeres]"};
     return{label:"Reserve now",enabled:true,sel:"#dockin [data-homeres]"};}
   return{label:"Reserve now",enabled:true,sel:"#dockin [data-homeres]"};}
 function emitCta(){if(!IS_EMBED)return;try{const i=primaryCtaInfo();const wide=["rooms","room","pay","done"].includes(S.screen);
@@ -1653,7 +1659,7 @@ function setBar(hidden){if(!IS_EMBED)return;try{parent.postMessage({ke:"bar",hid
 addEventListener("message",function(e){const d=e&&e.data;if(!d)return;
   if(d.ke==="sync"){emitCta();return;}
   if(d.ke==="primary"){const i=primaryCtaInfo();if(!i||i.enabled===false)return;const b=document.querySelector(i.sel);if(b)b.click();}});
-function refreshPayCta(){payPrewarm();const b=$("#payBtn"),u=document.querySelector(".under");if(!b||S.paying)return;const why=readyToPay();b.classList.toggle("soft",!!why);if(u)u.textContent=why||"You'll see the amount again on Razorpay before you pay";emitCta()}
+function refreshPayCta(){payPrewarm();const b=$("#payBtn"),u=document.querySelector(".under");if(!b||S.paying)return;const why=payStepWhy();b.classList.toggle("soft",!!why);if(u)u.textContent=why||PAY_NEXT;emitCta()}
 function shenbaMsg(){const bits=[];
   if(S.pick.length&&["rooms","pay"].includes(S.screen))bits.push(`Rooms: ${S.pick.join(" + ")}`);else if(S.screen==="room")bits.push(`Room: ${room().name}`);
   if(S.checkIn&&S.checkOut)bits.push(`Dates: ${fmt(S.checkIn)} – ${fmt(S.checkOut)}`);
@@ -1702,8 +1708,8 @@ document.addEventListener("click",e=>{
     if(n)requestAnimationFrame(()=>$("#plan")?.scrollIntoView({behavior:"smooth",block:"start"}));return}
   if(d.homeres!==undefined){if(S.screen!=="home"){S.screen="home";S.tab="home";HIST.length=0;S.plan=0}const go2=n=>{S.plan=n;S.anim=n===1?"enter":"";render();requestAnimationFrame(()=>$("#plan")?.scrollIntoView({behavior:"smooth",block:"start"}))};
     if(!S.plan)return go2(1);if(S.plan===1){if(nights())return go2(2);toast("Tap check-in, then check-out");return go2(1)}
-    $("[data-find]")?.click();return}
-  if(d.find!==undefined){dropBusy();S.showSmall=false;if(S.want){const w=byName(S.want);if(w&&!busyOn(w)&&!S.pick.includes(w.name)&&capOf(picked())<pax())S.pick.push(w.name);S.want=null}go("rooms");return}
+    findRooms();return}
+  if(d.find!==undefined){findRooms();return}
   if(d.gal){const g=t.closest(".gw").querySelector(".gal");g.scrollBy({left:g.clientWidth*(+d.gal),behavior:"smooth"});return}
   if(d.pick){const fromSheet=d.rspick!==undefined;const i=S.pick.indexOf(d.pick),add=i<0;add?S.pick.push(d.pick):S.pick.splice(i,1);
     if(fromSheet)closeRoomSheet();render();toast(add?"Room added to your stay":"Room removed");
@@ -1735,7 +1741,7 @@ document.addEventListener("click",e=>{
   if(d.zoom){S.pi=+d.zoom;render();window.scrollTo({top:0,behavior:"smooth"});return}
   if(d.shenba!==undefined){S.shenba=!S.shenba;renderShenba();return}
   if(d.copy){navigator.clipboard?.writeText(d.copy).then(()=>toast("Number copied"),()=>toast(d.copy));return}
-  if(d.confirm!==undefined){if(S.paying)return;openConfirm();return}
+  if(d.confirm!==undefined){if(S.paying||(S.problem&&S.problem.pay))return;openConfirm();return}
   if(d.cfclose!==undefined){closeConfirm();return}
   if(d.payrz!==undefined){startPayment();return}
 });
