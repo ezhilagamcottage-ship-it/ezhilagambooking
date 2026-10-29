@@ -785,6 +785,19 @@ html[data-nav=done]::view-transition-new(root){animation:vtRiseIn .6s var(--ease
 .wb{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:999px;padding:4px 12px 4px 4px;box-shadow:var(--shadow-sm);font-size:11px;color:var(--muted);text-align:left;line-height:1.2}
 .wb b{display:block;font-size:13px;color:var(--ink)}
 .homehead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+/* v11.5 brand band: gold logo on a full-width navy header with a thick gold bar */
+.homehead.brandband{background:var(--maroon-deep);padding-block:20px 18px;border-bottom:6px solid var(--maroon-hi);margin-bottom:4px}
+.brandband h1{line-height:0}
+.brandband .bblogo{height:58px;width:auto}
+.brandband .lead2{color:var(--gold-lt);margin:10px 0 0;font-size:12.5px;letter-spacing:.01em}
+.brandband .lead2 svg{color:var(--gold-lt)}
+.brandband .wb{background:rgba(255,255,255,.08);box-shadow:none;color:rgba(255,255,255,.72)}
+.brandband .wb b{color:#fff}
+body:has(.brandband){margin:0}
+.brandband .lead2{white-space:nowrap}
+.brandband .wb{flex:0 1 auto;min-width:0;max-width:52%}
+.brandband .wb span{min-width:0;overflow:hidden}
+.brandband .wb b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sisheet{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center}
 .sibg{position:absolute;inset:0;background:rgba(35,23,24,.45);animation:fadein .25s ease both}
 .sibox{position:relative;width:100%;max-width:480px;background:var(--white);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:22px max(20px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;animation:sheetup .35s cubic-bezier(.2,.8,.2,1) both}
@@ -1168,8 +1181,8 @@ function planHTML(){const st=S.plan,ready=nights()>0,free=ready?freeRooms():[];
     <button class="btn pill" data-find>Show available rooms ${ic.arrow}</button>
     <p class="hint" style="text-align:center">${beyond()?"Shenba confirms rooms for dates this far ahead.":!BUSY?(AVAIL_ERR?"Could not check rooms just now":"Checking which rooms are free…"):(free.length<=3?`<b class="lowleft">${ic.clock} Only ${free.length} room${free.length>1?"s":""} left on your dates</b>`:`${free.length} of 9 rooms free on your dates`)}</p>${planRe}</div></div>`}
 V.home=()=>{const prop=[HERO],order=slideOrder();return `
+  <header class="homehead brandband gut"><div><h1><img class="bblogo" src="img/logo-gold.webp" width="490" height="174" alt="Kutralam Ezhilagam"></h1><p class="lead2">${sm(ic.pin)} Vairams Nagar, Courtallam</p></div>${ACCOUNT?`<button class="wb" data-tab="bookings">${avatar(ACCOUNT,34)}<span>Welcome back,<b>${esc(ACCOUNT.given||firstName(ACCOUNT.name))}</b></span></button>`:""}</header>
   ${topTabs()}
-  <header class="homehead gut"><div><p class="lead2">${sm(ic.pin)} Vairams Nagar, Courtallam</p><h1>Kutralam Ezhilagam</h1></div>${ACCOUNT?`<button class="wb" data-tab="bookings">${avatar(ACCOUNT,34)}<span>Welcome back,<b>${esc(ACCOUNT.given||firstName(ACCOUNT.name))}</b></span></button>`:""}</header>
   <div class="gut stack">
     <section class="hero2"><img src="${prop[0]}" alt="Kutralam Ezhilagam building, Courtallam"><div class="hshade"></div>
       <div class="htext"><p>Live with Nature</p><h2>A comfortable stay, a short walk from Main Falls</h2></div></section>
