@@ -28,6 +28,47 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
+
+/* v12.2 resume wizard (Rakesh, 30 Oct 2026): an expired Shenba hold or a payment reminder opens /lite?resume=1&... */
+.rz{position:fixed;inset:0;z-index:60;background:rgba(10,24,48,.62);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.rz-in{width:min(480px,100%);max-height:92vh;overflow:auto;background:var(--bg);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:0 0 calc(18px + env(safe-area-inset-bottom,0px));box-shadow:var(--shadow);animation:rzUp .38s var(--ease-expo,ease) both}
+@keyframes rzUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.rz-hd{background:var(--maroon-deep);color:var(--white);padding:18px 18px 16px;border-radius:var(--r-xl) var(--r-xl) 0 0;position:relative}
+.rz-hd small{display:block;font:600 11px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-lt)}
+.rz-hd h3{margin:4px 0 0;font:400 24px/1.15 var(--serif);color:var(--white)}
+.rz-x{position:absolute;right:12px;top:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);color:var(--white);display:flex;align-items:center;justify-content:center}
+.rz-x .i{width:18px;height:18px}
+.rz-st{display:flex;align-items:center;margin:16px 18px 6px}
+.rz-st>div{display:flex;flex-direction:column;align-items:center;gap:4px;width:70px;flex:none;font:600 11px var(--sans);color:var(--muted)}
+.rz-st i{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 12px var(--sans);font-style:normal;background:var(--white);border:1.5px solid var(--line);color:var(--muted)}
+.rz-st .now i{border-color:var(--maroon-hi);color:var(--maroon);box-shadow:0 0 0 4px var(--maroon-soft)}
+.rz-st .done i{background:var(--maroon);border-color:var(--maroon);color:var(--white)}
+.rz-st .now,.rz-st .done{color:var(--ink)}
+.rz-st b{flex:1;height:2px;background:var(--line);margin:0 -12px 18px}
+.rz-st b.done{background:var(--maroon)}
+.rz-bd{padding:6px 18px 0;display:flex;flex-direction:column;gap:12px}
+.rz-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px;display:flex;gap:12px;align-items:center}
+.rz-card img{width:78px;height:78px;border-radius:var(--r-sm);object-fit:cover;flex:none;background:#e9e2d4}
+.rz-card h4{margin:0;font:400 20px/1.1 var(--serif);color:var(--ink)}
+.rz-card p{margin:3px 0 0;font:400 13px/1.4 var(--sans);color:var(--muted)}
+.rz-card .amt{margin-left:auto;text-align:right;font:600 15px var(--sans);color:var(--ink);white-space:nowrap}
+.rz-card .amt small{display:block;font:400 11px var(--sans);color:var(--muted)}
+.rz-msg{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r-md);font:400 14px/1.45 var(--sans);color:var(--ink)}
+.rz-msg b{display:block;font-weight:600}
+.rz-msg.ok{background:#e6f4ec;border:1px solid #b7dfc6}.rz-msg.bad{background:#fdf0ec;border:1px solid #f1cfc4}.rz-msg.wait{background:var(--maroon-soft);border:1px solid var(--maroon-line)}
+.rz-msg .i{width:20px;height:20px;flex:none;margin-top:1px}
+.rz-spin{width:20px;height:20px;flex:none;border:2.5px solid var(--maroon-line);border-top-color:var(--maroon);border-radius:50%;animation:rzR .9s linear infinite}
+@keyframes rzR{to{transform:rotate(360deg)}}
+.rz-sh{display:flex;gap:10px;align-items:center;font:600 14px var(--sans);color:var(--ink)}
+.rz-sh img{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid var(--maroon-hi)}
+.rz-opt{width:100%;text-align:left;cursor:pointer;font:inherit}
+.rz-opt:active{transform:scale(.99)}
+.rz-opt .tag{display:inline-block;margin-top:5px;padding:2px 8px;border-radius:999px;background:var(--maroon-soft);color:var(--maroon);font:600 11px var(--sans)}
+.rz-bt{display:flex;flex-direction:column;gap:10px;margin-top:2px}
+.rz-bt .btn{width:100%}
+.rz-bt .btn.lt{background:var(--white);color:var(--maroon);border:1.5px solid var(--maroon-line);box-shadow:none}
+.rz-bt .btn .i{width:20px;height:20px}
+.rz-note{margin:0;font:400 12px/1.45 var(--sans);color:var(--muted);text-align:center}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font:400 14px/1.5 var(--sans);-webkit-tap-highlight-color:transparent}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--maroon)}
@@ -1772,18 +1813,89 @@ document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.tar
 $("#sheet").querySelector("[aria-label=Close]").innerHTML=ic.close;
 $("#sheet a.p").insertAdjacentHTML("afterbegin",ic.mic);$("#waShenba").insertAdjacentHTML("afterbegin",ic.chat);
 $("#shenImg").src=SHENBA_IMG;$("#shenImg2").src=SHENBA_IMG;
+/* v12.2 resume wizard (Rakesh, 30 Oct 2026): "when a payment link shared by Shenba or a reminder link has expired, it
+   should resume - only after checking the same room is still free for the same dates; if not, Shenba suggests the next
+   room that fits the head count, then the usual payment and voucher." Link: /lite?resume=1&room=&ci=&co=&ad=&ch=&ac=&name=&phone=&ref=&amt=
+   Built by pay.html (expired hold) and the payment reminder. Nothing is held or charged here: payment runs through the
+   normal pay screen, and Prime re-prices and re-checks the room before it confirms (webBooking). */
+const RESUME=(()=>{try{const q=new URLSearchParams(location.search);if(!q.has("resume"))return null;
+  const d=x=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(x||"");return m?new Date(+m[1],+m[2]-1,+m[3]):null};
+  const want=String(q.get("room")||"").toLowerCase(),r=ROOMS.find(x=>x.name.toLowerCase()===want)||null;
+  const n=(k,lo,hi,df)=>{const v=parseInt(q.get(k),10);return v>=lo&&v<=hi?v:df};
+  const ph=String(q.get("phone")||"").replace(/\D/g,"").slice(-10),nm=String(q.get("name")||"").trim().slice(0,60);
+  return{room:r,ci:d(q.get("ci")),co:d(q.get("co")),ad:n("ad",1,40,2),ch:n("ch",0,20,0),ac:q.get("ac")==="1",
+    name:nm.length>=2?nm:"",phone:/^[6-9]\d{9}$/.test(ph)?ph:"",ref:String(q.get("ref")||"").replace(/[^\w-]/g,"").slice(0,20),
+    amt:n("amt",1,10000000,0)}}catch(e){return null}})();
+const RZ={stage:"check",opts:[]};
+function rzWa(extra){const R=RESUME,r=R.room;const t=`Vanakkam Shenba! I want to resume my booking${R.ref?` (ref ${R.ref})`:""}: ${r?r.name:"a room"}, ${R.ci?fmtL(R.ci):""}${R.co?" to "+fmtL(R.co):""}, ${guestLine()}.${extra?" "+extra:""}`;
+  return `https://wa.me/${SHENBA_WA}?text=${encodeURIComponent(t)}`}
+function rzSteps(){const st=RZ.stage,ok=st==="free"||st==="alt",pay=false;
+  const c=(done,now)=>done?"done":now?"now":"";
+  return `<div class="rz-st" aria-label="Resume steps"><div class="${c(ok,!ok)}"><i>${ok?"✓":"1"}</i>Room check</div><b class="${ok?"done":""}"></b>
+    <div class="${c(pay,ok)}"><i>2</i>Payment</div><b></b><div><i>3</i>Voucher</div></div>`}
+function rzRoomCard(set,extra){const tot=setCost(set),r=set[0];
+  return `<div class="rz-card"><img src="${r.ph}" alt="${esc(r.name)} room"><div><h4>${esc(set.map(x=>x.name).join(" + "))}</h4>
+    <p>${esc(set.length>1?setWhy(set):catName(r)+" · "+r.floor+" floor"+(acOn(r)?" · A/C":r.noAc?" · non-A/C":""))}</p>${extra||""}</div>
+    <div class="amt">${inr(tot)}<small>${nights()} night${nights()>1?"s":""}</small></div></div>`}
+function rzRender(){let el=$("#rz");if(!el){el=document.createElement("div");el.id="rz";el.className="rz";el.setAttribute("role","dialog");
+    el.setAttribute("aria-label","Resume your booking");document.body.appendChild(el)}
+  const R=RESUME,r=R.room,st=RZ.stage;
+  const stay=`${R.ci?fmtD(R.ci):"?"} → ${R.co?fmtD(R.co):"?"} · ${guestLine()}`;
+  let body="";
+  if(st==="check")body=`<div class="rz-msg wait"><span class="rz-spin" aria-hidden="true"></span><div><b>Checking ${esc(r?r.name:"your room")} for your dates…</b>Live availability, one moment.</div></div>`;
+  else if(st==="free"){const was=R.amt&&Math.abs(R.amt-setCost([r]))>=1;
+    body=`<div class="rz-msg ok">${ic.check}<div><b>Good news — ${esc(r.name)} is still free</b>${esc(stay)}</div></div>${rzRoomCard([r])}
+    ${was?`<p class="rz-note">Today's price is shown. Your earlier quote was ${inr(R.amt)}.</p>`:""}
+    <div class="rz-bt"><button class="btn pill" data-rzgo="${r.name}">${ic.lock} Continue to payment</button>
+    <a class="btn lt" href="${rzWa("")}" target="_blank" rel="noopener">${ic.chat} Ask Shenba on WhatsApp</a></div>
+    <p class="rz-note">The room is confirmed only after payment. Your voucher comes on WhatsApp right after.</p>`}
+  else if(st==="alt")body=`<div class="rz-msg bad">${ic.bed}<div><b>${esc(r?r.name:"That room")} was just taken</b>${esc(stay)}</div></div>
+    <div class="rz-sh"><img src="${SHENBA_IMG}" alt="">Shenba suggests the next rooms for ${pax()} guest${pax()>1?"s":""}:</div>
+    ${RZ.opts.map((set,i)=>`<button class="rz-opt" data-rzgo="${set.map(x=>x.name).join(",")}">${rzRoomCard(set,i===0?'<span class="tag">Closest match</span>':"")}</button>`).join("")}
+    <div class="rz-bt"><a class="btn lt" href="${rzWa(`${r?r.name:"The room"} is taken. Please suggest the next available room.`)}" target="_blank" rel="noopener">${ic.chat} Ask Shenba on WhatsApp</a></div>
+    <p class="rz-note">Tap a room to continue to payment. Prices are for your dates, taxes included.</p>`;
+  else if(st==="full")body=`<div class="rz-msg bad">${ic.bed}<div><b>Every room is booked for these dates</b>${esc(stay)}</div></div>
+    <div class="rz-bt"><a class="btn pill" href="${rzWa("All rooms show booked. Can you help with nearby dates?")}" target="_blank" rel="noopener">${ic.chat} Ask Shenba for other dates</a>
+    <button class="btn lt" data-rzdates>${ic.cal} Pick other dates</button></div>`;
+  else if(st==="past")body=`<div class="rz-msg bad">${ic.cal}<div><b>These dates have passed</b>Pick new dates and we will show the free rooms.</div></div>
+    <div class="rz-bt"><button class="btn pill" data-rzdates>${ic.cal} Pick new dates</button></div>`;
+  else body=`<div class="rz-msg bad">${ic.bolt}<div><b>We could not check the rooms just now</b>Please try again, or Shenba will check for you.</div></div>
+    <div class="rz-bt"><button class="btn pill" data-rzretry>Try again</button><a class="btn lt" href="${rzWa("")}" target="_blank" rel="noopener">${ic.chat} Ask Shenba on WhatsApp</a>
+    <a class="btn lt" href="tel:${DESK.replace(/\s/g,"")}">Call ${DESK}</a></div>`;
+  el.innerHTML=`<div class="rz-in"><div class="rz-hd"><small>${R.ref?"Booking ref "+esc(R.ref):"Your booking"}</small><h3>Resume your booking</h3>
+    <button class="rz-x" data-rzclose aria-label="Close">${ic.close}</button></div>${rzSteps()}<div class="rz-bd">${body}</div></div>`}
+function rzClose(){const el=$("#rz");if(el)el.remove();try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}}
+function rzCheck(){const R=RESUME,r=R.room;
+  if(BUSY===null||AVAIL_ERR||beyond()){RZ.stage="err";return rzRender()}
+  if(r&&!busyOn(r)){RZ.stage="free";return rzRender()}   /* the same room the guest was quoted is still free */
+  /* Shenba's pick: free rooms that sleep everyone, same kind and A/C first, then the nearest price */
+  const base=r||ROOMS[0],one=freeRooms().filter(x=>x.max>=pax()&&!(S.wantAc&&x.noAc))
+    .sort((a,b)=>(a.cat===base.cat?0:1)-(b.cat===base.cat?0:1)||Math.abs(a.rate-base.rate)-Math.abs(b.rate-base.rate)).slice(0,3).map(x=>[x]);
+  if(!one.length){const p=packages();[p.budget,p.luxury].forEach(set=>{if(set&&!one.some(o=>o.map(x=>x.name).join()===set.map(x=>x.name).join()))one.push(set)})}
+  RZ.opts=one;RZ.stage=one.length?"alt":"full";rzRender()}
+function resumeStart(avp){const R=RESUME;
+  if(R.ci&&R.co&&R.co>R.ci){S.checkIn=R.ci;S.checkOut=R.co;S.month=new Date(R.ci.getFullYear(),R.ci.getMonth(),1)}
+  S.adults=R.ad;S.teens=0;S.kids=R.ch;S.wantAc=R.ac&&!(R.room&&R.room.noAc);if(R.name)S.name=R.name;if(R.phone)S.phone=R.phone;
+  if(!R.ci||!R.co||R.co<=R.ci||R.ci<today){RZ.stage="past";return rzRender()}
+  RZ.stage="check";rzRender();Promise.resolve(avp).then(rzCheck,rzCheck)}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-rzgo],[data-rzclose],[data-rzdates],[data-rzretry]");if(!t)return;e.preventDefault();e.stopPropagation();
+  if(t.dataset.rzgo){const names=t.dataset.rzgo.split(",").filter(byName);if(names.some(n=>busyOn(byName(n)))){toast("That room was just taken");return rzCheck()}
+    S.pick=names;if(S.pick.some(n=>byName(n).noAc))S.wantAc=false;rzClose();S.tab="home";S.problem=null;openSignin("pay");return}
+  if(t.dataset.rzretry!==undefined){RZ.stage="check";rzRender();AVAIL_ERR=false;BUSY=null;loadAvail().then(rzCheck,rzCheck);return}
+  if(t.dataset.rzdates!==undefined){rzClose();S.pick=[];S.screen="home";S.tab="home";S.plan=1;S.anim="enter";render();requestAnimationFrame(()=>$("#plan")?.scrollIntoView({block:"start"}));return}
+  rzClose()},true);
 /* inside the desktop iPad: open straight on date selection, then the wizard follows */
 /* v11.2: resume — restore a still-valid saved stay (checkout today or later) so returning guests
    don't re-enter dates/guests */
 (function(){try{const sp=store.get("plan",null);if(sp&&sp.ci){const end=new Date(sp.co||sp.ci);end.setHours(23,59,59,999);if(end>=today){S.checkIn=new Date(sp.ci);S.checkOut=sp.co?new Date(sp.co):null;if(sp.a!=null)S.adults=sp.a;if(sp.t!=null)S.teens=sp.t;if(sp.k!=null)S.kids=sp.k;S.month=new Date(S.checkIn.getFullYear(),S.checkIn.getMonth(),1);}}}catch(e){}})();
 if(document.documentElement.classList.contains("embed")){S.plan=1}
-render();startCarousel();loadAvail();if(CFG.GOOGLE_CLIENT_ID){loadGsi();refreshSignin()}else GSI_FAILED=true;
+render();startCarousel();const AVP=loadAvail();if(RESUME)resumeStart(AVP);if(CFG.GOOGLE_CLIENT_ID){loadGsi();refreshSignin()}else GSI_FAILED=true;
 if(location.hash==="#bookings")go("bookings");
 /* Logo intro: once per visit, never on a deep link, skipped for reduced motion. Same rhythm as index.html:
    clip plays (3.3 s), line + caption + Duphora pill rise, then the white screen lifts away. */
 (function(){const el=$("#intro");let seen=false;try{seen=sessionStorage.getItem("liteIntro")==="1"}catch(e){}
   const reveal=()=>{document.body.classList.remove("intro-on")};
-  if(seen||location.hash||matchMedia("(prefers-reduced-motion: reduce)").matches){el.remove();reveal();return}
+  if(seen||location.hash||RESUME||matchMedia("(prefers-reduced-motion: reduce)").matches){el.remove();reveal();return}
   try{sessionStorage.setItem("liteIntro","1")}catch(e){}
   /* v9.2 (Rakesh, 28 Oct 03:39): a tad faster (logo at 1.4x, shorter hold, quicker lift) with a soft
      nature sound - a dense morning forest with birds and insects and a waterfall far away. Phones only allow sound after a touch,

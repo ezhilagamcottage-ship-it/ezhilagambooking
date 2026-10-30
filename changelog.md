@@ -7,6 +7,16 @@ and the one in the Drive filename, and they must always be the same number.
 
 ---
 
+## v12.2 — 30 Oct 2026
+
+**Resume booking** (Rakesh): an expired or cancelled Shenba payment link (`/pay`) no longer dead-ends. If the check-in is
+still ahead it shows **↻ Resume booking**, which opens `/lite?resume=1&room=&ci=&co=&ad=&ch=&ac=&name=&phone=&ref=&amt=`.
+The lite site first checks live availability for that same room and dates. Free → "Good news, still free" and straight
+to the normal Review & pay (Razorpay, voucher, everything as usual). Taken → "Shenba suggests" the next free rooms that
+sleep the same head count (same kind and A/C first, nearest price), plus Ask Shenba on WhatsApp. All booked → Shenba for
+other dates. Past dates → pick new dates. Today's price is used (Prime re-prices and re-checks before confirming); the
+earlier quote is shown if it differs. The payment reminder should use the same link format.
+
 ## v12.1 — 29 Oct 2026
 
 **WhatsApp room cards** (Rakesh): every room now has a card picture for WhatsApp (`img/cards/<room>.jpg`, made by

@@ -121,6 +121,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--brand);outline-offs
 .pay:active{background:var(--brand-dk);transform:translateY(1px)}
 .pay[disabled]{opacity:.7;cursor:wait}
 .pay svg{width:17px;height:17px}
+a.pay{text-decoration:none;color:#fff}
 
 .foot{text-align:center;color:var(--mute);font-size:12px;margin-top:20px;line-height:1.7}
 .foot a{color:var(--ink);font-weight:600;text-decoration:none}
@@ -283,7 +284,25 @@ function status(d) {
   if (s === "pending_payment") return `<div class="st hold"><div class="ic">⏳</div><div style="flex:1"><b>Room held for you</b><span>Pay within <span class="clock" id="clock">--:--</span> to confirm (until ${esc(d.hold_until)})</span><div class="tbar"><i id="tbar" style="width:100%"></i></div></div></div>`;
   if (s === "needs_review") return `<div class="st wait"><div class="ic">✓</div><div><b>Payment received</b><span>Our team will call you shortly to complete your booking</span></div></div>`;
   if (s === "quoted") return `<div class="st wait"><div class="ic">₹</div><div><b>Your tariff</b><span>Not reserved yet</span></div></div>`;
+  if (resumeUrl(d)) return `<div class="st bad"><div class="ic">!</div><div><b>${s === "cancelled" ? "Hold cancelled" : "Hold expired"}</b><span>No problem — tap Resume booking. We first check that ${esc(d.room || "the room")} is still free for your dates, then you pay.</span></div></div>`;
   return `<div class="st bad"><div class="ic">!</div><div><b>${s === "cancelled" ? "Hold cancelled" : "Hold expired"}</b><span>The room was released. Call or WhatsApp us to book again.</span></div></div>`;
+}
+
+/* v12.2 (Rakesh, 30 Oct 2026): an expired or cancelled hold whose check-in is still ahead can be resumed. The lite site
+   checks the same room for the same dates first; if it has gone, Shenba suggests the next room for the head count;
+   then the normal payment and voucher. Prime re-prices and re-checks before it confirms. */
+function resumeUrl(d) {
+  if (!d || !/expired|cancelled/.test(d.status || "")) return "";
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d.check_in || ""), m2 = /^(\d{4}-\d{2}-\d{2})/.exec(d.check_out || "");
+  if (!m || !m2) return "";
+  const t = new Date(); t.setHours(0, 0, 0, 0);
+  if (new Date(+m[1], +m[2] - 1, +m[3]) < t) return "";
+  const name = String(d.guest_name || d.guestName || "").trim(), phone = String(d.phone || d.contact || d.guest_phone || d.mobileNumber || d.whatsapp_number || "").replace(/\D/g, "").slice(-10);
+  const p = new URLSearchParams({ resume: "1", room: d.room || "", ci: m[0], co: m2[1], ad: String(Math.max(1, Number(d.adults) || 1)),
+    ch: String(Math.max(0, Number(d.children) || 0)), ac: d.ac === "AC" ? "1" : "0", ref: d.reference || "", amt: String(Math.round(Number(d.total) || 0)) });
+  if (name && !/^(—|none|website guest)$/i.test(name)) p.set("name", name);
+  if (/^[6-9]\d{9}$/.test(phone)) p.set("phone", phone);
+  return "/lite?" + p.toString();
 }
 
 function render(d) {
@@ -329,7 +348,10 @@ function render(d) {
   ${paid ? `<p class="note ok">Your reservation voucher has been sent to your WhatsApp. Please show it at check-in with an original photo ID for every adult. See you in Courtallam!</p>
   <div class="btns"><a class="ghost" href="https://maps.app.goo.gl/uMu427TCwSHLzAVEA">📍 Directions</a><a class="ghost" href="tel:+918248320685">📞 Reception</a></div>` : ""}
   ${/expired|cancelled/.test(d.status) ? `<div class="btns"><a class="ghost" href="tel:+919962222415">📞 Call us</a><a class="ghost" href="https://wa.me/916374213184">💬 WhatsApp</a></div>` : ""}`;
-  barEl.innerHTML = canPay ? `<div class="paybar"><div class="in"><div class="amt"><small>Total</small><b>${inr(d.total)}</b></div>
+  const ru = resumeUrl(d);
+  if (ru) barEl.innerHTML = `<div class="paybar"><div class="in"><div class="amt"><small>Same room, same dates</small><b>${esc(d.room || "")}</b></div>
+    <a class="pay" id="resume" href="${esc(ru)}">↻ Resume booking</a></div></div>`;
+  if (!ru) barEl.innerHTML = canPay ? `<div class="paybar"><div class="in"><div class="amt"><small>Total</small><b>${inr(d.total)}</b></div>
     <button class="pay" id="pay" type="button">${I.lock}Pay securely</button></div></div>` : "";
   const btn = document.getElementById("pay"); if (btn) btn.onclick = payNow;
   startClock();
